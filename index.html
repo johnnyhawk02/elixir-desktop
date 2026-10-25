@@ -878,9 +878,11 @@ body { padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 @keyframes m-blink { 50% { opacity: .35; } }
 @media (prefers-reduced-motion: reduce) { .m-rec.on i { animation: none; } }
 
-/* vertical faders, three to a row */
+/* vertical faders, three to a row (four on the play tab, where the randomisers take the last two places) */
 .m-faders { display: grid; gap: 14px; }
 #m-faders, #m-comp, #m-duck { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 10px; }
+#m-faders { grid-template-columns: repeat(4, 1fr); gap: 16px 6px; }
+#m-faders .m-vtrack { width: 52px; }
 .m-vf { display: grid; grid-template-rows: 2.6em auto auto; justify-items: center; gap: 6px; min-width: 0; }
 .m-vf output { font-family: var(--mono); font-size: var(--fs-xs); line-height: 1.3; color: var(--muted); text-align: center; white-space: pre-line;
   align-self: end; overflow: hidden; max-width: 100%; font-variant-numeric: tabular-nums; }
@@ -889,7 +891,7 @@ body { padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-vtrack b { position: absolute; left: 6px; right: 6px; height: 10px; bottom: calc(var(--f) * (100% - 22px) + 6px); border-radius: 5px; background: var(--panel); }
 .m-vf.held .m-vtrack b { background: var(--led); }
 .m-vf .m-flab { font-size: var(--fs-s); font-weight: 600; }
-.m-rand { display: grid; gap: 8px; align-content: center; }
+.m-rand { display: grid; gap: 8px; align-content: center; grid-column: span 2; grid-template-columns: 1fr 1fr; }
 .m-btn { min-height: 56px; border-radius: 12px; background: var(--tint) !important; font-size: var(--fs-m) !important; font-weight: 500; }
 .m-btn:active { background: var(--ink) !important; color: var(--panel) !important; }
 .m-btn:disabled { opacity: .4; }
@@ -7352,12 +7354,19 @@ const mBuildMaster = buildMaster;
 buildMaster = function () { mBuildMaster(); mPatUndo = null; mUndo(); mDrawAll(); };
 
 const pf = (k) => ({ min: PERF_RANGE[k][0], max: PERF_RANGE[k][1], get: () => perfGet(k), set: (v) => setPerf(k, v), show: () => perfText(k), dflt: PERF_RANGE[k][2] });
-// beat runs over the current style's grooves, and names the style
-// two rows: tempo, beat, energy over rush, sidechain and the randomisers
-mFader($('m-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
-// beat runs over the current style's grooves; its readout is the groove, then the style
-mFader($('m-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => `${perfText('beat').split('·')[0].trim()}\n${STYLES[styleIdx].name}` });
+// genre steps through the built-in styles (not user); a preset in the user style shows it with the slider at the bottom
+const mGenres = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
+mFader($('m-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () => Math.max(0, mGenres.indexOf(styleIdx)),
+  set: (v) => {
+    setStyle(mGenres[v]); perf.beat = Math.min(perf.beat, STYLES[styleIdx].grooves.length - 1);
+    if (view === 'steps') setTab('perform'); else generate();
+    sendSeq(); setDirty(true); drawPerf();
+  }, show: () => STYLES[styleIdx].name.replace(' ', '\n'), dflt: 0 });
+// four across, two down: genre, beat, energy, tempo over rush, sidechain and the randomisers
+// beat runs over the current style's grooves; its readout is the groove, then where it is in the list
+mFader($('m-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => perfText('beat').replace(' · ', '\n') });
 mFader($('m-faders'), 'energy', { ...pf('energy'), show: () => perfText('energy').replace(' · ', '\n') });
+mFader($('m-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
 mFader($('m-faders'), 'rush', pf('rush'));
 // the drum 1 sidechain duck: above 0 it switches the sidechain on
 const setDuck = (v) => {

@@ -77,12 +77,19 @@ const mBuildMaster = buildMaster;
 buildMaster = function () { mBuildMaster(); mPatUndo = null; mUndo(); mDrawAll(); };
 
 const pf = (k) => ({ min: PERF_RANGE[k][0], max: PERF_RANGE[k][1], get: () => perfGet(k), set: (v) => setPerf(k, v), show: () => perfText(k), dflt: PERF_RANGE[k][2] });
-// beat runs over the current style's grooves, and names the style
-// two rows: tempo, beat, energy over rush, sidechain and the randomisers
-mFader($('m-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
-// beat runs over the current style's grooves; its readout is the groove, then the style
-mFader($('m-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => `${perfText('beat').split('·')[0].trim()}\n${STYLES[styleIdx].name}` });
+// genre steps through the built-in styles (not user); a preset in the user style shows it with the slider at the bottom
+const mGenres = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
+mFader($('m-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () => Math.max(0, mGenres.indexOf(styleIdx)),
+  set: (v) => {
+    setStyle(mGenres[v]); perf.beat = Math.min(perf.beat, STYLES[styleIdx].grooves.length - 1);
+    if (view === 'steps') setTab('perform'); else generate();
+    sendSeq(); setDirty(true); drawPerf();
+  }, show: () => STYLES[styleIdx].name.replace(' ', '\n'), dflt: 0 });
+// four across, two down: genre, beat, energy, tempo over rush, sidechain and the randomisers
+// beat runs over the current style's grooves; its readout is the groove, then where it is in the list
+mFader($('m-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => perfText('beat').replace(' · ', '\n') });
 mFader($('m-faders'), 'energy', { ...pf('energy'), show: () => perfText('energy').replace(' · ', '\n') });
+mFader($('m-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
 mFader($('m-faders'), 'rush', pf('rush'));
 // the drum 1 sidechain duck: above 0 it switches the sidechain on
 const setDuck = (v) => {
