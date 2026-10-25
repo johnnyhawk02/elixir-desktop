@@ -14,23 +14,51 @@
 <main class="m" id="m">
   <header class="m-top">
     <b class="m-title">elixir</b>
-    <span class="m-preset"><button class="m-step" id="m-prev" type="button" aria-label="Previous preset">‹</button><span class="m-pname" id="m-pname">preset</span><button class="m-step" id="m-next" type="button" aria-label="Next preset">›</button></span>
+    <span class="m-pname" id="m-pname">preset</span>
   </header>
+  <nav class="m-tabs" role="tablist">
+    <button type="button" role="tab" data-m-tab="play" aria-selected="true">play</button>
+    <button type="button" role="tab" data-m-tab="comp" aria-selected="false">compressor</button>
+    <button type="button" role="tab" data-m-tab="presets" aria-selected="false">presets</button>
+  </nav>
   <section class="m-card m-trans">
     <button class="m-play" id="m-play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 4.5v15l13-7.5z"/><rect class="i-stop" x="5.5" y="5.5" width="13" height="13" rx="2"/></svg><span>play</span></button>
     <button class="m-rec" id="m-rec" type="button" aria-pressed="false" aria-label="Record"><i></i><span id="m-rec-t">rec</span></button>
-  </section>
-  <section class="m-card m-faders" id="m-faders"></section>
-  <section class="m-card m-rand">
-    <button class="m-btn m-big" id="m-everything" type="button">everything</button>
-    <button class="m-btn" id="m-kit" type="button">kit</button>
-    <button class="m-btn" id="m-alter" type="button">alter</button>
-    <button class="m-btn" id="m-undo" type="button" disabled>undo</button>
   </section>
   <section class="m-card m-take" id="m-take" hidden>
     <span class="m-take-info"><b id="m-take-name"></b><small id="m-take-sub"></small></span>
     <button class="m-btn" id="m-save" type="button">save .wav</button>
   </section>
+
+  <div class="m-panel" data-m-panel="play">
+    <section class="m-card m-faders" id="m-faders"></section>
+    <section class="m-card m-rand">
+      <button class="m-btn m-big" id="m-everything" type="button">everything</button>
+      <button class="m-btn" id="m-kit" type="button">kit + pattern</button>
+      <button class="m-btn" id="m-undo" type="button" disabled>undo sound</button>
+    </section>
+  </div>
+
+  <div class="m-panel" data-m-panel="comp" hidden>
+    <section class="m-card m-faders">
+      <div class="m-chead"><b>compressor</b><button class="m-toggle" id="m-comp-on" type="button" aria-pressed="true">on</button></div>
+      <div class="m-gr" aria-label="gain reduction"><span>reduction</span><i><b id="m-gr"></b></i><output id="m-gr-out">0 dB</output></div>
+      <div id="m-comp"></div>
+    </section>
+    <section class="m-card m-faders">
+      <div class="m-chead"><b>drum 1 sidechain</b></div>
+      <div id="m-duck"></div>
+    </section>
+  </div>
+
+  <div class="m-panel" data-m-panel="presets" hidden>
+    <section class="m-card">
+      <button class="m-btn m-big m-wide" id="m-psave" type="button">save this sound</button>
+      <p class="m-note" id="m-pnote" aria-live="polite"></p>
+      <ul class="m-plist" id="m-plist"></ul>
+    </section>
+  </div>
+
   <footer class="m-foot">Engine ported from the Erica Synths LXR-02 firmware (GPL-3.0). Unofficial. <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a></footer>
 </main>
 
