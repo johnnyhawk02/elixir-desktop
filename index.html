@@ -896,12 +896,6 @@ body { padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-big { background: var(--ink) !important; color: var(--panel) !important; font-weight: 600; font-size: 1.1rem !important; }
 .m-big:active { transform: scale(.98); }
 
-.m-take { display: flex; align-items: center; gap: 12px; }
-.m-take[hidden] { display: none; }
-.m-take-info { flex: 1; min-width: 0; display: grid; }
-.m-take-info b { font-size: var(--fs-s); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.m-take-info small { font-size: var(--fs-xs); color: var(--muted); }
-.m-take .m-btn { padding: 0 16px; min-height: 44px; flex: none; }
 
 .m-foot { font-size: var(--fs-xs); color: var(--ink); opacity: .75; text-align: center; padding: 4px 8px; line-height: 1.5; }
 .m-foot a { color: inherit; }
@@ -949,10 +943,6 @@ body { padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
   <section class="m-card m-trans">
     <button class="m-play" id="m-play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 4.5v15l13-7.5z"/><rect class="i-stop" x="5.5" y="5.5" width="13" height="13" rx="2"/></svg><span>play</span></button>
     <button class="m-rec" id="m-rec" type="button" aria-pressed="false" aria-label="Record"><i></i><span id="m-rec-t">rec</span></button>
-  </section>
-  <section class="m-card m-take" id="m-take" hidden>
-    <span class="m-take-info"><b id="m-take-name"></b><small id="m-take-sub"></small></span>
-    <button class="m-btn" id="m-save" type="button">save .wav</button>
   </section>
 
   <div class="m-panel" data-m-panel="play">
@@ -7489,7 +7479,7 @@ $('m-pexport').addEventListener('click', async () => {
 });
 
 // ---- record: free length, no count-in; starts now (and starts playback), the second press stops and saves ----
-let mTake = null, mTimer = 0;
+let mTimer = 0;
 function mRecUi() {
   const on = recState !== 'off';
   mRec.setAttribute('aria-pressed', on); mRec.classList.toggle('on', on);
@@ -7513,12 +7503,10 @@ mRec.addEventListener('click', async () => {
 const mRecEvent = recEvent;
 recEvent = function (ev) { mRecEvent(ev); if (ev.type === 'rec') mRecUi(); };
 
-// a finished take downloads straight away; it also stays on the take card to save again (or share, on a phone)
+// a finished take downloads straight away, with nothing else shown
 const mAddTake = addTake;
 addTake = function (t) {
   mAddTake(t);
-  mTake = t;
-  $('m-take').hidden = false; $('m-take-name').textContent = t.name; $('m-take-sub').textContent = `${t.len} · 44.1 kHz 16-bit`;
   mRecUi();
   mDownload(t);
 };
@@ -7536,7 +7524,6 @@ async function mOffer(t, type) {
   }
   mDownload(t);
 }
-$('m-save').addEventListener('click', () => { if (mTake) mOffer(mTake, 'audio/wav'); });
 
 mSync(); mUndo(); mName(); mCompOn(); mDrawAll();
 </script>

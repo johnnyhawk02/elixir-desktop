@@ -205,7 +205,7 @@ $('m-pexport').addEventListener('click', async () => {
 });
 
 // ---- record: free length, no count-in; starts now (and starts playback), the second press stops and saves ----
-let mTake = null, mTimer = 0;
+let mTimer = 0;
 function mRecUi() {
   const on = recState !== 'off';
   mRec.setAttribute('aria-pressed', on); mRec.classList.toggle('on', on);
@@ -229,12 +229,10 @@ mRec.addEventListener('click', async () => {
 const mRecEvent = recEvent;
 recEvent = function (ev) { mRecEvent(ev); if (ev.type === 'rec') mRecUi(); };
 
-// a finished take downloads straight away; it also stays on the take card to save again (or share, on a phone)
+// a finished take downloads straight away, with nothing else shown
 const mAddTake = addTake;
 addTake = function (t) {
   mAddTake(t);
-  mTake = t;
-  $('m-take').hidden = false; $('m-take-name').textContent = t.name; $('m-take-sub').textContent = `${t.len} · 44.1 kHz 16-bit`;
   mRecUi();
   mDownload(t);
 };
@@ -252,6 +250,5 @@ async function mOffer(t, type) {
   }
   mDownload(t);
 }
-$('m-save').addEventListener('click', () => { if (mTake) mOffer(mTake, 'audio/wav'); });
 
 mSync(); mUndo(); mName(); mCompOn(); mDrawAll();

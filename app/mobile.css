@@ -51,12 +51,6 @@ body { padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-big { background: var(--ink) !important; color: var(--panel) !important; font-weight: 600; font-size: 1.1rem !important; }
 .m-big:active { transform: scale(.98); }
 
-.m-take { display: flex; align-items: center; gap: 12px; }
-.m-take[hidden] { display: none; }
-.m-take-info { flex: 1; min-width: 0; display: grid; }
-.m-take-info b { font-size: var(--fs-s); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.m-take-info small { font-size: var(--fs-xs); color: var(--muted); }
-.m-take .m-btn { padding: 0 16px; min-height: 44px; flex: none; }
 
 .m-foot { font-size: var(--fs-xs); color: var(--ink); opacity: .75; text-align: center; padding: 4px 8px; line-height: 1.5; }
 .m-foot a { color: inherit; }
