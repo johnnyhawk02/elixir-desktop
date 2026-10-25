@@ -860,8 +860,12 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-tabs { flex: 1; max-width: 280px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--tint); border-radius: 999px; padding: 3px; }
 .m-tabs button { background: none; border-radius: 999px; min-height: 34px; font-size: var(--fs-s) !important; font-weight: 500; }
 .m-tabs button[aria-selected="true"] { background: var(--panel); }
-.m-panel { display: grid; gap: 12px; }
-.m-panel[hidden] { display: none; }
+/* the pages sit side by side and snap: swipe between them, or tap a tab. The faders' tracks take their own
+   touches (touch-action: none), so a drag on one never turns the page */
+.m-pages { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; column-gap: 16px; min-height: 0; overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
+.m-pages::-webkit-scrollbar { display: none; }
+.m-panel { display: grid; gap: 12px; align-content: start; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; scroll-snap-align: start; scroll-snap-stop: always; }
 
 .m-trans { padding: 8px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: stretch; }
 .m-play { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; border-radius: 10px; background: var(--ink) !important;
@@ -881,12 +885,10 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 /* vertical faders, three to a row (four on the play tab, where the randomisers take the last two places) */
 .m-faders { display: grid; gap: 14px; }
 #m-faders, #m-comp, #m-duck { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 10px; }
-/* the play tab fills the screen: header, tabs and transport, then three rows of faders that take the rest
-   (each track stretches to its row), then the randomisers */
-.m:has([data-m-panel="play"]:not([hidden])) { height: calc(100dvh - max(10px, env(safe-area-inset-top, 0px)) - max(20px, env(safe-area-inset-bottom, 0px)));
-  grid-template-rows: auto auto 1fr; }
-.m:has([data-m-panel="play"]:not([hidden])) .m-foot { display: none; }
-[data-m-panel="play"] { min-height: 0; grid-template-rows: 1fr; }
+/* the page is one screen high: header, tabs and transport, then the pages; on the play page three rows of
+   faders take the rest (each track stretches to its row), then the randomisers. The other pages scroll inside */
+.m { height: calc(100dvh - max(10px, env(safe-area-inset-top, 0px)) - max(20px, env(safe-area-inset-bottom, 0px))); grid-template-rows: auto auto 1fr; }
+[data-m-panel="play"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
 .m-play-card { display: grid; grid-template-rows: 1fr auto; gap: 10px; min-height: 0; padding: 10px 8px; }
 #m-faders { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 10px 6px; min-height: 0; }
 #m-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 3px; }
@@ -957,6 +959,7 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
     <button class="m-pname" id="m-pname" type="button" title="Presets">preset</button>
   </section>
 
+  <div class="m-pages" id="m-pages">
   <div class="m-panel" data-m-panel="play">
     <section class="m-card m-play-card"><div class="m-faders" id="m-faders">
       <div class="m-rand">
@@ -968,7 +971,7 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
     </div></section>
   </div>
 
-  <div class="m-panel" data-m-panel="comp" hidden>
+  <div class="m-panel" data-m-panel="comp">
     <section class="m-card m-faders">
       <div class="m-chead"><b>compressor</b><button class="m-toggle" id="m-comp-on" type="button" aria-pressed="true">on</button></div>
       <div class="m-gr" aria-label="gain reduction"><span>reduction</span><i><b id="m-gr"></b></i><output id="m-gr-out">0 dB</output></div>
@@ -980,7 +983,7 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
     </section>
   </div>
 
-  <div class="m-panel" data-m-panel="presets" hidden>
+  <div class="m-panel" data-m-panel="presets">
     <section class="m-card">
       <button class="m-btn m-big m-wide" id="m-psave" type="button">save this sound</button>
       <p class="m-note" id="m-pnote" aria-live="polite"></p>
@@ -991,9 +994,9 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
       </div>
       <p class="m-note">Import reads a presets file exported from the full Elixir (star presets there, then export favourites). Export mine writes one the full Elixir can import.</p>
     </section>
+    <footer class="m-foot">Engine ported from the Erica Synths LXR-02 firmware (GPL-3.0). Unofficial. <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a></footer>
   </div>
-
-  <footer class="m-foot">Engine ported from the Erica Synths LXR-02 firmware (GPL-3.0). Unofficial. <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a></footer>
+  </div>
 </main>
 
 <div class="wrap" aria-hidden="true">
@@ -7292,12 +7295,25 @@ drawScope();
 try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
 const mRnd = (n) => Math.floor(Math.random() * n);
 
-// ---- tabs ----
+// ---- pages: swipe between them, or tap a tab to scroll to one ----
+const mPages = $('m-pages');
+let mCur = 'play';
 function mTab(t) {
+  const el = document.querySelector(`[data-m-panel="${t}"]`);
+  mPages.scrollTo({ left: el.offsetLeft - mPages.offsetLeft, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  mShown(t);
+}
+// the tab that shows which page is in view
+function mShown(t) {
+  if (t === mCur) return;
+  mCur = t;
   document.querySelectorAll('[data-m-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.mTab === t));
-  document.querySelectorAll('[data-m-panel]').forEach((el) => { el.hidden = el.dataset.mPanel !== t; });
   if (t === 'presets') mDrawPresets();
 }
+mPages.addEventListener('scroll', () => {
+  const panels = [...mPages.querySelectorAll('[data-m-panel]')], i = Math.round(mPages.scrollLeft / (mPages.scrollWidth / panels.length));
+  mShown(panels[Math.max(0, Math.min(panels.length - 1, i))].dataset.mPanel);
+}, { passive: true });
 document.querySelectorAll('[data-m-tab]').forEach((b) => b.addEventListener('click', () => mTab(b.dataset.mTab)));
 $('m-pname').addEventListener('click', () => mTab('presets'));
 

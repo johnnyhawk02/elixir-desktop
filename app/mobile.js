@@ -5,12 +5,25 @@
 try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
 const mRnd = (n) => Math.floor(Math.random() * n);
 
-// ---- tabs ----
+// ---- pages: swipe between them, or tap a tab to scroll to one ----
+const mPages = $('m-pages');
+let mCur = 'play';
 function mTab(t) {
+  const el = document.querySelector(`[data-m-panel="${t}"]`);
+  mPages.scrollTo({ left: el.offsetLeft - mPages.offsetLeft, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  mShown(t);
+}
+// the tab that shows which page is in view
+function mShown(t) {
+  if (t === mCur) return;
+  mCur = t;
   document.querySelectorAll('[data-m-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.mTab === t));
-  document.querySelectorAll('[data-m-panel]').forEach((el) => { el.hidden = el.dataset.mPanel !== t; });
   if (t === 'presets') mDrawPresets();
 }
+mPages.addEventListener('scroll', () => {
+  const panels = [...mPages.querySelectorAll('[data-m-panel]')], i = Math.round(mPages.scrollLeft / (mPages.scrollWidth / panels.length));
+  mShown(panels[Math.max(0, Math.min(panels.length - 1, i))].dataset.mPanel);
+}, { passive: true });
 document.querySelectorAll('[data-m-tab]').forEach((b) => b.addEventListener('click', () => mTab(b.dataset.mTab)));
 $('m-pname').addEventListener('click', () => mTab('presets'));
 

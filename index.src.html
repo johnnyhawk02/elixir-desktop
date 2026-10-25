@@ -26,6 +26,7 @@
     <button class="m-pname" id="m-pname" type="button" title="Presets">preset</button>
   </section>
 
+  <div class="m-pages" id="m-pages">
   <div class="m-panel" data-m-panel="play">
     <section class="m-card m-play-card"><div class="m-faders" id="m-faders">
       <div class="m-rand">
@@ -37,7 +38,7 @@
     </div></section>
   </div>
 
-  <div class="m-panel" data-m-panel="comp" hidden>
+  <div class="m-panel" data-m-panel="comp">
     <section class="m-card m-faders">
       <div class="m-chead"><b>compressor</b><button class="m-toggle" id="m-comp-on" type="button" aria-pressed="true">on</button></div>
       <div class="m-gr" aria-label="gain reduction"><span>reduction</span><i><b id="m-gr"></b></i><output id="m-gr-out">0 dB</output></div>
@@ -49,7 +50,7 @@
     </section>
   </div>
 
-  <div class="m-panel" data-m-panel="presets" hidden>
+  <div class="m-panel" data-m-panel="presets">
     <section class="m-card">
       <button class="m-btn m-big m-wide" id="m-psave" type="button">save this sound</button>
       <p class="m-note" id="m-pnote" aria-live="polite"></p>
@@ -60,9 +61,9 @@
       </div>
       <p class="m-note">Import reads a presets file exported from the full Elixir (star presets there, then export favourites). Export mine writes one the full Elixir can import.</p>
     </section>
+    <footer class="m-foot">Engine ported from the Erica Synths LXR-02 firmware (GPL-3.0). Unofficial. <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a></footer>
   </div>
-
-  <footer class="m-foot">Engine ported from the Erica Synths LXR-02 firmware (GPL-3.0). Unofficial. <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a></footer>
+  </div>
 </main>
 
 <div class="wrap" aria-hidden="true">
