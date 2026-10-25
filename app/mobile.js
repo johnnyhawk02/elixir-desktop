@@ -70,8 +70,11 @@ function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel =
 const mDrawAll = () => mDraws.forEach((d) => d());
 perfDraws.push(mDrawAll);
 // a preset load rebuilds the master section; the sliders follow
+// (the pattern button's undo; a preset load clears it, as it clears the desktop's)
+let mPatUndo = null;
+const mUndo = () => { $('m-undo').disabled = !mPatUndo && $('undo').disabled; };
 const mBuildMaster = buildMaster;
-buildMaster = function () { mBuildMaster(); mDrawAll(); };
+buildMaster = function () { mBuildMaster(); mPatUndo = null; mUndo(); mDrawAll(); };
 
 const pf = (k) => ({ min: PERF_RANGE[k][0], max: PERF_RANGE[k][1], get: () => perfGet(k), set: (v) => setPerf(k, v), show: () => perfText(k), dflt: PERF_RANGE[k][2] });
 // beat runs over the current style's grooves, and names the style
@@ -117,21 +120,31 @@ grVu.set = (db) => {
 };
 
 // ---- randomisers ----
-$('m-everything').addEventListener('click', () => $('new-kit').click());
-// kit + pattern: every drum voice from a random built-in kit, and the pattern rolled too
-// (style, beat, energy, fills, groove and its depth); tempo, rush, mixer and FX stay
-$('m-kit').addEventListener('click', async () => {
-  $('rand-all').click();
-  const styles = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
-  setStyle(styles[mRnd(styles.length)]);
-  perf.beat = mRnd(STYLES[styleIdx].grooves.length); perf.energy = 35 + mRnd(61); perf.fills = mRnd(101);
-  groove.type = GROOVE_TYPES[mRnd(GROOVE_TYPES.length)].name; groove.depth = 50 + mRnd(51);
+// undo takes back the last randomise: the sound for everything and kit (the desktop's undo), the pattern for pattern
+$('m-everything').addEventListener('click', () => { mPatUndo = null; $('new-kit').click(); });
+// kit: every drum voice from a random built-in kit; the pattern, mixer and FX stay
+$('m-kit').addEventListener('click', () => { mPatUndo = null; $('rand-all').click(); });
+// pattern: style, beat, energy, fills, groove and its depth rolled; the sound, tempo, rush, mixer and FX stay
+const mPatGet = () => ({ style: styleIdx, beat: perf.beat, energy: perf.energy, fills: perf.fills, type: groove.type, depth: groove.depth });
+function mPatSet(p) {
+  setStyle(p.style);
+  perf.beat = p.beat; perf.energy = p.energy; perf.fills = p.fills; groove.type = p.type; groove.depth = p.depth;
   drawUserTools();
   if (view === 'steps') setTab('perform'); else generate();
   drawGroove(); sendSeq(); setDirty(true);
+}
+$('m-pattern').addEventListener('click', async () => {
+  await startAudio();
+  const was = mPatGet();
+  const styles = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
+  const style = styles[mRnd(styles.length)];
+  mPatSet({ style, beat: mRnd(STYLES[style].grooves.length), energy: 35 + mRnd(61), fills: mRnd(101),
+    type: GROOVE_TYPES[mRnd(GROOVE_TYPES.length)].name, depth: 50 + mRnd(51) });
+  undoValues = null; $('undo').disabled = true; mPatUndo = was; mUndo();
 });
-$('m-undo').addEventListener('click', () => $('undo').click());
-const mUndo = () => { $('m-undo').disabled = $('undo').disabled; };
+$('m-undo').addEventListener('click', () => {
+  if (mPatUndo) { const p = mPatUndo; mPatUndo = null; mPatSet(p); mUndo(); } else $('undo').click();
+});
 new MutationObserver(mUndo).observe($('undo'), { attributes: true, attributeFilter: ['disabled'] });
 
 // ---- presets: save, and a list to load or delete (kept in this browser, as on the desktop) ----
