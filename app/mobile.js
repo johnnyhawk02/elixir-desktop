@@ -151,6 +151,32 @@ $('m-psave').addEventListener('click', () => {
   mName(); mDrawPresets();
 });
 
+// presets files: the full Elixir's format, { elixir: 1, presets: [...] } (PRESETS.md); only the current
+// preset version loads, and a name already saved here is skipped
+$('m-pimport').addEventListener('change', async (e) => {
+  let n = 0, old = 0, bad = 0;
+  for (const f of e.target.files) {
+    try {
+      for (const p of JSON.parse(await f.text()).presets || []) {
+        if (!isCurrent(p)) { old++; continue; }
+        if (kitList.some((k) => k.saved && k.name === p.name)) continue;
+        kitList.push(fromStored(p, { saved: true })); n++;
+      }
+    } catch (err) { bad++; }
+  }
+  e.target.value = '';
+  if (n) { const v = $('kit').value; storePresets(); fillKits(); $('kit').value = v; }
+  $('m-pnote').textContent = (n ? `Imported ${n}.` : 'Nothing new to import.') + (old ? ` ${old} skipped: another preset version.` : '') + (bad ? ` ${bad} file${bad > 1 ? 's' : ''} not a presets file.` : '');
+  mName(); mDrawPresets();
+});
+$('m-pexport').addEventListener('click', async () => {
+  const mine = kitList.filter((k) => k.saved).map(presetData);
+  if (!mine.length) { $('m-pnote').textContent = 'Save a preset first.'; return; }
+  const blob = new Blob([JSON.stringify({ elixir: 1, presets: mine }, null, 1)], { type: 'application/json' });
+  mOffer({ blob, name: 'elixir-mobile-presets.json' }, 'application/json');
+  $('m-pnote').textContent = `Exported ${mine.length}.`;
+});
+
 // ---- record: free length, no count-in; starts now (and starts playback), the second press stops and saves ----
 let mTake = null, mTimer = 0;
 function mRecUi() {
@@ -191,14 +217,14 @@ function mDownload(t) {
   document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
-$('m-save').addEventListener('click', async () => {
-  if (!mTake) return;
-  const file = new File([mTake.blob], mTake.name, { type: 'audio/wav' });
-  // phones get the share sheet (Save to Files, AirDrop, apps); elsewhere it downloads again
+// phones get the share sheet (Save to Files, AirDrop, apps); elsewhere it downloads
+async function mOffer(t, type) {
+  const file = new File([t.blob], t.name, { type });
   if (matchMedia('(pointer: coarse)').matches && navigator.canShare && navigator.canShare({ files: [file] })) {
-    try { await navigator.share({ files: [file], title: mTake.name }); return; } catch (e) { if (e.name === 'AbortError') return; }
+    try { await navigator.share({ files: [file], title: t.name }); return; } catch (e) { if (e.name === 'AbortError') return; }
   }
-  mDownload(mTake);
-});
+  mDownload(t);
+}
+$('m-save').addEventListener('click', () => { if (mTake) mOffer(mTake, 'audio/wav'); });
 
 mSync(); mUndo(); mName(); mCompOn(); mDrawAll();

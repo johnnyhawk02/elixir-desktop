@@ -56,6 +56,11 @@
       <button class="m-btn m-big m-wide" id="m-psave" type="button">save this sound</button>
       <p class="m-note" id="m-pnote" aria-live="polite"></p>
       <ul class="m-plist" id="m-plist"></ul>
+      <div class="m-pio">
+        <label class="m-btn m-file">import presets<input id="m-pimport" type="file" accept="application/json,.json" multiple></label>
+        <button class="m-btn" id="m-pexport" type="button">export mine</button>
+      </div>
+      <p class="m-note">Import reads a presets file exported from the full Elixir (star presets there, then export favourites). Export mine writes one the full Elixir can import.</p>
     </section>
   </div>
 
