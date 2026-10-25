@@ -23,25 +23,48 @@ const mSync = () => {
 new MutationObserver(mSync).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
 mPlay.addEventListener('click', () => $('play').click());
 
-// ---- sliders: one row each, label, readout and a wide track; a double tap on the label resets it ----
+// ---- sliders: vertical faders, readout on top and label under; dragging moves the value from where it is
+// (a touch doesn't jump it), the whole track's height is the full range (tempo's is twice it, for finer steps), and a double tap on the label resets it ----
 const mDraws = [];
-function mFader(box, label, { min, max, step = 1, get, set, show, dflt }) {
-  const row = document.createElement('label');
-  row.className = 'm-fader'; row.innerHTML = `<span class="m-flab"></span><output></output><input type="range" min="${min}" max="${max}" step="${step}">`;
-  row.querySelector('.m-flab').textContent = label;
-  const inp = row.querySelector('input'), out = row.querySelector('output');
-  inp.setAttribute('aria-label', label);
-  const draw = () => {
-    const hi = typeof max === 'function' ? max() : max; inp.max = hi;
-    const v = get(); inp.value = v; out.textContent = show(v); inp.style.setProperty('--f', (v - min) / (hi - min || 1));
+function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel = 1 }) {
+  const el = document.createElement('div');
+  el.className = 'm-vf';
+  el.innerHTML = '<output></output><div class="m-vtrack" role="slider" tabindex="0"><i></i><b></b></div><span class="m-flab"></span>';
+  el.querySelector('.m-flab').textContent = label;
+  const tr = el.querySelector('.m-vtrack'), out = el.querySelector('output');
+  tr.setAttribute('aria-label', label);
+  const hiOf = () => (typeof max === 'function' ? max() : max);
+  const put = (v) => {
+    const hi = hiOf(); v = Math.max(min, Math.min(hi, min + Math.round((v - min) / step) * step));
+    if (v !== get()) set(v);
+    draw();
   };
-  inp.addEventListener('input', () => { set(Number(inp.value)); draw(); });
-  let last = 0;
-  row.querySelector('.m-flab').addEventListener('click', (e) => {
-    e.preventDefault(); const t = performance.now();
-    if (t - last < 350 && dflt !== undefined) { set(dflt); draw(); } last = t;
+  const draw = () => {
+    const hi = hiOf(), v = get();
+    out.textContent = show(v); tr.style.setProperty('--f', (v - min) / (hi - min || 1));
+    tr.setAttribute('aria-valuemin', min); tr.setAttribute('aria-valuemax', hi); tr.setAttribute('aria-valuenow', v); tr.setAttribute('aria-valuetext', show(v));
+  };
+  let drag = null;
+  tr.addEventListener('pointerdown', (e) => {
+    tr.setPointerCapture(e.pointerId); el.classList.add('held');
+    drag = { y: e.clientY, v: get(), h: tr.getBoundingClientRect().height };
   });
-  box.append(row); mDraws.push(draw);
+  tr.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    put(drag.v + (drag.y - e.clientY) / (drag.h * travel) * (hiOf() - min));
+  });
+  const end = () => { drag = null; el.classList.remove('held'); };
+  tr.addEventListener('pointerup', end); tr.addEventListener('pointercancel', end);
+  tr.addEventListener('keydown', (e) => {
+    const d = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 10, PageDown: -10 }[e.key];
+    if (d) { e.preventDefault(); put(get() + d * step); }
+  });
+  let last = 0;
+  el.querySelector('.m-flab').addEventListener('click', () => {
+    const t = performance.now();
+    if (t - last < 350 && dflt !== undefined) put(dflt); last = t;
+  });
+  box.append(el); mDraws.push(draw);
   return draw;
 }
 const mDrawAll = () => mDraws.forEach((d) => d());
@@ -52,8 +75,11 @@ buildMaster = function () { mBuildMaster(); mDrawAll(); };
 
 const pf = (k) => ({ min: PERF_RANGE[k][0], max: PERF_RANGE[k][1], get: () => perfGet(k), set: (v) => setPerf(k, v), show: () => perfText(k), dflt: PERF_RANGE[k][2] });
 // beat runs over the current style's grooves, and names the style
-mFader($('m-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => `${STYLES[styleIdx].name} · ${perfText('beat')}` });
-mFader($('m-faders'), 'energy', pf('energy'));
+// two rows: tempo, beat, energy over rush, sidechain and the randomisers
+mFader($('m-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
+// beat runs over the current style's grooves; its readout is the groove, then the style
+mFader($('m-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => `${perfText('beat').split('·')[0].trim()}\n${STYLES[styleIdx].name}` });
+mFader($('m-faders'), 'energy', { ...pf('energy'), show: () => perfText('energy').replace(' · ', '\n') });
 mFader($('m-faders'), 'rush', pf('rush'));
 // the drum 1 sidechain duck: above 0 it switches the sidechain on
 const setDuck = (v) => {
@@ -62,6 +88,7 @@ const setDuck = (v) => {
 };
 const duckFader = { min: 0, max: 100, get: () => (master.duckOn ? Math.round(master.duck * 100) : 0), set: setDuck, show: (v) => (v ? v + '%' : 'off'), dflt: Math.round(MASTER0.duck * 100) };
 mFader($('m-faders'), 'sidechain', duckFader);
+$('m-faders').append($('m-faders').querySelector('.m-rand'));
 
 // ---- compressor tab ----
 const mMaster = (box, label, key, lo, hi, step, show) => mFader(box, label, { min: lo, max: hi, step, get: () => master[key],

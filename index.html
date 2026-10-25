@@ -863,39 +863,37 @@ body { padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-panel { display: grid; gap: 12px; }
 .m-panel[hidden] { display: none; }
 
-.m-trans { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: stretch; }
-.m-play { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 84px; border-radius: 14px; background: var(--ink) !important;
-  color: var(--panel) !important; font-size: 1.35rem !important; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
-.m-play svg { width: 28px; height: 28px; fill: currentColor; }
+.m-trans { padding: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
+.m-play { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; border-radius: 10px; background: var(--ink) !important;
+  color: var(--panel) !important; font-size: 1rem !important; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.m-play svg { width: 20px; height: 20px; fill: currentColor; }
 .m-play .i-stop, .m-play[aria-pressed="true"] .i-play { display: none; }
 .m-play[aria-pressed="true"] .i-stop { display: inline; }
 .m-play:active { transform: scale(.98); }
-.m-rec { width: 84px; border-radius: 14px; background: var(--tint) !important; display: grid; place-items: center; align-content: center; gap: 6px; }
-.m-rec i { width: 30px; height: 30px; border-radius: 50%; background: var(--led); box-shadow: 0 0 0 3px var(--panel), 0 0 0 5px var(--led); }
+.m-rec { border-radius: 10px; grid-auto-flow: column; justify-content: center; gap: 10px !important; min-height: 46px; background: var(--tint) !important; display: grid; place-items: center; align-content: center; gap: 6px; }
+.m-rec i { width: 20px; height: 20px; border-radius: 50%; background: var(--led); box-shadow: 0 0 0 3px var(--panel), 0 0 0 5px var(--led); }
 .m-rec span { font-family: var(--mono); font-size: var(--fs-s); font-variant-numeric: tabular-nums; }
 .m-rec.on { background: var(--led) !important; color: #fff !important; }
-.m-rec.on i { border-radius: 5px; width: 24px; height: 24px; background: #fff; box-shadow: none; animation: m-blink 1s steps(1) infinite; }
+.m-rec.on i { border-radius: 4px; width: 16px; height: 16px; background: #fff; box-shadow: none; animation: m-blink 1s steps(1) infinite; }
 @keyframes m-blink { 50% { opacity: .35; } }
 @media (prefers-reduced-motion: reduce) { .m-rec.on i { animation: none; } }
 
+/* vertical faders, three to a row */
 .m-faders { display: grid; gap: 14px; }
-.m-fader { display: grid; grid-template-columns: 1fr auto; row-gap: 6px; align-items: baseline; }
-.m-flab { font-size: var(--fs-m); font-weight: 600; text-transform: lowercase; }
-.m-fader output { font-family: var(--mono); font-size: var(--fs-s); color: var(--muted); font-variant-numeric: tabular-nums; }
-.m-fader input[type=range] { grid-column: 1 / -1; width: 100%; height: 44px; margin: 0; background: none; -webkit-appearance: none; appearance: none; --f: 0; }
-.m-fader input[type=range]::-webkit-slider-runnable-track { height: 14px; border-radius: 7px;
-  background: linear-gradient(to right, var(--ink) calc(var(--f) * 100%), var(--tint-2) 0); }
-.m-fader input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 34px; height: 34px; margin-top: -10px; border-radius: 50%;
-  background: var(--panel); border: 3px solid var(--ink); }
-.m-fader input[type=range]::-moz-range-track { height: 14px; border-radius: 7px; background: var(--tint-2); }
-.m-fader input[type=range]::-moz-range-progress { height: 14px; border-radius: 7px; background: var(--ink); }
-.m-fader input[type=range]::-moz-range-thumb { width: 28px; height: 28px; border-radius: 50%; background: var(--panel); border: 3px solid var(--ink); }
-
-.m-rand { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+#m-faders, #m-comp, #m-duck { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 10px; }
+.m-vf { display: grid; grid-template-rows: 2.6em auto auto; justify-items: center; gap: 6px; min-width: 0; }
+.m-vf output { font-family: var(--mono); font-size: var(--fs-xs); line-height: 1.3; color: var(--muted); text-align: center; white-space: pre-line;
+  align-self: end; overflow: hidden; max-width: 100%; font-variant-numeric: tabular-nums; }
+.m-vtrack { --f: 0; position: relative; width: 56px; height: 150px; border-radius: 14px; background: var(--tint-2); touch-action: none; cursor: ns-resize; overflow: hidden; }
+.m-vtrack i { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--f) * 100%); background: var(--ink); }
+.m-vtrack b { position: absolute; left: 6px; right: 6px; height: 10px; bottom: calc(var(--f) * (100% - 22px) + 6px); border-radius: 5px; background: var(--panel); }
+.m-vf.held .m-vtrack b { background: var(--led); }
+.m-vf .m-flab { font-size: var(--fs-s); font-weight: 600; }
+.m-rand { display: grid; gap: 8px; align-content: center; }
 .m-btn { min-height: 56px; border-radius: 12px; background: var(--tint) !important; font-size: var(--fs-m) !important; font-weight: 500; }
 .m-btn:active { background: var(--ink) !important; color: var(--panel) !important; }
 .m-btn:disabled { opacity: .4; }
-.m-big { grid-column: 1 / -1; background: var(--ink) !important; color: var(--panel) !important; font-weight: 600; font-size: 1.1rem !important; }
+.m-big { background: var(--ink) !important; color: var(--panel) !important; font-weight: 600; font-size: 1.1rem !important; }
 .m-big:active { transform: scale(.98); }
 
 .m-take { display: flex; align-items: center; gap: 12px; }
@@ -908,8 +906,7 @@ body { padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-foot { font-size: var(--fs-xs); color: var(--ink); opacity: .75; text-align: center; padding: 4px 8px; line-height: 1.5; }
 .m-foot a { color: inherit; }
 
-.m-rand .m-big { grid-column: 1 / -1; }
-.m-rand { grid-template-columns: 1fr 1fr; }
+.m-rand .m-btn { min-height: 52px; font-size: var(--fs-s) !important; padding: 0 4px; }
 .m-chead { display: flex; align-items: center; justify-content: space-between; }
 .m-chead b { font-size: var(--fs-m); font-weight: 700; }
 .m-toggle { min-width: 64px; min-height: 36px; border-radius: 999px; background: var(--tint) !important; font-size: var(--fs-s) !important; font-weight: 600; }
@@ -959,11 +956,12 @@ body { padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
   </section>
 
   <div class="m-panel" data-m-panel="play">
-    <section class="m-card m-faders" id="m-faders"></section>
-    <section class="m-card m-rand">
-      <button class="m-btn m-big" id="m-everything" type="button">everything</button>
-      <button class="m-btn" id="m-kit" type="button">kit + pattern</button>
-      <button class="m-btn" id="m-undo" type="button" disabled>undo sound</button>
+    <section class="m-card m-faders" id="m-faders">
+      <div class="m-rand">
+        <button class="m-btn m-big" id="m-everything" type="button">everything</button>
+        <button class="m-btn" id="m-kit" type="button">kit + pattern</button>
+        <button class="m-btn" id="m-undo" type="button" disabled>undo</button>
+      </div>
     </section>
   </div>
 
@@ -7309,25 +7307,48 @@ const mSync = () => {
 new MutationObserver(mSync).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
 mPlay.addEventListener('click', () => $('play').click());
 
-// ---- sliders: one row each, label, readout and a wide track; a double tap on the label resets it ----
+// ---- sliders: vertical faders, readout on top and label under; dragging moves the value from where it is
+// (a touch doesn't jump it), the whole track's height is the full range (tempo's is twice it, for finer steps), and a double tap on the label resets it ----
 const mDraws = [];
-function mFader(box, label, { min, max, step = 1, get, set, show, dflt }) {
-  const row = document.createElement('label');
-  row.className = 'm-fader'; row.innerHTML = `<span class="m-flab"></span><output></output><input type="range" min="${min}" max="${max}" step="${step}">`;
-  row.querySelector('.m-flab').textContent = label;
-  const inp = row.querySelector('input'), out = row.querySelector('output');
-  inp.setAttribute('aria-label', label);
-  const draw = () => {
-    const hi = typeof max === 'function' ? max() : max; inp.max = hi;
-    const v = get(); inp.value = v; out.textContent = show(v); inp.style.setProperty('--f', (v - min) / (hi - min || 1));
+function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel = 1 }) {
+  const el = document.createElement('div');
+  el.className = 'm-vf';
+  el.innerHTML = '<output></output><div class="m-vtrack" role="slider" tabindex="0"><i></i><b></b></div><span class="m-flab"></span>';
+  el.querySelector('.m-flab').textContent = label;
+  const tr = el.querySelector('.m-vtrack'), out = el.querySelector('output');
+  tr.setAttribute('aria-label', label);
+  const hiOf = () => (typeof max === 'function' ? max() : max);
+  const put = (v) => {
+    const hi = hiOf(); v = Math.max(min, Math.min(hi, min + Math.round((v - min) / step) * step));
+    if (v !== get()) set(v);
+    draw();
   };
-  inp.addEventListener('input', () => { set(Number(inp.value)); draw(); });
-  let last = 0;
-  row.querySelector('.m-flab').addEventListener('click', (e) => {
-    e.preventDefault(); const t = performance.now();
-    if (t - last < 350 && dflt !== undefined) { set(dflt); draw(); } last = t;
+  const draw = () => {
+    const hi = hiOf(), v = get();
+    out.textContent = show(v); tr.style.setProperty('--f', (v - min) / (hi - min || 1));
+    tr.setAttribute('aria-valuemin', min); tr.setAttribute('aria-valuemax', hi); tr.setAttribute('aria-valuenow', v); tr.setAttribute('aria-valuetext', show(v));
+  };
+  let drag = null;
+  tr.addEventListener('pointerdown', (e) => {
+    tr.setPointerCapture(e.pointerId); el.classList.add('held');
+    drag = { y: e.clientY, v: get(), h: tr.getBoundingClientRect().height };
   });
-  box.append(row); mDraws.push(draw);
+  tr.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    put(drag.v + (drag.y - e.clientY) / (drag.h * travel) * (hiOf() - min));
+  });
+  const end = () => { drag = null; el.classList.remove('held'); };
+  tr.addEventListener('pointerup', end); tr.addEventListener('pointercancel', end);
+  tr.addEventListener('keydown', (e) => {
+    const d = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 10, PageDown: -10 }[e.key];
+    if (d) { e.preventDefault(); put(get() + d * step); }
+  });
+  let last = 0;
+  el.querySelector('.m-flab').addEventListener('click', () => {
+    const t = performance.now();
+    if (t - last < 350 && dflt !== undefined) put(dflt); last = t;
+  });
+  box.append(el); mDraws.push(draw);
   return draw;
 }
 const mDrawAll = () => mDraws.forEach((d) => d());
@@ -7338,8 +7359,11 @@ buildMaster = function () { mBuildMaster(); mDrawAll(); };
 
 const pf = (k) => ({ min: PERF_RANGE[k][0], max: PERF_RANGE[k][1], get: () => perfGet(k), set: (v) => setPerf(k, v), show: () => perfText(k), dflt: PERF_RANGE[k][2] });
 // beat runs over the current style's grooves, and names the style
-mFader($('m-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => `${STYLES[styleIdx].name} · ${perfText('beat')}` });
-mFader($('m-faders'), 'energy', pf('energy'));
+// two rows: tempo, beat, energy over rush, sidechain and the randomisers
+mFader($('m-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
+// beat runs over the current style's grooves; its readout is the groove, then the style
+mFader($('m-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => `${perfText('beat').split('·')[0].trim()}\n${STYLES[styleIdx].name}` });
+mFader($('m-faders'), 'energy', { ...pf('energy'), show: () => perfText('energy').replace(' · ', '\n') });
 mFader($('m-faders'), 'rush', pf('rush'));
 // the drum 1 sidechain duck: above 0 it switches the sidechain on
 const setDuck = (v) => {
@@ -7348,6 +7372,7 @@ const setDuck = (v) => {
 };
 const duckFader = { min: 0, max: 100, get: () => (master.duckOn ? Math.round(master.duck * 100) : 0), set: setDuck, show: (v) => (v ? v + '%' : 'off'), dflt: Math.round(MASTER0.duck * 100) };
 mFader($('m-faders'), 'sidechain', duckFader);
+$('m-faders').append($('m-faders').querySelector('.m-rand'));
 
 // ---- compressor tab ----
 const mMaster = (box, label, key, lo, hi, step, show) => mFader(box, label, { min: lo, max: hi, step, get: () => master[key],
