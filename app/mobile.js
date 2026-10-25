@@ -85,11 +85,13 @@ mFader($('m-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () => Mat
     if (view === 'steps') setTab('perform'); else generate();
     sendSeq(); setDirty(true); drawPerf();
   }, show: () => STYLES[styleIdx].name.replace(' ', '\n'), dflt: 0 });
-// four across, two down: genre, beat, energy, tempo over rush, sidechain and the randomisers
+// four across, three down: genre, beat, energy, tempo / fills, groove, rush, sidechain / pitch, decay, filter, fm
 // beat runs over the current style's grooves; its readout is the groove, then where it is in the list
 mFader($('m-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => perfText('beat').replace(' · ', '\n') });
 mFader($('m-faders'), 'energy', { ...pf('energy'), show: () => perfText('energy').replace(' · ', '\n') });
 mFader($('m-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
+mFader($('m-faders'), 'fills', { ...pf('fills'), show: () => perfText('fills').replace(' · ', '\n') });
+mFader($('m-faders'), 'groove', { ...pf('groove'), show: () => perfText('groove').replace(' ', '\n') });
 mFader($('m-faders'), 'rush', pf('rush'));
 // the drum 1 sidechain duck: above 0 it switches the sidechain on
 const setDuck = (v) => {
@@ -98,7 +100,17 @@ const setDuck = (v) => {
 };
 const duckFader = { min: 0, max: 100, get: () => (master.duckOn ? Math.round(master.duck * 100) : 0), set: setDuck, show: (v) => (v ? v + '%' : 'off'), dflt: Math.round(MASTER0.duck * 100) };
 mFader($('m-faders'), 'sidechain', duckFader);
-$('m-faders').append($('m-faders').querySelector('.m-rand'));
+// the sound macros, as on the desktop's pattern card: 100 (pitch 24) is the middle, the sound as it is
+for (const [m, label] of [['pitch', 'pitch'], ['decay', 'decay'], ['filter', 'filter'], ['fm', 'fm']]) {
+  const pitch = m === 'pitch';
+  mFader($('m-faders'), label, { min: 0, max: pitch ? 48 : 200, get: () => macro[m], set: (v) => { setMacro(m, v); drawMacros(); },
+    show: (v) => (pitch ? (v === 24 ? '0 st' : (v > 24 ? '+' : '−') + Math.abs(v - 24) + ' st') : (v === 100 ? '0%' : (v > 100 ? '+' : '−') + Math.abs(v - 100) + '%')),
+    dflt: MACRO0[m] });
+}
+const mDrawMacros = drawMacros;
+drawMacros = function () { mDrawMacros(); mDrawAll(); };
+// the randomisers go in a row under the faders
+$('m-faders').after($('m-faders').querySelector('.m-rand'));
 
 // ---- compressor tab ----
 const mMaster = (box, label, key, lo, hi, step, show) => mFader(box, label, { min: lo, max: hi, step, get: () => master[key],

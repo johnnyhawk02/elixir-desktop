@@ -846,24 +846,24 @@ pre { margin: 0; padding: 14px 18px; overflow: auto; max-width: 100%; background
 
 /* ---- the phone screen: one column of mustard cards on the green bench; the desktop panels are hidden ---- */
 .wrap { display: none !important; }
-body { padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(20px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(20px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
   min-height: 100dvh; -webkit-tap-highlight-color: transparent; }
-.m { max-width: 480px; margin: 0 auto; display: grid; gap: 12px; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+.m { max-width: 480px; margin: 0 auto; display: grid; gap: 10px; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
 .m-card { background: var(--panel); border-radius: 18px; padding: 16px; }
 .m button { font: inherit; color: var(--ink); border: 0; cursor: pointer; touch-action: manipulation; }
 
-.m-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 2px 4px; }
-.m-title { font-family: var(--display); font-size: 1.7rem; font-weight: 700; letter-spacing: -.02em; }
-.m-pname { font-size: var(--fs-s); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55vw;
-  background: var(--panel); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.m-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 2px; }
+.m-title { font-family: var(--display); font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em; }
+.m-pname { font-size: var(--fs-s) !important; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+  background: var(--tint) !important; border-radius: 10px; padding: 0 10px; }
 
-.m-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--tint); border-radius: 999px; padding: 4px; }
-.m-tabs button { background: none; border-radius: 999px; min-height: 40px; font-size: var(--fs-s) !important; font-weight: 500; }
+.m-tabs { flex: 1; max-width: 280px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--tint); border-radius: 999px; padding: 3px; }
+.m-tabs button { background: none; border-radius: 999px; min-height: 34px; font-size: var(--fs-s) !important; font-weight: 500; }
 .m-tabs button[aria-selected="true"] { background: var(--panel); }
 .m-panel { display: grid; gap: 12px; }
 .m-panel[hidden] { display: none; }
 
-.m-trans { padding: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
+.m-trans { padding: 8px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: stretch; }
 .m-play { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; border-radius: 10px; background: var(--ink) !important;
   color: var(--panel) !important; font-size: 1rem !important; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
 .m-play svg { width: 20px; height: 20px; fill: currentColor; }
@@ -881,8 +881,18 @@ body { padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 /* vertical faders, three to a row (four on the play tab, where the randomisers take the last two places) */
 .m-faders { display: grid; gap: 14px; }
 #m-faders, #m-comp, #m-duck { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 10px; }
-#m-faders { grid-template-columns: repeat(4, 1fr); gap: 16px 6px; }
-#m-faders .m-vtrack { width: 52px; }
+/* the play tab fills the screen: header, tabs and transport, then three rows of faders that take the rest
+   (each track stretches to its row), then the randomisers */
+.m:has([data-m-panel="play"]:not([hidden])) { height: calc(100dvh - max(10px, env(safe-area-inset-top, 0px)) - max(20px, env(safe-area-inset-bottom, 0px)));
+  grid-template-rows: auto auto 1fr; }
+.m:has([data-m-panel="play"]:not([hidden])) .m-foot { display: none; }
+[data-m-panel="play"] { min-height: 0; grid-template-rows: 1fr; }
+.m-play-card { display: grid; grid-template-rows: 1fr auto; gap: 10px; min-height: 0; padding: 10px 8px; }
+#m-faders { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 10px 6px; min-height: 0; }
+#m-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 3px; }
+#m-faders .m-vf output { font-size: .62rem; line-height: 1.25; height: 2.5em; display: flex; align-items: flex-end; justify-content: center; flex: none; align-self: stretch; }
+#m-faders .m-flab { font-size: var(--fs-xs); line-height: 1.2; }
+#m-faders .m-vtrack { width: min(56px, 100%); flex: 1; height: auto; min-height: 48px; }
 .m-vf { display: grid; grid-template-rows: 2.6em auto auto; justify-items: center; gap: 6px; min-width: 0; }
 .m-vf output { font-family: var(--mono); font-size: var(--fs-xs); line-height: 1.3; color: var(--muted); text-align: center; white-space: pre-line;
   align-self: end; overflow: hidden; max-width: 100%; font-variant-numeric: tabular-nums; }
@@ -891,7 +901,7 @@ body { padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-vtrack b { position: absolute; left: 6px; right: 6px; height: 10px; bottom: calc(var(--f) * (100% - 22px) + 6px); border-radius: 5px; background: var(--panel); }
 .m-vf.held .m-vtrack b { background: var(--led); }
 .m-vf .m-flab { font-size: var(--fs-s); font-weight: 600; }
-.m-rand { display: grid; gap: 8px; align-content: center; grid-column: span 2; grid-template-columns: 1fr 1fr; }
+.m-rand { display: grid; gap: 8px; grid-template-columns: 1.4fr 1fr 1fr 1fr; }
 .m-btn { min-height: 56px; border-radius: 12px; background: var(--tint) !important; font-size: var(--fs-m) !important; font-weight: 500; }
 .m-btn:active { background: var(--ink) !important; color: var(--panel) !important; }
 .m-btn:disabled { opacity: .4; }
@@ -902,7 +912,7 @@ body { padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-foot { font-size: var(--fs-xs); color: var(--ink); opacity: .75; text-align: center; padding: 4px 8px; line-height: 1.5; }
 .m-foot a { color: inherit; }
 
-.m-rand .m-btn { min-height: 52px; font-size: var(--fs-s) !important; padding: 0 4px; }
+.m-rand .m-btn { min-height: 48px; font-size: var(--fs-s) !important; padding: 0 4px; }
 .m-chead { display: flex; align-items: center; justify-content: space-between; }
 .m-chead b { font-size: var(--fs-m); font-weight: 700; }
 .m-toggle { min-width: 64px; min-height: 36px; border-radius: 999px; background: var(--tint) !important; font-size: var(--fs-s) !important; font-weight: 600; }
@@ -935,27 +945,27 @@ body { padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 <main class="m" id="m">
   <header class="m-top">
     <b class="m-title">elixir</b>
-    <span class="m-pname" id="m-pname">preset</span>
+    <nav class="m-tabs" role="tablist">
+      <button type="button" role="tab" data-m-tab="play" aria-selected="true">play</button>
+      <button type="button" role="tab" data-m-tab="comp" aria-selected="false">comp</button>
+      <button type="button" role="tab" data-m-tab="presets" aria-selected="false">presets</button>
+    </nav>
   </header>
-  <nav class="m-tabs" role="tablist">
-    <button type="button" role="tab" data-m-tab="play" aria-selected="true">play</button>
-    <button type="button" role="tab" data-m-tab="comp" aria-selected="false">compressor</button>
-    <button type="button" role="tab" data-m-tab="presets" aria-selected="false">presets</button>
-  </nav>
   <section class="m-card m-trans">
     <button class="m-play" id="m-play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 4.5v15l13-7.5z"/><rect class="i-stop" x="5.5" y="5.5" width="13" height="13" rx="2"/></svg><span>play</span></button>
     <button class="m-rec" id="m-rec" type="button" aria-pressed="false" aria-label="Record"><i></i><span id="m-rec-t">rec</span></button>
+    <button class="m-pname" id="m-pname" type="button" title="Presets">preset</button>
   </section>
 
   <div class="m-panel" data-m-panel="play">
-    <section class="m-card m-faders" id="m-faders">
+    <section class="m-card m-play-card"><div class="m-faders" id="m-faders">
       <div class="m-rand">
         <button class="m-btn m-big" id="m-everything" type="button">everything</button>
         <button class="m-btn" id="m-kit" type="button">kit</button>
         <button class="m-btn" id="m-pattern" type="button">pattern</button>
         <button class="m-btn" id="m-undo" type="button" disabled>undo</button>
       </div>
-    </section>
+    </div></section>
   </div>
 
   <div class="m-panel" data-m-panel="comp" hidden>
@@ -7362,11 +7372,13 @@ mFader($('m-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () => Mat
     if (view === 'steps') setTab('perform'); else generate();
     sendSeq(); setDirty(true); drawPerf();
   }, show: () => STYLES[styleIdx].name.replace(' ', '\n'), dflt: 0 });
-// four across, two down: genre, beat, energy, tempo over rush, sidechain and the randomisers
+// four across, three down: genre, beat, energy, tempo / fills, groove, rush, sidechain / pitch, decay, filter, fm
 // beat runs over the current style's grooves; its readout is the groove, then where it is in the list
 mFader($('m-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => perfText('beat').replace(' · ', '\n') });
 mFader($('m-faders'), 'energy', { ...pf('energy'), show: () => perfText('energy').replace(' · ', '\n') });
 mFader($('m-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
+mFader($('m-faders'), 'fills', { ...pf('fills'), show: () => perfText('fills').replace(' · ', '\n') });
+mFader($('m-faders'), 'groove', { ...pf('groove'), show: () => perfText('groove').replace(' ', '\n') });
 mFader($('m-faders'), 'rush', pf('rush'));
 // the drum 1 sidechain duck: above 0 it switches the sidechain on
 const setDuck = (v) => {
@@ -7375,7 +7387,17 @@ const setDuck = (v) => {
 };
 const duckFader = { min: 0, max: 100, get: () => (master.duckOn ? Math.round(master.duck * 100) : 0), set: setDuck, show: (v) => (v ? v + '%' : 'off'), dflt: Math.round(MASTER0.duck * 100) };
 mFader($('m-faders'), 'sidechain', duckFader);
-$('m-faders').append($('m-faders').querySelector('.m-rand'));
+// the sound macros, as on the desktop's pattern card: 100 (pitch 24) is the middle, the sound as it is
+for (const [m, label] of [['pitch', 'pitch'], ['decay', 'decay'], ['filter', 'filter'], ['fm', 'fm']]) {
+  const pitch = m === 'pitch';
+  mFader($('m-faders'), label, { min: 0, max: pitch ? 48 : 200, get: () => macro[m], set: (v) => { setMacro(m, v); drawMacros(); },
+    show: (v) => (pitch ? (v === 24 ? '0 st' : (v > 24 ? '+' : '−') + Math.abs(v - 24) + ' st') : (v === 100 ? '0%' : (v > 100 ? '+' : '−') + Math.abs(v - 100) + '%')),
+    dflt: MACRO0[m] });
+}
+const mDrawMacros = drawMacros;
+drawMacros = function () { mDrawMacros(); mDrawAll(); };
+// the randomisers go in a row under the faders
+$('m-faders').after($('m-faders').querySelector('.m-rand'));
 
 // ---- compressor tab ----
 const mMaster = (box, label, key, lo, hi, step, show) => mFader(box, label, { min: lo, max: hi, step, get: () => master[key],
