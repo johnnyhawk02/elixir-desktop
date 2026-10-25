@@ -85,7 +85,7 @@ perfDraws.push(mDrawAll);
 // a preset load rebuilds the master section; the sliders follow
 // (the pattern button's undo; a preset load clears it, as it clears the desktop's)
 let mPatUndo = null;
-const mUndo = () => { $('m-undo').disabled = !mPatUndo && $('undo').disabled; };
+const mUndo = () => { document.querySelectorAll('[data-m-undo]').forEach((b) => { b.disabled = !mPatUndo && $('undo').disabled; }); };
 const mBuildMaster = buildMaster;
 buildMaster = function () { mBuildMaster(); mPatUndo = null; mUndo(); mDrawAll(); };
 
@@ -165,7 +165,7 @@ function mPatSet(p) {
   if (view === 'steps') setTab('perform'); else generate();
   drawGroove(); sendSeq(); setDirty(true);
 }
-$('m-pattern').addEventListener('click', async () => {
+const mRandPattern = async () => {
   await startAudio();
   const was = mPatGet();
   const styles = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
@@ -173,11 +173,43 @@ $('m-pattern').addEventListener('click', async () => {
   mPatSet({ style, beat: mRnd(STYLES[style].grooves.length), energy: 35 + mRnd(61), fills: mRnd(101),
     type: GROOVE_TYPES[mRnd(GROOVE_TYPES.length)].name, depth: 50 + mRnd(51) });
   undoValues = null; $('undo').disabled = true; mPatUndo = was; mUndo();
-});
-$('m-undo').addEventListener('click', () => {
+};
+$('m-pattern').addEventListener('click', mRandPattern);
+document.querySelectorAll('[data-m-undo]').forEach((b) => b.addEventListener('click', () => {
   if (mPatUndo) { const p = mPatUndo; mPatUndo = null; mPatSet(p); mUndo(); } else $('undo').click();
-});
+}));
 new MutationObserver(mUndo).observe($('undo'), { attributes: true, attributeFilter: ['disabled'] });
+
+// ---- the random page: everything, sequence, a button per drum (its sound from a random built-in kit) and the energy / rush pad ----
+$('m-d-everything').addEventListener('click', () => $('m-everything').click());
+$('m-d-pattern').addEventListener('click', mRandPattern);
+XN.forEach((name, v) => {
+  const b = document.createElement('button');
+  b.className = 'm-btn'; b.type = 'button'; b.textContent = name;
+  b.addEventListener('click', () => { mPatUndo = null; randomOne(v); });
+  $('m-voices').append(b);
+});
+// across is energy, up is rush; a touch puts the dot where it lands
+{
+  const pad = $('m-xy'), dot = pad.querySelector('i'), out = pad.querySelector('output');
+  const draw = () => {
+    dot.style.left = perf.energy + '%'; dot.style.bottom = perf.rush + '%';
+    out.textContent = `${perfText('energy')}\nrush ${perfText('rush')}`;
+  };
+  const at = (e) => {
+    const r = pad.getBoundingClientRect(), f = (x) => Math.round(Math.max(0, Math.min(1, x)) * 100);
+    const en = f((e.clientX - r.left) / r.width), ru = f((r.bottom - e.clientY) / r.height);
+    if (en !== perf.energy) setPerf('energy', en);
+    if (ru !== perf.rush) setPerf('rush', ru);
+    draw();
+  };
+  let held = false;
+  pad.addEventListener('pointerdown', (e) => { pad.setPointerCapture(e.pointerId); held = true; pad.classList.add('held'); at(e); });
+  pad.addEventListener('pointermove', (e) => { if (held) at(e); });
+  const end = () => { held = false; pad.classList.remove('held'); };
+  pad.addEventListener('pointerup', end); pad.addEventListener('pointercancel', end);
+  mDraws.push(draw);
+}
 
 // ---- presets: save, and a list to load or delete (kept in this browser, as on the desktop) ----
 // (a star once it's changed, as on the desktop's save button)

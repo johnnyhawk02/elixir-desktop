@@ -16,6 +16,7 @@
     <b class="m-title">elixir</b>
     <nav class="m-tabs" role="tablist">
       <button type="button" role="tab" data-m-tab="play" aria-selected="true">play</button>
+      <button type="button" role="tab" data-m-tab="dice" aria-selected="false">random</button>
       <button type="button" role="tab" data-m-tab="comp" aria-selected="false">comp</button>
       <button type="button" role="tab" data-m-tab="presets" aria-selected="false">presets</button>
     </nav>
@@ -33,9 +34,21 @@
         <button class="m-btn m-big" id="m-everything" type="button">everything</button>
         <button class="m-btn" id="m-kit" type="button">kit</button>
         <button class="m-btn" id="m-pattern" type="button">pattern</button>
-        <button class="m-btn" id="m-undo" type="button" disabled>undo</button>
+        <button class="m-btn" id="m-undo" data-m-undo type="button" disabled>undo</button>
       </div>
     </div></section>
+  </div>
+
+  <div class="m-panel" data-m-panel="dice">
+    <section class="m-card m-dice-card">
+      <div class="m-dice">
+        <button class="m-btn m-big" id="m-d-everything" type="button">everything</button>
+        <button class="m-btn" id="m-d-pattern" type="button">sequence</button>
+        <div class="m-voices" id="m-voices"></div>
+        <button class="m-btn" data-m-undo type="button" disabled>undo</button>
+      </div>
+      <div class="m-xy" id="m-xy" role="group" aria-label="energy and rush pad"><span class="m-xy-x">energy →</span><span class="m-xy-y">↑ rush</span><i></i><output></output></div>
+    </section>
   </div>
 
   <div class="m-panel" data-m-panel="comp">

@@ -857,8 +857,8 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-pname { font-size: var(--fs-s) !important; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
   background: var(--tint) !important; border-radius: 10px; padding: 0 10px; }
 
-.m-tabs { flex: 1; max-width: 280px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--tint); border-radius: 999px; padding: 3px; }
-.m-tabs button { background: none; border-radius: 999px; min-height: 34px; font-size: var(--fs-s) !important; font-weight: 500; }
+.m-tabs { flex: 1; max-width: 300px; display: grid; grid-template-columns: repeat(4, auto); gap: 2px; background: var(--tint); border-radius: 999px; padding: 3px; }
+.m-tabs button { background: none; padding: 0 10px; border-radius: 999px; min-height: 34px; font-size: var(--fs-s) !important; font-weight: 500; }
 .m-tabs button[aria-selected="true"] { background: var(--panel); }
 /* the pages sit side by side and snap: swipe between them, or tap a tab. The faders' tracks take their own
    touches (touch-action: none), so a drag on one never turns the page */
@@ -888,7 +888,20 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 /* the page is one screen high: header, tabs and transport, then the pages; on the play page three rows of
    faders take the rest (each track stretches to its row), then the randomisers. The other pages scroll inside */
 .m { height: calc(100dvh - max(10px, env(safe-area-inset-top, 0px)) - max(20px, env(safe-area-inset-bottom, 0px))); grid-template-rows: auto auto 1fr; }
-[data-m-panel="play"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
+[data-m-panel="play"], [data-m-panel="dice"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
+/* the random page: the buttons, then the energy / rush pad in what's left */
+.m-dice-card { display: grid; grid-template-rows: auto 1fr; gap: 10px; min-height: 0; padding: 10px 8px; }
+.m-dice { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.m-voices { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.m-dice .m-btn { min-height: 52px; font-size: var(--fs-s) !important; padding: 0 4px; }
+.m-dice [data-m-undo] { grid-column: 1 / -1; min-height: 44px; }
+.m-xy { position: relative; min-height: 120px; border-radius: 14px; background: var(--tint-2); touch-action: none; cursor: crosshair; overflow: hidden; }
+.m-xy i { position: absolute; width: 44px; height: 44px; margin: 0 0 -22px -22px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 4px var(--panel); pointer-events: none; }
+.m-xy.held i { background: var(--led); }
+.m-xy span { position: absolute; font-size: var(--fs-xs); font-weight: 600; opacity: .55; pointer-events: none; }
+.m-xy-x { right: 12px; bottom: 8px; }
+.m-xy-y { left: 12px; bottom: 8px; }
+.m-xy output { position: absolute; left: 12px; top: 10px; font-family: var(--mono); font-size: var(--fs-xs); line-height: 1.3; color: var(--muted); white-space: pre-line; pointer-events: none; }
 .m-play-card { display: grid; grid-template-rows: 1fr auto; gap: 10px; min-height: 0; padding: 10px 8px; }
 #m-faders { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 10px 6px; min-height: 0; }
 #m-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 3px; }
@@ -949,6 +962,7 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
     <b class="m-title">elixir</b>
     <nav class="m-tabs" role="tablist">
       <button type="button" role="tab" data-m-tab="play" aria-selected="true">play</button>
+      <button type="button" role="tab" data-m-tab="dice" aria-selected="false">random</button>
       <button type="button" role="tab" data-m-tab="comp" aria-selected="false">comp</button>
       <button type="button" role="tab" data-m-tab="presets" aria-selected="false">presets</button>
     </nav>
@@ -966,9 +980,21 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
         <button class="m-btn m-big" id="m-everything" type="button">everything</button>
         <button class="m-btn" id="m-kit" type="button">kit</button>
         <button class="m-btn" id="m-pattern" type="button">pattern</button>
-        <button class="m-btn" id="m-undo" type="button" disabled>undo</button>
+        <button class="m-btn" id="m-undo" data-m-undo type="button" disabled>undo</button>
       </div>
     </div></section>
+  </div>
+
+  <div class="m-panel" data-m-panel="dice">
+    <section class="m-card m-dice-card">
+      <div class="m-dice">
+        <button class="m-btn m-big" id="m-d-everything" type="button">everything</button>
+        <button class="m-btn" id="m-d-pattern" type="button">sequence</button>
+        <div class="m-voices" id="m-voices"></div>
+        <button class="m-btn" data-m-undo type="button" disabled>undo</button>
+      </div>
+      <div class="m-xy" id="m-xy" role="group" aria-label="energy and rush pad"><span class="m-xy-x">energy →</span><span class="m-xy-y">↑ rush</span><i></i><output></output></div>
+    </section>
   </div>
 
   <div class="m-panel" data-m-panel="comp">
@@ -7375,7 +7401,7 @@ perfDraws.push(mDrawAll);
 // a preset load rebuilds the master section; the sliders follow
 // (the pattern button's undo; a preset load clears it, as it clears the desktop's)
 let mPatUndo = null;
-const mUndo = () => { $('m-undo').disabled = !mPatUndo && $('undo').disabled; };
+const mUndo = () => { document.querySelectorAll('[data-m-undo]').forEach((b) => { b.disabled = !mPatUndo && $('undo').disabled; }); };
 const mBuildMaster = buildMaster;
 buildMaster = function () { mBuildMaster(); mPatUndo = null; mUndo(); mDrawAll(); };
 
@@ -7455,7 +7481,7 @@ function mPatSet(p) {
   if (view === 'steps') setTab('perform'); else generate();
   drawGroove(); sendSeq(); setDirty(true);
 }
-$('m-pattern').addEventListener('click', async () => {
+const mRandPattern = async () => {
   await startAudio();
   const was = mPatGet();
   const styles = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
@@ -7463,11 +7489,43 @@ $('m-pattern').addEventListener('click', async () => {
   mPatSet({ style, beat: mRnd(STYLES[style].grooves.length), energy: 35 + mRnd(61), fills: mRnd(101),
     type: GROOVE_TYPES[mRnd(GROOVE_TYPES.length)].name, depth: 50 + mRnd(51) });
   undoValues = null; $('undo').disabled = true; mPatUndo = was; mUndo();
-});
-$('m-undo').addEventListener('click', () => {
+};
+$('m-pattern').addEventListener('click', mRandPattern);
+document.querySelectorAll('[data-m-undo]').forEach((b) => b.addEventListener('click', () => {
   if (mPatUndo) { const p = mPatUndo; mPatUndo = null; mPatSet(p); mUndo(); } else $('undo').click();
-});
+}));
 new MutationObserver(mUndo).observe($('undo'), { attributes: true, attributeFilter: ['disabled'] });
+
+// ---- the random page: everything, sequence, a button per drum (its sound from a random built-in kit) and the energy / rush pad ----
+$('m-d-everything').addEventListener('click', () => $('m-everything').click());
+$('m-d-pattern').addEventListener('click', mRandPattern);
+XN.forEach((name, v) => {
+  const b = document.createElement('button');
+  b.className = 'm-btn'; b.type = 'button'; b.textContent = name;
+  b.addEventListener('click', () => { mPatUndo = null; randomOne(v); });
+  $('m-voices').append(b);
+});
+// across is energy, up is rush; a touch puts the dot where it lands
+{
+  const pad = $('m-xy'), dot = pad.querySelector('i'), out = pad.querySelector('output');
+  const draw = () => {
+    dot.style.left = perf.energy + '%'; dot.style.bottom = perf.rush + '%';
+    out.textContent = `${perfText('energy')}\nrush ${perfText('rush')}`;
+  };
+  const at = (e) => {
+    const r = pad.getBoundingClientRect(), f = (x) => Math.round(Math.max(0, Math.min(1, x)) * 100);
+    const en = f((e.clientX - r.left) / r.width), ru = f((r.bottom - e.clientY) / r.height);
+    if (en !== perf.energy) setPerf('energy', en);
+    if (ru !== perf.rush) setPerf('rush', ru);
+    draw();
+  };
+  let held = false;
+  pad.addEventListener('pointerdown', (e) => { pad.setPointerCapture(e.pointerId); held = true; pad.classList.add('held'); at(e); });
+  pad.addEventListener('pointermove', (e) => { if (held) at(e); });
+  const end = () => { held = false; pad.classList.remove('held'); };
+  pad.addEventListener('pointerup', end); pad.addEventListener('pointercancel', end);
+  mDraws.push(draw);
+}
 
 // ---- presets: save, and a list to load or delete (kept in this browser, as on the desktop) ----
 // (a star once it's changed, as on the desktop's save button)
