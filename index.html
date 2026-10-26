@@ -1176,6 +1176,15 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     linear-gradient(180deg, rgba(30, 38, 20, .22) 0%, rgba(30, 38, 20, 0) 30%),
     radial-gradient(130% 100% at 50% 60%, rgba(0, 0, 0, 0) 55%, rgba(20, 26, 12, .3) 100%);
 }
+
+/* ---- depth: the screen sits deeper in its bezel (a heavier inner shadow, heaviest at the top right), and the ink casts
+   a deeper shadow on the backplane, the gap between them a little wider toward the top-right corner, since the glass
+   isn't quite flat (--d, set per control from where it sits: 1 at the bottom left, about 1.7 at the top right) ---- */
+.m { box-shadow: inset 0 6px 16px rgba(0, 0, 0, .36), inset -8px 8px 18px rgba(0, 0, 0, .2), inset 0 0 0 1px rgba(255, 255, 255, .1), 0 1px 0 rgba(255, 255, 255, .07); }
+.m, .m button, .m-title, .m .m-flab, .m .m-vf output { --d: 1; text-shadow: calc(2px * var(--d)) calc(2.2px * var(--d)) calc(.3px * var(--d)) rgba(23, 32, 14, calc(.16 + .04 * var(--d))); }
+.m .m-vtrack i, .m .m-seq-steps i::after, .m .m-seq-steps i::before, .m .m-gr i b { filter: drop-shadow(calc(2px * var(--d, 1)) calc(2.2px * var(--d, 1)) 0 rgba(23, 32, 14, .17)); }
+.m .m-btn, .m .m-toggle, .m .m-pload, .m .m-tabs button, .m .m-xy, .m .m-seq-len, .m .m-xyrow select { box-shadow: calc(2px * var(--d, 1)) calc(2.2px * var(--d, 1)) 0 rgba(23, 32, 14, .14); }
+.m .m-tabs button:not([aria-selected="true"]) { box-shadow: none; }
 </style>
 
 <main class="m" id="m">
@@ -8324,5 +8333,19 @@ $('m-install').addEventListener('click', async () => {
   mInstallEv = null; $('m-install').hidden = true;
 });
 
+// ---- the glass isn't flat: each control's ink shadow deepens a little toward the top right of the screen (--d, used
+// by the CSS), worked out once from where it sits and again when the screen's size changes ----
+function mDepth() {
+  const m = $('m').getBoundingClientRect();
+  for (const el of document.querySelectorAll('.m-vf, .m-btn, .m-toggle, .m-pload, .m-tabs button, .m-xy, .m-chead, .m-fx-row > b, .m-title, .m-trans button, .m-seq-lenrow')) {
+    const r = el.getBoundingClientRect();
+    if (!r.width) continue;
+    // pages off to the side count by their place on their own page
+    const x = (((r.left + r.width / 2 - m.left) % m.width) + m.width) % m.width / m.width, y = (r.top + r.height / 2 - m.top) / m.height;
+    el.style.setProperty('--d', (1 + 0.7 * Math.max(0, Math.min(1, x)) * Math.max(0, Math.min(1, 1 - y))).toFixed(2));
+  }
+}
+addEventListener('resize', mDepth);
+requestAnimationFrame(mDepth);
 mSync(); mUndo(); mCompOn(); mDrawAll();
 </script>
