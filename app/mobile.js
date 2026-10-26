@@ -428,9 +428,7 @@ $('m-fx-rand').addEventListener('click', async () => {
       q.dist[v] = Math.random() < 0.3 ? rIn(10, 70) : 0;
       q.ring[v] = Math.random() < 0.2 ? rIn(10, 60) : 0;
     }
-    // echo time: 1/16, 1/8, dotted 1/8 or 1/4, or a triplet 1/16, 1/8 or 1/4, then up to 1% off it either way
-    const t = [1 / 16, 1 / 8, 3 / 16, 1 / 4, 1 / 24, 1 / 12, 1 / 6][rIn(0, 6)];
-    q.pos = Math.max(0, Math.min(1, posOf(t * (1 + (Math.random() * 2 - 1) * 0.01))));
+    q.pos = randomDelayPos(); // (musical lengths, as every randomiser)
     q.p3 = rIn(40, 110); q.p4 = Math.random() < 0.8 ? rIn(15, 70) : rIn(70, 105);
     q.fx3.echo.pct = rIn(60, 160);
     q.fx3.dist.type = rIn(0, DIST_T.length - 1); q.fx3.dist.p = [rIn(30, 127), rIn(20, 110), rIn(40, 120), rIn(60, 110)];

@@ -22,14 +22,12 @@ function kitDelayPos() {
   const secs = lerp(min, max, p1 * rng) / fs, bar = 240 / perf.tempo;
   return Math.max(0, Math.min(1, posOf(secs / bar)));
 }
-// randomise picks 1/2, 1/4, dotted 1/8, 1/8 or 1/16, or now and then (1 roll in 20) 1/128, and puts it up to
-// 10 ms either side at 120 bpm. The time is a fraction of the bar, so the window is 1/200 of a bar at any
-// tempo. 1/128 is the shortest the dial goes, so it only drifts up, by up to a fifth
+// every randomiser picks the echo time from the musical lengths: 1/16, 1/8, dotted 1/8 or 1/4, or a triplet 1/16, 1/8
+// or 1/4, then puts it up to 1% off that length either way
 function randomDelayPos() {
-  if (rnd() < 1 / 20) return posOf((1 + rnd() * 0.2) / 128);
-  const pool = [1 / 2, 1 / 4, 3 / 16, 1 / 8, 1 / 16];
+  const pool = [1 / 16, 1 / 8, 3 / 16, 1 / 4, 1 / 24, 1 / 12, 1 / 6];
   const fr = pool[Math.floor(rnd() * pool.length)];
-  return Math.max(0, Math.min(1, posOf(fr + (rnd() * 2 - 1) * 0.005)));
+  return Math.max(0, Math.min(1, posOf(fr * (1 + (rnd() * 2 - 1) * 0.01))));
 }
 // a row of radio buttons drawn as a segmented control
 function radios(box, name, labels, get, set) {
