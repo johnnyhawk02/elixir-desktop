@@ -192,14 +192,15 @@ XN.forEach((name, v) => {
 });
 // across is energy, up is rush; a touch puts the dot where it lands
 {
-  const pad = $('m-xy'), dot = pad.querySelector('i'), out = pad.querySelector('output');
+  const pad = $('m-xy'), out = pad.querySelector('output'), XY_IN = 22;
   const draw = () => {
-    dot.style.left = perf.energy + '%'; dot.style.bottom = perf.rush + '%';
+    pad.style.setProperty('--x', perf.energy / 100); pad.style.setProperty('--y', perf.rush / 100);
     out.textContent = `${perfText('energy')}\nrush ${perfText('rush')}`;
   };
   const at = (e) => {
     const r = pad.getBoundingClientRect(), f = (x) => Math.round(Math.max(0, Math.min(1, x)) * 100);
-    const en = f((e.clientX - r.left) / r.width), ru = f((r.bottom - e.clientY) / r.height);
+    // the cursor's centre stays XY_IN px inside the edges, so it never hangs off them
+    const en = f((e.clientX - r.left - XY_IN) / (r.width - 2 * XY_IN)), ru = f((r.bottom - XY_IN - e.clientY) / (r.height - 2 * XY_IN));
     if (en !== perf.energy) setPerf('energy', en);
     if (ru !== perf.rush) setPerf('rush', ru);
     draw();
