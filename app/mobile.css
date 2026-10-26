@@ -43,9 +43,20 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
    faders take the rest (each track stretches to its row), then the randomisers. The other pages scroll inside */
 .m { height: calc(100dvh - max(10px, env(safe-area-inset-top, 0px)) - max(10px, env(safe-area-inset-bottom, 0px))); grid-template-rows: auto auto 1fr auto; }
 [data-m-panel="play"], [data-m-panel="dice"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
-/* the x/y page: the voice strip, then six pads, two across */
-.m-dice-card { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 10px; min-height: 0; padding: 10px 8px; }
-.m-pads { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px; min-height: 0; }
+/* the voice page: the drum strip, its faders (four across, three down), the pad's drop-downs, then the pad */
+.m-dice-card { display: grid; grid-template-rows: auto minmax(0, 2.6fr) auto minmax(0, 1fr); gap: 10px; min-height: 0; padding: 10px 8px; }
+.m-pads { display: grid; min-height: 0; }
+.m-vsets { display: grid; min-height: 0; }
+.m-vset { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 4px 6px; min-height: 0; }
+.m-vset[hidden] { display: none; }
+.m-vset .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
+.m .m-vset .m-vf output { font-size: var(--fs-xs); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; }
+.m .m-vset .m-flab { font-size: .85rem; letter-spacing: .02em; white-space: nowrap; }
+.m .m-vset .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 24px; }
+.m-xyrow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.m-xyrow label { display: flex; align-items: center; gap: 6px; text-transform: uppercase; font-size: var(--fs-xs); }
+.m-xyrow select { flex: 1; min-width: 0; min-height: 38px; font: inherit; font-size: var(--fs-s); text-transform: uppercase; color: var(--ink);
+  background: transparent; border: 2px solid var(--ink); border-radius: 3px; padding: 0 6px; }
 .m-xy { position: relative; min-height: 0; border-radius: 14px; background: var(--tint-2); touch-action: none; cursor: crosshair; overflow: hidden; }
 .m-xy i { position: absolute; left: calc(16px + (100% - 32px) * var(--x, 0)); bottom: calc(16px + (100% - 32px) * var(--y, 0)); width: 24px; height: 24px; margin: 0 0 -12px -12px;
   border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 3px var(--panel); pointer-events: none; }
