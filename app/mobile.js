@@ -232,7 +232,7 @@ function mPad(title, X, Y) {
     const x = val(X, (e.clientX - r.left - XY_IN) / (r.width - 2 * XY_IN)), y = val(Y, (r.bottom - XY_IN - e.clientY) / (r.height - 2 * XY_IN));
     if (x !== X.get()) X.set(x);
     if (y !== Y.get()) Y.set(y);
-    draw(); setDirty(true);
+    mDrawAll(); setDirty(true); // (the fx page's faders show the same settings)
   };
   let held = false;
   pad.addEventListener('pointerdown', (e) => { pad.setPointerCapture(e.pointerId); held = true; pad.classList.add('held'); at(e); });
@@ -374,6 +374,29 @@ async function mOffer(t, type) {
   }
   mDownload(t);
 }
+
+// ---- the fx page: every setting of the three effects on faders, a row each ----
+const fxF = (box, label, A) => mFader($(box), label, { min: A.min, max: A.max, step: A.step || 1, get: A.get, set: (v) => { A.set(v); setDirty(true); }, show: A.show, dflt: A.dflt });
+const fxSend = (k) => ({ ...mAllSend(k), show: (v) => mPct(v), dflt: 0 });
+const fxPar = (p, dflt) => ({ min: 0, max: 127, get: () => values[p], set: (v) => setValue(p, v, true), show: String, dflt });
+const fx3P = (i) => ({ min: 0, max: 127, get: () => fx3.dist.p[i], set: (v) => { fx3.dist.p[i] = v; sendMix(); }, show: String, dflt: FX3_0.dist.p[i] });
+// echo: send, its tempo-synced time (the nearest note length), tone, feedback and width
+fxF('m-fx-echo', 'send', fxSend('fx'));
+fxF('m-fx-echo', 'time', { min: 0, max: 1000, get: () => Math.round(delayPos * 1000), set: (v) => { delayPos = v / 1000; send({ type: 'delay', pos: delayPos }); },
+  show: (v) => showDelay(v).replace(/^\d+% /, ''), dflt: Math.round(posOf(3 / 16) * 1000) });
+fxF('m-fx-echo', 'tone', fxPar(PAR.FX_P3));
+fxF('m-fx-echo', 'feedback', fxPar(PAR.FX_P4));
+fxF('m-fx-echo', 'width', { min: 0, max: 200, get: () => fx3.echo.pct, set: (v) => { fx3.echo.pct = v; sendMix(); }, show: (v) => v + '%', dflt: FX3_0.echo.pct });
+// distortion: send, type (tube, fold or rat), drive, color, tone, volume
+fxF('m-fx-dist', 'send', fxSend('dist'));
+const DIST_T = LXR.DIST_NAMES.map((n) => n.toLowerCase());
+fxF('m-fx-dist', 'type', { min: 0, max: DIST_T.length - 1, get: () => fx3.dist.type, set: (v) => { fx3.dist.type = v; sendMix(); }, show: (v) => DIST_T[v], dflt: 0 });
+['drive', 'color', 'tone', 'volume'].forEach((l, i) => fxF('m-fx-dist', l, fx3P(i)));
+// ring mod: send, the carrier's wave and frequency
+fxF('m-fx-ring', 'send', fxSend('ring'));
+const RING_W = LXR.OSC_WAVE_NAMES.map((n) => n.toLowerCase());
+fxF('m-fx-ring', 'wave', { min: 0, max: RING_W.length - 1, get: () => fx3.ring.wave, set: (v) => { fx3.ring.wave = v; sendMix(); }, show: (v) => RING_W[v], dflt: 0 });
+fxF('m-fx-ring', 'freq', { min: 0, max: 127, get: () => fx3.ring.freq, set: (v) => { fx3.ring.freq = v; sendMix(); }, show: String, dflt: FX3_0.ring.freq });
 
 // ---- step sequencers: holding a fader opens one for it: 2 to 16 steps, each a value it takes on that 16th note while
 // playing (the step is the bar's 16th counted from the start, wrapped at the length, so short ones run against the bar),

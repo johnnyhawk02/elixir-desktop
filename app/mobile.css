@@ -208,3 +208,17 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 #m-beat-faders { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; height: min(42vh, 320px); }
 .m-pop { z-index: 9; }
 .m .m-beat-open { min-height: 46px; }
+
+/* the fx page: a row of faders per effect, its name above it */
+[data-m-panel="fx"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
+.m-fx-card { display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px; min-height: 0; padding: 8px; }
+.m-fx-row { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 2px; min-height: 0; }
+.m-fx-row b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); padding-left: 4px; }
+.m-fx-row .m-faders { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+.m-fx-row .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
+.m .m-fx-row .m-vf output { font-size: var(--fs-xs); line-height: 1; height: 1.1em; display: flex; align-items: flex-end; justify-content: center; flex: none; align-self: stretch; overflow: hidden; white-space: nowrap; }
+.m .m-fx-row .m-flab { font-size: .85rem; letter-spacing: .02em; }
+.m .m-fx-row .m-vtrack { width: min(44px, 100%); flex: 1; height: auto; min-height: 30px; }
+/* five page buttons share the bar */
+.m-tabs { grid-template-columns: repeat(5, 1fr); }
+.m-tabs button { font-size: var(--fs-s) !important; letter-spacing: 0; padding: 0 1px; min-width: 0; }

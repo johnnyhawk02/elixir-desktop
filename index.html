@@ -1056,6 +1056,20 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 #m-beat-faders { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; height: min(42vh, 320px); }
 .m-pop { z-index: 9; }
 .m .m-beat-open { min-height: 46px; }
+
+/* the fx page: a row of faders per effect, its name above it */
+[data-m-panel="fx"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
+.m-fx-card { display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px; min-height: 0; padding: 8px; }
+.m-fx-row { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 2px; min-height: 0; }
+.m-fx-row b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); padding-left: 4px; }
+.m-fx-row .m-faders { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+.m-fx-row .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
+.m .m-fx-row .m-vf output { font-size: var(--fs-xs); line-height: 1; height: 1.1em; display: flex; align-items: flex-end; justify-content: center; flex: none; align-self: stretch; overflow: hidden; white-space: nowrap; }
+.m .m-fx-row .m-flab { font-size: .85rem; letter-spacing: .02em; }
+.m .m-fx-row .m-vtrack { width: min(44px, 100%); flex: 1; height: auto; min-height: 30px; }
+/* five page buttons share the bar */
+.m-tabs { grid-template-columns: repeat(5, 1fr); }
+.m-tabs button { font-size: var(--fs-s) !important; letter-spacing: 0; padding: 0 1px; min-width: 0; }
 </style>
 
 <main class="m" id="m">
@@ -1086,6 +1100,14 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
   <div class="m-panel" data-m-panel="dice">
     <section class="m-card m-dice-card">
       <div class="m-pads" id="m-pads"></div>
+    </section>
+  </div>
+
+  <div class="m-panel" data-m-panel="fx">
+    <section class="m-card m-fx-card">
+      <div class="m-fx-row"><b>echo</b><div class="m-faders" id="m-fx-echo"></div></div>
+      <div class="m-fx-row"><b>distortion</b><div class="m-faders" id="m-fx-dist"></div></div>
+      <div class="m-fx-row"><b>ring mod</b><div class="m-faders" id="m-fx-ring"></div></div>
     </section>
   </div>
 
@@ -1138,6 +1160,7 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
   <nav class="m-tabs" role="tablist" aria-label="pages">
     <button type="button" role="tab" data-m-tab="play" aria-selected="true">perf</button>
     <button type="button" role="tab" data-m-tab="dice" aria-selected="false">x/y</button>
+    <button type="button" role="tab" data-m-tab="fx" aria-selected="false">fx</button>
     <button type="button" role="tab" data-m-tab="comp" aria-selected="false">comp</button>
     <button type="button" role="tab" data-m-tab="presets" aria-selected="false">presets</button>
   </nav>
@@ -7739,7 +7762,7 @@ function mPad(title, X, Y) {
     const x = val(X, (e.clientX - r.left - XY_IN) / (r.width - 2 * XY_IN)), y = val(Y, (r.bottom - XY_IN - e.clientY) / (r.height - 2 * XY_IN));
     if (x !== X.get()) X.set(x);
     if (y !== Y.get()) Y.set(y);
-    draw(); setDirty(true);
+    mDrawAll(); setDirty(true); // (the fx page's faders show the same settings)
   };
   let held = false;
   pad.addEventListener('pointerdown', (e) => { pad.setPointerCapture(e.pointerId); held = true; pad.classList.add('held'); at(e); });
@@ -7881,6 +7904,29 @@ async function mOffer(t, type) {
   }
   mDownload(t);
 }
+
+// ---- the fx page: every setting of the three effects on faders, a row each ----
+const fxF = (box, label, A) => mFader($(box), label, { min: A.min, max: A.max, step: A.step || 1, get: A.get, set: (v) => { A.set(v); setDirty(true); }, show: A.show, dflt: A.dflt });
+const fxSend = (k) => ({ ...mAllSend(k), show: (v) => mPct(v), dflt: 0 });
+const fxPar = (p, dflt) => ({ min: 0, max: 127, get: () => values[p], set: (v) => setValue(p, v, true), show: String, dflt });
+const fx3P = (i) => ({ min: 0, max: 127, get: () => fx3.dist.p[i], set: (v) => { fx3.dist.p[i] = v; sendMix(); }, show: String, dflt: FX3_0.dist.p[i] });
+// echo: send, its tempo-synced time (the nearest note length), tone, feedback and width
+fxF('m-fx-echo', 'send', fxSend('fx'));
+fxF('m-fx-echo', 'time', { min: 0, max: 1000, get: () => Math.round(delayPos * 1000), set: (v) => { delayPos = v / 1000; send({ type: 'delay', pos: delayPos }); },
+  show: (v) => showDelay(v).replace(/^\d+% /, ''), dflt: Math.round(posOf(3 / 16) * 1000) });
+fxF('m-fx-echo', 'tone', fxPar(PAR.FX_P3));
+fxF('m-fx-echo', 'feedback', fxPar(PAR.FX_P4));
+fxF('m-fx-echo', 'width', { min: 0, max: 200, get: () => fx3.echo.pct, set: (v) => { fx3.echo.pct = v; sendMix(); }, show: (v) => v + '%', dflt: FX3_0.echo.pct });
+// distortion: send, type (tube, fold or rat), drive, color, tone, volume
+fxF('m-fx-dist', 'send', fxSend('dist'));
+const DIST_T = LXR.DIST_NAMES.map((n) => n.toLowerCase());
+fxF('m-fx-dist', 'type', { min: 0, max: DIST_T.length - 1, get: () => fx3.dist.type, set: (v) => { fx3.dist.type = v; sendMix(); }, show: (v) => DIST_T[v], dflt: 0 });
+['drive', 'color', 'tone', 'volume'].forEach((l, i) => fxF('m-fx-dist', l, fx3P(i)));
+// ring mod: send, the carrier's wave and frequency
+fxF('m-fx-ring', 'send', fxSend('ring'));
+const RING_W = LXR.OSC_WAVE_NAMES.map((n) => n.toLowerCase());
+fxF('m-fx-ring', 'wave', { min: 0, max: RING_W.length - 1, get: () => fx3.ring.wave, set: (v) => { fx3.ring.wave = v; sendMix(); }, show: (v) => RING_W[v], dflt: 0 });
+fxF('m-fx-ring', 'freq', { min: 0, max: 127, get: () => fx3.ring.freq, set: (v) => { fx3.ring.freq = v; sendMix(); }, show: String, dflt: FX3_0.ring.freq });
 
 // ---- step sequencers: holding a fader opens one for it: 2 to 16 steps, each a value it takes on that 16th note while
 // playing (the step is the bar's 16th counted from the start, wrapped at the length, so short ones run against the bar),
