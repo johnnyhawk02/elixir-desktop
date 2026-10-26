@@ -406,3 +406,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-tabs button { font-size: min(1.1rem, 3.5vw) !important; }
 .m-presets-card .m-foot { font-size: .95rem; }
 .m #m-faders .m-flab { font-size: min(var(--fs-xs), 3.75vw); letter-spacing: -.02em; }
+
+/* ---- the page selector: a strip that swipes sideways, about five buttons in view at a size that reads, the chosen
+   one kept in view (snapping to whole buttons) ---- */
+.m > .m-tabs { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; overscroll-behavior-x: contain;
+  scrollbar-width: none; touch-action: pan-x; gap: 6px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent); mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent); }
+.m > .m-tabs::-webkit-scrollbar { display: none; }
+.m .m-tabs button { flex: 0 0 calc((100% - 4 * 6px) / 5.4); scroll-snap-align: center; font-size: var(--fs-s) !important; letter-spacing: .04em; padding: 0 2px; }
