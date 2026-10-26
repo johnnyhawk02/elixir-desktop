@@ -1254,6 +1254,11 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-tabs button { font-size: min(1.1rem, 3.5vw) !important; }
 .m-presets-card .m-foot { font-size: .95rem; }
 .m #m-faders .m-flab { font-size: min(var(--fs-xs), 3.75vw); letter-spacing: -.02em; }
+
+/* ---- pages turn only with their buttons: the pages don't swipe, and the buttons' text is as big as fits ---- */
+.m-pages { overflow-x: hidden; }
+.m > .m-tabs { gap: 2px; padding-left: 0; padding-right: 0; }
+.m .m-tabs button { font-size: min(1.4rem, 4.9vw) !important; letter-spacing: 0; padding: 0; min-height: 56px; }
 </style>
 
 <main class="m" id="m">
@@ -7771,8 +7776,7 @@ drawScope();
 try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
 const mRnd = (n) => Math.floor(Math.random() * n);
 
-// ---- pages: swipe between them, or tap a tab to scroll to one. The tab changes once: at once for a tap, and for a
-// swipe when the pages come to rest (not for each page passed on the way) ----
+// ---- pages: tap a tab to scroll to one (the pages don't swipe). The tab changes once, at once, not for each page passed ----
 const mPages = $('m-pages');
 let mCur = 'play', mSettle = 0;
 function mTab(t) {

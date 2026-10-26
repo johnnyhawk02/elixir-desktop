@@ -5,8 +5,7 @@
 try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
 const mRnd = (n) => Math.floor(Math.random() * n);
 
-// ---- pages: swipe between them, or tap a tab to scroll to one. The tab changes once: at once for a tap, and for a
-// swipe when the pages come to rest (not for each page passed on the way) ----
+// ---- pages: tap a tab to scroll to one (the pages don't swipe). The tab changes once, at once, not for each page passed ----
 const mPages = $('m-pages');
 let mCur = 'play', mSettle = 0;
 function mTab(t) {
