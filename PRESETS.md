@@ -21,8 +21,8 @@ the built-in presets in `presets/*.json` must match it (`build.mjs` refuses one 
 ## Additions in Elixir Mobile
 
 - `song.master.space`: the sidechain's spacer, 0..100 (missing means 0).
-- `song.seqs`: the step sequencers, `{ "<box id>:<fader label>": { on, len, slew, speed, vals } }`, where `len` is 2..16, `slew` 0..100 (how much of a step it glides over), `speed`
-  steps per 16th note (1/16, 1/8, 1/4, 1/2, 1, 2, 4 or 8; missing means 1) and
+- `song.seqs`: the step sequencers, `{ "<box id>:<fader label>": { on, len, slew, step, vals } }`, where `len` is 2..16, `slew` 0..100 (how much of a step it glides over), `step`
+  how long each step lasts in 16ths (1, 2, 4, 8, 16, 32, 64 or 128: a 16th note up to 8 bars; missing means 1) and
   `vals` holds sixteen values in the fader's own range (e.g. `"m-beat-faders:energy"`). A preset without one for a
   fader clears it.
 - `song.xdepth`: the crossfeed depth, 0..100 (missing means 100).
