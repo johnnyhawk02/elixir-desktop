@@ -1331,6 +1331,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-ch-card .m-rs-tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .m-rand-card .m-rand { grid-template-rows: auto auto repeat(6, minmax(0, 1fr)); }
 .m-rand-card .m-nextbar { justify-content: flex-start; padding-left: 6px; min-height: 30px; }
+/* a fader moved by MIDI follows the knob straight away, without the LCD fade */
+.m .m-vf.cc .m-vtrack i { transition: none; }
 </style>
 
 <main class="m" id="m">
@@ -8795,13 +8797,26 @@ $('m-assign').addEventListener('change', () => { $('m-faders').classList.toggle(
 // MIDI: CC 17..24 set faders 1..8 across their range (other CCs go to the PC4 map as before); MIDI starts at the
 // first touch, since the browser may ask first
 const mPc4Midi = pc4Midi;
+// (a controller sends many CCs a second: only each fader's latest is kept, applied once a frame, and the moving
+// fader skips the LCD fade so it keeps up with the knob)
+const mCcNext = new Map();
+let mCcFrame = 0;
 pc4Midi = function (cc, val) {
   if (cc < 17 || cc > 24) return mPc4Midi(cc, val);
-  const el = mSlotEls[cc - 17] && mSlotEls[cc - 17].el, fd = el && mFaders.find((f) => f.el === el); if (!fd) return;
-  const v = fd.snap(fd.min + val / 127 * (fd.hiOf() - fd.min));
-  if (fd.base !== null) { fd.base = v; mSeqApply(fd); } else fd.put(v);
-  setDirty(true);
+  mCcNext.set(cc - 17, val);
+  if (!mCcFrame) mCcFrame = requestAnimationFrame(mCcApply);
 };
+function mCcApply() {
+  mCcFrame = 0;
+  for (const [i, val] of mCcNext) {
+    const el = mSlotEls[i] && mSlotEls[i].el, fd = el && mFaders.find((f) => f.el === el); if (!fd) continue;
+    const v = fd.snap(fd.min + val / 127 * (fd.hiOf() - fd.min));
+    el.classList.add('cc'); clearTimeout(el._cc); el._cc = setTimeout(() => el.classList.remove('cc'), 250);
+    if (fd.base !== null) { fd.base = v; mSeqApply(fd); } else fd.put(v);
+  }
+  mCcNext.clear();
+  setDirty(true);
+}
 addEventListener('pointerdown', () => startMidi(), { once: true });
 // in assign mode a tap on a slot opens the chooser instead of moving it (on the click, once the finger is up, so the
 // tap can't land on the chooser too)
