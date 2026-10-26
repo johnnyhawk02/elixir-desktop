@@ -1130,6 +1130,42 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-pages .m-card + .m-card, .m-fx-row + .m-fx-row, .m-fx-btns { border-top: 1px solid var(--ink); padding-top: 6px; }
 .m > .m-card.m-trans { border-bottom: 2px solid var(--ink); border-radius: 0; }
 [data-m-panel="play"] .m-card.m-rand-card { border-top: 0; padding-top: 10px; }
+
+/* ---- nothing scrolls: the comp page is two rows of faders, the presets list turns pages, the sequencer sheet fits
+   under play and record ---- */
+[data-m-panel="comp"], [data-m-panel="presets"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
+.m-comp-card { display: grid; grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 6px; min-height: 0; padding: 8px 2px; }
+.m-comp-card .m-chead { gap: 10px; }
+.m-comp-card .m-chead + .m-chead, .m-comp-card #m-comp + .m-chead { border-top: 1px solid var(--ink); padding-top: 6px; }
+.m-comp-card .m-gr { flex: 1; grid-template-columns: 1fr auto; gap: 8px; }
+#m-comp, #m-duck { grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+#m-comp .m-vf, #m-duck .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
+.m #m-comp .m-vf output, .m #m-duck .m-vf output { font-size: var(--fs-xs); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; white-space: nowrap; }
+.m #m-comp .m-flab, .m #m-duck .m-flab { font-size: .85rem; letter-spacing: .02em; }
+.m #m-comp .m-vtrack, .m #m-duck .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 30px; }
+.m-presets-card { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto auto auto; gap: 6px; min-height: 0; padding: 8px 2px; }
+.m-presets-card .m-note { margin: 0; min-height: 1.2em; }
+.m-plist { min-height: 0; overflow: hidden; align-content: start; }
+.m-plist li[hidden] { display: none; }
+.m-ppager { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
+.m-ppager[hidden] { display: none; }
+.m-ppager .m-btn { min-height: 40px; font-size: 1.4rem !important; }
+.m-ppager output { min-width: 4em; text-align: center; }
+.m-pio { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); margin-top: 0; }
+.m-pio .m-btn { min-height: 46px; font-size: var(--fs-xs) !important; }
+.m-presets-card .m-foot { color: var(--muted); opacity: 1; padding: 0; font-size: .8rem; line-height: 1.2; }
+.m-seq-card { height: min(calc(100dvh - 150px), 640px); grid-template-rows: auto minmax(0, 1fr) auto auto auto auto auto; }
+.m-seq-card .m-seq-steps { height: auto; min-height: 60px; }
+#m-beat .m-seq-card { height: auto; grid-template-rows: none; }
+/* the perf page: the randomise buttons share their column evenly, beside the three rows of faders */
+.m-rand-card .m-rand { grid-auto-rows: auto; grid-template-rows: repeat(6, minmax(0, 1fr)); align-content: stretch; height: 100%; }
+.m-rand-card .m-rand .m-btn { min-height: 0; }
+[data-m-panel="play"] .m-card.m-rand-card { padding: 6px 0 6px 8px; }
+.m-play-card { padding: 6px 4px 6px 0; }
+[data-m-panel="comp"], [data-m-panel="presets"] { grid-template-columns: minmax(0, 1fr); }
+.m-comp-card .m-chead b { white-space: nowrap; }
+.m-comp-card .m-toggle { min-width: 52px; }
+.m-pages .m-card.m-comp-card { padding-right: 6px; padding-left: 4px; }
 </style>
 
 <main class="m" id="m">
@@ -1195,30 +1231,27 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   </div>
 
   <div class="m-panel" data-m-panel="comp">
-    <section class="m-card m-faders">
-      <div class="m-chead"><b>compressor</b><button class="m-toggle" id="m-comp-on" type="button" aria-pressed="true">on</button></div>
-      <div class="m-gr" aria-label="gain reduction"><span>reduction</span><i><b id="m-gr"></b></i><output id="m-gr-out">0 dB</output></div>
-      <div id="m-comp"></div>
-    </section>
-    <section class="m-card m-faders">
+    <section class="m-card m-comp-card">
+      <div class="m-chead"><b>compressor</b><div class="m-gr" aria-label="gain reduction"><i><b id="m-gr"></b></i><output id="m-gr-out">0 dB</output></div><button class="m-toggle" id="m-comp-on" type="button" aria-pressed="true">on</button></div>
+      <div class="m-faders" id="m-comp"></div>
       <div class="m-chead"><b>drum 1 sidechain</b></div>
-      <div id="m-duck"></div>
+      <div class="m-faders" id="m-duck"></div>
     </section>
   </div>
 
   <div class="m-panel" data-m-panel="presets">
-    <section class="m-card">
+    <section class="m-card m-presets-card">
       <button class="m-btn m-big m-wide" id="m-psave" type="button">save this sound</button>
       <p class="m-note" id="m-pnote" aria-live="polite"></p>
       <ul class="m-plist" id="m-plist"></ul>
+      <div class="m-ppager" id="m-ppager" hidden><button class="m-btn" id="m-pprev" type="button" aria-label="previous presets">‹</button><output id="m-ppage"></output><button class="m-btn" id="m-pnext" type="button" aria-label="more presets">›</button></div>
       <div class="m-pio">
-        <label class="m-btn m-file">import presets<input id="m-pimport" type="file" accept="application/json,.json" multiple></label>
-        <button class="m-btn" id="m-pexport" type="button">export mine</button>
+        <label class="m-btn m-file" title="Reads a presets file: one exported here, or favourites exported from the full Elixir">import<input id="m-pimport" type="file" accept="application/json,.json" multiple></label>
+        <button class="m-btn" id="m-pexport" type="button" title="Saves every preset saved here to a file">export mine</button>
+        <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <p class="m-note">Import reads a presets file exported from the full Elixir (star presets there, then export favourites). Export mine writes one the full Elixir can import.</p>
+      <footer class="m-foot">Engine ported from the Erica Synths LXR-02 firmware (GPL-3.0). Unofficial. <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a></footer>
     </section>
-    <button class="m-btn m-wide m-install" id="m-install" type="button" hidden>install the app</button>
-    <footer class="m-foot">Engine ported from the Erica Synths LXR-02 firmware (GPL-3.0). Unofficial. <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a></footer>
   </div>
   </div>
 
@@ -7955,7 +7988,32 @@ function mDrawPresets() {
   else { const li = document.createElement('li'); li.className = 'm-pempty'; li.textContent = 'None yet. Save makes one.'; list.append(li); }
   group('built in');
   kitList.filter((k) => k.builtin).forEach(row);
+  mPaginate();
 }
+// the list never scrolls: it's split into pages of as many rows as fit, with ‹ › to turn them (the page holding the
+// preset playing comes up first)
+let mPPage = -1;
+function mPaginate() {
+  const list = $('m-plist'), rows = [...list.children];
+  rows.forEach((r) => { r.hidden = false; });
+  const room = list.clientHeight, pages = [[]];
+  let used = 0;
+  for (const r of rows) {
+    const h = r.offsetHeight + 4;
+    if (used + h > room && pages[pages.length - 1].length) { pages.push([]); used = 0; }
+    pages[pages.length - 1].push(r); used += h;
+  }
+  // a group heading never ends a page
+  for (let i = 0; i < pages.length - 1; i++) { const pg = pages[i], last = pg[pg.length - 1]; if (pg.length > 1 && last.classList.contains('m-pgroup')) pages[i + 1].unshift(pg.pop()); }
+  if (mPPage < 0 || mPPage >= pages.length) { const cur = rows.findIndex((r) => r.classList.contains('cur')); mPPage = Math.max(0, pages.findIndex((pg) => pg.includes(rows[cur]))); }
+  pages.forEach((pg, i) => pg.forEach((r) => { r.hidden = i !== mPPage; }));
+  $('m-ppager').hidden = pages.length < 2;
+  $('m-ppage').textContent = `${mPPage + 1} / ${pages.length}`;
+  $('m-pprev').disabled = mPPage === 0; $('m-pnext').disabled = mPPage === pages.length - 1;
+}
+$('m-pprev').addEventListener('click', () => { mPPage--; mPaginate(); });
+$('m-pnext').addEventListener('click', () => { mPPage++; mPaginate(); });
+addEventListener('resize', () => { mPPage = -1; mPaginate(); });
 $('m-psave').addEventListener('click', () => {
   $('kit-save').click();
   const k = kitList[kitList.length - 1];

@@ -282,3 +282,39 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-pages .m-card + .m-card, .m-fx-row + .m-fx-row, .m-fx-btns { border-top: 1px solid var(--ink); padding-top: 6px; }
 .m > .m-card.m-trans { border-bottom: 2px solid var(--ink); border-radius: 0; }
 [data-m-panel="play"] .m-card.m-rand-card { border-top: 0; padding-top: 10px; }
+
+/* ---- nothing scrolls: the comp page is two rows of faders, the presets list turns pages, the sequencer sheet fits
+   under play and record ---- */
+[data-m-panel="comp"], [data-m-panel="presets"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
+.m-comp-card { display: grid; grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 6px; min-height: 0; padding: 8px 2px; }
+.m-comp-card .m-chead { gap: 10px; }
+.m-comp-card .m-chead + .m-chead, .m-comp-card #m-comp + .m-chead { border-top: 1px solid var(--ink); padding-top: 6px; }
+.m-comp-card .m-gr { flex: 1; grid-template-columns: 1fr auto; gap: 8px; }
+#m-comp, #m-duck { grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+#m-comp .m-vf, #m-duck .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
+.m #m-comp .m-vf output, .m #m-duck .m-vf output { font-size: var(--fs-xs); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; white-space: nowrap; }
+.m #m-comp .m-flab, .m #m-duck .m-flab { font-size: .85rem; letter-spacing: .02em; }
+.m #m-comp .m-vtrack, .m #m-duck .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 30px; }
+.m-presets-card { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto auto auto; gap: 6px; min-height: 0; padding: 8px 2px; }
+.m-presets-card .m-note { margin: 0; min-height: 1.2em; }
+.m-plist { min-height: 0; overflow: hidden; align-content: start; }
+.m-plist li[hidden] { display: none; }
+.m-ppager { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
+.m-ppager[hidden] { display: none; }
+.m-ppager .m-btn { min-height: 40px; font-size: 1.4rem !important; }
+.m-ppager output { min-width: 4em; text-align: center; }
+.m-pio { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); margin-top: 0; }
+.m-pio .m-btn { min-height: 46px; font-size: var(--fs-xs) !important; }
+.m-presets-card .m-foot { color: var(--muted); opacity: 1; padding: 0; font-size: .8rem; line-height: 1.2; }
+.m-seq-card { height: min(calc(100dvh - 150px), 640px); grid-template-rows: auto minmax(0, 1fr) auto auto auto auto auto; }
+.m-seq-card .m-seq-steps { height: auto; min-height: 60px; }
+#m-beat .m-seq-card { height: auto; grid-template-rows: none; }
+/* the perf page: the randomise buttons share their column evenly, beside the three rows of faders */
+.m-rand-card .m-rand { grid-auto-rows: auto; grid-template-rows: repeat(6, minmax(0, 1fr)); align-content: stretch; height: 100%; }
+.m-rand-card .m-rand .m-btn { min-height: 0; }
+[data-m-panel="play"] .m-card.m-rand-card { padding: 6px 0 6px 8px; }
+.m-play-card { padding: 6px 4px 6px 0; }
+[data-m-panel="comp"], [data-m-panel="presets"] { grid-template-columns: minmax(0, 1fr); }
+.m-comp-card .m-chead b { white-space: nowrap; }
+.m-comp-card .m-toggle { min-width: 52px; }
+.m-pages .m-card.m-comp-card { padding-right: 6px; padding-left: 4px; }
