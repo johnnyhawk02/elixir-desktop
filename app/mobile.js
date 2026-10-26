@@ -333,9 +333,10 @@ async function mOffer(t, type) {
 // notes), rotate shifts the line round the bar, pitch transposes it. Random makes a new line, alter changes a few steps,
 // voice gives it a drum voice from a random built-in kit, held longer and with less pitch sweep so the notes read.
 // Space makes room for the drums: the line is cut, band by band, where the drums (the whole mix before the master) are.
+// The drums' energy thins it too: at energy 0 it plays the density fader's notes, at full energy none.
 const ACID_SCALE = [0, 0, 0, 0, 3, 5, 7, 7, 10, 12, 12, -12, 15];
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const acid = { rank: [], note: [], acc: [], slide: [], density: 60, rotate: 0, pitch: 0, level: 70, space: 50 };
+const acid = { rank: [], note: [], acc: [], slide: [], density: 60, rotate: 0, pitch: 0, level: 70, space: 50, verb: 0, kit: null };
 function acidNew() {
   // downbeats tend to come first, so a thin line still lands on the beat
   const w = Array.from({ length: 16 }, (_, s) => Math.random() - (s % 4 === 0 ? 0.35 : s % 2 === 0 ? 0.1 : 0));
@@ -348,14 +349,18 @@ function acidAlter() {
   const a = mRnd(16), b = mRnd(16); [acid.rank[a], acid.rank[b]] = [acid.rank[b], acid.rank[a]];
   acid.acc[mRnd(16)] ^= true; acid.slide[mRnd(16)] ^= true;
 }
-// the steps as played: rotated, thinned by density
+// how many steps play: the density fader's count, thinned as the drums' energy goes up (none at full energy), so the
+// line and the drums trade places across the X/Y pad (and the energy fader)
+const acidMax = () => Math.round(acid.density / 100 * 16);
+const acidCount = () => Math.round(acidMax() * (100 - perf.energy) / 100);
+// the steps as played: rotated, thinned by density and energy
 const acidSteps = () => Array.from({ length: 16 }, (_, s) => {
   const src = (s - acid.rotate + 16) % 16;
-  return acid.rank[src] < Math.round(acid.density / 100 * 16) ? { n: acid.note[src], acc: !!acid.acc[src], slide: !!acid.slide[src] } : null;
+  return acid.rank[src] < acidCount() ? { n: acid.note[src], acc: !!acid.acc[src], slide: !!acid.slide[src] } : null;
 });
 function acidSend() {
   const steps = acidSteps();
-  send({ type: 'acid', acid: { steps, level: acid.level, base: 60 + acid.pitch, space: acid.space } });
+  send({ type: 'acid', acid: { steps, level: acid.level, base: 60 + acid.pitch, space: acid.space, verb: acid.verb } });
   acidDraw(steps);
 }
 const mAcidCells = Array.from({ length: 16 }, () => { const c = document.createElement('span'); $('m-acid-steps').append(c); return c; });
@@ -376,20 +381,35 @@ function acidVoice() {
   kit[PAR.VELOD1] = Math.max(45, Math.min(85, kit[PAR.VELOD1] * 2));
   kit[PAR.MODAMNT1] = Math.min(kit[PAR.MODAMNT1], 30);
   kit[PAR.AMOUNT_LFO1] = 0; kit[PAR.VELO_MOD_AMT_1] = 0; kit[PAR.VOL1] = 100; kit[PAR.PAN1] = 64;
+  // the fm, cutoff and drive faders keep where they are across a new voice
+  if (acid.kit) for (const par of ACID_KEEP) kit[par] = acid.kit[par];
+  acid.kit = kit;
   send({ type: 'acidKit', values: Array.from(kit) });
 }
+const ACID_KEEP = [PAR.FMAMNT1, PAR.FILTER_FREQ_1, PAR.DRIVE1];
 const acidFader = (label, key, min, max, show) => mFader($('m-acid-faders'), label, { min, max, get: () => acid[key],
-  set: (v) => { acid[key] = v; acidSend(); }, show, dflt: { density: 60, rotate: 0, pitch: 0, level: 70, space: 50 }[key] });
-acidFader('density', 'density', 0, 100, (v) => `${Math.round(v / 100 * 16)}\nnotes`);
+  set: (v) => { acid[key] = v; acidSend(); }, show, dflt: { density: 60, rotate: 0, pitch: 0, level: 70, space: 50, verb: 0 }[key] });
+acidFader('density', 'density', 0, 100, () => `${acidCount()}/${acidMax()}\nnotes`);
 acidFader('rotate', 'rotate', 0, 15, (v) => (v ? `+${v}` : '0') + '\nsteps');
 acidFader('pitch', 'pitch', -12, 12, (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v) + '\nst');
 acidFader('level', 'level', 0, 100, (v) => (v ? v + '%' : 'off'));
 // space: the spacer, which cuts the line's frequencies wherever the drums are playing in them (after Trackspacer)
 acidFader('space', 'space', 0, 100, (v) => (v ? v + '%' : 'off'));
+// the voice's own fm depth, filter cutoff and drive (the LXR's per-voice distortion), on the acid engine only
+const acidPar = (label, par) => mFader($('m-acid-faders'), label, { min: 0, max: 127, get: () => (acid.kit ? acid.kit[par] : 0),
+  set: (v) => { acid.kit[par] = v; send({ type: 'acidParam', par, value: v }); }, show: (v) => String(v) });
+acidPar('fm', PAR.FMAMNT1);
+acidPar('cutoff', PAR.FILTER_FREQ_1);
+acidPar('drive', PAR.DRIVE1);
+// reverb: a send into the line's own reverb
+acidFader('reverb', 'verb', 0, 100, (v) => (v ? v + '%' : 'off'));
 $('m-acid-new').addEventListener('click', async () => { await startAudio(); acidNew(); acidSend(); });
 $('m-acid-alter').addEventListener('click', async () => { await startAudio(); acidAlter(); acidSend(); });
-$('m-acid-voice').addEventListener('click', async () => { await startAudio(); acidVoice(); });
+$('m-acid-voice').addEventListener('click', async () => { await startAudio(); acidVoice(); mDrawAll(); });
 acidNew(); acidVoice(); acidSend();
+// a change of energy (pad or fader) re-thins the line
+let mAcidE = perf.energy;
+perfDraws.push(() => { if (perf.energy !== mAcidE) { mAcidE = perf.energy; acidSend(); mDrawAll(); } });
 // the playing step lights up (stopped, none does)
 const mMarkStep = markStep;
 markStep = function (s) { mMarkStep(s); mAcidCells.forEach((c, i) => c.classList.toggle('now', i === s)); };

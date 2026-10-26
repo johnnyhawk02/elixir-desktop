@@ -70,7 +70,7 @@ class Player {
     // the acid line: a second engine, of which only drum 1 plays, stepping through 16 notes (null = rest) on the
     // straight grid; a slide doesn't retrigger, it glides into the note (bend: the pitch ratio still to go, easing to 1)
     this.b = new LXR.LxrEngine({ seed: 0x1f2e3d4c }); this.b.loadInitKit();
-    this.acid = { steps: new Array(16).fill(null), level: 0, base: 60, space: 0 };
+    this.acid = { steps: new Array(16).fill(null), level: 0, base: 60, space: 0, verb: 0 };
     this.acidNote = 60; this.acidBend = 1; this.acidG = 1; this.acidGTo = 1;
     // drum voices differ a lot in level, so the line is evened out: its peak, held and let go over a couple of seconds,
     // sets a gain toward a fixed peak (acidNorm, eased so a change never jumps)
@@ -82,6 +82,11 @@ class Player {
     this.spF = Array.from({ length: 8 }, (_, k) => Math.tan(Math.PI * 60 * Math.pow(2, k * 1.1) / LXR.REAL_FS));
     this.spS = new Float64Array(32); this.spEnv = new Float32Array(8); this.spG = new Float32Array(8).fill(1);
     this.spBand = Array.from({ length: 8 }, () => new Float32Array(64)); this.spGr = new Float32Array(8);
+    // the acid line's reverb, a send: a small Freeverb (four damped combs and two all-passes a side, the right side's
+    // delays a little longer for width), its input the line after the spacer
+    const comb = (n) => ({ b: new Float32Array(n), i: 0, z: 0 }), ap = (n) => ({ b: new Float32Array(n), i: 0 });
+    this.verb = [0, 23].map((sp) => ({ c: [1116, 1188, 1277, 1356].map((n) => comb(n + sp)), a: [556, 441].map((n) => ap(n + sp)) }));
+    this.verbTail = 0;
     this.events = [];
     this._render(this.A); this._render(this.B);
   }
@@ -91,6 +96,7 @@ class Player {
     else if (m.type === 'trig') { this.e.trigger(m.voice, m.vel, 60); this.gainTo[Math.min(m.voice, 5)] = 1; }
     else if (m.type === 'rush') this.rush = m.v;
     else if (m.type === 'acid') Object.assign(this.acid, m.acid);
+    else if (m.type === 'acidParam') this.b.setParam(m.par, m.value);
     else if (m.type === 'acidKit') { this.b.loadKit(m.values); this.acidPk = 12000; }
     else if (m.type === 'rushSet') Object.assign(this.rs, m.set);
     else if (m.type === 'mute') m.muted.forEach((v, n) => { this.muted[n] = v ? 1 : 0; });
@@ -210,6 +216,20 @@ class Player {
       const g0 = this.spG[b], g1 = 1 - (1 - floor) * Math.min(1, e / 0.04);
       for (let i = 0; i < 64; i++) ab[i] += (g0 + (g1 - g0) * (i + 1) / 64 - 1) * band[i];
       this.spG[b] = g1; this.spGr[b] = Math.max(this.spGr[b], 1 - g1);
+    }
+  }
+  // the reverb: x (or silence) at the send into both sides, the wet added to L and R
+  reverb(x, L, R) {
+    const send = this.acid.verb / 100 * 0.06, fb = 0.84, damp = 0.25;
+    for (let ch = 0; ch < 2; ch++) {
+      const V = this.verb[ch], O = ch ? R : L;
+      for (let i = 0; i < 64; i++) {
+        const inp = x ? x[i] * send : 0;
+        let y = 0;
+        for (const c of V.c) { const o = c.b[c.i]; c.z = o * (1 - damp) + c.z * damp; c.b[c.i] = inp + c.z * fb; if (++c.i === c.b.length) c.i = 0; y += o; }
+        for (const a of V.a) { const o = a.b[a.i]; a.b[a.i] = y + o * 0.5; y = o - y; if (++a.i === a.b.length) a.i = 0; }
+        O[i] += y;
+      }
     }
   }
   // an acid step: a new note retriggers drum 1 of the acid engine; a slide keeps it sounding and glides from the last note
@@ -372,6 +392,8 @@ class Player {
       if (this.acid.space) this.spacer(ab, L, R);
       for (let i = 0; i < 64; i++) { L[i] += ab[i]; R[i] += ab[i]; }
     }
+    if (this.acid.verb && this.acidOn) this.verbTail = 3 * LXR.REAL_FS;
+    if (this.verbTail > 0) { this.reverb(this.acidOn ? this.acidBuf : null, L, R); this.verbTail -= 64; }
     if (this.rush > S.hp || this.hpOn) this.highPass(L, R);
     if (M.comp) {
       // peak detector in dB, attack/release smoothing, gain = over * (1/ratio - 1) + makeup

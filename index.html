@@ -958,7 +958,7 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 
 /* the acid page: the sixteen steps (note, accent, slide; the playing one lit), four faders, then the buttons */
 .m-acid-card { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 10px; min-height: 0; padding: 10px 8px; }
-#m-acid-faders { grid-template-columns: repeat(5, 1fr); grid-template-rows: minmax(0, 1fr); }
+#m-acid-faders { grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
 .m-acid-steps { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
 .m-acid-steps span { display: grid; place-items: center; align-content: center; gap: 2px; min-height: 52px; border-radius: 8px; background: var(--tint-2);
   font-family: var(--mono); font-size: var(--fs-xs); line-height: 1.1; font-variant-numeric: tabular-nums; }
@@ -4877,7 +4877,7 @@ class Player {
     // the acid line: a second engine, of which only drum 1 plays, stepping through 16 notes (null = rest) on the
     // straight grid; a slide doesn't retrigger, it glides into the note (bend: the pitch ratio still to go, easing to 1)
     this.b = new LXR.LxrEngine({ seed: 0x1f2e3d4c }); this.b.loadInitKit();
-    this.acid = { steps: new Array(16).fill(null), level: 0, base: 60, space: 0 };
+    this.acid = { steps: new Array(16).fill(null), level: 0, base: 60, space: 0, verb: 0 };
     this.acidNote = 60; this.acidBend = 1; this.acidG = 1; this.acidGTo = 1;
     // drum voices differ a lot in level, so the line is evened out: its peak, held and let go over a couple of seconds,
     // sets a gain toward a fixed peak (acidNorm, eased so a change never jumps)
@@ -4889,6 +4889,11 @@ class Player {
     this.spF = Array.from({ length: 8 }, (_, k) => Math.tan(Math.PI * 60 * Math.pow(2, k * 1.1) / LXR.REAL_FS));
     this.spS = new Float64Array(32); this.spEnv = new Float32Array(8); this.spG = new Float32Array(8).fill(1);
     this.spBand = Array.from({ length: 8 }, () => new Float32Array(64)); this.spGr = new Float32Array(8);
+    // the acid line's reverb, a send: a small Freeverb (four damped combs and two all-passes a side, the right side's
+    // delays a little longer for width), its input the line after the spacer
+    const comb = (n) => ({ b: new Float32Array(n), i: 0, z: 0 }), ap = (n) => ({ b: new Float32Array(n), i: 0 });
+    this.verb = [0, 23].map((sp) => ({ c: [1116, 1188, 1277, 1356].map((n) => comb(n + sp)), a: [556, 441].map((n) => ap(n + sp)) }));
+    this.verbTail = 0;
     this.events = [];
     this._render(this.A); this._render(this.B);
   }
@@ -4898,6 +4903,7 @@ class Player {
     else if (m.type === 'trig') { this.e.trigger(m.voice, m.vel, 60); this.gainTo[Math.min(m.voice, 5)] = 1; }
     else if (m.type === 'rush') this.rush = m.v;
     else if (m.type === 'acid') Object.assign(this.acid, m.acid);
+    else if (m.type === 'acidParam') this.b.setParam(m.par, m.value);
     else if (m.type === 'acidKit') { this.b.loadKit(m.values); this.acidPk = 12000; }
     else if (m.type === 'rushSet') Object.assign(this.rs, m.set);
     else if (m.type === 'mute') m.muted.forEach((v, n) => { this.muted[n] = v ? 1 : 0; });
@@ -5017,6 +5023,20 @@ class Player {
       const g0 = this.spG[b], g1 = 1 - (1 - floor) * Math.min(1, e / 0.04);
       for (let i = 0; i < 64; i++) ab[i] += (g0 + (g1 - g0) * (i + 1) / 64 - 1) * band[i];
       this.spG[b] = g1; this.spGr[b] = Math.max(this.spGr[b], 1 - g1);
+    }
+  }
+  // the reverb: x (or silence) at the send into both sides, the wet added to L and R
+  reverb(x, L, R) {
+    const send = this.acid.verb / 100 * 0.06, fb = 0.84, damp = 0.25;
+    for (let ch = 0; ch < 2; ch++) {
+      const V = this.verb[ch], O = ch ? R : L;
+      for (let i = 0; i < 64; i++) {
+        const inp = x ? x[i] * send : 0;
+        let y = 0;
+        for (const c of V.c) { const o = c.b[c.i]; c.z = o * (1 - damp) + c.z * damp; c.b[c.i] = inp + c.z * fb; if (++c.i === c.b.length) c.i = 0; y += o; }
+        for (const a of V.a) { const o = a.b[a.i]; a.b[a.i] = y + o * 0.5; y = o - y; if (++a.i === a.b.length) a.i = 0; }
+        O[i] += y;
+      }
     }
   }
   // an acid step: a new note retriggers drum 1 of the acid engine; a slide keeps it sounding and glides from the last note
@@ -5179,6 +5199,8 @@ class Player {
       if (this.acid.space) this.spacer(ab, L, R);
       for (let i = 0; i < 64; i++) { L[i] += ab[i]; R[i] += ab[i]; }
     }
+    if (this.acid.verb && this.acidOn) this.verbTail = 3 * LXR.REAL_FS;
+    if (this.verbTail > 0) { this.reverb(this.acidOn ? this.acidBuf : null, L, R); this.verbTail -= 64; }
     if (this.rush > S.hp || this.hpOn) this.highPass(L, R);
     if (M.comp) {
       // peak detector in dB, attack/release smoothing, gain = over * (1/ratio - 1) + makeup
@@ -7768,9 +7790,10 @@ async function mOffer(t, type) {
 // notes), rotate shifts the line round the bar, pitch transposes it. Random makes a new line, alter changes a few steps,
 // voice gives it a drum voice from a random built-in kit, held longer and with less pitch sweep so the notes read.
 // Space makes room for the drums: the line is cut, band by band, where the drums (the whole mix before the master) are.
+// The drums' energy thins it too: at energy 0 it plays the density fader's notes, at full energy none.
 const ACID_SCALE = [0, 0, 0, 0, 3, 5, 7, 7, 10, 12, 12, -12, 15];
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const acid = { rank: [], note: [], acc: [], slide: [], density: 60, rotate: 0, pitch: 0, level: 70, space: 50 };
+const acid = { rank: [], note: [], acc: [], slide: [], density: 60, rotate: 0, pitch: 0, level: 70, space: 50, verb: 0, kit: null };
 function acidNew() {
   // downbeats tend to come first, so a thin line still lands on the beat
   const w = Array.from({ length: 16 }, (_, s) => Math.random() - (s % 4 === 0 ? 0.35 : s % 2 === 0 ? 0.1 : 0));
@@ -7783,14 +7806,18 @@ function acidAlter() {
   const a = mRnd(16), b = mRnd(16); [acid.rank[a], acid.rank[b]] = [acid.rank[b], acid.rank[a]];
   acid.acc[mRnd(16)] ^= true; acid.slide[mRnd(16)] ^= true;
 }
-// the steps as played: rotated, thinned by density
+// how many steps play: the density fader's count, thinned as the drums' energy goes up (none at full energy), so the
+// line and the drums trade places across the X/Y pad (and the energy fader)
+const acidMax = () => Math.round(acid.density / 100 * 16);
+const acidCount = () => Math.round(acidMax() * (100 - perf.energy) / 100);
+// the steps as played: rotated, thinned by density and energy
 const acidSteps = () => Array.from({ length: 16 }, (_, s) => {
   const src = (s - acid.rotate + 16) % 16;
-  return acid.rank[src] < Math.round(acid.density / 100 * 16) ? { n: acid.note[src], acc: !!acid.acc[src], slide: !!acid.slide[src] } : null;
+  return acid.rank[src] < acidCount() ? { n: acid.note[src], acc: !!acid.acc[src], slide: !!acid.slide[src] } : null;
 });
 function acidSend() {
   const steps = acidSteps();
-  send({ type: 'acid', acid: { steps, level: acid.level, base: 60 + acid.pitch, space: acid.space } });
+  send({ type: 'acid', acid: { steps, level: acid.level, base: 60 + acid.pitch, space: acid.space, verb: acid.verb } });
   acidDraw(steps);
 }
 const mAcidCells = Array.from({ length: 16 }, () => { const c = document.createElement('span'); $('m-acid-steps').append(c); return c; });
@@ -7811,20 +7838,35 @@ function acidVoice() {
   kit[PAR.VELOD1] = Math.max(45, Math.min(85, kit[PAR.VELOD1] * 2));
   kit[PAR.MODAMNT1] = Math.min(kit[PAR.MODAMNT1], 30);
   kit[PAR.AMOUNT_LFO1] = 0; kit[PAR.VELO_MOD_AMT_1] = 0; kit[PAR.VOL1] = 100; kit[PAR.PAN1] = 64;
+  // the fm, cutoff and drive faders keep where they are across a new voice
+  if (acid.kit) for (const par of ACID_KEEP) kit[par] = acid.kit[par];
+  acid.kit = kit;
   send({ type: 'acidKit', values: Array.from(kit) });
 }
+const ACID_KEEP = [PAR.FMAMNT1, PAR.FILTER_FREQ_1, PAR.DRIVE1];
 const acidFader = (label, key, min, max, show) => mFader($('m-acid-faders'), label, { min, max, get: () => acid[key],
-  set: (v) => { acid[key] = v; acidSend(); }, show, dflt: { density: 60, rotate: 0, pitch: 0, level: 70, space: 50 }[key] });
-acidFader('density', 'density', 0, 100, (v) => `${Math.round(v / 100 * 16)}\nnotes`);
+  set: (v) => { acid[key] = v; acidSend(); }, show, dflt: { density: 60, rotate: 0, pitch: 0, level: 70, space: 50, verb: 0 }[key] });
+acidFader('density', 'density', 0, 100, () => `${acidCount()}/${acidMax()}\nnotes`);
 acidFader('rotate', 'rotate', 0, 15, (v) => (v ? `+${v}` : '0') + '\nsteps');
 acidFader('pitch', 'pitch', -12, 12, (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v) + '\nst');
 acidFader('level', 'level', 0, 100, (v) => (v ? v + '%' : 'off'));
 // space: the spacer, which cuts the line's frequencies wherever the drums are playing in them (after Trackspacer)
 acidFader('space', 'space', 0, 100, (v) => (v ? v + '%' : 'off'));
+// the voice's own fm depth, filter cutoff and drive (the LXR's per-voice distortion), on the acid engine only
+const acidPar = (label, par) => mFader($('m-acid-faders'), label, { min: 0, max: 127, get: () => (acid.kit ? acid.kit[par] : 0),
+  set: (v) => { acid.kit[par] = v; send({ type: 'acidParam', par, value: v }); }, show: (v) => String(v) });
+acidPar('fm', PAR.FMAMNT1);
+acidPar('cutoff', PAR.FILTER_FREQ_1);
+acidPar('drive', PAR.DRIVE1);
+// reverb: a send into the line's own reverb
+acidFader('reverb', 'verb', 0, 100, (v) => (v ? v + '%' : 'off'));
 $('m-acid-new').addEventListener('click', async () => { await startAudio(); acidNew(); acidSend(); });
 $('m-acid-alter').addEventListener('click', async () => { await startAudio(); acidAlter(); acidSend(); });
-$('m-acid-voice').addEventListener('click', async () => { await startAudio(); acidVoice(); });
+$('m-acid-voice').addEventListener('click', async () => { await startAudio(); acidVoice(); mDrawAll(); });
 acidNew(); acidVoice(); acidSend();
+// a change of energy (pad or fader) re-thins the line
+let mAcidE = perf.energy;
+perfDraws.push(() => { if (perf.energy !== mAcidE) { mAcidE = perf.energy; acidSend(); mDrawAll(); } });
 // the playing step lights up (stopped, none does)
 const mMarkStep = markStep;
 markStep = function (s) { mMarkStep(s); mAcidCells.forEach((c, i) => c.classList.toggle('now', i === s)); };
