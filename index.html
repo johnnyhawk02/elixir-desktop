@@ -1198,6 +1198,16 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-fx-card { grid-template-rows: repeat(2, minmax(0, 1fr)) auto; }
 /* the mix page: the two send rows small, the levels big */
 .m-fx-card.m-mix-card { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2.6fr); }
+
+/* ---- LCD fade: liquid crystal is slow, so segments come on quickly and linger a moment going off. The faders' and
+   meters' lit segments, the step bars and the inverted buttons and tabs ease rather than jump (off slower than on);
+   type changes as it does on a real LCD, at once ---- */
+.m .m-vtrack i, .m .m-gr i b { transition: height .09s cubic-bezier(.2, .7, .3, 1), width .09s cubic-bezier(.2, .7, .3, 1); }
+.m .m-seq-steps i::after, .m .m-seq-steps i::before { transition: height .09s cubic-bezier(.2, .7, .3, 1); }
+.m .m-btn, .m .m-toggle, .m .m-pload, .m .m-tabs button, .m .m-trans button { transition: background-color .22s ease-out, color .22s ease-out, opacity .22s ease-out; }
+.m .m-btn:active, .m .m-tabs button[aria-selected="true"], .m .m-toggle[aria-pressed="true"], .m .m-play[aria-pressed="true"] { transition-duration: .06s; }
+.m .m-seq-steps i.now, .m .m-xy i { transition: outline-color .2s ease-out, left .07s linear, bottom .07s linear; }
+@media (prefers-reduced-motion: reduce) { .m .m-vtrack i, .m .m-gr i b, .m .m-seq-steps i::after, .m .m-seq-steps i::before, .m .m-btn, .m .m-toggle, .m .m-pload, .m .m-tabs button, .m .m-trans button, .m .m-xy i { transition: none; } }
 </style>
 
 <main class="m" id="m">
