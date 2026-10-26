@@ -406,8 +406,17 @@ $('m-pexport').addEventListener('click', async () => {
   const favs = kitList.filter((k) => (k.saved || k.builtin) && mFavs.has(k.name)).map((k) => ({ ...presetData(k), fav: true }));
   if (!favs.length) { $('m-pnote').textContent = 'Star some presets first.'; return; }
   const blob = new Blob([JSON.stringify({ elixir: 1, presets: favs }, null, 1)], { type: 'application/json' });
-  mOffer({ blob, name: 'elixir-mobile-favourites.json' }, 'application/json');
+  if (!await mOffer({ blob, name: 'elixir-mobile-favourites.json' }, 'application/json')) return; // (cancelled: nothing deleted)
   $('m-pnote').textContent = `Exported ${favs.length} favourite${favs.length > 1 ? 's' : ''}.`;
+  // (for now, while the factory presets are being made: once they're out, offer a clean slate)
+  const mine = kitList.filter((k) => k.saved);
+  if (!confirm(`Exported ${favs.length}. Delete all ${mine.length} of your saved presets and clear every star?`)) return;
+  const cur = kitList[Number($('kit').value)];
+  for (const k of mine) kitList.splice(kitList.indexOf(k), 1);
+  mFavs.clear(); mFavStore(); storePresets(); fillKits();
+  $('kit').value = Math.max(0, kitList.indexOf(cur));
+  $('m-pnote').textContent = `Exported ${favs.length}; your presets deleted.`;
+  mDrawPresets();
 });
 
 // ---- record: free length, no count-in; starts now (and starts playback), the second press stops and saves ----
@@ -449,12 +458,14 @@ function mDownload(t) {
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 // phones get the share sheet (Save to Files, AirDrop, apps); elsewhere it downloads
+// (true once it's shared or downloaded, false if the share sheet was cancelled)
 async function mOffer(t, type) {
   const file = new File([t.blob], t.name, { type });
   if (matchMedia('(pointer: coarse)').matches && navigator.canShare && navigator.canShare({ files: [file] })) {
-    try { await navigator.share({ files: [file], title: t.name }); return; } catch (e) { if (e.name === 'AbortError') return; }
+    try { await navigator.share({ files: [file], title: t.name }); return true; } catch (e) { if (e.name === 'AbortError') return false; }
   }
   mDownload(t);
+  return true;
 }
 
 // ---- the fx page: the two send effects' settings on faders, a row each (the distortion is on the master page) ----
