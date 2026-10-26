@@ -456,3 +456,9 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-fxhead b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); }
 .m-fxhead .m-chk { min-height: 30px; gap: 8px; }
 .m-fxhead .m-chk i { width: 20px; height: 20px; }
+/* next bar: its box heads the randomise column, and a button waiting for the bar flashes */
+.m-rand-card .m-rand { grid-template-rows: auto repeat(6, minmax(0, 1fr)); }
+.m-nextbar { min-height: 34px; gap: 6px; font-size: min(var(--fs-xs), 3.6vw); justify-content: center; white-space: nowrap; }
+.m-nextbar i { width: 18px; height: 18px; }
+.m .m-rand .m-btn.pending { animation: m-flash .5s steps(1) infinite; }
+@media (prefers-reduced-motion: reduce) { .m .m-rand .m-btn.pending { animation: none; outline: 2px dashed var(--ink); outline-offset: 2px; } }

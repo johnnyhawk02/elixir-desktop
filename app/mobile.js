@@ -676,11 +676,17 @@ function mSeqStep(f, i, ms) {
 new MutationObserver(() => {
   if ($('play').getAttribute('aria-pressed') === 'true') return;
   mFaders.forEach(mSeqRelease); mSeqSteps.forEach((c) => c.classList.remove('now'));
+  mBarBtns.forEach((b) => b.classList.remove('pending')); mBarBtns.clear();
   if (mPending) { mPending = null; mDrawPresets(); }
 }).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
 // on each 16th (as the audio thread reaches it, ahead of the output), every running sequencer steps its fader
 const mOnEvent = onEvent;
 onEvent = function (ev) {
+  // the bar waiting randomises come in on: stop their buttons' flash as that bar is heard
+  if (ev.type === 'step' && ev.step === 0 && mBarBtns.size) {
+    const bs = [...mBarBtns]; mBarBtns.clear();
+    setTimeout(() => bs.forEach((b) => b.classList.remove('pending')), ctx && ctx.outputLatency ? ctx.outputLatency * 1000 : 0);
+  }
   // the bar a waiting preset comes in on: stop its flash as that bar is heard
   if (ev.type === 'step' && ev.step === 0 && mPending) {
     const p = mPending; setTimeout(() => { if (mPending === p) { mPending = null; mDrawPresets(); } }, ctx && ctx.outputLatency ? ctx.outputLatency * 1000 : 0);
@@ -709,6 +715,21 @@ $('m-install').addEventListener('click', async () => {
   mInstallEv = null; $('m-install').hidden = true;
 });
 
+
+// ---- next bar: with the box on the perf page ticked, while playing, a randomise button's changes wait for the start
+// of the next bar (the player holds them, as it does a preset's), the button flashing until then. Kept in this browser ----
+const NB_KEY = 'elixir-mobile-nextbar';
+try { $('m-nextbar').checked = localStorage.getItem(NB_KEY) === '1'; } catch (e) {}
+$('m-nextbar').addEventListener('change', () => { try { localStorage.setItem(NB_KEY, $('m-nextbar').checked ? '1' : '0'); } catch (e) {} });
+const mBarBtns = new Set();
+for (const id of ['m-everything', 'm-kit', 'm-alter', 'm-pattern', 'm-xrand']) {
+  // (before the button's own handler: everything it sends, now and in its awaited steps, goes to the bar)
+  $(id).addEventListener('click', () => {
+    if (!$('m-nextbar').checked || !playing) return;
+    barSync = true; setTimeout(() => { barSync = false; }, 0);
+    mBarBtns.add($(id)); $(id).classList.add('pending');
+  }, { capture: true });
+}
 
 // ---- the x/y page: two pads, each moving any two parameters. Each axis is picked in two short lists: first where it
 // lives (a drum, perform, fx, mix or master), then the parameter there (a drum's every parameter, grouped as on the

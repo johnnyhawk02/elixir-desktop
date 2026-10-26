@@ -1304,6 +1304,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-fxhead b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); }
 .m-fxhead .m-chk { min-height: 30px; gap: 8px; }
 .m-fxhead .m-chk i { width: 20px; height: 20px; }
+/* next bar: its box heads the randomise column, and a button waiting for the bar flashes */
+.m-rand-card .m-rand { grid-template-rows: auto repeat(6, minmax(0, 1fr)); }
+.m-nextbar { min-height: 34px; gap: 6px; font-size: min(var(--fs-xs), 3.6vw); justify-content: center; white-space: nowrap; }
+.m-nextbar i { width: 18px; height: 18px; }
+.m .m-rand .m-btn.pending { animation: m-flash .5s steps(1) infinite; }
+@media (prefers-reduced-motion: reduce) { .m .m-rand .m-btn.pending { animation: none; outline: 2px dashed var(--ink); outline-offset: 2px; } }
 </style>
 
 <main class="m" id="m">
@@ -1321,6 +1327,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     <section class="m-card m-play-card"><div class="m-faders" id="m-faders"></div></section>
     <section class="m-card m-rand-card" aria-label="randomise">
       <div class="m-rand">
+        <label class="m-chk m-nextbar"><input id="m-nextbar" type="checkbox"><i aria-hidden="true"></i>next bar</label>
         <button class="m-btn m-big" id="m-everything" type="button">everything</button>
         <button class="m-btn" id="m-kit" type="button">kit</button>
         <button class="m-btn" id="m-alter" type="button">alter</button>
@@ -8529,11 +8536,17 @@ function mSeqStep(f, i, ms) {
 new MutationObserver(() => {
   if ($('play').getAttribute('aria-pressed') === 'true') return;
   mFaders.forEach(mSeqRelease); mSeqSteps.forEach((c) => c.classList.remove('now'));
+  mBarBtns.forEach((b) => b.classList.remove('pending')); mBarBtns.clear();
   if (mPending) { mPending = null; mDrawPresets(); }
 }).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
 // on each 16th (as the audio thread reaches it, ahead of the output), every running sequencer steps its fader
 const mOnEvent = onEvent;
 onEvent = function (ev) {
+  // the bar waiting randomises come in on: stop their buttons' flash as that bar is heard
+  if (ev.type === 'step' && ev.step === 0 && mBarBtns.size) {
+    const bs = [...mBarBtns]; mBarBtns.clear();
+    setTimeout(() => bs.forEach((b) => b.classList.remove('pending')), ctx && ctx.outputLatency ? ctx.outputLatency * 1000 : 0);
+  }
   // the bar a waiting preset comes in on: stop its flash as that bar is heard
   if (ev.type === 'step' && ev.step === 0 && mPending) {
     const p = mPending; setTimeout(() => { if (mPending === p) { mPending = null; mDrawPresets(); } }, ctx && ctx.outputLatency ? ctx.outputLatency * 1000 : 0);
@@ -8562,6 +8575,21 @@ $('m-install').addEventListener('click', async () => {
   mInstallEv = null; $('m-install').hidden = true;
 });
 
+
+// ---- next bar: with the box on the perf page ticked, while playing, a randomise button's changes wait for the start
+// of the next bar (the player holds them, as it does a preset's), the button flashing until then. Kept in this browser ----
+const NB_KEY = 'elixir-mobile-nextbar';
+try { $('m-nextbar').checked = localStorage.getItem(NB_KEY) === '1'; } catch (e) {}
+$('m-nextbar').addEventListener('change', () => { try { localStorage.setItem(NB_KEY, $('m-nextbar').checked ? '1' : '0'); } catch (e) {} });
+const mBarBtns = new Set();
+for (const id of ['m-everything', 'm-kit', 'm-alter', 'm-pattern', 'm-xrand']) {
+  // (before the button's own handler: everything it sends, now and in its awaited steps, goes to the bar)
+  $(id).addEventListener('click', () => {
+    if (!$('m-nextbar').checked || !playing) return;
+    barSync = true; setTimeout(() => { barSync = false; }, 0);
+    mBarBtns.add($(id)); $(id).classList.add('pending');
+  }, { capture: true });
+}
 
 // ---- the x/y page: two pads, each moving any two parameters. Each axis is picked in two short lists: first where it
 // lives (a drum, perform, fx, mix or master), then the parameter there (a drum's every parameter, grouped as on the
