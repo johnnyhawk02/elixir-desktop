@@ -169,3 +169,30 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 .m .m-gr output, .m .m-pload small, .m .m-note, .m .m-pempty, .m .m-pgroup { color: var(--muted); }
 .m .m-chead b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; }
 .m-foot { color: #a7b58c; opacity: .7; }
+
+/* the step sequencer: a sheet over the bottom of the screen, leaving play and record above it free; sixteen step bars in two rows (the ones past the length
+   faint), the length as a horizontal segmented bar, then randomise and done */
+.m-seq { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; pointer-events: none; display: flex; align-items: flex-end; justify-content: center;
+  padding: 16px max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.m-seq[hidden] { display: none; }
+.m-seq-card { width: 100%; max-width: 480px; display: grid; gap: 14px; pointer-events: auto; box-shadow: 0 -8px 30px rgba(0, 0, 0, .5), inset 0 3px 10px rgba(0, 0, 0, .28); }
+.m-seq .m-chead { gap: 10px; }
+.m-seq .m-chead output { flex: 1; text-align: right; color: var(--muted); font-size: var(--fs-s); }
+.m-seq-steps { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; height: min(46vh, 340px); touch-action: none; }
+.m-seq-steps i { --f: 0; position: relative; border-radius: 2px; background: repeating-linear-gradient(to top, var(--ghost) 0 5px, transparent 5px 8px); }
+.m-seq-steps i::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: round(down, calc(var(--f) * 100%), 8px);
+  background: repeating-linear-gradient(to top, var(--ink) 0 5px, transparent 5px 8px); }
+.m-seq-steps i.off { opacity: .25; }
+.m-seq-steps i.now { outline: 2px solid var(--ink); outline-offset: 2px; }
+.m-seq-lenrow { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; text-transform: uppercase; }
+.m-seq-len { --f: 1; position: relative; height: 36px; touch-action: none; border: 2px solid var(--ink); border-radius: 2px;
+  background: repeating-linear-gradient(to right, var(--ghost) 0 5px, transparent 5px 8px) 4px 4px / calc(100% - 8px) calc(100% - 8px) no-repeat; }
+.m-seq-len i { position: absolute; left: 4px; top: 4px; bottom: 4px; width: calc((100% - 8px) * (var(--f) * 14 + 2) / 16);
+  background: repeating-linear-gradient(to right, var(--ink) 0 5px, transparent 5px 8px); }
+.m-seq-lenrow output { min-width: 5.5em; text-align: right; }
+.m-seq-btns { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; }
+.m-seq-btns .m-btn { min-height: 52px; }
+/* a fader with a sequencer running: its label is inverted */
+.m .m-vf.seq .m-flab { background: var(--ink); color: var(--panel); padding: 0 4px; text-shadow: none; }
+/* a long hold mustn't bring up the phone's own menus */
+.m { -webkit-touch-callout: none; }

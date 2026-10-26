@@ -36,8 +36,9 @@ new MutationObserver(mSync).observe($('play'), { attributes: true, attributeFilt
 mPlay.addEventListener('click', () => $('play').click());
 
 // ---- sliders: vertical faders, readout on top and label under; dragging moves the value from where it is
-// (a touch doesn't jump it), the whole track's height is the full range (tempo's is twice it, for finer steps), and a double tap on the label resets it ----
-const mDraws = [];
+// (a touch doesn't jump it), the whole track's height is the full range (tempo's is twice it, for finer steps), and a double tap on the label resets it;
+// holding one still opens its step sequencer (below) ----
+const mDraws = [], mFaders = [];
 function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel = 1 }) {
   const el = document.createElement('div');
   el.className = 'm-vf';
@@ -56,16 +57,20 @@ function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel =
     out.textContent = show(v); tr.style.setProperty('--f', (v - min) / (hi - min || 1));
     tr.setAttribute('aria-valuemin', min); tr.setAttribute('aria-valuemax', hi); tr.setAttribute('aria-valuenow', v); tr.setAttribute('aria-valuetext', show(v));
   };
-  let drag = null;
+  const fd = { label, min, hiOf, step, get, show, put, el, seq: null };
+  let drag = null, hold = 0;
   tr.addEventListener('pointerdown', (e) => {
     tr.setPointerCapture(e.pointerId); el.classList.add('held');
     drag = { y: e.clientY, v: get(), h: tr.getBoundingClientRect().height };
+    clearTimeout(hold);
+    hold = setTimeout(() => { if (!drag) return; const v = drag.v; end(); put(v); mSeqOpen(fd); }, 500);
   });
   tr.addEventListener('pointermove', (e) => {
     if (!drag) return;
+    if (Math.abs(drag.y - e.clientY) > 6) clearTimeout(hold);
     put(drag.v + (drag.y - e.clientY) / (drag.h * travel) * (hiOf() - min));
   });
-  const end = () => { drag = null; el.classList.remove('held'); };
+  const end = () => { clearTimeout(hold); drag = null; el.classList.remove('held'); };
   tr.addEventListener('pointerup', end); tr.addEventListener('pointercancel', end);
   tr.addEventListener('keydown', (e) => {
     const d = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 10, PageDown: -10 }[e.key];
@@ -76,7 +81,7 @@ function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel =
     const t = performance.now();
     if (t - last < 350 && dflt !== undefined) put(dflt); last = t;
   });
-  box.append(el); mDraws.push(draw);
+  box.append(el); mDraws.push(draw); mFaders.push(fd);
   return draw;
 }
 const mDrawAll = () => mDraws.forEach((d) => d());
@@ -324,6 +329,71 @@ async function mOffer(t, type) {
   }
   mDownload(t);
 }
+
+// ---- step sequencers: holding a fader opens one for it: 2 to 16 steps, each a value it takes on that 16th note while
+// playing (the step is the bar's 16th counted from the start, wrapped at the length, so short ones run against the bar).
+// Draw the steps with a finger (drag across to paint), randomise them, or switch it off; a fader with one running is
+// marked. They're not saved with presets ----
+const mSeqSteps = Array.from({ length: 16 }, (_, i) => { const c = document.createElement('i'); c.dataset.i = i; $('m-seq-steps').append(c); return c; });
+let mSeqF = null;
+const mSeqVal = (fd, f) => { const hi = fd.hiOf(); return Math.max(fd.min, Math.min(hi, fd.min + Math.round(f * (hi - fd.min) / fd.step) * fd.step)); };
+function mSeqOpen(fd) {
+  if (!fd.seq) fd.seq = { on: true, len: 16, vals: new Array(16).fill(fd.get()) };
+  mSeqF = fd; $('m-seq-name').textContent = fd.label;
+  $('m-seq').hidden = false; mSeqDraw();
+}
+function mSeqDraw() {
+  const fd = mSeqF, q = fd.seq, hi = fd.hiOf();
+  mSeqSteps.forEach((c, i) => {
+    c.style.setProperty('--f', (q.vals[i] - fd.min) / (hi - fd.min || 1));
+    c.classList.toggle('off', i >= q.len);
+  });
+  $('m-seq-len').style.setProperty('--f', (q.len - 2) / 14); $('m-seq-len-out').textContent = `${q.len} steps`;
+  $('m-seq-on').setAttribute('aria-pressed', q.on); $('m-seq-on').textContent = q.on ? 'on' : 'off';
+  mFaders.forEach((f) => f.el.classList.toggle('seq', !!(f.seq && f.seq.on)));
+}
+// painting: a step takes the value at the finger's height; dragging across paints the steps it passes
+{
+  const box = $('m-seq-steps');
+  let painting = false;
+  const paint = (e) => {
+    const r = box.getBoundingClientRect(), cols = 8, rows = 2;
+    const col = Math.max(0, Math.min(cols - 1, Math.floor((e.clientX - r.left) / r.width * cols)));
+    const row = Math.max(0, Math.min(rows - 1, Math.floor((e.clientY - r.top) / r.height * rows)));
+    const c = mSeqSteps[row * cols + col], cr = c.getBoundingClientRect();
+    if (c.classList.contains('off')) return;
+    mSeqF.seq.vals[row * cols + col] = mSeqVal(mSeqF, 1 - Math.max(0, Math.min(1, (e.clientY - cr.top) / cr.height)));
+    $('m-seq-val').textContent = mSeqF.show(mSeqF.seq.vals[row * cols + col]).replace('\n', ' ');
+    mSeqDraw();
+  };
+  box.addEventListener('pointerdown', (e) => { box.setPointerCapture(e.pointerId); painting = true; paint(e); });
+  box.addEventListener('pointermove', (e) => { if (painting) paint(e); });
+  const stop = () => { painting = false; };
+  box.addEventListener('pointerup', stop); box.addEventListener('pointercancel', stop);
+}
+// the length: a horizontal bar, 2 at the left to 16 at the right
+{
+  const bar = $('m-seq-len');
+  const at = (e) => { const r = bar.getBoundingClientRect(); mSeqF.seq.len = 2 + Math.round(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * 14); mSeqDraw(); };
+  let held = false;
+  bar.addEventListener('pointerdown', (e) => { bar.setPointerCapture(e.pointerId); held = true; at(e); });
+  bar.addEventListener('pointermove', (e) => { if (held) at(e); });
+  bar.addEventListener('pointerup', () => { held = false; }); bar.addEventListener('pointercancel', () => { held = false; });
+}
+$('m-seq-rand').addEventListener('click', () => { const q = mSeqF.seq; for (let i = 0; i < 16; i++) q.vals[i] = mSeqVal(mSeqF, Math.random()); q.on = true; mSeqDraw(); });
+$('m-seq-on').addEventListener('click', () => { mSeqF.seq.on = !mSeqF.seq.on; mSeqDraw(); });
+$('m-seq-close').addEventListener('click', () => { $('m-seq').hidden = true; mSeqF = null; });
+$('m').addEventListener('contextmenu', (e) => e.preventDefault());
+// on each 16th (as the audio thread reaches it, ahead of the output), every running sequencer sets its fader
+const mOnEvent = onEvent;
+onEvent = function (ev) {
+  if (ev.type === 'step' && playing) {
+    const n = ev.bar * 16 + ev.step;
+    for (const f of mFaders) if (f.seq && f.seq.on) f.put(f.seq.vals[n % f.seq.len]);
+    if (mSeqF && mSeqF.seq) { const i = n % mSeqF.seq.len; mSeqSteps.forEach((c, k) => c.classList.toggle('now', k === i)); }
+  }
+  mOnEvent(ev);
+};
 
 // ---- installable: a service worker keeps the app for offline use, and the presets page offers to install it
 // where the browser allows (Chrome on Android also has Install app in its menu) ----
