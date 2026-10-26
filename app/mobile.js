@@ -170,6 +170,11 @@ grVu.set = (db) => {
 $('m-everything').addEventListener('click', () => { mUndoFn = null; $('new-kit').click(); });
 // kit: every drum voice from a random built-in kit; the pattern, mixer and FX stay
 $('m-kit').addEventListener('click', () => { mUndoFn = null; $('rand-all').click(); });
+// alter: every drum's current sound varied by 10% (the desktop's alter is 5%), which undo takes back
+$('m-alter').addEventListener('click', async () => {
+  mUndoFn = null; await startAudio();
+  randChange(() => { for (let v = 0; v < 6; v++) { delete homes[v]; randomiseVoice(v, 0.1); delete homes[v]; } });
+});
 // crossfeed: a new 6 x 6 patch (the desktop's crossfeed randomiser), which undo takes back
 $('m-xrand').addEventListener('click', async () => {
   await startAudio();

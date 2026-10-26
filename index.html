@@ -909,7 +909,7 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 /* the randomisers: their own card, a column down the right of the faders' card */
 [data-m-panel="play"] { grid-template-columns: minmax(0, 1fr) 92px; gap: 8px; }
 .m-rand-card { padding: 10px 6px; display: grid; min-height: 0; }
-.m-rand-card .m-rand { grid-template-columns: 1fr; grid-auto-rows: 58px; align-content: center; min-width: 0; }
+.m-rand-card .m-rand { grid-template-columns: 1fr; grid-auto-rows: minmax(40px, 54px); align-content: center; min-width: 0; }
 .m-rand-card .m-rand .m-btn { min-height: 0; min-width: 0; padding: 0 2px; font-size: var(--fs-xs) !important; letter-spacing: .02em; overflow: hidden; }
 #m-faders .m-vf, #m-beat-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 3px; }
 #m-faders .m-vf output, #m-beat-faders .m-vf output { font-size: .62rem; line-height: 1.25; height: 2.5em; display: flex; align-items: flex-end; justify-content: center; flex: none; align-self: stretch; }
@@ -1075,6 +1075,7 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
       <div class="m-rand">
         <button class="m-btn m-big" id="m-everything" type="button">everything</button>
         <button class="m-btn" id="m-kit" type="button">kit</button>
+        <button class="m-btn" id="m-alter" type="button">alter</button>
         <button class="m-btn" id="m-pattern" type="button">pattern</button>
         <button class="m-btn" id="m-xrand" type="button">crossfeed</button>
         <button class="m-btn" id="m-undo" data-m-undo type="button" disabled>undo</button>
@@ -7676,6 +7677,11 @@ grVu.set = (db) => {
 $('m-everything').addEventListener('click', () => { mUndoFn = null; $('new-kit').click(); });
 // kit: every drum voice from a random built-in kit; the pattern, mixer and FX stay
 $('m-kit').addEventListener('click', () => { mUndoFn = null; $('rand-all').click(); });
+// alter: every drum's current sound varied by 10% (the desktop's alter is 5%), which undo takes back
+$('m-alter').addEventListener('click', async () => {
+  mUndoFn = null; await startAudio();
+  randChange(() => { for (let v = 0; v < 6; v++) { delete homes[v]; randomiseVoice(v, 0.1); delete homes[v]; } });
+});
 // crossfeed: a new 6 x 6 patch (the desktop's crossfeed randomiser), which undo takes back
 $('m-xrand').addEventListener('click', async () => {
   await startAudio();
