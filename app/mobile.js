@@ -191,7 +191,15 @@ duckVu.set = (db) => {
 // ---- randomisers ----
 // undo takes back the last randomise: the sound for everything and kit (the desktop's undo), the pattern for pattern,
 // the patch for crossfeed
-$('m-everything').addEventListener('click', () => { mUndoFn = null; $('new-kit').click(); });
+// everything loads a new kit, which clears the desktop's undo, so it keeps its own: the whole sound and song as they
+// were (as a preset would save them), put back by loading that
+$('m-everything').addEventListener('click', () => {
+  const was = { name: '', kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice() }, fx: mix.fx.slice(),
+    fx3: fx3Snapshot(), dpos: delayPos, song: songSnapshot(), userSamples: 0 };
+  $('new-kit').click();
+  mUndoFn = () => { useKit(was); useSong(was.song, false); initValues.set(was.kit); setDirty(true); };
+  mUndo();
+});
 // kit: every drum voice from a random built-in kit; the pattern, mixer and FX stay
 $('m-kit').addEventListener('click', () => { mUndoFn = null; $('rand-all').click(); });
 // alter: every drum's current sound varied by 10% (the desktop's alter is 5%), which undo takes back
