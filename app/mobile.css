@@ -260,3 +260,50 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 .m .m-plist li.pending .m-pload { animation: m-flash .5s steps(1) infinite; }
 @keyframes m-flash { 50% { opacity: .25; } }
 @media (prefers-reduced-motion: reduce) { .m .m-plist li.pending .m-pload { animation: none; outline: 2px dashed var(--ink); outline-offset: 2px; } }
+
+/* ---- the case: the LCD windows sit in a moulded charcoal body (a lit top edge, a shadowed lower one, a screw in each
+   corner), the play, record and beat keys and the page keys are raised cream keys that press in, with a status LED on
+   play, record and the chosen page. All CSS: gradients and shadows, no images ---- */
+body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-inset-right, 0px)) max(6px, env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px));
+  background: radial-gradient(140% 90% at 50% 0%, #2c2b29, #0d0d0c) fixed; }
+.m { height: calc(100dvh - max(6px, env(safe-area-inset-top, 0px)) - max(6px, env(safe-area-inset-bottom, 0px)));
+  position: relative; padding: 14px 12px 20px; border-radius: 24px; gap: 10px;
+  --screw: radial-gradient(circle at 40% 35%, #8d8f91 0 1.5px, #4a4c4e 2.5px, #232425 4px, transparent 4.6px);
+  background: var(--screw) 9px 9px / 10px 10px no-repeat, var(--screw) calc(100% - 9px) 9px / 10px 10px no-repeat,
+    var(--screw) 9px calc(100% - 9px) / 10px 10px no-repeat, var(--screw) calc(100% - 9px) calc(100% - 9px) / 10px 10px no-repeat,
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .012) 0 2px, transparent 2px 4px),
+    linear-gradient(180deg, #45474a 0%, #333538 6%, #2b2d2f 60%, #242527 100%);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .14), inset 0 -3px 0 rgba(0, 0, 0, .45), inset 2px 0 0 rgba(255, 255, 255, .04), inset -2px 0 0 rgba(0, 0, 0, .3),
+    0 18px 40px rgba(0, 0, 0, .7), 0 2px 4px rgba(0, 0, 0, .6); }
+/* the name, printed on the case */
+.m-top { justify-content: flex-start; align-items: baseline; gap: 10px; padding: 0 8px; }
+.m-title { font-family: "Outfit", system-ui, sans-serif; font-weight: 700; font-size: 1.35rem; letter-spacing: .32em; color: #e6e1d3; text-shadow: 0 -1px 0 rgba(0, 0, 0, .6); }
+.m-sub { font-family: "Outfit", system-ui, sans-serif; font-size: .62rem; letter-spacing: .22em; text-transform: uppercase; color: #9c9a92; text-shadow: none; }
+/* the LCD windows: recessed into the case, the glass behind a black bezel */
+.m .m-card:not(.m-trans) { box-shadow: inset 0 3px 10px rgba(0, 0, 0, .28), inset 0 0 0 1px rgba(255, 255, 255, .1), 0 0 0 2px #151617, 0 2px 0 3px rgba(255, 255, 255, .07), 0 -2px 0 3px rgba(0, 0, 0, .35); }
+/* the keys: play, record and beat above the windows, the pages below, on the case itself */
+.m .m-trans, .m .m-tabs { background: none; border: 0; box-shadow: none; padding: 2px 0 4px; }
+.m .m-trans { gap: 10px; }
+.m .m-tabs { gap: 6px; padding-top: 12px; }
+.m .m-trans button, .m .m-tabs button {
+  position: relative; background: linear-gradient(180deg, #f2efe6, #d5d1c4 70%, #c8c4b6) !important; color: #2a2a28 !important;
+  border: 0 !important; border-radius: 7px; text-shadow: 0 1px 0 rgba(255, 255, 255, .6) !important;
+  font-family: "Outfit", system-ui, sans-serif; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  box-shadow: 0 4px 0 #8f8b7f, 0 6px 9px rgba(0, 0, 0, .55), inset 0 1px 0 #fff, inset 0 -2px 3px rgba(0, 0, 0, .08);
+  transition: transform .05s, box-shadow .05s; }
+.m .m-trans button:active, .m .m-tabs button:active, .m .m-tabs button[aria-selected="true"] {
+  transform: translateY(3px); box-shadow: 0 1px 0 #8f8b7f, 0 2px 3px rgba(0, 0, 0, .5), inset 0 1px 0 #fff, inset 0 -2px 3px rgba(0, 0, 0, .1); }
+.m .m-trans .m-play { font-size: 1rem !important; }
+.m .m-trans .m-play svg { fill: #2a2a28; }
+.m .m-trans .m-rec span { font-family: "Outfit", system-ui, sans-serif; }
+.m .m-trans .m-rec i { background: #b8392f; box-shadow: none; border-radius: 50%; width: 14px; height: 14px; }
+.m .m-trans .m-rec.on i { background: #b8392f; animation: none; }
+/* the LEDs: dark when off; play glows green while playing, record red while recording, the chosen page amber */
+.m .m-trans .m-play::after, .m .m-trans .m-rec::after, .m .m-tabs button::after {
+  content: ""; position: absolute; top: 6px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: #3c3a33; box-shadow: inset 0 1px 1px rgba(0, 0, 0, .6); }
+.m .m-tabs button::after { top: -9px; right: calc(50% - 3.5px); background: #1d1e1f; box-shadow: inset 0 1px 1px rgba(0, 0, 0, .8), 0 1px 0 rgba(255, 255, 255, .08); }
+.m .m-trans .m-play[aria-pressed="true"]::after { background: #7dff6a; box-shadow: 0 0 6px 2px rgba(125, 255, 106, .6); }
+.m .m-trans .m-rec.on::after { background: #ff5243; box-shadow: 0 0 6px 2px rgba(255, 82, 67, .65); animation: m-blink 1s steps(1) infinite; }
+.m .m-tabs button[aria-selected="true"]::after { background: #ffb43a; box-shadow: 0 0 6px 2px rgba(255, 180, 58, .6); }
+.m .m-tabs button { min-height: 46px; font-size: min(.7rem, 2.75vw) !important; letter-spacing: 0; padding: 0; }
+@media (prefers-reduced-motion: reduce) { .m .m-trans .m-rec.on::after { animation: none; } }
