@@ -341,32 +341,7 @@ function mDrawPresets() {
   else { const li = document.createElement('li'); li.className = 'm-pempty'; li.textContent = 'None yet. Save makes one.'; list.append(li); }
   group('built in');
   kitList.filter((k) => k.builtin).forEach(row);
-  mPaginate();
 }
-// the list never scrolls: it's split into pages of as many rows as fit, with ‹ › to turn them (the page holding the
-// preset playing comes up first)
-let mPPage = -1;
-function mPaginate() {
-  const list = $('m-plist'), rows = [...list.children];
-  rows.forEach((r) => { r.hidden = false; });
-  const room = list.clientHeight, pages = [[]];
-  let used = 0;
-  for (const r of rows) {
-    const h = r.offsetHeight + 4;
-    if (used + h > room && pages[pages.length - 1].length) { pages.push([]); used = 0; }
-    pages[pages.length - 1].push(r); used += h;
-  }
-  // a group heading never ends a page
-  for (let i = 0; i < pages.length - 1; i++) { const pg = pages[i], last = pg[pg.length - 1]; if (pg.length > 1 && last.classList.contains('m-pgroup')) pages[i + 1].unshift(pg.pop()); }
-  if (mPPage < 0 || mPPage >= pages.length) { const cur = rows.findIndex((r) => r.classList.contains('cur')); mPPage = Math.max(0, pages.findIndex((pg) => pg.includes(rows[cur]))); }
-  pages.forEach((pg, i) => pg.forEach((r) => { r.hidden = i !== mPPage; }));
-  $('m-ppager').hidden = pages.length < 2;
-  $('m-ppage').textContent = `${mPPage + 1} / ${pages.length}`;
-  $('m-pprev').disabled = mPPage === 0; $('m-pnext').disabled = mPPage === pages.length - 1;
-}
-$('m-pprev').addEventListener('click', () => { mPPage--; mPaginate(); });
-$('m-pnext').addEventListener('click', () => { mPPage++; mPaginate(); });
-addEventListener('resize', () => { mPPage = -1; mPaginate(); });
 $('m-psave').addEventListener('click', () => {
   $('kit-save').click();
   const k = kitList[kitList.length - 1];
