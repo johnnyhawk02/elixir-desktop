@@ -14,9 +14,12 @@ function mTab(t) {
   mPages.scrollTo({ left: el.offsetLeft - mPages.offsetLeft, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
 }
 // the tab that shows which page is in view
+// the page's name, beside the title
+const M_PAGE_NAMES = { play: 'perform', beat: 'beat', dice: 'voice', xy: 'x/y pad', fx: 'effects', mix: 'mixer', comp: 'master', presets: 'presets' };
 function mShown(t) {
   if (t === mCur) return;
   mCur = t;
+  $('m-pagename').textContent = M_PAGE_NAMES[t] || t;
   document.querySelectorAll('[data-m-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.mTab === t));
   if (t === 'presets') mDrawPresets();
 }

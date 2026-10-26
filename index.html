@@ -1262,11 +1262,21 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 /* bigger still: the page buttons in two rows of four, so each has twice the room */
 .m > .m-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
 .m .m-tabs button { font-size: min(1.75rem, 6.6vw) !important; letter-spacing: .04em; min-height: 46px; }
+/* the page's name, at the right of the title line */
+.m-top { justify-content: space-between; align-items: baseline; }
+.m-pagename { font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
+.m .m-fx-row .m-vtrack, .m #m-comp .m-vtrack, .m #m-duck .m-vtrack, .m #m-dist .m-vtrack, .m .m-vset .m-vtrack { min-height: 12px; }
+/* short screens: the mix page's send rows keep a fixed short track and the levels take the rest; the beat page's
+   tracks may shrink further */
+.m-fx-card.m-mix-card { grid-template-rows: auto auto minmax(0, 1fr); }
+.m #m-mix-echo .m-vtrack, .m #m-mix-ring .m-vtrack { flex: none; height: clamp(18px, 4vh, 40px); min-height: 0; }
+#m-beat-faders .m-vtrack { min-height: 16px; }
 </style>
 
 <main class="m" id="m">
   <header class="m-top">
     <b class="m-title">elixir</b>
+    <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
   <section class="m-card m-trans">
     <button class="m-play" id="m-play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 4.5v15l13-7.5z"/><rect class="i-stop" x="5.5" y="5.5" width="13" height="13" rx="2"/></svg><span>play</span></button>
@@ -7788,9 +7798,12 @@ function mTab(t) {
   mPages.scrollTo({ left: el.offsetLeft - mPages.offsetLeft, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
 }
 // the tab that shows which page is in view
+// the page's name, beside the title
+const M_PAGE_NAMES = { play: 'perform', beat: 'beat', dice: 'voice', xy: 'x/y pad', fx: 'effects', mix: 'mixer', comp: 'master', presets: 'presets' };
 function mShown(t) {
   if (t === mCur) return;
   mCur = t;
+  $('m-pagename').textContent = M_PAGE_NAMES[t] || t;
   document.querySelectorAll('[data-m-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.mTab === t));
   if (t === 'presets') mDrawPresets();
 }
