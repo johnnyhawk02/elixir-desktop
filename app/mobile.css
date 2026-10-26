@@ -256,3 +256,7 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 /* seven page buttons share the bar */
 .m-tabs { grid-template-columns: repeat(7, 1fr); gap: 3px; padding: 5px; }
 .m .m-tabs button { font-size: min(var(--fs-s), 3.2vw) !important; }
+/* a preset waiting for the next bar: its row flashes on and off */
+.m .m-plist li.pending .m-pload { animation: m-flash .5s steps(1) infinite; }
+@keyframes m-flash { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .m .m-plist li.pending .m-pload { animation: none; outline: 2px dashed var(--ink); outline-offset: 2px; } }

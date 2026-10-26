@@ -1104,6 +1104,10 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 /* seven page buttons share the bar */
 .m-tabs { grid-template-columns: repeat(7, 1fr); gap: 3px; padding: 5px; }
 .m .m-tabs button { font-size: min(var(--fs-s), 3.2vw) !important; }
+/* a preset waiting for the next bar: its row flashes on and off */
+.m .m-plist li.pending .m-pload { animation: m-flash .5s steps(1) infinite; }
+@keyframes m-flash { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .m .m-plist li.pending .m-pload { animation: none; outline: 2px dashed var(--ink); outline-offset: 2px; } }
 </style>
 
 <main class="m" id="m">
@@ -7886,13 +7890,15 @@ const mAllSend = (k) => ({ min: 0, max: 100, get: () => Math.max(...mix[k]), sho
   set: (v) => { mix[k].fill(v); if (k === 'fx') fxButtons.forEach((b) => b()); sendMix(); } });
 
 // ---- presets: save, and a list to load or delete (kept in this browser, as on the desktop) ----
-const mLoad = (k) => { loadPreset(k); mDrawPresets(); };
+// while playing, a preset waits for the next bar to come in: until it's heard, its row flashes
+let mPending = null;
+const mLoad = (k) => { loadPreset(k); mPending = playing ? k : null; mDrawPresets(); };
 function mDrawPresets() {
   const list = $('m-plist'), cur = kitList[Number($('kit').value)];
   list.innerHTML = '';
   const group = (t) => { const li = document.createElement('li'); li.className = 'm-pgroup'; li.textContent = t; list.append(li); };
   const row = (k) => {
-    const li = document.createElement('li'); li.classList.toggle('cur', k === cur);
+    const li = document.createElement('li'); li.classList.toggle('cur', k === cur); li.classList.toggle('pending', k === mPending);
     li.innerHTML = '<button class="m-pload" type="button"><b></b><small></small></button>';
     li.querySelector('b').textContent = k.name; li.querySelector('small').textContent = k.song ? `${k.song.tempo} bpm` : '';
     li.querySelector('.m-pload').addEventListener('click', async () => { await startAudio(); mLoad(k); });
@@ -8210,10 +8216,15 @@ function mSeqStep(f, i, ms) {
 new MutationObserver(() => {
   if ($('play').getAttribute('aria-pressed') === 'true') return;
   mFaders.forEach(mSeqRelease); mSeqSteps.forEach((c) => c.classList.remove('now'));
+  if (mPending) { mPending = null; mDrawPresets(); }
 }).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
 // on each 16th (as the audio thread reaches it, ahead of the output), every running sequencer steps its fader
 const mOnEvent = onEvent;
 onEvent = function (ev) {
+  // the bar a waiting preset comes in on: stop its flash as that bar is heard
+  if (ev.type === 'step' && ev.step === 0 && mPending) {
+    const p = mPending; setTimeout(() => { if (mPending === p) { mPending = null; mDrawPresets(); } }, ctx && ctx.outputLatency ? ctx.outputLatency * 1000 : 0);
+  }
   if (ev.type === 'step' && playing) {
     const n = ev.bar * 16 + ev.step, stepMs = 60000 / perf.tempo / 4;
     for (const f of mFaders) {
