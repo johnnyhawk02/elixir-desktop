@@ -184,10 +184,13 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 .m-seq-card { width: 100%; max-width: 480px; display: grid; gap: 14px; pointer-events: auto; box-shadow: 0 -8px 30px rgba(0, 0, 0, .5), inset 0 3px 10px rgba(0, 0, 0, .28); }
 .m-seq .m-chead { gap: 10px; }
 .m-seq .m-chead output { flex: 1; text-align: right; color: var(--muted); font-size: var(--fs-s); }
-.m-seq-steps { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; height: min(46vh, 340px); touch-action: none; }
-.m-seq-steps i { --f: 0; position: relative; border-radius: 2px; background: repeating-linear-gradient(to top, var(--ghost) 0 5px, transparent 5px 8px); }
-.m-seq-steps i::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: round(down, calc(var(--f) * 100%), 8px);
-  background: repeating-linear-gradient(to top, var(--ink) 0 5px, transparent 5px 8px); }
+.m-seq-steps { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; height: min(34vh, 280px); touch-action: none; }
+.m-seq-steps i { --up: 0; --dn: 0; position: relative; border-radius: 2px;
+  background: linear-gradient(var(--ink), var(--ink)) center / 100% 2px no-repeat, repeating-linear-gradient(to top, var(--ghost) 0 5px, transparent 5px 8px); }
+/* a step's offset: lit up from the middle line, or down from it */
+.m-seq-steps i::after, .m-seq-steps i::before { content: ""; position: absolute; left: 0; right: 0; background: repeating-linear-gradient(to top, var(--ink) 0 5px, transparent 5px 8px); }
+.m-seq-steps i::after { bottom: 50%; height: calc(var(--up) * 50%); background-position: bottom; }
+.m-seq-steps i::before { top: 50%; height: calc(var(--dn) * 50%); background: repeating-linear-gradient(to bottom, var(--ink) 0 5px, transparent 5px 8px); }
 .m-seq-steps i.off { opacity: .25; }
 .m-seq-steps i.now { outline: 2px solid var(--ink); outline-offset: 2px; }
 .m-seq-lenrow { display: grid; grid-template-columns: 4.5em 1fr 5.5em; gap: 12px; align-items: center; text-transform: uppercase; }
@@ -224,3 +227,6 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 .m-tabs button { font-size: var(--fs-s) !important; letter-spacing: 0; padding: 0 1px; min-width: 0; }
 .m-fx-btns { display: grid; grid-template-columns: 1.3fr 1.3fr 1fr; gap: 8px; }
 .m-fx-btns .m-btn { min-height: 46px; font-size: var(--fs-xs) !important; padding: 0 2px; }
+/* a fader with a sequencer moving it: its setting is a bar across the track */
+.m .m-vtrack.mod b { display: block; left: -3px; right: -3px; height: 4px; border-radius: 0; bottom: calc(var(--b) * (100% - 4px)); background: var(--ink); box-shadow: 0 0 0 2px var(--panel); }
+.m .m-vtrack.mod { overflow: visible; }
