@@ -398,6 +398,49 @@ const RING_W = LXR.OSC_WAVE_NAMES.map((n) => n.toLowerCase());
 fxF('m-fx-ring', 'wave', { min: 0, max: RING_W.length - 1, get: () => fx3.ring.wave, set: (v) => { fx3.ring.wave = v; sendMix(); }, show: (v) => RING_W[v], dflt: 0 });
 fxF('m-fx-ring', 'freq', { min: 0, max: 127, get: () => fx3.ring.freq, set: (v) => { fx3.ring.freq = v; sendMix(); }, show: String, dflt: FX3_0.ring.freq });
 
+// random fx: new sends on every drum (each effect on some of them) and new settings for all three effects;
+// alter fx: every send already on, and every setting, moved up to 10% of its range either way. Undo takes either back
+const fxSnap = () => ({ fx: mix.fx.slice(), dist: mix.dist.slice(), ring: mix.ring.slice(), fx3: structuredClone(fx3), pos: delayPos, p3: values[PAR.FX_P3], p4: values[PAR.FX_P4] });
+function fxUse(q) {
+  mix.fx.splice(0, 6, ...q.fx); mix.dist.splice(0, 6, ...q.dist); mix.ring.splice(0, 6, ...q.ring);
+  Object.assign(fx3.echo, q.fx3.echo); Object.assign(fx3.ring, q.fx3.ring); fx3.dist.type = q.fx3.dist.type; fx3.dist.p.splice(0, 4, ...q.fx3.dist.p);
+  delayPos = q.pos; send({ type: 'delay', pos: delayPos });
+  setValue(PAR.FX_P3, q.p3, true); setValue(PAR.FX_P4, q.p4, true);
+  fxButtons.forEach((b) => b()); sendMix(); mDrawAll(); setDirty(true);
+}
+const rIn = (lo, hi) => lo + Math.round(Math.random() * (hi - lo));
+function fxChange(fn) {
+  const was = fxSnap(), q = fxSnap();
+  fn(q); fxUse(q);
+  undoValues = null; $('undo').disabled = true; mUndoFn = () => fxUse(was); mUndo();
+}
+$('m-fx-rand').addEventListener('click', async () => {
+  await startAudio();
+  fxChange((q) => {
+    for (let v = 0; v < 6; v++) {
+      q.fx[v] = Math.random() < 0.5 ? rIn(10, 60) : 0;
+      q.dist[v] = Math.random() < 0.3 ? rIn(10, 70) : 0;
+      q.ring[v] = Math.random() < 0.2 ? rIn(10, 60) : 0;
+    }
+    q.pos = posOf([1 / 2, 1 / 4, 3 / 16, 1 / 8, 1 / 16][rIn(0, 4)]);
+    q.p3 = rIn(40, 110); q.p4 = Math.random() < 0.8 ? rIn(15, 70) : rIn(70, 105);
+    q.fx3.echo.pct = rIn(60, 160);
+    q.fx3.dist.type = rIn(0, DIST_T.length - 1); q.fx3.dist.p = [rIn(30, 127), rIn(20, 110), rIn(40, 120), rIn(60, 110)];
+    q.fx3.ring.wave = rIn(0, RING_W.length - 1); q.fx3.ring.freq = rIn(5, 120);
+  });
+});
+$('m-fx-alter').addEventListener('click', async () => {
+  await startAudio();
+  const nudge = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v + (Math.random() * 2 - 1) * 0.1 * (hi - lo))));
+  fxChange((q) => {
+    for (const k of ['fx', 'dist', 'ring']) q[k] = q[k].map((v) => (v ? nudge(v, 1, 100) : 0));
+    q.pos = Math.max(0, Math.min(1, q.pos + (Math.random() * 2 - 1) * 0.05));
+    q.p3 = nudge(q.p3, 0, 127); q.p4 = nudge(q.p4, 0, 127);
+    q.fx3.echo.pct = nudge(q.fx3.echo.pct, 0, 200);
+    q.fx3.dist.p = q.fx3.dist.p.map((v) => nudge(v, 0, 127)); q.fx3.ring.freq = nudge(q.fx3.ring.freq, 0, 127);
+  });
+});
+
 // ---- step sequencers: holding a fader opens one for it: 2 to 16 steps, each a value it takes on that 16th note while
 // playing (the step is the bar's 16th counted from the start, wrapped at the length, so short ones run against the bar),
 // jumping to it or, with slew, gliding to it over up to a whole step; each step lasts a 16th note up to 8 bars.

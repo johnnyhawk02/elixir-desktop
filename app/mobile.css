@@ -211,7 +211,7 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 
 /* the fx page: a row of faders per effect, its name above it */
 [data-m-panel="fx"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
-.m-fx-card { display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px; min-height: 0; padding: 8px; }
+.m-fx-card { display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)) auto; gap: 8px; min-height: 0; padding: 8px; }
 .m-fx-row { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 2px; min-height: 0; }
 .m-fx-row b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); padding-left: 4px; }
 .m-fx-row .m-faders { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
@@ -222,3 +222,5 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 /* five page buttons share the bar */
 .m-tabs { grid-template-columns: repeat(5, 1fr); }
 .m-tabs button { font-size: var(--fs-s) !important; letter-spacing: 0; padding: 0 1px; min-width: 0; }
+.m-fx-btns { display: grid; grid-template-columns: 1.3fr 1.3fr 1fr; gap: 8px; }
+.m-fx-btns .m-btn { min-height: 46px; font-size: var(--fs-xs) !important; padding: 0 2px; }
