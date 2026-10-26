@@ -319,6 +319,12 @@ const mLoad = (k) => {
   if (!mPending) mPlayingPreset = kitList[Number($('kit').value)];
   loadPreset(k); mPending = playing ? k : null; mDrawPresets();
 };
+// favourites: a star on any preset, mine or built in, keeps it in a group at the top of the list. Kept in this browser
+// by name (a saved one also carries fav, so an export keeps it)
+const FAV_KEY = 'elixir-mobile-favs';
+const mFavs = new Set((() => { try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch (e) { return []; } })());
+for (const k of kitList) if (k.saved && k.fav) mFavs.add(k.name);
+const mFavStore = () => { try { localStorage.setItem(FAV_KEY, JSON.stringify([...mFavs])); } catch (e) {} };
 function mDrawPresets() {
   const list = $('m-plist'), cur = mPending ? mPlayingPreset : kitList[Number($('kit').value)];
   list.innerHTML = '';
@@ -328,13 +334,25 @@ function mDrawPresets() {
     li.innerHTML = '<button class="m-pload" type="button"><b></b><small></small></button>';
     li.querySelector('b').textContent = k.name; li.querySelector('small').textContent = k.song ? `${k.song.tempo} bpm` : '';
     li.querySelector('.m-pload').addEventListener('click', async () => { await startAudio(); mLoad(k); });
+    const fav = mFavs.has(k.name), star = document.createElement('button');
+    star.className = 'm-pfav'; star.type = 'button'; star.textContent = fav ? '★' : '☆';
+    star.setAttribute('aria-pressed', fav); star.setAttribute('aria-label', `Favourite ${k.name}`);
+    star.addEventListener('click', () => {
+      if (mFavs.has(k.name)) mFavs.delete(k.name); else mFavs.add(k.name);
+      if (k.saved) { k.fav = mFavs.has(k.name); storePresets(); }
+      mFavStore(); mDrawPresets();
+    });
+    li.append(star);
+    // (a built-in one has a gap where a saved one's delete is, so every row's name lines up)
+    if (!k.saved) { const gap = document.createElement('span'); gap.className = 'm-pdel'; li.append(gap); }
     if (k.saved) {
-      const d = document.createElement('button'); d.className = 'm-pdel'; d.type = 'button'; d.textContent = 'delete';
+      const d = document.createElement('button'); d.className = 'm-pdel'; d.type = 'button'; d.textContent = '✕';
       d.setAttribute('aria-label', `Delete ${k.name}`);
       d.addEventListener('click', () => {
         if (!confirm(`Delete ${k.name}?`)) return;
         const wasCur = k === kitList[Number($('kit').value)], keep = kitList[Number($('kit').value)];
         kitList.splice(kitList.indexOf(k), 1); storePresets(); fillKits();
+        mFavs.delete(k.name); mFavStore();
         $('kit').value = wasCur ? 0 : kitList.indexOf(keep);
         mDrawPresets();
       });
@@ -342,12 +360,15 @@ function mDrawPresets() {
     }
     list.append(li);
   };
-  const mine = kitList.filter((k) => k.saved);
+  // favourites first (each shows only there), then mine, then built in
+  const favs = kitList.filter((k) => mFavs.has(k.name) && (k.saved || k.builtin));
+  if (favs.length) { group('favourites'); favs.forEach(row); }
+  const mine = kitList.filter((k) => k.saved && !mFavs.has(k.name));
   group('mine');
   if (mine.length) mine.slice().reverse().forEach(row);
-  else { const li = document.createElement('li'); li.className = 'm-pempty'; li.textContent = 'None yet. Save makes one.'; list.append(li); }
+  else { const li = document.createElement('li'); li.className = 'm-pempty'; li.textContent = favs.some((k) => k.saved) ? 'All starred.' : 'None yet. Save makes one.'; list.append(li); }
   group('built in');
-  kitList.filter((k) => k.builtin).forEach(row);
+  kitList.filter((k) => k.builtin && !mFavs.has(k.name)).forEach(row);
 }
 $('m-psave').addEventListener('click', () => {
   $('kit-save').click();

@@ -370,3 +370,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     radial-gradient(22% 12% at 16% 66%, rgba(167, 181, 140, .38), rgba(167, 181, 140, 0) 100%),
     radial-gradient(14% 9% at 58% 83%, rgba(167, 181, 140, .3), rgba(167, 181, 140, 0) 100%),
     linear-gradient(90deg, rgba(167, 181, 140, 0) 88%, rgba(167, 181, 140, .22) 97%, rgba(167, 181, 140, .1)); }
+/* a preset's star: filled when it's a favourite */
+.m .m-pfav { min-height: 46px; min-width: 44px; padding: 0 6px; background: none !important; border: 0 !important; box-shadow: none !important; font-size: 1.5rem !important; line-height: 1; color: var(--ink); }
+.m .m-pfav[aria-pressed="false"] { opacity: .45; }
+.m .m-pdel { min-width: 40px; padding: 0; text-align: center; font-size: 1.2rem !important; }
