@@ -46,6 +46,8 @@ class Player {
     // rs: its break points and glides, from the rush settings popup (these are the defaults; top: log2 of the free roll's
     // hits a step at 100, 4 = 256ths; hpTop in Hz, the glides' time constants in ms)
     this.rs = { start: 75, p32: 80, top: 4, hats: 80, only: 98, kicks: 90, first: 95, hp: 90, hpTop: 1500, rollMs: 40, hpMs: 40 };
+    // rushT: the track the rush hands the hits to and rolls on (3, the snare, unless another is picked; Elixir Mobile)
+    this.rushT = 3;
     this.rush = 0; this.rushPh = null; this.rushLog = 1; this.rushHead = null; this.rushGap = 0; this.clock = 0; this.snareAt = -1e9;
     // and above 90 a high-pass on the whole mix, before the master compressor: 30 Hz at 90 up to 1.5 kHz at 100
     // (hpLog: its cutoff in log Hz, gliding; hpMix: how much of it is heard, faded in and out so it never clicks;
@@ -83,7 +85,7 @@ class Player {
     if (m.type === 'param') this.e.setParam(m.par, m.value);
     else if (m.type === 'kit') this.e.loadKit(m.values);
     else if (m.type === 'trig') { this.e.trigger(m.voice, m.vel, 60); this.gainTo[Math.min(m.voice, 5)] = 1; }
-    else if (m.type === 'rush') this.rush = m.v;
+    else if (m.type === 'rush') { this.rush = m.v; if (m.t !== undefined) this.rushT = m.t; }
     else if (m.type === 'rushSet') Object.assign(this.rs, m.set);
     else if (m.type === 'mute') m.muted.forEach((v, n) => { this.muted[n] = v ? 1 : 0; });
     else if (m.type === 'xmod') this.e.setCrossMod(m.amt, m.target);
@@ -155,6 +157,7 @@ class Player {
   // The roll's hits are tagged (roll 2 for a hit on a step the pattern plays, 1 for the rest): above 80 they don't play and
   // the free roll in _render takes over, the first free hit after a roll-2 hit taking its accent
   scheduleRush(s, bar, pg, P, at0, len, hits) {
+    const rt = this.rushT; // (the track the rush rolls on: the snare unless set)
     const { on, acc, bar: cond } = P, G = this.groove, R = this.rush, S = this.rs;
     const p = Math.pow(Math.min(1, R / S.only), 2.5), pHat = Math.pow(Math.min(1, R / S.hats), 2.5);
     let snare = R > S.start, sAcc = false, orig = false;
@@ -163,17 +166,17 @@ class Player {
       orig = true;
       const down = !t && !(s & 3);
       if (down && (R >= S.first || (R >= S.kicks && s))) continue; // the roll covers the step
-      if (t === 3 || (!down && rushHash(t, pg, s) < (t >= 5 ? pHat : p))) { snare = true; sAcc = sAcc || !!acc[t][s]; continue; } // a muted drum is still taken
+      if (t === rt || (!down && rushHash(t, pg, s) < (t >= 5 ? pHat : p))) { snare = true; sAcc = sAcc || !!acc[t][s]; continue; } // a muted drum is still taken
       if (this.muted[Math.min(t, 5)]) continue;
       this.queue.push({ at: Math.max(0, at0 + G.off[t][s] * len), t, acc: !!acc[t][s] });
       hits.push(t);
     }
-    if (snare && !this.muted[3]) {
-      const n = R > (S.start + S.p32) / 2 ? 2 : 1, at = R > S.start ? at0 : at0 + G.off[3][s] * len;
+    if (snare && !this.muted[Math.min(rt, 5)]) {
+      const n = R > (S.start + S.p32) / 2 ? 2 : 1, at = R > S.start ? at0 : at0 + G.off[rt][s] * len;
       const sw = R > S.start ? 0.6 + 0.4 * (R - S.start) / (100 - S.start) : 1;
       for (let i = 0; i < n; i++) {
         const first = !i && orig;
-        this.queue.push({ at: Math.max(0, at + i * len / n), t: 3, acc: first && sAcc, sw, roll: R > S.start ? (first ? 2 : 1) : 0 });
+        this.queue.push({ at: Math.max(0, at + i * len / n), t: rt, acc: first && sAcc, sw, roll: R > S.start ? (first ? 2 : 1) : 0 });
       }
       hits.push(3);
     }
@@ -272,7 +275,7 @@ class Player {
       const sw = 0.6 + 0.4 * (this.rush - S.start) / (100 - S.start);
       for (let k = Math.floor(this.rushPh) + 1; k <= this.rushPh + d; k++) {
         const h = this.rushHead; this.rushHead = null;
-        this.queue.push({ at: (k - this.rushPh) / d * 64, t: 3, acc: !!h && h.acc, sw, free: true });
+        this.queue.push({ at: (k - this.rushPh) / d * 64, t: this.rushT, acc: !!h && h.acc, sw, free: true });
       }
       this.rushPh = (this.rushPh + d) % 1; this.rushGap = len / rate / 2;
     } else { this.rushPh = null; this.rushHead = null; }
@@ -283,7 +286,7 @@ class Player {
         // a voice muted after its step was booked is skipped too; above 80 the grid roll gives way to the free one, and
         // no snare plays within half a free-roll gap of the last
         if (q.at < 64 && this.rush > S.p32 && (q.roll || q.free) && (q.roll || this.clock - this.snareAt < this.rushGap)) { if (q.roll === 2) this.rushHead = q; }
-        else if (q.at < 64) { if (q.t === 3) this.snareAt = this.clock; if (!this.muted[Math.min(q.t, 5)]) { const sw = q.sw || 1; this.e.trigger(q.t, q.acc ? 127 : Math.max(1, Math.round(this.vel * sw)), 60); this.gainTo[Math.min(q.t, 5)] = q.acc ? 1 : this.accGain * sw; } }
+        else if (q.at < 64) { if (q.t === this.rushT) this.snareAt = this.clock; if (!this.muted[Math.min(q.t, 5)]) { const sw = q.sw || 1; this.e.trigger(q.t, q.acc ? 127 : Math.max(1, Math.round(this.vel * sw)), 60); this.gainTo[Math.min(q.t, 5)] = q.acc ? 1 : this.accGain * sw; } }
         else { q.at -= 64; keep.push(q); }
       }
       this.queue = keep;

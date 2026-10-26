@@ -462,3 +462,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-nextbar i { width: 18px; height: 18px; }
 .m .m-rand .m-btn.pending { animation: m-flash .5s steps(1) infinite; }
 @media (prefers-reduced-motion: reduce) { .m .m-rand .m-btn.pending { animation: none; outline: 2px dashed var(--ink); outline-offset: 2px; } }
+/* the beat page: ten faders, five by two */
+#m-beat-faders { grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 10px 4px; }
+.m #m-beat-faders .m-flab { font-size: min(var(--fs-xs), 3.6vw); letter-spacing: -.02em; white-space: nowrap; }
+.m #m-beat-faders .m-vf output { font-size: min(var(--fs-xs), 3.5vw); }

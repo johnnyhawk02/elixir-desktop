@@ -31,6 +31,7 @@ format (`build.mjs` refuses one in any other version).
   `vals` holds sixteen offsets, -1..1 of depth, from the fader's setting (the preset saves the setting, not the value
   heard; a sequence without `rel` held values in the fader's range and loads as offsets from its middle) (e.g. `"m-beat-faders:energy"`). A preset without one for a
   fader clears it.
+- `song.rushT`: the track the rush rolls on, 0..6 (drum 1, 2, 3, snare, cymbal, closed hat, open hat; missing means 3, the snare).
 - `song.xdepth`: the crossfeed depth, 0..100 (missing means 100).
 
 ## The presets file

@@ -1310,6 +1310,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-nextbar i { width: 18px; height: 18px; }
 .m .m-rand .m-btn.pending { animation: m-flash .5s steps(1) infinite; }
 @media (prefers-reduced-motion: reduce) { .m .m-rand .m-btn.pending { animation: none; outline: 2px dashed var(--ink); outline-offset: 2px; } }
+/* the beat page: ten faders, five by two */
+#m-beat-faders { grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 10px 4px; }
+.m #m-beat-faders .m-flab { font-size: min(var(--fs-xs), 3.6vw); letter-spacing: -.02em; white-space: nowrap; }
+.m #m-beat-faders .m-vf output { font-size: min(var(--fs-xs), 3.5vw); }
 </style>
 
 <main class="m" id="m">
@@ -5216,6 +5220,8 @@ class Player {
     // rs: its break points and glides, from the rush settings popup (these are the defaults; top: log2 of the free roll's
     // hits a step at 100, 4 = 256ths; hpTop in Hz, the glides' time constants in ms)
     this.rs = { start: 75, p32: 80, top: 4, hats: 80, only: 98, kicks: 90, first: 95, hp: 90, hpTop: 1500, rollMs: 40, hpMs: 40 };
+    // rushT: the track the rush hands the hits to and rolls on (3, the snare, unless another is picked; Elixir Mobile)
+    this.rushT = 3;
     this.rush = 0; this.rushPh = null; this.rushLog = 1; this.rushHead = null; this.rushGap = 0; this.clock = 0; this.snareAt = -1e9;
     // and above 90 a high-pass on the whole mix, before the master compressor: 30 Hz at 90 up to 1.5 kHz at 100
     // (hpLog: its cutoff in log Hz, gliding; hpMix: how much of it is heard, faded in and out so it never clicks;
@@ -5253,7 +5259,7 @@ class Player {
     if (m.type === 'param') this.e.setParam(m.par, m.value);
     else if (m.type === 'kit') this.e.loadKit(m.values);
     else if (m.type === 'trig') { this.e.trigger(m.voice, m.vel, 60); this.gainTo[Math.min(m.voice, 5)] = 1; }
-    else if (m.type === 'rush') this.rush = m.v;
+    else if (m.type === 'rush') { this.rush = m.v; if (m.t !== undefined) this.rushT = m.t; }
     else if (m.type === 'rushSet') Object.assign(this.rs, m.set);
     else if (m.type === 'mute') m.muted.forEach((v, n) => { this.muted[n] = v ? 1 : 0; });
     else if (m.type === 'xmod') this.e.setCrossMod(m.amt, m.target);
@@ -5325,6 +5331,7 @@ class Player {
   // The roll's hits are tagged (roll 2 for a hit on a step the pattern plays, 1 for the rest): above 80 they don't play and
   // the free roll in _render takes over, the first free hit after a roll-2 hit taking its accent
   scheduleRush(s, bar, pg, P, at0, len, hits) {
+    const rt = this.rushT; // (the track the rush rolls on: the snare unless set)
     const { on, acc, bar: cond } = P, G = this.groove, R = this.rush, S = this.rs;
     const p = Math.pow(Math.min(1, R / S.only), 2.5), pHat = Math.pow(Math.min(1, R / S.hats), 2.5);
     let snare = R > S.start, sAcc = false, orig = false;
@@ -5333,17 +5340,17 @@ class Player {
       orig = true;
       const down = !t && !(s & 3);
       if (down && (R >= S.first || (R >= S.kicks && s))) continue; // the roll covers the step
-      if (t === 3 || (!down && rushHash(t, pg, s) < (t >= 5 ? pHat : p))) { snare = true; sAcc = sAcc || !!acc[t][s]; continue; } // a muted drum is still taken
+      if (t === rt || (!down && rushHash(t, pg, s) < (t >= 5 ? pHat : p))) { snare = true; sAcc = sAcc || !!acc[t][s]; continue; } // a muted drum is still taken
       if (this.muted[Math.min(t, 5)]) continue;
       this.queue.push({ at: Math.max(0, at0 + G.off[t][s] * len), t, acc: !!acc[t][s] });
       hits.push(t);
     }
-    if (snare && !this.muted[3]) {
-      const n = R > (S.start + S.p32) / 2 ? 2 : 1, at = R > S.start ? at0 : at0 + G.off[3][s] * len;
+    if (snare && !this.muted[Math.min(rt, 5)]) {
+      const n = R > (S.start + S.p32) / 2 ? 2 : 1, at = R > S.start ? at0 : at0 + G.off[rt][s] * len;
       const sw = R > S.start ? 0.6 + 0.4 * (R - S.start) / (100 - S.start) : 1;
       for (let i = 0; i < n; i++) {
         const first = !i && orig;
-        this.queue.push({ at: Math.max(0, at + i * len / n), t: 3, acc: first && sAcc, sw, roll: R > S.start ? (first ? 2 : 1) : 0 });
+        this.queue.push({ at: Math.max(0, at + i * len / n), t: rt, acc: first && sAcc, sw, roll: R > S.start ? (first ? 2 : 1) : 0 });
       }
       hits.push(3);
     }
@@ -5442,7 +5449,7 @@ class Player {
       const sw = 0.6 + 0.4 * (this.rush - S.start) / (100 - S.start);
       for (let k = Math.floor(this.rushPh) + 1; k <= this.rushPh + d; k++) {
         const h = this.rushHead; this.rushHead = null;
-        this.queue.push({ at: (k - this.rushPh) / d * 64, t: 3, acc: !!h && h.acc, sw, free: true });
+        this.queue.push({ at: (k - this.rushPh) / d * 64, t: this.rushT, acc: !!h && h.acc, sw, free: true });
       }
       this.rushPh = (this.rushPh + d) % 1; this.rushGap = len / rate / 2;
     } else { this.rushPh = null; this.rushHead = null; }
@@ -5453,7 +5460,7 @@ class Player {
         // a voice muted after its step was booked is skipped too; above 80 the grid roll gives way to the free one, and
         // no snare plays within half a free-roll gap of the last
         if (q.at < 64 && this.rush > S.p32 && (q.roll || q.free) && (q.roll || this.clock - this.snareAt < this.rushGap)) { if (q.roll === 2) this.rushHead = q; }
-        else if (q.at < 64) { if (q.t === 3) this.snareAt = this.clock; if (!this.muted[Math.min(q.t, 5)]) { const sw = q.sw || 1; this.e.trigger(q.t, q.acc ? 127 : Math.max(1, Math.round(this.vel * sw)), 60); this.gainTo[Math.min(q.t, 5)] = q.acc ? 1 : this.accGain * sw; } }
+        else if (q.at < 64) { if (q.t === this.rushT) this.snareAt = this.clock; if (!this.muted[Math.min(q.t, 5)]) { const sw = q.sw || 1; this.e.trigger(q.t, q.acc ? 127 : Math.max(1, Math.round(this.vel * sw)), 60); this.gainTo[Math.min(q.t, 5)] = q.acc ? 1 : this.accGain * sw; } }
         else { q.at -= 64; keep.push(q); }
       }
       this.queue = keep;
@@ -5750,7 +5757,8 @@ const grooveMsg = () => {
 };
 // ---- perform state: the perform dials (pattern card, PC4, presets) read and write here ----
 // The groove type and depth are the groove's; tempo is shown in the header's field too
-const perf = { energy: 60, beat: 0, fills: 40, tempo: 118, vel: 100, accent: 6, rush: 0 };
+// (rushT: the track the rush rolls on, 0..6 = drum 1, 2, 3, snare, cymbal, closed hat, open hat; Elixir Mobile)
+const perf = { energy: 60, beat: 0, fills: 40, tempo: 118, vel: 100, accent: 6, rush: 0, rushT: 3 };
 // [min, max, default] of each, as the knobs and the PC4 map them
 const PERF_RANGE = { energy: [0, 100, 60], beat: [0, 31, 0], fills: [0, 100, 40], tempo: [40, 240, 118], rush: [0, 100, 0], vel: [1, 127, 100], accent: [0, 6, 6],
   groove: [0, GROOVE_TYPES.length - 1, 0], depth: [0, 100, 100] };
@@ -5767,7 +5775,7 @@ function setPerf(k, v) {
   perf[k] = v;
   if (k === 'tempo') { $('tempo').value = v; sendSeq(); }
   else if (k === 'vel' || k === 'accent') sendSeq();
-  else if (k === 'rush') send({ type: 'rush', v });
+  else if (k === 'rush' || k === 'rushT') send({ type: 'rush', v: perf.rush, t: perf.rushT });
   else { generate(); if (k === 'beat') drawUserTools(); }
   drawPerf();
 }
@@ -6060,7 +6068,7 @@ const safeRange = (text, voice, name) => {
 // ---- the randomisers' settings (Elixir Mobile): the ranges and chances each randomise button uses, edited in the
 // hidden settings pop-up (tap ELIXIR) and kept in this browser. Percentages are 0..100; Lo/Hi pairs are ranges ----
 const RAND0 = {
-  every: { vary: 10, pingpong: 60, panOn: 30, panMax: 50, echoOn: 50, echoLo: 20, echoHi: 50, fbLo: 20, fbHi: 55, fbWild: 7, xfeed: 1, genre: 1, energyLo: 45, energyHi: 90, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 5, depthHi: 50 },
+  every: { rushVoice: 1, vary: 10, pingpong: 60, panOn: 30, panMax: 50, echoOn: 50, echoLo: 20, echoHi: 50, fbLo: 20, fbHi: 55, fbWild: 7, xfeed: 1, genre: 1, energyLo: 45, energyHi: 90, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 5, depthHi: 50 },
   kit: { vary: 0 },
   alter: { amount: 10 },
   pattern: { genre: 1, energyLo: 35, energyHi: 95, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 50, depthHi: 100 },
@@ -6503,7 +6511,7 @@ function setDirty(d) {
 function songSnapshot() {
   const copy = (a) => a.map((r) => r.slice());
   return { style: STYLES[styleIdx].name, user: STYLES[styleIdx].user && userPats.length ? structuredClone(userPats[userSlot()]) : undefined, energy: perf.energy, beat: perf.beat, fills: perf.fills,
-    tempo: perf.tempo, rush: perf.rush, vel: perf.vel, accent: perf.accent, view, source, groove: structuredClone(groove), macro: { ...macro },
+    tempo: perf.tempo, rush: perf.rush, rushT: perf.rushT, vel: perf.vel, accent: perf.accent, view, source, groove: structuredClone(groove), macro: { ...macro },
     pattern: { on: copy(pattern.on), acc: copy(pattern.acc), bar: copy(pattern.bar) }, stepPages: pages.slice(0, pageCount).map(copyPage),
     master: { ...master }, rushSet: { ...rushSet } };
 }
@@ -6515,7 +6523,8 @@ function useSong(g, keepTempo) {
   if (STYLES[styleIdx].user && g.user) { const i = ensureUserPat(g.user); if (i >= 0) useUserSlot(i); }
   Object.assign(master, MASTER0, g.master); buildMaster(); // presets saved before the sidechain switch have it on
   sendMix();
-  perf.rush = Math.max(0, Math.min(100, Number(g.rush) || 0)); send({ type: 'rush', v: perf.rush });
+  perf.rush = Math.max(0, Math.min(100, Number(g.rush) || 0)); perf.rushT = Number.isInteger(g.rushT) ? Math.max(0, Math.min(6, g.rushT)) : 3;
+  send({ type: 'rush', v: perf.rush, t: perf.rushT });
   useRushSet(g.rushSet);
   // the dial readouts come from generate; then the saved pattern, which may have been edited by hand
   generate();
@@ -6577,6 +6586,8 @@ $('new-kit').addEventListener('click', async () => {
   if (E.genre) setStyle(genres[Math.floor(rnd() * genres.length)]);
   perf.beat = Math.floor(rnd() * STYLES[styleIdx].grooves.length); perf.energy = rRange(E.energyLo, E.energyHi); perf.fills = rRange(E.fillsLo, E.fillsHi);
   // and a new groove, at a depth within its range (unless switched off)
+  // the rush's voice: any of the seven tracks (unless switched off)
+  if (E.rushVoice) { perf.rushT = Math.floor(rnd() * 7); send({ type: 'rush', v: perf.rush, t: perf.rushT }); }
   if (E.groove) { groove.type = GROOVE_TYPES[Math.floor(rnd() * GROOVE_TYPES.length)].name; groove.depth = rRange(E.depthLo, E.depthHi); }
   drawGroove(); sendSeq();
   drawUserTools();
@@ -7986,6 +7997,9 @@ mFader($('m-beat-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].
 mFader($('m-beat-faders'), 'energy', { ...pf('energy'), show: () => perfText('energy').replace(' · ', '\n') });
 mFader($('m-beat-faders'), 'fills', { ...pf('fills'), show: () => perfText('fills').replace(' · ', '\n') });
 mFader($('m-beat-faders'), 'rush', pf('rush'));
+// the voice the rush hands its hits to and rolls on (the snare unless changed)
+const RUSH_V = ['drum 1', 'drum 2', 'drum 3', 'snare', 'cymbal', 'cl hat', 'op hat'];
+mFader($('m-beat-faders'), 'rush on', { min: 0, max: 6, get: () => perf.rushT, set: (v) => { setPerf('rushT', v); setDirty(true); }, show: (v) => RUSH_V[v].replace(' ', '\n'), dflt: 3 });
 mFader($('m-beat-faders'), 'velocity', { ...pf('vel'), show: (v) => `${v}` });
 mFader($('m-beat-faders'), 'groove', { ...pf('groove'), show: () => perfText('groove').replace(' ', '\n') });
 mFader($('m-beat-faders'), 'depth', { ...pf('depth'), show: (v) => `${v}%` });
@@ -8672,7 +8686,7 @@ function xyPick() { try { localStorage.setItem(XY_KEY, JSON.stringify(mXY)); } c
 // a page: [key in RAND, name, the button it presses, rows: [setting, label, min, max, how it reads]]
 const pc = (v) => `${v}%`, onoff = (v) => (v ? 'on' : 'off');
 const RS_PAGES = [
-  ['every', 'everything', 'm-everything', [['vary', 'sound vary', 0, 50, pc], ['pingpong', 'ping pong', 0, 100, pc], ['panOn', 'pan chance', 0, 100, pc], ['panMax', 'pan max', 8, 63, String], ['echoOn', 'echo chance', 0, 100, pc], ['echoLo', 'echo min', 0, 100, String], ['echoHi', 'echo max', 0, 100, String],
+  ['every', 'everything', 'm-everything', [['rushVoice', 'rush voice', 0, 1, onoff], ['vary', 'sound vary', 0, 50, pc], ['pingpong', 'ping pong', 0, 100, pc], ['panOn', 'pan chance', 0, 100, pc], ['panMax', 'pan max', 8, 63, String], ['echoOn', 'echo chance', 0, 100, pc], ['echoLo', 'echo min', 0, 100, String], ['echoHi', 'echo max', 0, 100, String],
     ['fbLo', 'feedback min', 0, 127, String], ['fbHi', 'feedback max', 0, 127, String], ['fbWild', 'wild feedback', 0, 100, pc], ['xfeed', 'crossfeed', 0, 1, onoff],
     ['genre', 'genre', 0, 1, onoff], ['energyLo', 'energy min', 0, 100, pc], ['energyHi', 'energy max', 0, 100, pc], ['fillsLo', 'fills min', 0, 100, pc], ['fillsHi', 'fills max', 0, 100, pc],
     ['groove', 'groove', 0, 1, onoff], ['depthLo', 'depth min', 0, 100, pc], ['depthHi', 'depth max', 0, 100, pc]]],

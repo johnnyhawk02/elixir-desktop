@@ -159,7 +159,7 @@ function setDirty(d) {
 function songSnapshot() {
   const copy = (a) => a.map((r) => r.slice());
   return { style: STYLES[styleIdx].name, user: STYLES[styleIdx].user && userPats.length ? structuredClone(userPats[userSlot()]) : undefined, energy: perf.energy, beat: perf.beat, fills: perf.fills,
-    tempo: perf.tempo, rush: perf.rush, vel: perf.vel, accent: perf.accent, view, source, groove: structuredClone(groove), macro: { ...macro },
+    tempo: perf.tempo, rush: perf.rush, rushT: perf.rushT, vel: perf.vel, accent: perf.accent, view, source, groove: structuredClone(groove), macro: { ...macro },
     pattern: { on: copy(pattern.on), acc: copy(pattern.acc), bar: copy(pattern.bar) }, stepPages: pages.slice(0, pageCount).map(copyPage),
     master: { ...master }, rushSet: { ...rushSet } };
 }
@@ -171,7 +171,8 @@ function useSong(g, keepTempo) {
   if (STYLES[styleIdx].user && g.user) { const i = ensureUserPat(g.user); if (i >= 0) useUserSlot(i); }
   Object.assign(master, MASTER0, g.master); buildMaster(); // presets saved before the sidechain switch have it on
   sendMix();
-  perf.rush = Math.max(0, Math.min(100, Number(g.rush) || 0)); send({ type: 'rush', v: perf.rush });
+  perf.rush = Math.max(0, Math.min(100, Number(g.rush) || 0)); perf.rushT = Number.isInteger(g.rushT) ? Math.max(0, Math.min(6, g.rushT)) : 3;
+  send({ type: 'rush', v: perf.rush, t: perf.rushT });
   useRushSet(g.rushSet);
   // the dial readouts come from generate; then the saved pattern, which may have been edited by hand
   generate();
@@ -233,6 +234,8 @@ $('new-kit').addEventListener('click', async () => {
   if (E.genre) setStyle(genres[Math.floor(rnd() * genres.length)]);
   perf.beat = Math.floor(rnd() * STYLES[styleIdx].grooves.length); perf.energy = rRange(E.energyLo, E.energyHi); perf.fills = rRange(E.fillsLo, E.fillsHi);
   // and a new groove, at a depth within its range (unless switched off)
+  // the rush's voice: any of the seven tracks (unless switched off)
+  if (E.rushVoice) { perf.rushT = Math.floor(rnd() * 7); send({ type: 'rush', v: perf.rush, t: perf.rushT }); }
   if (E.groove) { groove.type = GROOVE_TYPES[Math.floor(rnd() * GROOVE_TYPES.length)].name; groove.depth = rRange(E.depthLo, E.depthHi); }
   drawGroove(); sendSeq();
   drawUserTools();
