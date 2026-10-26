@@ -33,6 +33,22 @@ mPages.addEventListener('scroll', () => { clearTimeout(mSettle); mSettle = setTi
 mPages.addEventListener('scrollend', mSettled);
 document.querySelectorAll('[data-m-tab]').forEach((b) => b.addEventListener('click', () => mTab(b.dataset.mTab)));
 
+// anywhere outside the pages (the title, play and record, the page buttons), a sideways swipe turns the page too
+{
+  let sw = null;
+  const order = () => [...document.querySelectorAll('[data-m-panel]')].map((el) => el.dataset.mPanel);
+  $('m').addEventListener('touchstart', (e) => {
+    sw = e.touches.length === 1 && !mPages.contains(e.target) && !e.target.closest('.m-seq') ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+  }, { passive: true });
+  $('m').addEventListener('touchend', (e) => {
+    if (!sw) return;
+    const t = e.changedTouches[0], dx = t.clientX - sw.x, dy = t.clientY - sw.y; sw = null;
+    if (Math.abs(dx) < 50 || Math.abs(dx) < 2 * Math.abs(dy)) return;
+    const o = order(), i = o.indexOf(mCur) + (dx < 0 ? 1 : -1);
+    if (i >= 0 && i < o.length) mTab(o[i]);
+  }, { passive: true });
+}
+
 // ---- transport ----
 const mPlay = $('m-play'), mRec = $('m-rec');
 const mSync = () => {
@@ -84,7 +100,9 @@ function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel =
     move(drag.v + (drag.y - e.clientY) / (drag.h * travel) * (hiOf() - min));
   });
   const end = () => { clearTimeout(hold); drag = null; el.classList.remove('held'); };
-  tr.addEventListener('pointerup', end); tr.addEventListener('pointercancel', end);
+  tr.addEventListener('pointerup', end);
+  // a sideways swipe that starts on a fader turns the page instead (the browser takes it over): the fader goes back
+  tr.addEventListener('pointercancel', () => { const v = drag && drag.v; end(); if (v !== null && v !== undefined) move(v); });
   tr.addEventListener('keydown', (e) => {
     const d = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 10, PageDown: -10 }[e.key];
     if (d) { e.preventDefault(); move((fd.base !== null ? fd.base : get()) + d * step); }

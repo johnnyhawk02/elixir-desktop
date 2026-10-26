@@ -406,3 +406,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-tabs button { font-size: min(1.1rem, 3.5vw) !important; }
 .m-presets-card .m-foot { font-size: .95rem; }
 .m #m-faders .m-flab { font-size: min(var(--fs-xs), 3.75vw); letter-spacing: -.02em; }
+
+/* ---- swiping the whole screen turns the page: a fader takes only up-and-down drags (pan-x leaves sideways ones to the
+   pages), the step bars and the pad still take every touch ---- */
+.m .m-vtrack { touch-action: pan-x; }
