@@ -1,22 +1,29 @@
-# Elixir preset format (v4)
+# Elixir Mobile preset format (v4)
 
-Elixir and Elixir Mobile share this format, so a preset made in one plays the same in the other. Each app
-reads presets in its current version only (`PRESET_V` in `app/presets.js`) and skips any others. **If either
-app changes the format, both must move to the new version together**, and the built-in presets in
-`presets/*.json` must be rewritten to match (`build.mjs` refuses a built-in preset in any other version).
+Elixir Mobile started as a copy of Elixir and shared its preset format. It is its own app now (from 2026-10-26)
+and its presets can change without regard to the full Elixir. It still reads presets exported from the full
+Elixir (they are this format, minus the additions below), but a preset saved here may not load there.
 
-## Moving presets between the apps
+Each version reads presets in its current format only (`PRESET_V` in `app/presets.js`) and skips any others;
+the built-in presets in `presets/*.json` must match it (`build.mjs` refuses one in any other version).
 
-- **Full Elixir to phone:** in the full Elixir's preset manager, star the presets, press *export
-  favourites* and get `elixir-favourites.json` onto the phone (AirDrop, Files, email). Then press
-  *import presets* on the phone's presets tab.
-- **Phone to full Elixir:** press *export mine* on the phone's presets tab (it saves every preset saved on the
-  phone), then *import* in the full Elixir's preset manager.
-- **In the same browser:** the two apps are both on `johnnyhawk02.github.io` and keep saved presets under the
-  same storage key (`elexir-presets-v2`), so presets saved in one already show in the other.
+## Getting presets in and out
+
+- **From the full Elixir:** in its preset manager, star the presets, press *export favourites* and get
+  `elixir-favourites.json` onto the phone. Then press *import presets* on the phone's presets page.
+- **Backing up:** *export mine* saves every preset saved on the phone, and *import presets* reads it back.
+- Presets saved here are kept under their own storage key (`elixir-mobile-presets`), apart from the full Elixir's
+  (`elexir-presets-v2`, on the same site). The first time the app runs with its own key it copies the shared
+  key's presets over.
 - A preset whose name is already saved is skipped on import.
-- **Built in:** favourites dropped into `presets/*.json` in either repo are baked into that app's page when it
-  is built.
+- **Built in:** favourites dropped into `presets/*.json` are baked into the page when it is built.
+
+## Additions in Elixir Mobile
+
+- `song.master.space`: the sidechain's spacer, 0..100 (missing means 0).
+- `song.seqs`: the step sequencers, `{ "<box id>:<fader label>": { on, len, vals } }`, where `len` is 2..16 and
+  `vals` holds sixteen values in the fader's own range (e.g. `"m-faders:energy"`). A preset without one for a
+  fader clears it.
 
 ## The presets file
 
@@ -24,7 +31,7 @@ app changes the format, both must move to the new version together**, and the bu
 { "elixir": 1, "presets": [ <preset>, ... ] }
 ```
 
-`elixir: 1` marks a presets file and isn't the preset version. Storage (`localStorage['elexir-presets-v2']`)
+`elixir: 1` marks a presets file and isn't the preset version. Storage (`localStorage['elixir-mobile-presets']`)
 holds just the array of presets.
 
 ## A preset
@@ -60,7 +67,7 @@ the kit's own FX settings and the pattern stays as it is.
 | `pattern` | the perform pattern as played: `{ on, acc, bar }`, each 7 tracks × 16 steps |
 | `stepPages` | the steps grid, 1–4 pages of `{ on, acc, bar }` |
 | `view`, `source` | `perform` or `steps`; what plays (`perform`, `steps`, or `off` for MIDI in) |
-| `master` | `{ comp, thresh, ratio, attack, release, makeup, duck, duckRelease, duckFx, duckOn, space }` (`space`, the sidechain's spacer 0..100, is Elixir Mobile's; missing means 0, and the full Elixir ignores it) |
+| `master` | `{ comp, thresh, ratio, attack, release, makeup, duck, duckRelease, duckFx, duckOn, space }` (`space`: see the additions above) |
 
 Tracks run in the app's row order (`ROW` in `app/styles.js`: `k`, `lo`, `hi`, `s`, `cy`, `ch`, `oh`). `on` holds
 the hits, `acc` the accents and `bar` the bar conditions, as `app/steps.js` reads them.

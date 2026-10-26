@@ -87,7 +87,7 @@ $('kit-file').addEventListener('change', async (e) => {
   if (last) { pm.close(); useKit(last); setDirty(true); kitNote(`opened ${last.name}`); }
 });
 // TEMP: delete-all-user-presets — remove when factory presets are done
-// (elexir-presets-v2 holds only the presets saved here; the built-in ones are baked into the page)
+// (SAVE_KEY holds only the presets saved here; the built-in ones are baked into the page)
 {
   const btn = $('pm-del-all');
   const sync = () => { btn.disabled = !kitList.some((k) => k.saved); };

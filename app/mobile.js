@@ -57,7 +57,7 @@ function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel =
     out.textContent = show(v); tr.style.setProperty('--f', (v - min) / (hi - min || 1));
     tr.setAttribute('aria-valuemin', min); tr.setAttribute('aria-valuemax', hi); tr.setAttribute('aria-valuenow', v); tr.setAttribute('aria-valuetext', show(v));
   };
-  const fd = { label, min, hiOf, step, get, show, put, el, seq: null };
+  const fd = { key: `${box.id}:${label}`, label, min, hiOf, step, get, show, put, el, seq: null };
   let drag = null, hold = 0;
   tr.addEventListener('pointerdown', (e) => {
     tr.setPointerCapture(e.pointerId); el.classList.add('held');
@@ -333,7 +333,7 @@ async function mOffer(t, type) {
 // ---- step sequencers: holding a fader opens one for it: 2 to 16 steps, each a value it takes on that 16th note while
 // playing (the step is the bar's 16th counted from the start, wrapped at the length, so short ones run against the bar).
 // Draw the steps with a finger (drag across to paint), randomise them, or switch it off; a fader with one running is
-// marked. They're not saved with presets ----
+// marked. Presets keep them ----
 const mSeqSteps = Array.from({ length: 16 }, (_, i) => { const c = document.createElement('i'); c.dataset.i = i; $('m-seq-steps').append(c); return c; });
 let mSeqF = null;
 const mSeqVal = (fd, f) => { const hi = fd.hiOf(); return Math.max(fd.min, Math.min(hi, fd.min + Math.round(f * (hi - fd.min) / fd.step) * fd.step)); };
@@ -350,8 +350,22 @@ function mSeqDraw() {
   });
   $('m-seq-len').style.setProperty('--f', (q.len - 2) / 14); $('m-seq-len-out').textContent = `${q.len} steps`;
   $('m-seq-on').setAttribute('aria-pressed', q.on); $('m-seq-on').textContent = q.on ? 'on' : 'off';
-  mFaders.forEach((f) => f.el.classList.toggle('seq', !!(f.seq && f.seq.on)));
+  mSeqMarks();
 }
+const mSeqMarks = () => mFaders.forEach((f) => f.el.classList.toggle('seq', !!(f.seq && f.seq.on)));
+// presets keep them: song.seqs, by fader (its box and label); a preset without one clears it
+const mSnapSong = songSnapshot, mUseSong = useSong;
+songSnapshot = function () {
+  const seqs = {};
+  for (const f of mFaders) if (f.seq) seqs[f.key] = { on: f.seq.on, len: f.seq.len, vals: f.seq.vals.slice() };
+  return { ...mSnapSong(), seqs };
+};
+useSong = function (g, keepTempo) {
+  mUseSong(g, keepTempo);
+  for (const f of mFaders) { const q = g.seqs && g.seqs[f.key]; f.seq = q ? { on: !!q.on, len: q.len, vals: q.vals.slice() } : null; }
+  if (mSeqF) { if (mSeqF.seq) mSeqDraw(); else $('m-seq-close').click(); }
+  mSeqMarks();
+};
 // painting: a step takes the value at the finger's height; dragging across paints the steps it passes
 {
   const box = $('m-seq-steps');
