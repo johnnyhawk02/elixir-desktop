@@ -1161,6 +1161,21 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-comp-card .m-chead b { white-space: nowrap; }
 .m-comp-card .m-toggle { min-width: 52px; }
 .m-pages .m-card.m-comp-card { padding-right: 6px; padding-left: 4px; }
+
+/* ---- uneven backlighting: the screen is lit from LEDs along its lower edge, as a cheap LCD is, so it glows brighter
+   and warmer near the bottom corners, fades toward the top, and has a dim patch where the light doesn't quite
+   reach; the glass texture sits over it (all behind the ink, so the type stays as dark) ---- */
+.m {
+  background-image: linear-gradient(170deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, 0) 38%, rgba(0, 0, 0, .05)),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, .03) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0, 0, 0, .03) 0 1px, transparent 1px 3px),
+    radial-gradient(60% 34% at 12% 100%, rgba(255, 252, 195, .6), rgba(255, 252, 200, 0) 70%),
+    radial-gradient(52% 30% at 88% 102%, rgba(250, 255, 200, .45), rgba(250, 255, 205, 0) 70%),
+    radial-gradient(45% 25% at 50% 104%, rgba(255, 255, 215, .26), rgba(255, 255, 220, 0) 75%),
+    radial-gradient(38% 22% at 72% 38%, rgba(40, 50, 25, .16), rgba(40, 50, 25, 0) 70%),
+    radial-gradient(30% 18% at 22% 30%, rgba(255, 255, 230, .08), rgba(255, 255, 230, 0) 70%),
+    linear-gradient(180deg, rgba(30, 38, 20, .22) 0%, rgba(30, 38, 20, 0) 30%),
+    radial-gradient(130% 100% at 50% 60%, rgba(0, 0, 0, 0) 55%, rgba(20, 26, 12, .3) 100%);
+}
 </style>
 
 <main class="m" id="m">
