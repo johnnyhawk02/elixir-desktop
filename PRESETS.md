@@ -22,8 +22,9 @@ the built-in presets in `presets/*.json` must match it (`build.mjs` refuses one 
 
 - `song.master.space`: the sidechain's spacer, 0..100 (missing means 0).
 - `song.seqs`: the step sequencers, `{ "<box id>:<fader label>": { on, len, vals } }`, where `len` is 2..16 and
-  `vals` holds sixteen values in the fader's own range (e.g. `"m-faders:energy"`). A preset without one for a
+  `vals` holds sixteen values in the fader's own range (e.g. `"m-beat-faders:energy"`). A preset without one for a
   fader clears it.
+- `song.xdepth`: the crossfeed depth, 0..100 (missing means 100).
 
 ## The presets file
 

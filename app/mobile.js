@@ -94,22 +94,22 @@ const mBuildMaster = buildMaster;
 buildMaster = function () { mBuildMaster(); mPatUndo = null; mUndo(); mDrawAll(); };
 
 const pf = (k) => ({ min: PERF_RANGE[k][0], max: PERF_RANGE[k][1], get: () => perfGet(k), set: (v) => setPerf(k, v), show: () => perfText(k), dflt: PERF_RANGE[k][2] });
-// genre steps through the built-in styles (not user); a preset in the user style shows it with the slider at the bottom
+// the beat pop-up (the beat button by play and record): genre, beat, energy and rush.
+// Genre steps through the built-in styles (not user); a preset in the user style shows it with the slider at the bottom
 const mGenres = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
-mFader($('m-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () => Math.max(0, mGenres.indexOf(styleIdx)),
+mFader($('m-beat-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () => Math.max(0, mGenres.indexOf(styleIdx)),
   set: (v) => {
     setStyle(mGenres[v]); perf.beat = Math.min(perf.beat, STYLES[styleIdx].grooves.length - 1);
     if (view === 'steps') setTab('perform'); else generate();
     sendSeq(); setDirty(true); drawPerf();
   }, show: () => STYLES[styleIdx].name.replace(' ', '\n'), dflt: 0 });
-// four across, three down: genre, beat, energy, tempo / fills, groove, rush, sidechain / pitch, decay, filter, fm
 // beat runs over the current style's grooves; its readout is the groove, then where it is in the list
-mFader($('m-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => perfText('beat').replace(' · ', '\n') });
-mFader($('m-faders'), 'energy', { ...pf('energy'), show: () => perfText('energy').replace(' · ', '\n') });
+mFader($('m-beat-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => perfText('beat').replace(' · ', '\n') });
+mFader($('m-beat-faders'), 'energy', { ...pf('energy'), show: () => perfText('energy').replace(' · ', '\n') });
 mFader($('m-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
 mFader($('m-faders'), 'fills', { ...pf('fills'), show: () => perfText('fills').replace(' · ', '\n') });
 mFader($('m-faders'), 'groove', { ...pf('groove'), show: () => perfText('groove').replace(' ', '\n') });
-mFader($('m-faders'), 'rush', pf('rush'));
+mFader($('m-beat-faders'), 'rush', pf('rush'));
 // the drum 1 sidechain duck: above 0 it switches the sidechain on
 const setDuck = (v) => {
   master.duck = v / 100;
@@ -126,6 +126,12 @@ for (const [m, label] of [['pitch', 'pitch'], ['decay', 'decay'], ['filter', 'fi
 }
 const mDrawMacros = drawMacros;
 drawMacros = function () { mDrawMacros(); mDrawAll(); };
+// crossfeed depth: how much of the crossfeed patchbay is heard (the desktop's depth control); presets keep it
+const mXDepth = (v) => { $('xdepth').value = v; $('xdepth').dispatchEvent(new Event('input')); };
+mFader($('m-faders'), 'crossfeed', { min: 0, max: 100, get: () => Number($('xdepth').value), set: mXDepth, show: (v) => (v ? v + '%' : 'off'), dflt: 100 });
+// so the play page is three by three: tempo, fills, groove / sidechain, pitch, decay / filter, fm, crossfeed
+$('m-beat-open').addEventListener('click', () => { $('m-beat').hidden = false; mDrawAll(); });
+$('m-beat-close').addEventListener('click', () => { $('m-beat').hidden = true; });
 // the randomisers go in a row under the faders
 $('m-faders').after($('m-faders').querySelector('.m-rand'));
 
@@ -358,10 +364,11 @@ const mSnapSong = songSnapshot, mUseSong = useSong;
 songSnapshot = function () {
   const seqs = {};
   for (const f of mFaders) if (f.seq) seqs[f.key] = { on: f.seq.on, len: f.seq.len, vals: f.seq.vals.slice() };
-  return { ...mSnapSong(), seqs };
+  return { ...mSnapSong(), seqs, xdepth: Number($('xdepth').value) };
 };
 useSong = function (g, keepTempo) {
   mUseSong(g, keepTempo);
+  mXDepth(typeof g.xdepth === 'number' ? g.xdepth : 100);
   for (const f of mFaders) { const q = g.seqs && g.seqs[f.key]; f.seq = q ? { on: !!q.on, len: q.len, vals: q.vals.slice() } : null; }
   if (mSeqF) { if (mSeqF.seq) mSeqDraw(); else $('m-seq-close').click(); }
   mSeqMarks();

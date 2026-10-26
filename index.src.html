@@ -21,6 +21,7 @@
   <section class="m-card m-trans">
     <button class="m-play" id="m-play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 4.5v15l13-7.5z"/><rect class="i-stop" x="5.5" y="5.5" width="13" height="13" rx="2"/></svg><span>play</span></button>
     <button class="m-rec" id="m-rec" type="button" aria-pressed="false" aria-label="Record"><i></i><span id="m-rec-t">rec</span></button>
+    <button class="m-btn m-beat-open" id="m-beat-open" type="button" aria-haspopup="dialog">beat</button>
   </section>
 
   <div class="m-pages" id="m-pages">
@@ -73,6 +74,13 @@
     <button class="m-btn m-wide m-install" id="m-install" type="button" hidden>install the app</button>
     <footer class="m-foot">Engine ported from the Erica Synths LXR-02 firmware (GPL-3.0). Unofficial. <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a></footer>
   </div>
+  </div>
+
+  <div class="m-seq m-pop" id="m-beat" hidden>
+    <section class="m-card m-seq-card" role="dialog" aria-labelledby="m-beat-name">
+      <div class="m-chead"><b id="m-beat-name">beat</b><button class="m-toggle" id="m-beat-close" type="button">done</button></div>
+      <div class="m-faders" id="m-beat-faders"></div>
+    </section>
   </div>
 
   <div class="m-seq" id="m-seq" hidden>
