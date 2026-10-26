@@ -205,7 +205,7 @@ $('m-kit').addEventListener('click', () => { mUndoFn = null; $('rand-all').click
 // alter: every drum's current sound varied by 10% (the desktop's alter is 5%), which undo takes back
 $('m-alter').addEventListener('click', async () => {
   mUndoFn = null; await startAudio();
-  randChange(() => { for (let v = 0; v < 6; v++) { delete homes[v]; randomiseVoice(v, 0.1); delete homes[v]; } });
+  randChange(() => { for (let v = 0; v < 6; v++) { delete homes[v]; randomiseVoice(v, RAND.alter.amount / 100); delete homes[v]; } });
 });
 // crossfeed: a new 6 x 6 patch (the desktop's crossfeed randomiser), which undo takes back
 $('m-xrand').addEventListener('click', async () => {
@@ -231,10 +231,10 @@ function mPatSet(p) {
 const mRandPattern = async () => {
   await startAudio();
   const was = mPatGet();
-  const styles = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
-  const style = styles[mRnd(styles.length)];
-  mPatSet({ style, beat: mRnd(STYLES[style].grooves.length), energy: 35 + mRnd(61), fills: mRnd(101),
-    type: GROOVE_TYPES[mRnd(GROOVE_TYPES.length)].name, depth: 50 + mRnd(51) });
+  const P = RAND.pattern, styles = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
+  const style = P.genre ? styles[mRnd(styles.length)] : styleIdx;
+  mPatSet({ style, beat: mRnd(STYLES[style].grooves.length), energy: rRange(P.energyLo, P.energyHi), fills: rRange(P.fillsLo, P.fillsHi),
+    type: P.groove ? GROOVE_TYPES[mRnd(GROOVE_TYPES.length)].name : groove.type, depth: P.groove ? rRange(P.depthLo, P.depthHi) : groove.depth });
   undoValues = null; $('undo').disabled = true; mUndoFn = () => mPatSet(was); mUndo();
 };
 $('m-pattern').addEventListener('click', mRandPattern);
@@ -494,22 +494,23 @@ function fxChange(fn) {
 $('m-fx-rand').addEventListener('click', async () => {
   await startAudio();
   fxChange((q) => {
+    const F = RAND.fx;
     for (let v = 0; v < 6; v++) {
-      q.fx[v] = Math.random() < 0.5 ? rIn(10, 60) : 0;
-      q.ring[v] = Math.random() < 0.2 ? rIn(10, 60) : 0;
+      q.fx[v] = rChance(F.echoOn) ? rRange(F.echoLo, F.echoHi) : 0;
+      q.ring[v] = rChance(F.ringOn) ? rRange(F.ringLo, F.ringHi) : 0;
     }
     q.pos = randomDelayPos(); // (musical lengths, as every randomiser)
-    q.p3 = rIn(40, 110); q.p4 = Math.random() < 0.8 ? rIn(15, 70) : rIn(70, 105);
-    q.fx3.echo.pct = rIn(60, 160);
+    q.p3 = rRange(F.toneLo, F.toneHi); q.p4 = rChance(F.fbWild) ? rIn(70, 105) : rRange(F.fbLo, F.fbHi);
+    q.fx3.echo.pct = rRange(F.widthLo, F.widthHi);
     q.fx3.ring.wave = rIn(0, RING_W.length - 1); q.fx3.ring.freq = rIn(5, 120);
   });
 });
 $('m-fx-alter').addEventListener('click', async () => {
   await startAudio();
-  const nudge = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v + (Math.random() * 2 - 1) * 0.1 * (hi - lo))));
+  const a = RAND.alterfx.amount / 100, nudge = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v + (Math.random() * 2 - 1) * a * (hi - lo))));
   fxChange((q) => {
     for (const k of ['fx', 'ring']) q[k] = q[k].map((v) => (v ? nudge(v, 1, 100) : 0));
-    q.pos = Math.max(0, Math.min(1, q.pos + (Math.random() * 2 - 1) * 0.05));
+    q.pos = Math.max(0, Math.min(1, q.pos + (Math.random() * 2 - 1) * a / 2));
     q.p3 = nudge(q.p3, 0, 127); q.p4 = nudge(q.p4, 0, 127);
     q.fx3.echo.pct = nudge(q.fx3.echo.pct, 0, 200);
     q.fx3.ring.freq = nudge(q.fx3.ring.freq, 0, 127);
@@ -759,6 +760,60 @@ function xyPick() { try { localStorage.setItem(XY_KEY, JSON.stringify(mXY)); } c
   box.append(pad); $('m-xy-card').append(box); mDraws.push(draw);
   lists();
 });
+
+// ---- the randomisers' settings: tapping ELIXIR opens a pop-up with a page for each randomise button, its ranges and
+// chances on bars (RAND, kept in this browser), that randomiser's button and play / stop ----
+// a page: [key in RAND, name, the button it presses, rows: [setting, label, min, max, how it reads]]
+const pc = (v) => `${v}%`, onoff = (v) => (v ? 'on' : 'off');
+const RS_PAGES = [
+  ['every', 'everything', 'm-everything', [['vary', 'sound vary', 0, 50, pc], ['echoOn', 'echo chance', 0, 100, pc], ['echoLo', 'echo min', 0, 100, String], ['echoHi', 'echo max', 0, 100, String],
+    ['fbLo', 'feedback min', 0, 127, String], ['fbHi', 'feedback max', 0, 127, String], ['fbWild', 'wild feedback', 0, 100, pc], ['xfeed', 'crossfeed', 0, 1, onoff],
+    ['genre', 'genre', 0, 1, onoff], ['energyLo', 'energy min', 0, 100, pc], ['energyHi', 'energy max', 0, 100, pc], ['fillsLo', 'fills min', 0, 100, pc], ['fillsHi', 'fills max', 0, 100, pc],
+    ['groove', 'groove', 0, 1, onoff], ['depthLo', 'depth min', 0, 100, pc], ['depthHi', 'depth max', 0, 100, pc]]],
+  ['kit', 'kit', 'm-kit', [['vary', 'vary', 0, 50, pc]]],
+  ['alter', 'alter', 'm-alter', [['amount', 'amount', 1, 50, pc]]],
+  ['pattern', 'pattern', 'm-pattern', [['genre', 'genre', 0, 1, onoff], ['energyLo', 'energy min', 0, 100, pc], ['energyHi', 'energy max', 0, 100, pc], ['fillsLo', 'fills min', 0, 100, pc],
+    ['fillsHi', 'fills max', 0, 100, pc], ['groove', 'groove', 0, 1, onoff], ['depthLo', 'depth min', 0, 100, pc], ['depthHi', 'depth max', 0, 100, pc]]],
+  ['xfeed', 'crossfeed', 'm-xrand', [['linksLo', 'links min', 1, 36, String], ['linksHi', 'links max', 1, 36, String], ['amtLo', 'amount min', 5, 100, pc], ['amtHi', 'amount max', 5, 100, pc], ['neg', 'negative', 0, 100, pc]]],
+  ['fx', 'random fx', 'm-fx-rand', [['echoOn', 'echo chance', 0, 100, pc], ['echoLo', 'echo min', 0, 100, String], ['echoHi', 'echo max', 0, 100, String], ['ringOn', 'ring chance', 0, 100, pc],
+    ['ringLo', 'ring min', 0, 100, String], ['ringHi', 'ring max', 0, 100, String], ['fbLo', 'feedback min', 0, 127, String], ['fbHi', 'feedback max', 0, 127, String], ['fbWild', 'wild feedback', 0, 100, pc],
+    ['toneLo', 'tone min', 0, 127, String], ['toneHi', 'tone max', 0, 127, String], ['widthLo', 'width min', 0, 200, pc], ['widthHi', 'width max', 0, 200, pc]]],
+  ['alterfx', 'alter fx', 'm-fx-alter', [['amount', 'amount', 1, 50, pc]]],
+];
+let mRsPage = 0;
+RS_PAGES.forEach(([, name], i) => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'm-btn'; b.setAttribute('role', 'tab'); b.textContent = name;
+  b.addEventListener('click', () => { mRsPage = i; mRsDraw(); });
+  $('m-rs-tabs').append(b);
+});
+function mRsDraw() {
+  const [key, name, , rows] = RS_PAGES[mRsPage], S = RAND[key];
+  [...$('m-rs-tabs').children].forEach((b, i) => b.setAttribute('aria-selected', i === mRsPage));
+  $('m-rs-go').textContent = `randomise ${name}`;
+  const box = $('m-rs-rows'); box.innerHTML = '';
+  for (const [k, label, min, max, show] of rows) {
+    const row = document.createElement('div'); row.className = 'm-seq-lenrow';
+    row.innerHTML = '<span></span><div class="m-seq-len" role="slider"><i></i></div><output></output>';
+    row.querySelector('span').textContent = label;
+    const bar = row.querySelector('.m-seq-len'), out = row.querySelector('output');
+    bar.setAttribute('aria-label', label);
+    const draw = () => { bar.style.setProperty('--w', (S[k] - min) / (max - min)); out.textContent = show(S[k]); bar.setAttribute('aria-valuenow', S[k]); };
+    const at = (e) => { const r = bar.getBoundingClientRect(); S[k] = min + Math.round(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * (max - min)); saveRand(); draw(); };
+    let held = false;
+    bar.addEventListener('pointerdown', (e) => { bar.setPointerCapture(e.pointerId); held = true; at(e); });
+    bar.addEventListener('pointermove', (e) => { if (held) at(e); });
+    bar.addEventListener('pointerup', () => { held = false; }); bar.addEventListener('pointercancel', () => { held = false; });
+    draw(); box.append(row);
+  }
+  mRsPlay();
+}
+const mRsPlay = () => { $('m-rs-play').textContent = $('play').getAttribute('aria-pressed') === 'true' ? 'stop' : 'play'; };
+new MutationObserver(mRsPlay).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
+$('m-title').addEventListener('click', () => { $('m-rs').hidden = false; mRsDraw(); });
+$('m-rs-close').addEventListener('click', () => { $('m-rs').hidden = true; });
+$('m-rs-go').addEventListener('click', () => $(RS_PAGES[mRsPage][2]).click());
+$('m-rs-play').addEventListener('click', () => $('play').click());
+$('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][0]; Object.assign(RAND[key], RAND0[key]); saveRand(); mRsDraw(); });
 
 // ---- the glass isn't flat: each control's ink shadow deepens a little toward the top right of the screen (--d, used
 // by the CSS), worked out once from where it sits and again when the screen's size changes ----

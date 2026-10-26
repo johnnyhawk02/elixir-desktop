@@ -44,10 +44,10 @@ $('xdepth').addEventListener('input', () => { $('xdepth-out').textContent = $('x
 const xSelects = [...xgrid.querySelectorAll('select')];
 function randomiseX() {
   xm.amt.fill(0);
-  const n = 3 + Math.floor(rnd() * 4);
+  const X = RAND.xfeed, n = rRange(X.linksLo, X.linksHi);
   for (let i = 0; i < n; i++) {
     const k = Math.floor(rnd() * 36);
-    xm.amt[k] = (rnd() < 0.3 ? -1 : 1) * 5 * Math.round((25 + rnd() * 75) / 5);
+    xm.amt[k] = (rChance(X.neg) ? -1 : 1) * 5 * Math.round(rRange(X.amtLo, X.amtHi) / 5);
   }
   for (let d = 0; d < 6; d++) {
     if (![0, 1, 2, 3, 4, 5].some((sIdx) => xm.amt[sIdx * 6 + d])) continue;

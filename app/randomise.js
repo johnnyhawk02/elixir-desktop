@@ -26,6 +26,23 @@ const safeRange = (text, voice, name) => {
   if (text === 'DECAY_OPEN') return [8, 70];
   return SAFE[text] || [0, 127];
 };
+// ---- the randomisers' settings (Elixir Mobile): the ranges and chances each randomise button uses, edited in the
+// hidden settings pop-up (tap ELIXIR) and kept in this browser. Percentages are 0..100; Lo/Hi pairs are ranges ----
+const RAND0 = {
+  every: { vary: 10, echoOn: 50, echoLo: 20, echoHi: 50, fbLo: 20, fbHi: 55, fbWild: 7, xfeed: 1, genre: 1, energyLo: 45, energyHi: 90, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 5, depthHi: 50 },
+  kit: { vary: 0 },
+  alter: { amount: 10 },
+  pattern: { genre: 1, energyLo: 35, energyHi: 95, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 50, depthHi: 100 },
+  xfeed: { linksLo: 3, linksHi: 6, amtLo: 25, amtHi: 100, neg: 30 },
+  fx: { echoOn: 50, echoLo: 10, echoHi: 60, ringOn: 20, ringLo: 10, ringHi: 60, fbLo: 15, fbHi: 70, fbWild: 20, toneLo: 40, toneHi: 110, widthLo: 60, widthHi: 160 },
+  alterfx: { amount: 10 },
+};
+const RAND_KEY = 'elixir-mobile-rand';
+const RAND = (() => { let s = {}; try { s = JSON.parse(localStorage.getItem(RAND_KEY)) || {}; } catch (e) {} return Object.fromEntries(Object.entries(RAND0).map(([k, d]) => [k, { ...d, ...(s[k] || {}) }])); })();
+const saveRand = () => { try { localStorage.setItem(RAND_KEY, JSON.stringify(RAND)); } catch (e) {} };
+// a whole number from a Lo..Hi pair (either way round), and a yes for a percentage chance
+const rRange = (a, b) => { const lo = Math.min(a, b), hi = Math.max(a, b); return lo + Math.floor(rnd() * (hi - lo + 1)); };
+const rChance = (pct) => rnd() * 100 < pct;
 let undoValues = null;
 const homes = {};
 function voiceParams(voice) {
@@ -83,7 +100,7 @@ $('rand').addEventListener('click', async () => { await startAudio(); randomise(
 // alter nudges each current drum sound a little (5%) so it stays recognisable; mixer, FX and pattern stay
 $('rand-all').addEventListener('click', async () => {
   await startAudio();
-  if (sourceKits.length) randChange(() => { for (let v = 0; v < 6; v++) pickVoice(v, 0); });
+  if (sourceKits.length) randChange(() => { for (let v = 0; v < 6; v++) pickVoice(v, RAND.kit.vary / 100); });
 });
 $('alter').addEventListener('click', async () => { await startAudio(); randChange(() => { for (let v = 0; v < 6; v++) alterVoice(v); }); });
 // per drum (rows built with the mixer strips): random is that voice from a random built-in kit, alter nudges it by 5%

@@ -16,7 +16,7 @@
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title">elixir</b>
+    <b class="m-title" id="m-title">elixir</b>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
   <section class="m-card m-trans">
@@ -99,6 +99,15 @@
       <footer class="m-foot">Engine ported from the Erica Synths LXR-02 firmware (GPL-3.0). Unofficial. <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a></footer>
     </section>
   </div>
+  </div>
+
+  <div class="m-rs" id="m-rs" hidden>
+    <section class="m-card m-rs-card" role="dialog" aria-labelledby="m-rs-title">
+      <div class="m-chead"><b id="m-rs-title">randomise settings</b><button class="m-toggle" id="m-rs-close" type="button">done</button></div>
+      <div class="m-rs-tabs" id="m-rs-tabs" role="tablist"></div>
+      <div class="m-rs-rows" id="m-rs-rows"></div>
+      <div class="m-rs-btns"><button class="m-btn m-big" id="m-rs-go" type="button">randomise</button><button class="m-btn" id="m-rs-play" type="button">play</button><button class="m-btn" id="m-rs-reset" type="button">reset</button></div>
+    </section>
   </div>
 
   <div class="m-seq" id="m-seq" hidden>

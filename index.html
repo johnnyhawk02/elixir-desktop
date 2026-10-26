@@ -1276,11 +1276,29 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-xybox { display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 6px; min-height: 0; }
 .m-xybox + .m-xybox { border-top: var(--rule); padding-top: 8px; }
 .m-xybox .m-xyrow select { min-height: 34px; }
+
+/* the randomisers' settings pop-up: over the whole screen, its page tabs, a list of bars, then the buttons */
+.m-title { cursor: pointer; }
+.m-rs { position: fixed; inset: 0; z-index: 11; display: flex; justify-content: center;
+  padding: max(8px, env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px)) max(8px, env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
+.m-rs[hidden] { display: none; }
+.m-rs-card { width: 100%; max-width: 480px; height: 100%; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 10px; min-height: 0;
+  box-shadow: 0 0 0 100vmax rgba(10, 11, 9, .55), inset 0 3px 10px rgba(0, 0, 0, .28); }
+.m-rs-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.m .m-rs-tabs .m-btn { min-height: 40px; font-size: min(var(--fs-xs), 3.8vw) !important; padding: 0 2px; letter-spacing: 0; }
+.m .m-rs-tabs .m-btn[aria-selected="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
+.m-rs-rows { display: grid; align-content: start; gap: 10px; overflow-y: auto; overscroll-behavior: contain; min-height: 0; padding: 4px 2px; border-top: var(--rule); }
+.m-rs-rows .m-seq-lenrow { grid-template-columns: 7.5em 1fr 3.5em; gap: 8px; font-size: var(--fs-xs); }
+.m-rs-rows .m-seq-len { height: 34px; }
+.m-rs-btns { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 8px; }
+.m .m-rs-btns .m-btn { min-height: 50px; font-size: var(--fs-xs) !important; padding: 0 4px; }
+.m-rs-rows .m-seq-lenrow { grid-template-columns: 7.2em minmax(0, 1fr) 3.6em; }
+.m-rs-rows .m-seq-lenrow output { min-width: 0; text-align: right; white-space: nowrap; }
 </style>
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title">elixir</b>
+    <b class="m-title" id="m-title">elixir</b>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
   <section class="m-card m-trans">
@@ -1363,6 +1381,15 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
       <footer class="m-foot">Engine ported from the Erica Synths LXR-02 firmware (GPL-3.0). Unofficial. <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a></footer>
     </section>
   </div>
+  </div>
+
+  <div class="m-rs" id="m-rs" hidden>
+    <section class="m-card m-rs-card" role="dialog" aria-labelledby="m-rs-title">
+      <div class="m-chead"><b id="m-rs-title">randomise settings</b><button class="m-toggle" id="m-rs-close" type="button">done</button></div>
+      <div class="m-rs-tabs" id="m-rs-tabs" role="tablist"></div>
+      <div class="m-rs-rows" id="m-rs-rows"></div>
+      <div class="m-rs-btns"><button class="m-btn m-big" id="m-rs-go" type="button">randomise</button><button class="m-btn" id="m-rs-play" type="button">play</button><button class="m-btn" id="m-rs-reset" type="button">reset</button></div>
+    </section>
   </div>
 
   <div class="m-seq" id="m-seq" hidden>
@@ -6013,6 +6040,23 @@ const safeRange = (text, voice, name) => {
   if (text === 'DECAY_OPEN') return [8, 70];
   return SAFE[text] || [0, 127];
 };
+// ---- the randomisers' settings (Elixir Mobile): the ranges and chances each randomise button uses, edited in the
+// hidden settings pop-up (tap ELIXIR) and kept in this browser. Percentages are 0..100; Lo/Hi pairs are ranges ----
+const RAND0 = {
+  every: { vary: 10, echoOn: 50, echoLo: 20, echoHi: 50, fbLo: 20, fbHi: 55, fbWild: 7, xfeed: 1, genre: 1, energyLo: 45, energyHi: 90, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 5, depthHi: 50 },
+  kit: { vary: 0 },
+  alter: { amount: 10 },
+  pattern: { genre: 1, energyLo: 35, energyHi: 95, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 50, depthHi: 100 },
+  xfeed: { linksLo: 3, linksHi: 6, amtLo: 25, amtHi: 100, neg: 30 },
+  fx: { echoOn: 50, echoLo: 10, echoHi: 60, ringOn: 20, ringLo: 10, ringHi: 60, fbLo: 15, fbHi: 70, fbWild: 20, toneLo: 40, toneHi: 110, widthLo: 60, widthHi: 160 },
+  alterfx: { amount: 10 },
+};
+const RAND_KEY = 'elixir-mobile-rand';
+const RAND = (() => { let s = {}; try { s = JSON.parse(localStorage.getItem(RAND_KEY)) || {}; } catch (e) {} return Object.fromEntries(Object.entries(RAND0).map(([k, d]) => [k, { ...d, ...(s[k] || {}) }])); })();
+const saveRand = () => { try { localStorage.setItem(RAND_KEY, JSON.stringify(RAND)); } catch (e) {} };
+// a whole number from a Lo..Hi pair (either way round), and a yes for a percentage chance
+const rRange = (a, b) => { const lo = Math.min(a, b), hi = Math.max(a, b); return lo + Math.floor(rnd() * (hi - lo + 1)); };
+const rChance = (pct) => rnd() * 100 < pct;
 let undoValues = null;
 const homes = {};
 function voiceParams(voice) {
@@ -6070,7 +6114,7 @@ $('rand').addEventListener('click', async () => { await startAudio(); randomise(
 // alter nudges each current drum sound a little (5%) so it stays recognisable; mixer, FX and pattern stay
 $('rand-all').addEventListener('click', async () => {
   await startAudio();
-  if (sourceKits.length) randChange(() => { for (let v = 0; v < 6; v++) pickVoice(v, 0); });
+  if (sourceKits.length) randChange(() => { for (let v = 0; v < 6; v++) pickVoice(v, RAND.kit.vary / 100); });
 });
 $('alter').addEventListener('click', async () => { await startAudio(); randChange(() => { for (let v = 0; v < 6; v++) alterVoice(v); }); });
 // per drum (rows built with the mixer strips): random is that voice from a random built-in kit, alter nudges it by 5%
@@ -6494,24 +6538,25 @@ $('new-kit').addEventListener('click', async () => {
   if (src.length) for (let v = 0; v < 6; v++) { const k = pick(src); for (const par of voiceOwned(v)) kit[par] = k.kit[par]; }
   for (let v = 0; v < 6; v++) kit[PAR.VOL1 + v] = values[PAR.VOL1 + v]; // the mixer levels stay as they are
   useKit({ name: '', kit, xm: { amt: new Array(36).fill(0), target: xm.target.slice() }, userSamples: 0 });
-  for (let v = 0; v < 6; v++) randomiseVoice(v, 0.1);
-  // each drum's echo send: off, or 20..50 (half and half), routing the drum to the echo when it's on
-  for (let v = 0; v < 6; v++) mix.fx[v] = rnd() < 0.5 ? 0 : 20 + Math.floor(rnd() * 31);
+  const E = RAND.every; // (its settings: see RAND0)
+  for (let v = 0; v < 6; v++) randomiseVoice(v, E.vary / 100);
+  // each drum's echo send: on by chance, within its range, routing the drum to the echo when it's on
+  for (let v = 0; v < 6; v++) mix.fx[v] = rChance(E.echoOn) ? rRange(E.echoLo, E.echoHi) : 0;
   fxButtons.forEach((b) => b()); sendMix();
-  // echo feedback stays lowish (20..55); about one roll in 15 slams it up to 75..110
-  setValue(PAR.FX_P4, rnd() < 1 / 15 ? 75 + Math.floor(rnd() * 36) : 20 + Math.floor(rnd() * 36), true);
+  // echo feedback within its range, now and then (the wild chance) slammed up to 75..110
+  setValue(PAR.FX_P4, rChance(E.fbWild) ? rRange(75, 110) : rRange(E.fbLo, E.fbHi), true);
   delayPos = randomDelayPos(); send({ type: 'delay', pos: delayPos }); syncFx();
   initValues.set(values);
   for (const h in homes) delete homes[h];
   send({ type: 'kit', values: effValues() });
   buildKnobs(); drawScope();
-  randomiseX();
-  // a new genre too (any built-in style, never user), and a beat from its grooves
+  if (E.xfeed) randomiseX(); else { xm.amt.fill(0); xcells.forEach((d) => d()); sendX(); }
+  // a new genre too (any built-in style, never user; unless switched off), and a beat from its grooves
   const genres = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
-  setStyle(genres[Math.floor(rnd() * genres.length)]);
-  perf.beat = Math.floor(rnd() * STYLES[styleIdx].grooves.length); perf.energy = 45 + Math.floor(rnd() * 46); perf.fills = Math.floor(rnd() * 101);
-  // and a new groove, at a depth of 5..50%
-  groove.type = GROOVE_TYPES[Math.floor(rnd() * GROOVE_TYPES.length)].name; groove.depth = 5 + Math.floor(rnd() * 46);
+  if (E.genre) setStyle(genres[Math.floor(rnd() * genres.length)]);
+  perf.beat = Math.floor(rnd() * STYLES[styleIdx].grooves.length); perf.energy = rRange(E.energyLo, E.energyHi); perf.fills = rRange(E.fillsLo, E.fillsHi);
+  // and a new groove, at a depth within its range (unless switched off)
+  if (E.groove) { groove.type = GROOVE_TYPES[Math.floor(rnd() * GROOVE_TYPES.length)].name; groove.depth = rRange(E.depthLo, E.depthHi); }
   drawGroove(); sendSeq();
   drawUserTools();
   if (view === 'steps') setTab('perform'); else generate();
@@ -7706,10 +7751,10 @@ $('xdepth').addEventListener('input', () => { $('xdepth-out').textContent = $('x
 const xSelects = [...xgrid.querySelectorAll('select')];
 function randomiseX() {
   xm.amt.fill(0);
-  const n = 3 + Math.floor(rnd() * 4);
+  const X = RAND.xfeed, n = rRange(X.linksLo, X.linksHi);
   for (let i = 0; i < n; i++) {
     const k = Math.floor(rnd() * 36);
-    xm.amt[k] = (rnd() < 0.3 ? -1 : 1) * 5 * Math.round((25 + rnd() * 75) / 5);
+    xm.amt[k] = (rChance(X.neg) ? -1 : 1) * 5 * Math.round(rRange(X.amtLo, X.amtHi) / 5);
   }
   for (let d = 0; d < 6; d++) {
     if (![0, 1, 2, 3, 4, 5].some((sIdx) => xm.amt[sIdx * 6 + d])) continue;
@@ -7999,7 +8044,7 @@ $('m-kit').addEventListener('click', () => { mUndoFn = null; $('rand-all').click
 // alter: every drum's current sound varied by 10% (the desktop's alter is 5%), which undo takes back
 $('m-alter').addEventListener('click', async () => {
   mUndoFn = null; await startAudio();
-  randChange(() => { for (let v = 0; v < 6; v++) { delete homes[v]; randomiseVoice(v, 0.1); delete homes[v]; } });
+  randChange(() => { for (let v = 0; v < 6; v++) { delete homes[v]; randomiseVoice(v, RAND.alter.amount / 100); delete homes[v]; } });
 });
 // crossfeed: a new 6 x 6 patch (the desktop's crossfeed randomiser), which undo takes back
 $('m-xrand').addEventListener('click', async () => {
@@ -8025,10 +8070,10 @@ function mPatSet(p) {
 const mRandPattern = async () => {
   await startAudio();
   const was = mPatGet();
-  const styles = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
-  const style = styles[mRnd(styles.length)];
-  mPatSet({ style, beat: mRnd(STYLES[style].grooves.length), energy: 35 + mRnd(61), fills: mRnd(101),
-    type: GROOVE_TYPES[mRnd(GROOVE_TYPES.length)].name, depth: 50 + mRnd(51) });
+  const P = RAND.pattern, styles = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
+  const style = P.genre ? styles[mRnd(styles.length)] : styleIdx;
+  mPatSet({ style, beat: mRnd(STYLES[style].grooves.length), energy: rRange(P.energyLo, P.energyHi), fills: rRange(P.fillsLo, P.fillsHi),
+    type: P.groove ? GROOVE_TYPES[mRnd(GROOVE_TYPES.length)].name : groove.type, depth: P.groove ? rRange(P.depthLo, P.depthHi) : groove.depth });
   undoValues = null; $('undo').disabled = true; mUndoFn = () => mPatSet(was); mUndo();
 };
 $('m-pattern').addEventListener('click', mRandPattern);
@@ -8288,22 +8333,23 @@ function fxChange(fn) {
 $('m-fx-rand').addEventListener('click', async () => {
   await startAudio();
   fxChange((q) => {
+    const F = RAND.fx;
     for (let v = 0; v < 6; v++) {
-      q.fx[v] = Math.random() < 0.5 ? rIn(10, 60) : 0;
-      q.ring[v] = Math.random() < 0.2 ? rIn(10, 60) : 0;
+      q.fx[v] = rChance(F.echoOn) ? rRange(F.echoLo, F.echoHi) : 0;
+      q.ring[v] = rChance(F.ringOn) ? rRange(F.ringLo, F.ringHi) : 0;
     }
     q.pos = randomDelayPos(); // (musical lengths, as every randomiser)
-    q.p3 = rIn(40, 110); q.p4 = Math.random() < 0.8 ? rIn(15, 70) : rIn(70, 105);
-    q.fx3.echo.pct = rIn(60, 160);
+    q.p3 = rRange(F.toneLo, F.toneHi); q.p4 = rChance(F.fbWild) ? rIn(70, 105) : rRange(F.fbLo, F.fbHi);
+    q.fx3.echo.pct = rRange(F.widthLo, F.widthHi);
     q.fx3.ring.wave = rIn(0, RING_W.length - 1); q.fx3.ring.freq = rIn(5, 120);
   });
 });
 $('m-fx-alter').addEventListener('click', async () => {
   await startAudio();
-  const nudge = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v + (Math.random() * 2 - 1) * 0.1 * (hi - lo))));
+  const a = RAND.alterfx.amount / 100, nudge = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v + (Math.random() * 2 - 1) * a * (hi - lo))));
   fxChange((q) => {
     for (const k of ['fx', 'ring']) q[k] = q[k].map((v) => (v ? nudge(v, 1, 100) : 0));
-    q.pos = Math.max(0, Math.min(1, q.pos + (Math.random() * 2 - 1) * 0.05));
+    q.pos = Math.max(0, Math.min(1, q.pos + (Math.random() * 2 - 1) * a / 2));
     q.p3 = nudge(q.p3, 0, 127); q.p4 = nudge(q.p4, 0, 127);
     q.fx3.echo.pct = nudge(q.fx3.echo.pct, 0, 200);
     q.fx3.ring.freq = nudge(q.fx3.ring.freq, 0, 127);
@@ -8553,6 +8599,60 @@ function xyPick() { try { localStorage.setItem(XY_KEY, JSON.stringify(mXY)); } c
   box.append(pad); $('m-xy-card').append(box); mDraws.push(draw);
   lists();
 });
+
+// ---- the randomisers' settings: tapping ELIXIR opens a pop-up with a page for each randomise button, its ranges and
+// chances on bars (RAND, kept in this browser), that randomiser's button and play / stop ----
+// a page: [key in RAND, name, the button it presses, rows: [setting, label, min, max, how it reads]]
+const pc = (v) => `${v}%`, onoff = (v) => (v ? 'on' : 'off');
+const RS_PAGES = [
+  ['every', 'everything', 'm-everything', [['vary', 'sound vary', 0, 50, pc], ['echoOn', 'echo chance', 0, 100, pc], ['echoLo', 'echo min', 0, 100, String], ['echoHi', 'echo max', 0, 100, String],
+    ['fbLo', 'feedback min', 0, 127, String], ['fbHi', 'feedback max', 0, 127, String], ['fbWild', 'wild feedback', 0, 100, pc], ['xfeed', 'crossfeed', 0, 1, onoff],
+    ['genre', 'genre', 0, 1, onoff], ['energyLo', 'energy min', 0, 100, pc], ['energyHi', 'energy max', 0, 100, pc], ['fillsLo', 'fills min', 0, 100, pc], ['fillsHi', 'fills max', 0, 100, pc],
+    ['groove', 'groove', 0, 1, onoff], ['depthLo', 'depth min', 0, 100, pc], ['depthHi', 'depth max', 0, 100, pc]]],
+  ['kit', 'kit', 'm-kit', [['vary', 'vary', 0, 50, pc]]],
+  ['alter', 'alter', 'm-alter', [['amount', 'amount', 1, 50, pc]]],
+  ['pattern', 'pattern', 'm-pattern', [['genre', 'genre', 0, 1, onoff], ['energyLo', 'energy min', 0, 100, pc], ['energyHi', 'energy max', 0, 100, pc], ['fillsLo', 'fills min', 0, 100, pc],
+    ['fillsHi', 'fills max', 0, 100, pc], ['groove', 'groove', 0, 1, onoff], ['depthLo', 'depth min', 0, 100, pc], ['depthHi', 'depth max', 0, 100, pc]]],
+  ['xfeed', 'crossfeed', 'm-xrand', [['linksLo', 'links min', 1, 36, String], ['linksHi', 'links max', 1, 36, String], ['amtLo', 'amount min', 5, 100, pc], ['amtHi', 'amount max', 5, 100, pc], ['neg', 'negative', 0, 100, pc]]],
+  ['fx', 'random fx', 'm-fx-rand', [['echoOn', 'echo chance', 0, 100, pc], ['echoLo', 'echo min', 0, 100, String], ['echoHi', 'echo max', 0, 100, String], ['ringOn', 'ring chance', 0, 100, pc],
+    ['ringLo', 'ring min', 0, 100, String], ['ringHi', 'ring max', 0, 100, String], ['fbLo', 'feedback min', 0, 127, String], ['fbHi', 'feedback max', 0, 127, String], ['fbWild', 'wild feedback', 0, 100, pc],
+    ['toneLo', 'tone min', 0, 127, String], ['toneHi', 'tone max', 0, 127, String], ['widthLo', 'width min', 0, 200, pc], ['widthHi', 'width max', 0, 200, pc]]],
+  ['alterfx', 'alter fx', 'm-fx-alter', [['amount', 'amount', 1, 50, pc]]],
+];
+let mRsPage = 0;
+RS_PAGES.forEach(([, name], i) => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'm-btn'; b.setAttribute('role', 'tab'); b.textContent = name;
+  b.addEventListener('click', () => { mRsPage = i; mRsDraw(); });
+  $('m-rs-tabs').append(b);
+});
+function mRsDraw() {
+  const [key, name, , rows] = RS_PAGES[mRsPage], S = RAND[key];
+  [...$('m-rs-tabs').children].forEach((b, i) => b.setAttribute('aria-selected', i === mRsPage));
+  $('m-rs-go').textContent = `randomise ${name}`;
+  const box = $('m-rs-rows'); box.innerHTML = '';
+  for (const [k, label, min, max, show] of rows) {
+    const row = document.createElement('div'); row.className = 'm-seq-lenrow';
+    row.innerHTML = '<span></span><div class="m-seq-len" role="slider"><i></i></div><output></output>';
+    row.querySelector('span').textContent = label;
+    const bar = row.querySelector('.m-seq-len'), out = row.querySelector('output');
+    bar.setAttribute('aria-label', label);
+    const draw = () => { bar.style.setProperty('--w', (S[k] - min) / (max - min)); out.textContent = show(S[k]); bar.setAttribute('aria-valuenow', S[k]); };
+    const at = (e) => { const r = bar.getBoundingClientRect(); S[k] = min + Math.round(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * (max - min)); saveRand(); draw(); };
+    let held = false;
+    bar.addEventListener('pointerdown', (e) => { bar.setPointerCapture(e.pointerId); held = true; at(e); });
+    bar.addEventListener('pointermove', (e) => { if (held) at(e); });
+    bar.addEventListener('pointerup', () => { held = false; }); bar.addEventListener('pointercancel', () => { held = false; });
+    draw(); box.append(row);
+  }
+  mRsPlay();
+}
+const mRsPlay = () => { $('m-rs-play').textContent = $('play').getAttribute('aria-pressed') === 'true' ? 'stop' : 'play'; };
+new MutationObserver(mRsPlay).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
+$('m-title').addEventListener('click', () => { $('m-rs').hidden = false; mRsDraw(); });
+$('m-rs-close').addEventListener('click', () => { $('m-rs').hidden = true; });
+$('m-rs-go').addEventListener('click', () => $(RS_PAGES[mRsPage][2]).click());
+$('m-rs-play').addEventListener('click', () => $('play').click());
+$('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][0]; Object.assign(RAND[key], RAND0[key]); saveRand(); mRsDraw(); });
 
 // ---- the glass isn't flat: each control's ink shadow deepens a little toward the top right of the screen (--d, used
 // by the CSS), worked out once from where it sits and again when the screen's size changes ----

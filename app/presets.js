@@ -211,24 +211,25 @@ $('new-kit').addEventListener('click', async () => {
   if (src.length) for (let v = 0; v < 6; v++) { const k = pick(src); for (const par of voiceOwned(v)) kit[par] = k.kit[par]; }
   for (let v = 0; v < 6; v++) kit[PAR.VOL1 + v] = values[PAR.VOL1 + v]; // the mixer levels stay as they are
   useKit({ name: '', kit, xm: { amt: new Array(36).fill(0), target: xm.target.slice() }, userSamples: 0 });
-  for (let v = 0; v < 6; v++) randomiseVoice(v, 0.1);
-  // each drum's echo send: off, or 20..50 (half and half), routing the drum to the echo when it's on
-  for (let v = 0; v < 6; v++) mix.fx[v] = rnd() < 0.5 ? 0 : 20 + Math.floor(rnd() * 31);
+  const E = RAND.every; // (its settings: see RAND0)
+  for (let v = 0; v < 6; v++) randomiseVoice(v, E.vary / 100);
+  // each drum's echo send: on by chance, within its range, routing the drum to the echo when it's on
+  for (let v = 0; v < 6; v++) mix.fx[v] = rChance(E.echoOn) ? rRange(E.echoLo, E.echoHi) : 0;
   fxButtons.forEach((b) => b()); sendMix();
-  // echo feedback stays lowish (20..55); about one roll in 15 slams it up to 75..110
-  setValue(PAR.FX_P4, rnd() < 1 / 15 ? 75 + Math.floor(rnd() * 36) : 20 + Math.floor(rnd() * 36), true);
+  // echo feedback within its range, now and then (the wild chance) slammed up to 75..110
+  setValue(PAR.FX_P4, rChance(E.fbWild) ? rRange(75, 110) : rRange(E.fbLo, E.fbHi), true);
   delayPos = randomDelayPos(); send({ type: 'delay', pos: delayPos }); syncFx();
   initValues.set(values);
   for (const h in homes) delete homes[h];
   send({ type: 'kit', values: effValues() });
   buildKnobs(); drawScope();
-  randomiseX();
-  // a new genre too (any built-in style, never user), and a beat from its grooves
+  if (E.xfeed) randomiseX(); else { xm.amt.fill(0); xcells.forEach((d) => d()); sendX(); }
+  // a new genre too (any built-in style, never user; unless switched off), and a beat from its grooves
   const genres = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
-  setStyle(genres[Math.floor(rnd() * genres.length)]);
-  perf.beat = Math.floor(rnd() * STYLES[styleIdx].grooves.length); perf.energy = 45 + Math.floor(rnd() * 46); perf.fills = Math.floor(rnd() * 101);
-  // and a new groove, at a depth of 5..50%
-  groove.type = GROOVE_TYPES[Math.floor(rnd() * GROOVE_TYPES.length)].name; groove.depth = 5 + Math.floor(rnd() * 46);
+  if (E.genre) setStyle(genres[Math.floor(rnd() * genres.length)]);
+  perf.beat = Math.floor(rnd() * STYLES[styleIdx].grooves.length); perf.energy = rRange(E.energyLo, E.energyHi); perf.fills = rRange(E.fillsLo, E.fillsHi);
+  // and a new groove, at a depth within its range (unless switched off)
+  if (E.groove) { groove.type = GROOVE_TYPES[Math.floor(rnd() * GROOVE_TYPES.length)].name; groove.depth = rRange(E.depthLo, E.depthHi); }
   drawGroove(); sendSeq();
   drawUserTools();
   if (view === 'steps') setTab('perform'); else generate();

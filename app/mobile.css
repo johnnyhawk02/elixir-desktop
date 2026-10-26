@@ -428,3 +428,21 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-xybox { display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 6px; min-height: 0; }
 .m-xybox + .m-xybox { border-top: var(--rule); padding-top: 8px; }
 .m-xybox .m-xyrow select { min-height: 34px; }
+
+/* the randomisers' settings pop-up: over the whole screen, its page tabs, a list of bars, then the buttons */
+.m-title { cursor: pointer; }
+.m-rs { position: fixed; inset: 0; z-index: 11; display: flex; justify-content: center;
+  padding: max(8px, env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px)) max(8px, env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
+.m-rs[hidden] { display: none; }
+.m-rs-card { width: 100%; max-width: 480px; height: 100%; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 10px; min-height: 0;
+  box-shadow: 0 0 0 100vmax rgba(10, 11, 9, .55), inset 0 3px 10px rgba(0, 0, 0, .28); }
+.m-rs-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.m .m-rs-tabs .m-btn { min-height: 40px; font-size: min(var(--fs-xs), 3.8vw) !important; padding: 0 2px; letter-spacing: 0; }
+.m .m-rs-tabs .m-btn[aria-selected="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
+.m-rs-rows { display: grid; align-content: start; gap: 10px; overflow-y: auto; overscroll-behavior: contain; min-height: 0; padding: 4px 2px; border-top: var(--rule); }
+.m-rs-rows .m-seq-lenrow { grid-template-columns: 7.5em 1fr 3.5em; gap: 8px; font-size: var(--fs-xs); }
+.m-rs-rows .m-seq-len { height: 34px; }
+.m-rs-btns { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 8px; }
+.m .m-rs-btns .m-btn { min-height: 50px; font-size: var(--fs-xs) !important; padding: 0 4px; }
+.m-rs-rows .m-seq-lenrow { grid-template-columns: 7.2em minmax(0, 1fr) 3.6em; }
+.m-rs-rows .m-seq-lenrow output { min-width: 0; text-align: right; white-space: nowrap; }
