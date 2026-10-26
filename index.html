@@ -7795,7 +7795,7 @@ let mCur = 'play', mSettle = 0;
 function mTab(t) {
   const el = document.querySelector(`[data-m-panel="${t}"]`);
   mShown(t);
-  mPages.scrollTo({ left: el.offsetLeft - mPages.offsetLeft, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  mPages.scrollTo({ left: el.offsetLeft - mPages.offsetLeft, behavior: 'instant' }); // (straight there, no slide)
 }
 // the tab that shows which page is in view
 // the page's name, beside the title
