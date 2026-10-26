@@ -171,7 +171,7 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 .m-foot { color: #a7b58c; opacity: .7; }
 
 /* the step sequencer: a sheet over the bottom of the screen, leaving play and record above it free; sixteen step bars in two rows (the ones past the length
-   faint), the length as a horizontal segmented bar, then randomise and done */
+   faint), the length and slew as horizontal segmented bars, then randomise and done */
 .m-seq { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; pointer-events: none; display: flex; align-items: flex-end; justify-content: center;
   padding: 16px max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
 .m-seq[hidden] { display: none; }
@@ -184,10 +184,10 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
   background: repeating-linear-gradient(to top, var(--ink) 0 5px, transparent 5px 8px); }
 .m-seq-steps i.off { opacity: .25; }
 .m-seq-steps i.now { outline: 2px solid var(--ink); outline-offset: 2px; }
-.m-seq-lenrow { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; text-transform: uppercase; }
+.m-seq-lenrow { display: grid; grid-template-columns: 4.5em 1fr 5.5em; gap: 12px; align-items: center; text-transform: uppercase; }
 .m-seq-len { --f: 1; position: relative; height: 36px; touch-action: none; border: 2px solid var(--ink); border-radius: 2px;
   background: repeating-linear-gradient(to right, var(--ghost) 0 5px, transparent 5px 8px) 4px 4px / calc(100% - 8px) calc(100% - 8px) no-repeat; }
-.m-seq-len i { position: absolute; left: 4px; top: 4px; bottom: 4px; width: calc((100% - 8px) * (var(--f) * 14 + 2) / 16);
+.m-seq-len i { position: absolute; left: 4px; top: 4px; bottom: 4px; width: calc((100% - 8px) * var(--w, 1));
   background: repeating-linear-gradient(to right, var(--ink) 0 5px, transparent 5px 8px); }
 .m-seq-lenrow output { min-width: 5.5em; text-align: right; }
 .m-seq-btns { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; }

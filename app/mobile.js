@@ -337,14 +337,15 @@ async function mOffer(t, type) {
 }
 
 // ---- step sequencers: holding a fader opens one for it: 2 to 16 steps, each a value it takes on that 16th note while
-// playing (the step is the bar's 16th counted from the start, wrapped at the length, so short ones run against the bar).
+// playing (the step is the bar's 16th counted from the start, wrapped at the length, so short ones run against the bar),
+// jumping to it or, with slew, gliding to it over up to a whole step.
 // Draw the steps with a finger (drag across to paint), randomise them, or switch it off; a fader with one running is
 // marked. Presets keep them ----
 const mSeqSteps = Array.from({ length: 16 }, (_, i) => { const c = document.createElement('i'); c.dataset.i = i; $('m-seq-steps').append(c); return c; });
 let mSeqF = null;
 const mSeqVal = (fd, f) => { const hi = fd.hiOf(); return Math.max(fd.min, Math.min(hi, fd.min + Math.round(f * (hi - fd.min) / fd.step) * fd.step)); };
 function mSeqOpen(fd) {
-  if (!fd.seq) fd.seq = { on: true, len: 16, vals: new Array(16).fill(fd.get()) };
+  if (!fd.seq) fd.seq = { on: true, len: 16, slew: 0, vals: new Array(16).fill(fd.get()) };
   mSeqF = fd; $('m-seq-name').textContent = fd.label;
   $('m-seq').hidden = false; mSeqDraw();
 }
@@ -354,7 +355,8 @@ function mSeqDraw() {
     c.style.setProperty('--f', (q.vals[i] - fd.min) / (hi - fd.min || 1));
     c.classList.toggle('off', i >= q.len);
   });
-  $('m-seq-len').style.setProperty('--f', (q.len - 2) / 14); $('m-seq-len-out').textContent = `${q.len} steps`;
+  $('m-seq-len').style.setProperty('--w', q.len / 16); $('m-seq-len-out').textContent = `${q.len} steps`;
+  $('m-seq-slew').style.setProperty('--w', q.slew / 100); $('m-seq-slew-out').textContent = q.slew ? `${q.slew}%` : 'off';
   $('m-seq-on').setAttribute('aria-pressed', q.on); $('m-seq-on').textContent = q.on ? 'on' : 'off';
   mSeqMarks();
 }
@@ -363,13 +365,13 @@ const mSeqMarks = () => mFaders.forEach((f) => f.el.classList.toggle('seq', !!(f
 const mSnapSong = songSnapshot, mUseSong = useSong;
 songSnapshot = function () {
   const seqs = {};
-  for (const f of mFaders) if (f.seq) seqs[f.key] = { on: f.seq.on, len: f.seq.len, vals: f.seq.vals.slice() };
+  for (const f of mFaders) if (f.seq) seqs[f.key] = { on: f.seq.on, len: f.seq.len, slew: f.seq.slew, vals: f.seq.vals.slice() };
   return { ...mSnapSong(), seqs, xdepth: Number($('xdepth').value) };
 };
 useSong = function (g, keepTempo) {
   mUseSong(g, keepTempo);
   mXDepth(typeof g.xdepth === 'number' ? g.xdepth : 100);
-  for (const f of mFaders) { const q = g.seqs && g.seqs[f.key]; f.seq = q ? { on: !!q.on, len: q.len, vals: q.vals.slice() } : null; }
+  for (const f of mFaders) { const q = g.seqs && g.seqs[f.key]; f.seq = q ? { on: !!q.on, len: q.len, slew: q.slew || 0, vals: q.vals.slice() } : null; }
   if (mSeqF) { if (mSeqF.seq) mSeqDraw(); else $('m-seq-close').click(); }
   mSeqMarks();
 };
@@ -392,25 +394,50 @@ useSong = function (g, keepTempo) {
   const stop = () => { painting = false; };
   box.addEventListener('pointerup', stop); box.addEventListener('pointercancel', stop);
 }
-// the length: a horizontal bar, 2 at the left to 16 at the right
-{
-  const bar = $('m-seq-len');
-  const at = (e) => { const r = bar.getBoundingClientRect(); mSeqF.seq.len = 2 + Math.round(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * 14); mSeqDraw(); };
+// the length (2 at the left to 16 at the right) and the slew (off to a whole step): horizontal bars
+function mSeqBar(bar, setFrac) {
+  const at = (e) => { const r = bar.getBoundingClientRect(); setFrac(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width))); mSeqDraw(); };
   let held = false;
   bar.addEventListener('pointerdown', (e) => { bar.setPointerCapture(e.pointerId); held = true; at(e); });
   bar.addEventListener('pointermove', (e) => { if (held) at(e); });
   bar.addEventListener('pointerup', () => { held = false; }); bar.addEventListener('pointercancel', () => { held = false; });
 }
+mSeqBar($('m-seq-len'), (x) => { mSeqF.seq.len = 2 + Math.round(x * 14); });
+mSeqBar($('m-seq-slew'), (x) => { mSeqF.seq.slew = Math.round(x * 20) * 5; });
 $('m-seq-rand').addEventListener('click', () => { const q = mSeqF.seq; for (let i = 0; i < 16; i++) q.vals[i] = mSeqVal(mSeqF, Math.random()); q.on = true; mSeqDraw(); });
 $('m-seq-on').addEventListener('click', () => { mSeqF.seq.on = !mSeqF.seq.on; mSeqDraw(); });
 $('m-seq-close').addEventListener('click', () => { $('m-seq').hidden = true; mSeqF = null; });
+// the glides, a frame at a time while any is moving
+let mGlideOn = false;
+function mGlideRun() {
+  if (mGlideOn) return;
+  mGlideOn = true;
+  const tick = () => {
+    const now = performance.now();
+    let any = false;
+    for (const f of mFaders) {
+      const g = f.glide; if (!g) continue;
+      const k = Math.min(1, (now - g.t0) / g.ms);
+      f.put(g.from + (g.to - g.from) * k);
+      if (k < 1 && f.seq && f.seq.on) any = true; else f.glide = null;
+    }
+    if (any) requestAnimationFrame(tick); else mGlideOn = false;
+  };
+  requestAnimationFrame(tick);
+}
 $('m').addEventListener('contextmenu', (e) => e.preventDefault());
 // on each 16th (as the audio thread reaches it, ahead of the output), every running sequencer sets its fader
 const mOnEvent = onEvent;
 onEvent = function (ev) {
   if (ev.type === 'step' && playing) {
     const n = ev.bar * 16 + ev.step;
-    for (const f of mFaders) if (f.seq && f.seq.on) f.put(f.seq.vals[n % f.seq.len]);
+    const stepMs = 60000 / perf.tempo / 4, now = performance.now();
+    for (const f of mFaders) {
+      if (!f.seq || !f.seq.on) continue;
+      const to = f.seq.vals[n % f.seq.len];
+      // slew: glide from where the fader is to the step's value over that share of a step
+      if (f.seq.slew) { f.glide = { from: f.get(), to, t0: now, ms: f.seq.slew / 100 * stepMs }; mGlideRun(); } else { f.glide = null; f.put(to); }
+    }
     if (mSeqF && mSeqF.seq) { const i = n % mSeqF.seq.len; mSeqSteps.forEach((c, k) => c.classList.toggle('now', k === i)); }
   }
   mOnEvent(ev);
