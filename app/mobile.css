@@ -446,3 +446,5 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-rs-btns .m-btn { min-height: 50px; font-size: var(--fs-xs) !important; padding: 0 4px; }
 .m-rs-rows .m-seq-lenrow { grid-template-columns: 7.2em minmax(0, 1fr) 3.6em; }
 .m-rs-rows .m-seq-lenrow output { min-width: 0; text-align: right; white-space: nowrap; }
+.m-rs-card .m-chead { gap: 8px; }
+.m-rs-card .m-chead b { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

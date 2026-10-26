@@ -1294,6 +1294,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-rs-btns .m-btn { min-height: 50px; font-size: var(--fs-xs) !important; padding: 0 4px; }
 .m-rs-rows .m-seq-lenrow { grid-template-columns: 7.2em minmax(0, 1fr) 3.6em; }
 .m-rs-rows .m-seq-lenrow output { min-width: 0; text-align: right; white-space: nowrap; }
+.m-rs-card .m-chead { gap: 8px; }
+.m-rs-card .m-chead b { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 </style>
 
 <main class="m" id="m">
@@ -1385,7 +1387,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
   <div class="m-rs" id="m-rs" hidden>
     <section class="m-card m-rs-card" role="dialog" aria-labelledby="m-rs-title">
-      <div class="m-chead"><b id="m-rs-title">randomise settings</b><button class="m-toggle" id="m-rs-close" type="button">done</button></div>
+      <div class="m-chead"><b id="m-rs-title">randomise settings</b><button class="m-toggle" id="m-rs-copy" type="button">copy</button><button class="m-toggle" id="m-rs-close" type="button">done</button></div>
       <div class="m-rs-tabs" id="m-rs-tabs" role="tablist"></div>
       <div class="m-rs-rows" id="m-rs-rows"></div>
       <div class="m-rs-btns"><button class="m-btn m-big" id="m-rs-go" type="button">randomise</button><button class="m-btn" id="m-rs-play" type="button">play</button><button class="m-btn" id="m-rs-reset" type="button">reset</button></div>
@@ -8650,6 +8652,13 @@ const mRsPlay = () => { $('m-rs-play').textContent = $('play').getAttribute('ari
 new MutationObserver(mRsPlay).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
 $('m-title').addEventListener('click', () => { $('m-rs').hidden = false; mRsDraw(); });
 $('m-rs-close').addEventListener('click', () => { $('m-rs').hidden = true; });
+// copy: every page's settings as text, to paste back as the new defaults (RAND0); where the clipboard is refused, a
+// box with the text selected instead
+$('m-rs-copy').addEventListener('click', async () => {
+  const text = `Elixir Mobile randomise settings\n${JSON.stringify(RAND)}`;
+  try { await navigator.clipboard.writeText(text); $('m-rs-copy').textContent = 'copied'; setTimeout(() => { $('m-rs-copy').textContent = 'copy'; }, 1500); }
+  catch (e) { prompt('Copy these settings:', text); }
+});
 $('m-rs-go').addEventListener('click', () => $(RS_PAGES[mRsPage][2]).click());
 $('m-rs-play').addEventListener('click', () => $('play').click());
 $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][0]; Object.assign(RAND[key], RAND0[key]); saveRand(); mRsDraw(); });
