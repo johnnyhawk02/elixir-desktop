@@ -247,34 +247,44 @@ document.querySelectorAll('[data-m-undo]').forEach((b) => b.addEventListener('cl
 }));
 new MutationObserver(mUndo).observe($('undo'), { attributes: true, attributeFilter: ['disabled'] });
 
-// ---- the voice page: the strip at the top picks a drum; its twelve main parameters are on faders (a set per drum, so a
-// fader's step sequencer stays with its drum) ----
-const VP_DRUM = (n) => [['pitch', `COARSE${n}`], ['decay', `VELOD${n}`], ['env amt', `MODAMNT${n}`], ['env time', `MOD_EG${n}`],
-  ['fm amt', `FMAMNT${n}`], ['fm freq', `FM_FREQ${n}`], ['click', `TRANS${n}_VOL`], ['click frq', `TRANS${n}_FREQ`],
-  ['cutoff', `FILTER_FREQ_${n}`], ['reso', `RESO_${n}`], ['drive', `DRIVE${n}`], ['rate', `VOICE_DECIMATION${n}`]];
-const VOICE_PARS = [VP_DRUM(1), VP_DRUM(2), VP_DRUM(3),
-  [['pitch', 'COARSE4'], ['decay', 'VELOD4'], ['noise', 'NOISE_FREQ1'], ['mix', 'MIX1'], ['env amt', 'MODAMNT4'], ['env time', 'MOD_EG4'],
-    ['click', 'TRANS4_VOL'], ['click frq', 'TRANS4_FREQ'], ['cutoff', 'FILTER_FREQ_4'], ['reso', 'RESO_4'], ['drive', 'SNARE_DISTORTION'], ['rate', 'VOICE_DECIMATION4']],
-  [['pitch', 'COARSE5'], ['decay', 'VELOD5'], ['m1 freq', 'MOD_OSC_F1_CYM'], ['m1 amt', 'MOD_OSC_GAIN1_CYM'], ['m2 freq', 'MOD_OSC_F2_CYM'], ['m2 amt', 'MOD_OSC_GAIN2_CYM'],
-    ['click', 'TRANS5_VOL'], ['click frq', 'TRANS5_FREQ'], ['cutoff', 'FILTER_FREQ_5'], ['reso', 'RESO_5'], ['drive', 'CYMBAL_DISTORTION'], ['rate', 'VOICE_DECIMATION5']],
-  [['pitch', 'COARSE6'], ['closed', 'VELOD6_CLOSED'], ['open', 'VELOD6_OPEN'], ['m1 freq', 'MOD_OSC_F1'], ['m1 amt', 'MOD_OSC_GAIN1'], ['m2 freq', 'MOD_OSC_F2'],
-    ['m2 amt', 'MOD_OSC_GAIN2'], ['click', 'TRANS6_VOL'], ['cutoff', 'FILTER_FREQ_6'], ['reso', 'RESO_6'], ['drive', 'HAT_DISTORTION'], ['rate', 'VOICE_DECIMATION6']]];
-let mVoice = 0;
+// ---- the voice page: every parameter of a drum. The top strip picks the drum, the second its section (oscillator,
+// amp eg, modulation, fm, transient, filter, lfo, mix, as the desktop's pages), and that section's faders fill the
+// rest. A drum's section is made the first time it's shown and kept (so a fader's step sequencer stays with it) ----
+const VP_SHORT = { 'oscillator': 'osc', 'amp eg': 'amp', 'modulation': 'mod', 'fm': 'fm', 'transient sample': 'click', 'filter': 'filter', 'lfo': 'lfo', 'mix': 'mix' };
+const vpNice = (t) => t.toLowerCase().replace(/_/g, ' ');
+const vpSections = (v) => VOICE_PAGES[v].groups.filter((g) => g.params.length).map((g) => ({ name: vpNice(g.name.replace(/ \(.*\)/, '')), params: g.params }));
+let mVoice = 0, mVSec = 0;
+const mVBoxes = {};
 XN.forEach((name, v) => {
   const b = document.createElement('button');
   b.type = 'button'; b.className = 'm-btn'; b.textContent = name; b.setAttribute('role', 'tab');
-  b.addEventListener('click', () => { mVoice = v; mVoiceShow(); });
+  b.addEventListener('click', () => { mVoice = v; mVSec = Math.min(mVSec, vpSections(v).length - 1); mVoiceShow(); });
   $('m-voice').append(b);
-  const box = document.createElement('div');
-  box.className = 'm-faders m-vset'; box.id = `m-voice-${v + 1}`; $('m-vsets').append(box);
-  for (const [label, name] of VOICE_PARS[v]) {
-    const par = PAR[name];
-    mFader(box, label, { min: 0, max: spec(par).max, get: () => values[par], set: (x) => { setValue(par, x); setDirty(true); }, show: String, dflt: () => initValues[par] });
-  }
 });
+function mVoiceBox(v, k) {
+  const id = `m-voice-${v + 1}-${k}`;
+  if (mVBoxes[id]) return mVBoxes[id];
+  const sec = vpSections(v)[k], box = document.createElement('div');
+  box.className = 'm-faders m-vset'; box.id = id; $('m-vsets').append(box);
+  // a fader's label drops its section's own word (filter reso → reso)
+  const drop = new RegExp(`\\b(${sec.name.split(' ')[0]}|transient|lfo)\\b ?`, 'g');
+  for (const [text, pn] of sec.params) {
+    const par = PAR[pn], sp = spec(par), short = vpNice(text).replace(drop, '').trim(), label = { f: 'cutoff', '': vpNice(text) }[short] ?? short;
+    mFader(box, label, { min: 0, max: sp.max, get: () => values[par], set: (x) => { setValue(par, x); setDirty(true); },
+      show: (x) => String(sp.show ? sp.show(x) : x), dflt: () => initValues[par] });
+  }
+  return (mVBoxes[id] = box);
+}
 function mVoiceShow() {
   [...$('m-voice').children].forEach((b, v) => b.setAttribute('aria-selected', v === mVoice));
-  [...$('m-vsets').children].forEach((box, v) => { box.hidden = v !== mVoice; });
+  const secs = vpSections(mVoice), strip = $('m-vsec'); strip.innerHTML = '';
+  secs.forEach((sc, k) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'm-btn'; b.setAttribute('role', 'tab');
+    b.textContent = VP_SHORT[sc.name] || sc.name; b.setAttribute('aria-selected', k === mVSec);
+    b.addEventListener('click', () => { mVSec = k; mVoiceShow(); }); strip.append(b);
+  });
+  const cur = mVoiceBox(mVoice, mVSec);
+  for (const box of Object.values(mVBoxes)) box.hidden = box !== cur;
   mDrawAll();
 }
 mVoiceShow();
