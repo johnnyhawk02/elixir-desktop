@@ -57,7 +57,6 @@
   <div class="m-panel" data-m-panel="fx">
     <section class="m-card m-fx-card">
       <div class="m-fx-row"><b>echo</b><div class="m-faders" id="m-fx-echo"></div></div>
-      <div class="m-fx-row"><b>distortion</b><div class="m-faders" id="m-fx-dist"></div></div>
       <div class="m-fx-row"><b>ring mod</b><div class="m-faders" id="m-fx-ring"></div></div>
       <div class="m-fx-btns">
         <button class="m-btn m-big" id="m-fx-rand" type="button">random fx</button>
@@ -70,7 +69,6 @@
   <div class="m-panel" data-m-panel="mix">
     <section class="m-card m-fx-card m-mix-card">
       <div class="m-fx-row"><b>echo send</b><div class="m-faders" id="m-mix-echo"></div></div>
-      <div class="m-fx-row"><b>distortion send</b><div class="m-faders" id="m-mix-dist"></div></div>
       <div class="m-fx-row"><b>ring mod send</b><div class="m-faders" id="m-mix-ring"></div></div>
       <div class="m-fx-row m-mix-vol"><b>level</b><div class="m-faders" id="m-mix-vol"></div></div>
     </section>
@@ -78,6 +76,8 @@
 
   <div class="m-panel" data-m-panel="comp">
     <section class="m-card m-comp-card">
+      <div class="m-chead"><b>distortion</b><small class="m-chint">whole mix → comp</small></div>
+      <div class="m-faders" id="m-dist"></div>
       <div class="m-chead"><b>compressor</b><div class="m-gr" aria-label="gain reduction"><i><b id="m-gr"></b></i><output id="m-gr-out">0 dB</output></div><button class="m-toggle" id="m-comp-on" type="button" aria-pressed="true">on</button></div>
       <div class="m-faders" id="m-comp"></div>
       <div class="m-chead"><b>drum 1 sidechain</b></div>
@@ -125,7 +125,7 @@
     <button type="button" role="tab" data-m-tab="xy" aria-selected="false">x/y</button>
     <button type="button" role="tab" data-m-tab="fx" aria-selected="false">fx</button>
     <button type="button" role="tab" data-m-tab="mix" aria-selected="false">mix</button>
-    <button type="button" role="tab" data-m-tab="comp" aria-selected="false">comp</button>
+    <button type="button" role="tab" data-m-tab="comp" aria-selected="false">master</button>
     <button type="button" role="tab" data-m-tab="presets" aria-selected="false">presets</button>
   </nav>
 </main>

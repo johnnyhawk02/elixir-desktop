@@ -337,3 +337,15 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-vtrack i, .m .m-seq-steps i::after, .m .m-seq-steps i::before, .m .m-gr i b { filter: drop-shadow(calc(2px * var(--d, 1)) calc(2.2px * var(--d, 1)) 0 rgba(23, 32, 14, .17)); }
 .m .m-btn, .m .m-toggle, .m .m-pload, .m .m-tabs button, .m .m-xy, .m .m-seq-len, .m .m-xyrow select { box-shadow: calc(2px * var(--d, 1)) calc(2.2px * var(--d, 1)) 0 rgba(23, 32, 14, .14); }
 .m .m-tabs button:not([aria-selected="true"]) { box-shadow: none; }
+
+/* the master page: distortion, compressor and sidechain, a row each; the mix page's three rows; the fx page's two */
+.m-comp-card { grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); }
+.m-comp-card .m-chead:not(:first-child) { border-top: 1px solid var(--ink); padding-top: 6px; }
+.m-chint { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: right; color: var(--muted); font-size: var(--fs-xs); text-transform: uppercase; }
+#m-dist { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+#m-dist .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
+.m #m-dist .m-vf output { font-size: var(--fs-xs); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; white-space: nowrap; }
+.m #m-dist .m-flab { font-size: .85rem; letter-spacing: .02em; }
+.m #m-dist .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 24px; }
+.m-mix-card { grid-template-rows: 1fr 1fr 1.6fr; }
+.m-fx-card { grid-template-rows: repeat(2, minmax(0, 1fr)) auto; }

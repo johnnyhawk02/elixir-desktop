@@ -65,12 +65,13 @@ class Player {
     // delay: tempo-synced time, 0 = 1/128 .. 1 = one bar, and run as a send effect (all wet,
     // the voices keep their dry path); not in the firmware
     this.delayPos = 1 + Math.log2(3 / 16) / 7;
-    // two more of the firmware's FX, each as its own send bus: distortion and ring mod (the
-    // engine's own FX bus is the echo); all three are wet only, the voices keep their dry path
+    // two more of the firmware's FX: ring mod as its own send bus (wet only, the voices keep their dry path; the engine's
+    // own FX bus is the echo), and in Elixir Mobile the distortion as an insert on the whole mix, before the compressor
     this.dist = new LXR.FxBus(); this.dist.fxType = LXR.FX_DISTORTION; this.dist.forceWet = true;
     this.ring = new LXR.FxBus(); this.ring.fxType = LXR.FX_RING; this.ring.forceWet = true;
     this.fxRng = new LXR.Rng(0x2545f491);
     this.sendD = new Float32Array(6); this.sendR = new Float32Array(6); this.echoWidth = 1;
+    this.distMix = 0; this.distAt = 0;
     this.busIn = new Float32Array(128); this.busOut = new Int16Array(128);
     this.duckEnv = 0; this.duckAt = 1; this.compEnv = 0; this.gr = 0; this.duckMin = 1;
     // level meters: each voice's peak after its fader, accent, mute and duck
@@ -93,6 +94,7 @@ class Player {
       if (m.dist) {
         this.dist.distortion.type = m.dist.type;
         m.dist.p.forEach((v, i) => this.dist.setParameter(i, v / 127));
+        this.distMix = (m.dist.mix || 0) / 100;
         this.ring.ringmod.osc.waveform = m.ring.wave;
         this.ring.setParameter(0, m.ring.freq / 127);
         this.sendD.set(m.sendD); this.sendR.set(m.sendR); this.echoWidth = m.echo.pct / 100;
@@ -340,7 +342,7 @@ class Player {
     const fd0 = M.duckFx ? duck0 : 1, fdd = M.duckFx ? (duck1 - duck0) / 64 : 0;
     // distortion and ring mod buses: each voice panned in at its send, saturated to int16.
     // The firmware's ring mod carrier is quiet (about a third of a plain multiply), so its bus gets makeup gain.
-    for (const [bus, sends, mk] of [[this.dist, this.sendD, 1], [this.ring, this.sendR, RING_MAKEUP]]) {
+    for (const [bus, sends, mk] of [[this.ring, this.sendR, RING_MAKEUP]]) {
       const bi = this.busIn; bi.fill(0);
       let any = false;
       for (let n = 0; n < 6; n++) {
@@ -356,6 +358,17 @@ class Player {
       if (any || bo.some((v) => v)) for (let i = 0; i < 64; i++) { const g = mk / 32768 * (fd0 + fdd * i); L[i] += bo[2 * i] * g; R[i] += bo[2 * i + 1] * g; }
     }
     for (let i = 0; i < 64; i++) { const g = (fd0 + fdd * i) / 32768; L[i] += fx[2 * i] * g; R[i] += fx[2 * i + 1] * g; }
+    // the distortion, a master insert (not in the firmware's routing): the whole mix through the firmware's distortion,
+    // blended in at its mix amount, ramped across the block, before the high-pass and the compressor; at 0 it's bypassed
+    if (this.distMix || this.distAt) {
+      const bi = this.dist.input;
+      for (let i = 0; i < 64; i++) { bi[2 * i] = Math.max(-32768, Math.min(32767, Math.round(L[i] * 32768))); bi[2 * i + 1] = Math.max(-32768, Math.min(32767, Math.round(R[i] * 32768))); }
+      const bo = this.busOut; bo.fill(0);
+      this.dist.process(bo, 64, this.fxRng);
+      const m0 = this.distAt, m1 = this.distMix;
+      for (let i = 0; i < 64; i++) { const m = m0 + (m1 - m0) * (i + 1) / 64; L[i] += (bo[2 * i] / 32768 - L[i]) * m; R[i] += (bo[2 * i + 1] / 32768 - R[i]) * m; }
+      this.distAt = m1;
+    }
     if (this.rush > S.hp || this.hpOn) this.highPass(L, R);
     if (M.comp) {
       // peak detector in dB, attack/release smoothing, gain = over * (1/ratio - 1) + makeup

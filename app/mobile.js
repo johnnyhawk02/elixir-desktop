@@ -422,7 +422,7 @@ async function mOffer(t, type) {
   mDownload(t);
 }
 
-// ---- the fx page: every setting of the three effects on faders, a row each ----
+// ---- the fx page: the two send effects' settings on faders, a row each (the distortion is on the master page) ----
 const fxF = (box, label, A) => mFader($(box), label, { min: A.min, max: A.max, step: A.step || 1, get: A.get, set: (v) => { A.set(v); setDirty(true); }, show: A.show, dflt: A.dflt });
 const fxSend = (k) => ({ ...mAllSend(k), show: (v) => mPct(v), dflt: 0 });
 const fxPar = (p, dflt) => ({ min: 0, max: 127, get: () => values[p], set: (v) => setValue(p, v, true), show: String, dflt });
@@ -434,22 +434,24 @@ fxF('m-fx-echo', 'time', { min: 0, max: 1000, get: () => Math.round(delayPos * 1
 fxF('m-fx-echo', 'tone', fxPar(PAR.FX_P3));
 fxF('m-fx-echo', 'feedback', fxPar(PAR.FX_P4));
 fxF('m-fx-echo', 'width', { min: 0, max: 200, get: () => fx3.echo.pct, set: (v) => { fx3.echo.pct = v; sendMix(); }, show: (v) => v + '%', dflt: FX3_0.echo.pct });
-// distortion: send, type (tube, fold or rat), drive, color, tone, volume
-fxF('m-fx-dist', 'send', fxSend('dist'));
-const DIST_T = LXR.DIST_NAMES.map((n) => n.toLowerCase());
-fxF('m-fx-dist', 'type', { min: 0, max: DIST_T.length - 1, get: () => fx3.dist.type, set: (v) => { fx3.dist.type = v; sendMix(); }, show: (v) => DIST_T[v], dflt: 0 });
-['drive', 'color', 'tone', 'volume'].forEach((l, i) => fxF('m-fx-dist', l, fx3P(i)));
 // ring mod: send, the carrier's wave and frequency
 fxF('m-fx-ring', 'send', fxSend('ring'));
 const RING_W = LXR.OSC_WAVE_NAMES.map((n) => n.toLowerCase());
 fxF('m-fx-ring', 'wave', { min: 0, max: RING_W.length - 1, get: () => fx3.ring.wave, set: (v) => { fx3.ring.wave = v; sendMix(); }, show: (v) => RING_W[v], dflt: 0 });
 fxF('m-fx-ring', 'freq', { min: 0, max: 127, get: () => fx3.ring.freq, set: (v) => { fx3.ring.freq = v; sendMix(); }, show: String, dflt: FX3_0.ring.freq });
 
-// ---- the mix page: each drum's echo, distortion and ring mod sends, then its level, a column a drum ----
+// ---- the master page's distortion: the whole mix through it, into the compressor. Mix (0 bypasses it), type (tube,
+// fold or rat), drive, color, tone, volume ----
+fxF('m-dist', 'mix', { min: 0, max: 100, get: () => fx3.dist.mix || 0, set: (v) => { fx3.dist.mix = v; sendMix(); }, show: (v) => (v ? v + '%' : 'off'), dflt: 0 });
+const DIST_T = LXR.DIST_NAMES.map((n) => n.toLowerCase());
+fxF('m-dist', 'type', { min: 0, max: DIST_T.length - 1, get: () => fx3.dist.type, set: (v) => { fx3.dist.type = v; sendMix(); }, show: (v) => DIST_T[v], dflt: 0 });
+['drive', 'color', 'tone', 'volume'].forEach((l, i) => fxF('m-dist', l, fx3P(i)));
+
+// ---- the mix page: each drum's echo and ring mod sends, then its level, a column a drum ----
 const XS = ['d1', 'd2', 'd3', 'sn', 'cy', 'hh'];
 XS.forEach((short, n) => {
   // an echo send above 0 routes the drum to the echo bus (fxButtons does that, as the mixer's dial does)
-  for (const [k, box] of [['fx', 'm-mix-echo'], ['dist', 'm-mix-dist'], ['ring', 'm-mix-ring']]) {
+  for (const [k, box] of [['fx', 'm-mix-echo'], ['ring', 'm-mix-ring']]) {
     mFader($(box), short, { min: 0, max: 100, get: () => mix[k][n], show: (v) => (v ? String(v) : 'off'), dflt: 0,
       set: (v) => { mix[k][n] = v; if (k === 'fx') fxButtons[n](); sendMix(); setDirty(true); } });
   }
@@ -458,12 +460,12 @@ XS.forEach((short, n) => {
     set: (v) => { setValue(vol, v, true); setDirty(true); } });
 });
 
-// random fx: new sends on every drum (each effect on some of them) and new settings for all three effects;
+// random fx: new sends on every drum (each effect on some of them) and new settings for the echo and ring mod;
 // alter fx: every send already on, and every setting, moved up to 10% of its range either way. Undo takes either back
-const fxSnap = () => ({ fx: mix.fx.slice(), dist: mix.dist.slice(), ring: mix.ring.slice(), fx3: structuredClone(fx3), pos: delayPos, p3: values[PAR.FX_P3], p4: values[PAR.FX_P4] });
+const fxSnap = () => ({ fx: mix.fx.slice(), ring: mix.ring.slice(), fx3: structuredClone(fx3), pos: delayPos, p3: values[PAR.FX_P3], p4: values[PAR.FX_P4] });
 function fxUse(q) {
-  mix.fx.splice(0, 6, ...q.fx); mix.dist.splice(0, 6, ...q.dist); mix.ring.splice(0, 6, ...q.ring);
-  Object.assign(fx3.echo, q.fx3.echo); Object.assign(fx3.ring, q.fx3.ring); fx3.dist.type = q.fx3.dist.type; fx3.dist.p.splice(0, 4, ...q.fx3.dist.p);
+  mix.fx.splice(0, 6, ...q.fx); mix.ring.splice(0, 6, ...q.ring);
+  Object.assign(fx3.echo, q.fx3.echo); Object.assign(fx3.ring, q.fx3.ring);
   delayPos = q.pos; send({ type: 'delay', pos: delayPos });
   setValue(PAR.FX_P3, q.p3, true); setValue(PAR.FX_P4, q.p4, true);
   fxButtons.forEach((b) => b()); sendMix(); mDrawAll(); setDirty(true);
@@ -479,13 +481,11 @@ $('m-fx-rand').addEventListener('click', async () => {
   fxChange((q) => {
     for (let v = 0; v < 6; v++) {
       q.fx[v] = Math.random() < 0.5 ? rIn(10, 60) : 0;
-      q.dist[v] = Math.random() < 0.3 ? rIn(10, 70) : 0;
       q.ring[v] = Math.random() < 0.2 ? rIn(10, 60) : 0;
     }
     q.pos = randomDelayPos(); // (musical lengths, as every randomiser)
     q.p3 = rIn(40, 110); q.p4 = Math.random() < 0.8 ? rIn(15, 70) : rIn(70, 105);
     q.fx3.echo.pct = rIn(60, 160);
-    q.fx3.dist.type = rIn(0, DIST_T.length - 1); q.fx3.dist.p = [rIn(30, 127), rIn(20, 110), rIn(40, 120), rIn(60, 110)];
     q.fx3.ring.wave = rIn(0, RING_W.length - 1); q.fx3.ring.freq = rIn(5, 120);
   });
 });
@@ -493,11 +493,11 @@ $('m-fx-alter').addEventListener('click', async () => {
   await startAudio();
   const nudge = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v + (Math.random() * 2 - 1) * 0.1 * (hi - lo))));
   fxChange((q) => {
-    for (const k of ['fx', 'dist', 'ring']) q[k] = q[k].map((v) => (v ? nudge(v, 1, 100) : 0));
+    for (const k of ['fx', 'ring']) q[k] = q[k].map((v) => (v ? nudge(v, 1, 100) : 0));
     q.pos = Math.max(0, Math.min(1, q.pos + (Math.random() * 2 - 1) * 0.05));
     q.p3 = nudge(q.p3, 0, 127); q.p4 = nudge(q.p4, 0, 127);
     q.fx3.echo.pct = nudge(q.fx3.echo.pct, 0, 200);
-    q.fx3.dist.p = q.fx3.dist.p.map((v) => nudge(v, 0, 127)); q.fx3.ring.freq = nudge(q.fx3.ring.freq, 0, 127);
+    q.fx3.ring.freq = nudge(q.fx3.ring.freq, 0, 127);
   });
 });
 
