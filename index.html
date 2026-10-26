@@ -6495,6 +6495,9 @@ $('new-kit').addEventListener('click', async () => {
   for (let v = 0; v < 6; v++) kit[PAR.VOL1 + v] = values[PAR.VOL1 + v]; // the mixer levels stay as they are
   useKit({ name: '', kit, xm: { amt: new Array(36).fill(0), target: xm.target.slice() }, userSamples: 0 });
   for (let v = 0; v < 6; v++) randomiseVoice(v, 0.1);
+  // each drum's echo send: off, or 20..50 (half and half), routing the drum to the echo when it's on
+  for (let v = 0; v < 6; v++) mix.fx[v] = rnd() < 0.5 ? 0 : 20 + Math.floor(rnd() * 31);
+  fxButtons.forEach((b) => b()); sendMix();
   // echo feedback stays lowish (20..55); about one roll in 15 slams it up to 75..110
   setValue(PAR.FX_P4, rnd() < 1 / 15 ? 75 + Math.floor(rnd() * 36) : 20 + Math.floor(rnd() * 36), true);
   delayPos = randomDelayPos(); send({ type: 'delay', pos: delayPos }); syncFx();
