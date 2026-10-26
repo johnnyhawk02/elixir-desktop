@@ -69,7 +69,7 @@ function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel =
     tr.classList.toggle('mod', fd.base !== null); if (fd.base !== null) tr.style.setProperty('--b', (fd.base - min) / (hi - min || 1));
     tr.setAttribute('aria-valuemin', min); tr.setAttribute('aria-valuemax', hi); tr.setAttribute('aria-valuenow', v); tr.setAttribute('aria-valuetext', show(v));
   };
-  const fd = { key: `${box.id}:${label}`, label, min, hiOf, step, get, show, put, el, seq: null, base: null, off: 0 };
+  const fd = { key: `${box.id}:${label}`, label, min, hiOf, step, get, show, put, el, dflt, seq: null, base: null, off: 0 };
   const snap = (v) => Math.round(Math.max(min, Math.min(hiOf(), min + Math.round((v - min) / step) * step)) * 1e6) / 1e6;
   // a move of the fader: its base while a sequencer runs, else its value
   const move = (v) => { if (fd.base !== null) { fd.base = snap(v); mSeqApply(fd); } else put(v); };
@@ -133,20 +133,21 @@ mFader($('m-beat-faders'), 'velocity', { ...pf('vel'), show: (v) => `${v}` });
 mFader($('m-beat-faders'), 'groove', { ...pf('groove'), show: () => perfText('groove').replace(' ', '\n') });
 mFader($('m-beat-faders'), 'depth', { ...pf('depth'), show: (v) => `${v}%` });
 mFader($('m-beat-faders'), 'accent', { ...pf('accent'), show: (v) => `+${v} dB` });
-// ---- the perf page: tempo, the sound macros, the sidechain and crossfeed, four by two, and the randomisers ----
-mFader($('m-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
+// ---- the perf page's own controls: tempo, the sidechain, the sound macros and crossfeed. They live in a hidden box;
+// the page shows eight assignable slots (below, after the x/y page's lists), these seven by default ----
+mFader($('m-perf-src'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
 // the drum 1 sidechain duck: above 0 it switches the sidechain on
 const setDuck = (v) => {
   master.duck = v / 100;
   if (v > 0 && !master.duckOn) $('duck-on').click(); else sendMix();
 };
 const duckFader = { min: 0, max: 100, get: () => (master.duckOn ? Math.round(master.duck * 100) : 0), set: setDuck, show: (v) => (v ? v + '%' : 'off'), dflt: Math.round(MASTER0.duck * 100) };
-mFader($('m-faders'), 'sidechain', duckFader);
+mFader($('m-perf-src'), 'sidechain', duckFader);
 // the sound macros, as on the desktop's pattern card: 100 (pitch 24) is the middle, the sound as it is
 for (const [m, label] of [['pitch', 'pitch'], ['decay', 'decay'], ['filter', 'filter'], ['fm', 'fm']]) {
   const pitch = m === 'pitch';
   // pitch is free: hundredths of a semitone, over twice the track's height
-  mFader($('m-faders'), label, { min: 0, max: pitch ? 48 : 200, step: pitch ? 0.01 : 1, travel: pitch ? 2 : 1, get: () => macro[m], set: (v) => { setMacro(m, v); drawMacros(); },
+  mFader($('m-perf-src'), label, { min: 0, max: pitch ? 48 : 200, step: pitch ? 0.01 : 1, travel: pitch ? 2 : 1, get: () => macro[m], set: (v) => { setMacro(m, v); drawMacros(); },
     show: (v) => (pitch ? (Math.abs(v - 24) < 0.005 ? '0 st' : (v > 24 ? '+' : '−') + Math.abs(v - 24).toFixed(2) + '\nst') : (v === 100 ? '0%' : (v > 100 ? '+' : '−') + Math.abs(v - 100) + '%')),
     dflt: MACRO0[m] });
 }
@@ -154,7 +155,7 @@ const mDrawMacros = drawMacros;
 drawMacros = function () { mDrawMacros(); mDrawAll(); };
 // crossfeed depth: how much of the crossfeed patchbay is heard (the desktop's depth control); presets keep it
 const mXDepth = (v) => { $('xdepth').value = v; $('xdepth').dispatchEvent(new Event('input')); };
-mFader($('m-faders'), 'crossfeed', { min: 0, max: 100, get: () => Number($('xdepth').value), set: mXDepth, show: (v) => (v ? v + '%' : 'off'), dflt: 100 });
+mFader($('m-perf-src'), 'crossfeed', { min: 0, max: 100, get: () => Number($('xdepth').value), set: mXDepth, show: (v) => (v ? v + '%' : 'off'), dflt: 100 });
 
 // ---- compressor tab ----
 const mMaster = (box, label, key, lo, hi, step, show) => mFader(box, label, { min: lo, max: hi, step, get: () => master[key],
@@ -742,12 +743,12 @@ const XY_IN = 16; // (the CSS's 16px)
 const XY_PLACES = (() => {
   const nice = (t) => t.toLowerCase().replace(/_/g, ' ');
   const drums = XN.map((name, v) => ({ name, groups: VOICE_PAGES[v].groups.filter((g) => g.params.length).map((g) => [nice(g.name.replace(/ \(.*\)/, '')),
-    g.params.map(([text, pn]) => { const par = PAR[pn]; return { label: nice(text), min: 0, max: spec(par).max, get: () => values[par], set: (x) => setValue(par, x) }; })]) }));
+    g.params.map(([text, pn]) => { const par = PAR[pn]; return { label: nice(text), min: 0, max: spec(par).max, get: () => values[par], set: (x) => setValue(par, x), par }; })]) }));
   // a page's faders, by their row
-  const faders = (rows) => rows.map(([heading, box]) => [heading, mFaders.filter((f) => f.key.startsWith(box + ':')).map((f) => ({ label: f.label, min: f.min, max: f.hiOf(), get: f.get, set: (x) => f.put(x) }))]);
+  const faders = (rows) => rows.map(([heading, box]) => [heading, mFaders.filter((f) => f.key.startsWith(box + ':')).map((f) => ({ label: f.label, min: f.min, max: f.hiOf(), get: f.get, set: (x) => f.put(x), fd: f }))]);
   return [...drums,
     { name: 'beat', groups: faders([['beat', 'm-beat-faders']]) },
-    { name: 'perf', groups: faders([['perf', 'm-faders']]) },
+    { name: 'perf', groups: faders([['perf', 'm-perf-src']]) },
     { name: 'fx', groups: faders([['echo', 'm-fx-echo'], ['ring mod', 'm-fx-ring']]) },
     { name: 'mix', groups: faders([['echo send', 'm-mix-echo'], ['ring send', 'm-mix-ring'], ['level', 'm-mix-vol']]) },
     { name: 'master', groups: faders([['sidechain', 'm-duck'], ['distortion', 'm-dist'], ['compressor', 'm-comp']]) }];
@@ -870,6 +871,81 @@ $('m-rs-copy').addEventListener('click', async () => {
 $('m-rs-go').addEventListener('click', () => $(RS_PAGES[mRsPage][2]).click());
 $('m-rs-play').addEventListener('click', () => $('play').click());
 $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][0]; Object.assign(RAND[key], RAND0[key]); saveRand(); mRsDraw(); });
+
+// ---- the perf page's eight slots: each fader can do anything on the x/y lists. ASSIGN (the eighth slot's button) turns
+// on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
+// grouped as on that page. The picks are kept in this browser, as [place, group, name], so they survive list changes ----
+const SLOT_KEY = 'elixir-mobile-perfmap';
+const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'], ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed']];
+let mSlots = (() => { try { const v = JSON.parse(localStorage.getItem(SLOT_KEY)); return Array.isArray(v) && v.length === 7 ? v : null; } catch (e) { return null; } })() || SLOT0.map((x) => x.slice());
+const slotAxis = ([pl, g, n]) => { const P = XY_PLACES.find((x) => x.name === pl), G = P && P.groups.find((x) => x[0] === g); return G && G[1].find((a) => a.label === n); };
+const mSlotEls = [];
+function mSlot(i) {
+  const box = $('m-faders'), old = mSlotEls[i];
+  if (old) { const k = mFaders.findIndex((f) => f.el === old.el); if (k >= 0) { mDraws.splice(mDraws.indexOf(old.draw), 1); mFaders.splice(k, 1); } old.el.remove(); }
+  const A = slotAxis(mSlots[i]) || slotAxis(SLOT0[i]), fd = A.fd;
+  // a page's fader keeps its own steps, readout and reset; a drum's parameter is whole steps 0..its top
+  const draw = mFader(box, A.label, fd ? { min: fd.min, max: () => fd.hiOf(), step: fd.step, get: fd.get, set: (v) => { fd.put(v); mDrawAll(); }, show: fd.show, dflt: fd.dflt }
+    : { min: A.min, max: A.max, get: A.get, set: (v) => { A.set(v); mDrawAll(); setDirty(true); }, show: String, dflt: () => initValues[A.par] });
+  const el = mFaders[mFaders.length - 1].el;
+  el.dataset.slot = i; mFaders[mFaders.length - 1].key = `m-faders:slot${i}`;
+  box.insertBefore(el, (mSlotEls[i + 1] && mSlotEls[i + 1].el) || $('m-assign').parentElement);
+  mSlotEls[i] = { el, draw }; draw();
+}
+// the eighth cell: the assign button
+{
+  const cell = document.createElement('div'); cell.className = 'm-vf m-assign-cell';
+  cell.innerHTML = '<button class="m-btn" id="m-assign" type="button" aria-pressed="false">assign</button>';
+  $('m-faders').append(cell);
+}
+for (let i = 0; i < 7; i++) mSlot(i);
+$('m-assign').addEventListener('click', () => {
+  const on = $('m-assign').getAttribute('aria-pressed') !== 'true';
+  $('m-assign').setAttribute('aria-pressed', on); $('m-faders').classList.toggle('assigning', on);
+});
+// in assign mode a tap on a slot opens the chooser instead of moving it (on the click, once the finger is up, so the
+// tap can't land on the chooser too)
+$('m-faders').addEventListener('click', (e) => {
+  if (!$('m-faders').classList.contains('assigning')) return;
+  const vf = e.target.closest('.m-vf[data-slot]'); if (vf) mChooser(Number(vf.dataset.slot));
+});
+// the chooser: where along the top, then what, in its groups
+let mChSlot = 0, mChPlace = 0;
+function mChooser(i) {
+  mChSlot = i; mChPlace = Math.max(0, XY_PLACES.findIndex((P) => P.name === mSlots[i][0]));
+  $('m-ch-title').textContent = `slot ${i + 1}: ${mSlots[i][2]}`;
+  $('m-ch').hidden = false; mChDraw();
+}
+function mChDraw() {
+  const tabs = $('m-ch-tabs'); tabs.innerHTML = '';
+  XY_PLACES.forEach((P, k) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'm-btn'; b.textContent = P.name; b.setAttribute('aria-selected', k === mChPlace);
+    b.addEventListener('click', () => { mChPlace = k; mChDraw(); }); tabs.append(b);
+  });
+  const list = $('m-ch-list'); list.innerHTML = '';
+  const P = XY_PLACES[mChPlace], cur = mSlots[mChSlot];
+  for (const [heading, axes] of P.groups) {
+    const h = document.createElement('b'); h.textContent = heading; list.append(h);
+    const grid = document.createElement('div');
+    for (const A of axes) {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'm-btn'; b.textContent = A.label;
+      b.setAttribute('aria-pressed', cur[0] === P.name && cur[1] === heading && cur[2] === A.label);
+      b.addEventListener('click', () => {
+        mSlots[mChSlot] = [P.name, heading, A.label];
+        try { localStorage.setItem(SLOT_KEY, JSON.stringify(mSlots)); } catch (e) {}
+        mSlot(mChSlot); $('m-ch').hidden = true;
+      });
+      grid.append(b);
+    }
+    list.append(grid);
+  }
+}
+$('m-ch-close').addEventListener('click', () => { $('m-ch').hidden = true; });
+$('m-ch-reset').addEventListener('click', () => {
+  mSlots[mChSlot] = SLOT0[mChSlot].slice();
+  try { localStorage.setItem(SLOT_KEY, JSON.stringify(mSlots)); } catch (e) {}
+  mSlot(mChSlot); $('m-ch').hidden = true;
+});
 
 // ---- the glass isn't flat: each control's ink shadow deepens a little toward the top right of the screen (--d, used
 // by the CSS), worked out once from where it sits and again when the screen's size changes ----

@@ -26,7 +26,7 @@
 
   <div class="m-pages" id="m-pages">
   <div class="m-panel" data-m-panel="play">
-    <section class="m-card m-play-card"><div class="m-faders" id="m-faders"></div></section>
+    <section class="m-card m-play-card"><div class="m-faders" id="m-faders"></div><div id="m-perf-src" hidden></div></section>
     <section class="m-card m-rand-card" aria-label="randomise">
       <div class="m-rand">
         <label class="m-chk m-nextbar"><input id="m-nextbar" type="checkbox"><i aria-hidden="true"></i>next bar</label>
@@ -100,6 +100,14 @@
       <footer class="m-foot">Engine ported from the Erica Synths LXR-02 firmware (GPL-3.0). Unofficial. <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a></footer>
     </section>
   </div>
+  </div>
+
+  <div class="m-rs" id="m-ch" hidden>
+    <section class="m-card m-rs-card m-ch-card" role="dialog" aria-labelledby="m-ch-title">
+      <div class="m-chead"><b id="m-ch-title">slot</b><button class="m-toggle" id="m-ch-reset" type="button">default</button><button class="m-toggle" id="m-ch-close" type="button">done</button></div>
+      <div class="m-rs-tabs" id="m-ch-tabs" role="tablist"></div>
+      <div class="m-ch-list" id="m-ch-list"></div>
+    </section>
   </div>
 
   <div class="m-rs" id="m-rs" hidden>

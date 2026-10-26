@@ -466,3 +466,18 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 #m-beat-faders { grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 10px 4px; }
 .m #m-beat-faders .m-flab { font-size: min(var(--fs-xs), 3.6vw); letter-spacing: -.02em; white-space: nowrap; }
 .m #m-beat-faders .m-vf output { font-size: min(var(--fs-xs), 3.5vw); }
+
+/* the perf page's assign button (in the eighth slot) and assign mode: every slot dashed, tap one to choose */
+.m-assign-cell { justify-content: flex-end; }
+.m .m-assign-cell .m-btn { width: 100%; min-height: 52px; font-size: min(var(--fs-xs), 3.6vw) !important; padding: 0 2px; }
+.m .m-assign-cell .m-btn[aria-pressed="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
+#m-faders.assigning .m-vf[data-slot] { outline: 2px dashed var(--ink); outline-offset: 2px; cursor: pointer; }
+#m-faders.assigning .m-vf[data-slot] .m-vtrack { pointer-events: none; }
+/* the chooser: where along the top, then what, in groups of buttons */
+.m-ch-card { grid-template-rows: auto auto minmax(0, 1fr); }
+.m-ch-list { overflow-y: auto; overscroll-behavior: contain; min-height: 0; display: grid; align-content: start; gap: 6px; border-top: var(--rule); padding-top: 6px; }
+.m-ch-list > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); margin-top: 4px; }
+.m-ch-list > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.m .m-ch-list .m-btn { min-height: 44px; font-size: min(var(--fs-xs), 3.6vw) !important; padding: 0 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.m .m-ch-list .m-btn[aria-pressed="true"], .m .m-ch-card .m-rs-tabs .m-btn[aria-selected="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
+.m-ch-card .m-rs-tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
