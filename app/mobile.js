@@ -218,7 +218,8 @@ document.querySelectorAll('[data-m-undo]').forEach((b) => b.addEventListener('cl
 new MutationObserver(mUndo).observe($('undo'), { attributes: true, attributeFilter: ['disabled'] });
 
 // ---- the voice page: the strip at the top picks a drum; its twelve main parameters are on faders (a set per drum, so a
-// fader's step sequencer stays with its drum), and one X/Y pad moves the two of them picked in its drop-downs ----
+// fader's step sequencer stays with its drum). The x/y page has the same strip and one big X/Y pad, which moves the two
+// of the drum's parameters picked in its drop-downs ----
 const VP_DRUM = (n) => [['pitch', `COARSE${n}`], ['decay', `VELOD${n}`], ['env amt', `MODAMNT${n}`], ['env time', `MOD_EG${n}`],
   ['fm amt', `FMAMNT${n}`], ['fm freq', `FM_FREQ${n}`], ['click', `TRANS${n}_VOL`], ['click frq', `TRANS${n}_FREQ`],
   ['cutoff', `FILTER_FREQ_${n}`], ['reso', `RESO_${n}`], ['drive', `DRIVE${n}`], ['rate', `VOICE_DECIMATION${n}`]];
@@ -231,10 +232,12 @@ const VOICE_PARS = [VP_DRUM(1), VP_DRUM(2), VP_DRUM(3),
     ['m2 amt', 'MOD_OSC_GAIN2'], ['click', 'TRANS6_VOL'], ['cutoff', 'FILTER_FREQ_6'], ['reso', 'RESO_6'], ['drive', 'HAT_DISTORTION'], ['rate', 'VOICE_DECIMATION6']]];
 let mVoice = 0;
 XN.forEach((name, v) => {
-  const b = document.createElement('button');
-  b.type = 'button'; b.className = 'm-btn'; b.textContent = name; b.setAttribute('role', 'tab');
-  b.addEventListener('click', () => { mVoice = v; mVoiceShow(); });
-  $('m-voice').append(b);
+  for (const strip of ['m-voice', 'm-voice-xy']) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'm-btn'; b.textContent = name; b.setAttribute('role', 'tab');
+    b.addEventListener('click', () => { mVoice = v; mVoiceShow(); });
+    $(strip).append(b);
+  }
   const box = document.createElement('div');
   box.className = 'm-faders m-vset'; box.id = `m-voice-${v + 1}`; $('m-vsets').append(box);
   for (const [label, name] of VOICE_PARS[v]) {
@@ -246,7 +249,7 @@ XN.forEach((name, v) => {
 const xySel = [$('m-xy-x'), $('m-xy-y')];
 xySel[1].dataset.i = 1;
 function mVoiceShow() {
-  [...$('m-voice').children].forEach((b, v) => b.setAttribute('aria-selected', v === mVoice));
+  for (const strip of ['m-voice', 'm-voice-xy']) [...$(strip).children].forEach((b, v) => b.setAttribute('aria-selected', v === mVoice));
   [...$('m-vsets').children].forEach((box, v) => { box.hidden = v !== mVoice; });
   for (const sel of xySel) {
     const i = Number(sel.dataset.i || 0);
