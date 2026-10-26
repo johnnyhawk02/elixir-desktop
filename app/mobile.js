@@ -109,8 +109,9 @@ const mBuildMaster = buildMaster;
 buildMaster = function () { mBuildMaster(); mUndoFn = null; mUndo(); mDrawAll(); };
 
 const pf = (k) => ({ min: PERF_RANGE[k][0], max: PERF_RANGE[k][1], get: () => perfGet(k), set: (v) => setPerf(k, v), show: () => perfText(k), dflt: PERF_RANGE[k][2] });
-// the beat pop-up (the beat button by play and record): genre, beat, energy and rush.
-// Genre steps through the built-in styles (not user); a preset in the user style shows it with the slider at the bottom
+// ---- the beat page: everything that makes the pattern, three by three: genre, beat, energy / fills, rush, velocity /
+// groove, its depth, accent. Genre steps through the built-in styles (not user); a preset in the user style shows it
+// with the slider at the bottom ----
 const mGenres = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
 mFader($('m-beat-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () => Math.max(0, mGenres.indexOf(styleIdx)),
   set: (v) => {
@@ -121,10 +122,14 @@ mFader($('m-beat-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () =
 // beat runs over the current style's grooves; its readout is the groove, then where it is in the list
 mFader($('m-beat-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => perfText('beat').replace(' · ', '\n') });
 mFader($('m-beat-faders'), 'energy', { ...pf('energy'), show: () => perfText('energy').replace(' · ', '\n') });
-mFader($('m-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
-mFader($('m-faders'), 'fills', { ...pf('fills'), show: () => perfText('fills').replace(' · ', '\n') });
-mFader($('m-faders'), 'groove', { ...pf('groove'), show: () => perfText('groove').replace(' ', '\n') });
+mFader($('m-beat-faders'), 'fills', { ...pf('fills'), show: () => perfText('fills').replace(' · ', '\n') });
 mFader($('m-beat-faders'), 'rush', pf('rush'));
+mFader($('m-beat-faders'), 'velocity', { ...pf('vel'), show: (v) => `${v}` });
+mFader($('m-beat-faders'), 'groove', { ...pf('groove'), show: () => perfText('groove').replace(' ', '\n') });
+mFader($('m-beat-faders'), 'depth', { ...pf('depth'), show: (v) => `${v}%` });
+mFader($('m-beat-faders'), 'accent', { ...pf('accent'), show: (v) => `+${v} dB` });
+// ---- the perf page: tempo, the sound macros, the sidechain and crossfeed, four by two, and the randomisers ----
+mFader($('m-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
 // the drum 1 sidechain duck: above 0 it switches the sidechain on
 const setDuck = (v) => {
   master.duck = v / 100;
@@ -145,9 +150,6 @@ drawMacros = function () { mDrawMacros(); mDrawAll(); };
 // crossfeed depth: how much of the crossfeed patchbay is heard (the desktop's depth control); presets keep it
 const mXDepth = (v) => { $('xdepth').value = v; $('xdepth').dispatchEvent(new Event('input')); };
 mFader($('m-faders'), 'crossfeed', { min: 0, max: 100, get: () => Number($('xdepth').value), set: mXDepth, show: (v) => (v ? v + '%' : 'off'), dflt: 100 });
-// so the play page is three by three: tempo, fills, groove / sidechain, pitch, decay / filter, fm, crossfeed
-$('m-beat-open').addEventListener('click', () => { $('m-beat').hidden = false; mDrawAll(); });
-$('m-beat-close').addEventListener('click', () => { $('m-beat').hidden = true; });
 
 // ---- compressor tab ----
 const mMaster = (box, label, key, lo, hi, step, show) => mFader(box, label, { min: lo, max: hi, step, get: () => master[key],
@@ -684,7 +686,8 @@ const XY_PLACES = (() => {
   // a page's faders, by their row
   const faders = (rows) => rows.map(([heading, box]) => [heading, mFaders.filter((f) => f.key.startsWith(box + ':')).map((f) => ({ label: f.label, min: f.min, max: f.hiOf(), get: f.get, set: (x) => f.put(x) }))]);
   return [...drums,
-    { name: 'perform', groups: faders([['beat', 'm-beat-faders'], ['play', 'm-faders']]) },
+    { name: 'beat', groups: faders([['beat', 'm-beat-faders']]) },
+    { name: 'perf', groups: faders([['perf', 'm-faders']]) },
     { name: 'fx', groups: faders([['echo', 'm-fx-echo'], ['ring mod', 'm-fx-ring']]) },
     { name: 'mix', groups: faders([['echo send', 'm-mix-echo'], ['ring send', 'm-mix-ring'], ['level', 'm-mix-vol']]) },
     { name: 'master', groups: faders([['sidechain', 'm-duck'], ['distortion', 'm-dist'], ['compressor', 'm-comp']]) }];

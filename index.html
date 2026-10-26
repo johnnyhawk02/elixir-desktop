@@ -1067,9 +1067,6 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 
 /* the beat pop-up: genre, beat, energy and rush in a sheet like the sequencer's (opened under it, so a fader's
    sequencer opens over it) */
-#m-beat-faders { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; height: min(42vh, 320px); }
-.m-pop { z-index: 9; }
-.m .m-beat-open { min-height: 46px; }
 
 /* the fx page: a row of faders per effect, its name above it */
 [data-m-panel="fx"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
@@ -1151,7 +1148,6 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-presets-card .m-foot { color: var(--muted); opacity: 1; padding: 0; font-size: .8rem; line-height: 1.2; }
 .m-seq-card { height: min(calc(100dvh - 150px), 640px); grid-template-rows: auto minmax(0, 1fr) auto auto auto auto auto; }
 .m-seq-card .m-seq-steps { height: auto; min-height: 60px; }
-#m-beat .m-seq-card { height: auto; grid-template-rows: none; }
 /* the perf page: the randomise buttons share their column evenly, beside the three rows of faders */
 .m-rand-card .m-rand { grid-auto-rows: auto; grid-template-rows: repeat(6, minmax(0, 1fr)); align-content: stretch; height: 100%; }
 .m-rand-card .m-rand .m-btn { min-height: 0; }
@@ -1228,6 +1224,16 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-chk i { flex: none; width: 24px; height: 24px; border: 2px solid var(--ink); border-radius: 2px; box-shadow: inset 0 0 0 3px var(--panel); }
 .m-chk input:checked + i { background: var(--ink); }
 .m-chk input:focus-visible + i { outline: 2px dashed var(--ink); outline-offset: 2px; }
+
+/* the beat page: nine faders, three by three, filling the page; the perf page now four by two beside the randomisers */
+[data-m-panel="beat"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
+.m-beat-card { display: grid; min-height: 0; padding: 6px 2px; }
+#m-beat-faders { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 10px 6px; min-height: 0; }
+#m-faders { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+.m-trans { grid-template-columns: 1.3fr 1fr; }
+/* eight page buttons share the bar */
+.m-tabs { grid-template-columns: repeat(8, 1fr); gap: 2px; padding-left: 0; padding-right: 0; }
+.m .m-tabs button { font-size: min(var(--fs-s), 2.9vw) !important; letter-spacing: 0; padding: 0; }
 </style>
 
 <main class="m" id="m">
@@ -1237,7 +1243,6 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   <section class="m-card m-trans">
     <button class="m-play" id="m-play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 4.5v15l13-7.5z"/><rect class="i-stop" x="5.5" y="5.5" width="13" height="13" rx="2"/></svg><span>play</span></button>
     <button class="m-rec" id="m-rec" type="button" aria-pressed="false" aria-label="Record"><i></i><span id="m-rec-t">rec</span></button>
-    <button class="m-btn m-beat-open" id="m-beat-open" type="button" aria-haspopup="dialog">beat</button>
   </section>
 
   <div class="m-pages" id="m-pages">
@@ -1253,6 +1258,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-undo" data-m-undo type="button" disabled>undo</button>
       </div>
     </section>
+  </div>
+
+  <div class="m-panel" data-m-panel="beat">
+    <section class="m-card m-beat-card"><div class="m-faders" id="m-beat-faders"></div></section>
   </div>
 
   <div class="m-panel" data-m-panel="dice">
@@ -1317,13 +1326,6 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   </div>
   </div>
 
-  <div class="m-seq m-pop" id="m-beat" hidden>
-    <section class="m-card m-seq-card" role="dialog" aria-labelledby="m-beat-name">
-      <div class="m-chead"><b id="m-beat-name">beat</b><button class="m-toggle" id="m-beat-close" type="button">done</button></div>
-      <div class="m-faders" id="m-beat-faders"></div>
-    </section>
-  </div>
-
   <div class="m-seq" id="m-seq" hidden>
     <section class="m-card m-seq-card" role="dialog" aria-labelledby="m-seq-name">
       <div class="m-chead"><b><span id="m-seq-name"></span> seq</b><output id="m-seq-val"></output><button class="m-toggle" id="m-seq-on" type="button" aria-pressed="true">on</button></div>
@@ -1338,6 +1340,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
   <nav class="m-tabs" role="tablist" aria-label="pages">
     <button type="button" role="tab" data-m-tab="play" aria-selected="true">perf</button>
+    <button type="button" role="tab" data-m-tab="beat" aria-selected="false">beat</button>
     <button type="button" role="tab" data-m-tab="dice" aria-selected="false">voice</button>
     <button type="button" role="tab" data-m-tab="xy" aria-selected="false">x/y</button>
     <button type="button" role="tab" data-m-tab="fx" aria-selected="false">fx</button>
@@ -7852,8 +7855,9 @@ const mBuildMaster = buildMaster;
 buildMaster = function () { mBuildMaster(); mUndoFn = null; mUndo(); mDrawAll(); };
 
 const pf = (k) => ({ min: PERF_RANGE[k][0], max: PERF_RANGE[k][1], get: () => perfGet(k), set: (v) => setPerf(k, v), show: () => perfText(k), dflt: PERF_RANGE[k][2] });
-// the beat pop-up (the beat button by play and record): genre, beat, energy and rush.
-// Genre steps through the built-in styles (not user); a preset in the user style shows it with the slider at the bottom
+// ---- the beat page: everything that makes the pattern, three by three: genre, beat, energy / fills, rush, velocity /
+// groove, its depth, accent. Genre steps through the built-in styles (not user); a preset in the user style shows it
+// with the slider at the bottom ----
 const mGenres = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
 mFader($('m-beat-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () => Math.max(0, mGenres.indexOf(styleIdx)),
   set: (v) => {
@@ -7864,10 +7868,14 @@ mFader($('m-beat-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () =
 // beat runs over the current style's grooves; its readout is the groove, then where it is in the list
 mFader($('m-beat-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => perfText('beat').replace(' · ', '\n') });
 mFader($('m-beat-faders'), 'energy', { ...pf('energy'), show: () => perfText('energy').replace(' · ', '\n') });
-mFader($('m-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
-mFader($('m-faders'), 'fills', { ...pf('fills'), show: () => perfText('fills').replace(' · ', '\n') });
-mFader($('m-faders'), 'groove', { ...pf('groove'), show: () => perfText('groove').replace(' ', '\n') });
+mFader($('m-beat-faders'), 'fills', { ...pf('fills'), show: () => perfText('fills').replace(' · ', '\n') });
 mFader($('m-beat-faders'), 'rush', pf('rush'));
+mFader($('m-beat-faders'), 'velocity', { ...pf('vel'), show: (v) => `${v}` });
+mFader($('m-beat-faders'), 'groove', { ...pf('groove'), show: () => perfText('groove').replace(' ', '\n') });
+mFader($('m-beat-faders'), 'depth', { ...pf('depth'), show: (v) => `${v}%` });
+mFader($('m-beat-faders'), 'accent', { ...pf('accent'), show: (v) => `+${v} dB` });
+// ---- the perf page: tempo, the sound macros, the sidechain and crossfeed, four by two, and the randomisers ----
+mFader($('m-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
 // the drum 1 sidechain duck: above 0 it switches the sidechain on
 const setDuck = (v) => {
   master.duck = v / 100;
@@ -7888,9 +7896,6 @@ drawMacros = function () { mDrawMacros(); mDrawAll(); };
 // crossfeed depth: how much of the crossfeed patchbay is heard (the desktop's depth control); presets keep it
 const mXDepth = (v) => { $('xdepth').value = v; $('xdepth').dispatchEvent(new Event('input')); };
 mFader($('m-faders'), 'crossfeed', { min: 0, max: 100, get: () => Number($('xdepth').value), set: mXDepth, show: (v) => (v ? v + '%' : 'off'), dflt: 100 });
-// so the play page is three by three: tempo, fills, groove / sidechain, pitch, decay / filter, fm, crossfeed
-$('m-beat-open').addEventListener('click', () => { $('m-beat').hidden = false; mDrawAll(); });
-$('m-beat-close').addEventListener('click', () => { $('m-beat').hidden = true; });
 
 // ---- compressor tab ----
 const mMaster = (box, label, key, lo, hi, step, show) => mFader(box, label, { min: lo, max: hi, step, get: () => master[key],
@@ -8427,7 +8432,8 @@ const XY_PLACES = (() => {
   // a page's faders, by their row
   const faders = (rows) => rows.map(([heading, box]) => [heading, mFaders.filter((f) => f.key.startsWith(box + ':')).map((f) => ({ label: f.label, min: f.min, max: f.hiOf(), get: f.get, set: (x) => f.put(x) }))]);
   return [...drums,
-    { name: 'perform', groups: faders([['beat', 'm-beat-faders'], ['play', 'm-faders']]) },
+    { name: 'beat', groups: faders([['beat', 'm-beat-faders']]) },
+    { name: 'perf', groups: faders([['perf', 'm-faders']]) },
     { name: 'fx', groups: faders([['echo', 'm-fx-echo'], ['ring mod', 'm-fx-ring']]) },
     { name: 'mix', groups: faders([['echo send', 'm-mix-echo'], ['ring send', 'm-mix-ring'], ['level', 'm-mix-vol']]) },
     { name: 'master', groups: faders([['sidechain', 'm-duck'], ['distortion', 'm-dist'], ['compressor', 'm-comp']]) }];
