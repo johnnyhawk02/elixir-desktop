@@ -19,9 +19,6 @@ function mShown(t) {
   if (t === mCur) return;
   mCur = t;
   document.querySelectorAll('[data-m-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.mTab === t));
-  // the selector strip swipes, so bring the chosen button into view
-  const tb = document.querySelector(`[data-m-tab="${t}"]`), bar = tb.parentElement;
-  bar.scrollTo({ left: tb.offsetLeft - bar.offsetLeft - (bar.clientWidth - tb.offsetWidth) / 2, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   if (t === 'presets') mDrawPresets();
 }
 // at rest: the page nearest the scroll position
