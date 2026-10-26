@@ -67,6 +67,14 @@ class Player {
     this.duckEnv = 0; this.duckAt = 1; this.compEnv = 0; this.gr = 0; this.duckMin = 1;
     // level meters: each voice's peak after its fader, accent, mute and duck
     this.lvl = new Float32Array(6); this.lvlN = 0; this.lvlOn = false;
+    // the acid line: a second engine, of which only drum 1 plays, stepping through 16 notes (null = rest) on the
+    // straight grid; a slide doesn't retrigger, it glides into the note (bend: the pitch ratio still to go, easing to 1)
+    this.b = new LXR.LxrEngine({ seed: 0x1f2e3d4c }); this.b.loadInitKit();
+    this.acid = { steps: new Array(16).fill(null), level: 0, base: 60 };
+    this.acidNote = 60; this.acidBend = 1; this.acidG = 1; this.acidGTo = 1;
+    // drum voices differ a lot in level, so the line is evened out: its peak, held and let go over a couple of seconds,
+    // sets a gain toward a fixed peak (acidNorm, eased so a change never jumps)
+    this.acidPk = 12000; this.acidNorm = 1;
     this.events = [];
     this._render(this.A); this._render(this.B);
   }
@@ -75,6 +83,8 @@ class Player {
     else if (m.type === 'kit') this.e.loadKit(m.values);
     else if (m.type === 'trig') { this.e.trigger(m.voice, m.vel, 60); this.gainTo[Math.min(m.voice, 5)] = 1; }
     else if (m.type === 'rush') this.rush = m.v;
+    else if (m.type === 'acid') Object.assign(this.acid, m.acid);
+    else if (m.type === 'acidKit') { this.b.loadKit(m.values); this.acidPk = 12000; }
     else if (m.type === 'rushSet') Object.assign(this.rs, m.set);
     else if (m.type === 'mute') m.muted.forEach((v, n) => { this.muted[n] = v ? 1 : 0; });
     else if (m.type === 'xmod') this.e.setCrossMod(m.amt, m.target);
@@ -126,6 +136,7 @@ class Player {
     const pg = this.pattern.pages ? bar % this.pattern.pages.length : 0;
     const P = this.pattern.pages ? this.pattern.pages[pg] : this.pattern; // pages: one bar each, in turn
     const hits = [], { on, acc, bar: cond } = P, G = this.groove, len = LXR.REAL_FS * 60 / this.bpm / 4;
+    if (this.acid.level && this.acid.steps[s]) this.queue.push({ at: Math.max(0, at0), acid: this.acid.steps[s] });
     if (this.rush && this.patternOn) { this.scheduleRush(s, bar, pg, P, at0, len, hits); return; }
     for (let t = 0; t < 7 && this.patternOn; t++) {
       if (!on[t][s] || !barOk(cond[t][s], bar) || this.muted[Math.min(t, 5)]) continue;
@@ -168,6 +179,15 @@ class Player {
       hits.push(3);
     }
     this.sched[s] = hits;
+  }
+  // an acid step: a new note retriggers drum 1 of the acid engine; a slide keeps it sounding and glides from the last note
+  acidHit(st) {
+    const note = Math.max(0, Math.min(127, this.acid.base + st.n));
+    if (st.slide && this.acidNote !== note) {
+      this.acidBend *= Math.pow(2, (this.acidNote - note) / 12);
+      this.b.setNote(0, note);
+    } else if (!st.slide) this.b.trigger(0, st.acc ? 127 : 90, note);
+    this.acidNote = note; this.acidGTo = st.acc ? 1 : 0.6;
   }
   clickAt(hi) { this.clk = { n: 0, ph: 0, w: 2 * Math.PI * (hi ? 1760 : 880) / LXR.REAL_FS }; }
   _render(dst) {
@@ -234,7 +254,8 @@ class Player {
       for (const q of this.queue) {
         // a voice muted after its step was booked is skipped too; above 80 the grid roll gives way to the free one, and
         // no snare plays within half a free-roll gap of the last
-        if (q.at < 64 && this.rush > S.p32 && (q.roll || q.free) && (q.roll || this.clock - this.snareAt < this.rushGap)) { if (q.roll === 2) this.rushHead = q; }
+        if (q.at < 64 && q.acid) this.acidHit(q.acid);
+        else if (q.at < 64 && this.rush > S.p32 && (q.roll || q.free) && (q.roll || this.clock - this.snareAt < this.rushGap)) { if (q.roll === 2) this.rushHead = q; }
         else if (q.at < 64) { if (q.t === 3) this.snareAt = this.clock; if (!this.muted[Math.min(q.t, 5)]) { const sw = q.sw || 1; this.e.trigger(q.t, q.acc ? 127 : Math.max(1, Math.round(this.vel * sw)), 60); this.gainTo[Math.min(q.t, 5)] = q.acc ? 1 : this.accGain * sw; } }
         else { q.at -= 64; keep.push(q); }
       }
@@ -245,6 +266,20 @@ class Player {
     const pans = [e.drums[0], e.drums[1], e.drums[2], e.snare, e.cymbal, e.hat];
     const [L, R] = dst;
     L.fill(0); R.fill(0);
+    // the acid line, mono in the middle, before the FX returns and the compressor; ducked like the drums
+    if (this.acid.level || this.acidBend !== 1) {
+      this.acidBend = 1 + (this.acidBend - 1) * Math.exp(-64 / (0.06 * LXR.REAL_FS));
+      if (Math.abs(this.acidBend - 1) < 1e-4) this.acidBend = 1;
+      const ao = this.b.renderVoice(0, this.acidBend);
+      let pk = 0;
+      for (let i = 0; i < 64; i++) { const a = ao[i] < 0 ? -ao[i] : ao[i]; if (a > pk) pk = a; }
+      this.acidPk = Math.max(pk, this.acidPk * Math.exp(-64 / (2 * LXR.REAL_FS)), 500);
+      const n0 = this.acidNorm; this.acidNorm = Math.min(6, 14000 / this.acidPk);
+      const lv = this.acid.level / 100 * 0.9 / 32768;
+      const g0 = this.acidG * lv * n0 * this.duckAt, dg = (this.acidGTo * lv * this.acidNorm * (1 - (this.master.duckOn ? this.master.duck : 0) * Math.min(1, this.duckEnv / 0.3)) - g0) / 64;
+      for (let i = 0; i < 64; i++) { const v = ao[i] * (g0 + dg * i); L[i] += v; R[i] += v; }
+      this.acidG = this.acidGTo;
+    }
     // sidechain: follow drum 1's level (instant attack, set release) and turn the rest down
     const M = this.master, k = out[0];
     const isDelay = e.fx.fxType === LXR.FX_DELAY;

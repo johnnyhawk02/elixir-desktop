@@ -328,4 +328,69 @@ async function mOffer(t, type) {
   mDownload(t);
 }
 
+// ---- the acid page: a 303-style line on its own LXR drum voice (a second engine plays it) ----
+// The line is sixteen steps of note, accent and slide; density turns steps on in a fixed order (so turning it up only adds
+// notes), rotate shifts the line round the bar, pitch transposes it. Random makes a new line, alter changes a few steps,
+// voice gives it a drum voice from a random built-in kit, held longer and with less pitch sweep so the notes read.
+const ACID_SCALE = [0, 0, 0, 0, 3, 5, 7, 7, 10, 12, 12, -12, 15];
+const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const acid = { rank: [], note: [], acc: [], slide: [], density: 60, rotate: 0, pitch: 0, level: 70 };
+function acidNew() {
+  // downbeats tend to come first, so a thin line still lands on the beat
+  const w = Array.from({ length: 16 }, (_, s) => Math.random() - (s % 4 === 0 ? 0.35 : s % 2 === 0 ? 0.1 : 0));
+  const order = [...w.keys()].sort((a, b) => w[a] - w[b]);
+  order.forEach((s, i) => { acid.rank[s] = i; });
+  for (let s = 0; s < 16; s++) { acid.note[s] = ACID_SCALE[mRnd(ACID_SCALE.length)]; acid.acc[s] = Math.random() < 0.3; acid.slide[s] = Math.random() < 0.2; }
+}
+function acidAlter() {
+  for (let i = 0; i < 3; i++) acid.note[mRnd(16)] = ACID_SCALE[mRnd(ACID_SCALE.length)];
+  const a = mRnd(16), b = mRnd(16); [acid.rank[a], acid.rank[b]] = [acid.rank[b], acid.rank[a]];
+  acid.acc[mRnd(16)] ^= true; acid.slide[mRnd(16)] ^= true;
+}
+// the steps as played: rotated, thinned by density
+const acidSteps = () => Array.from({ length: 16 }, (_, s) => {
+  const src = (s - acid.rotate + 16) % 16;
+  return acid.rank[src] < Math.round(acid.density / 100 * 16) ? { n: acid.note[src], acc: !!acid.acc[src], slide: !!acid.slide[src] } : null;
+});
+function acidSend() {
+  const steps = acidSteps();
+  send({ type: 'acid', acid: { steps, level: acid.level, base: 60 + acid.pitch } });
+  acidDraw(steps);
+}
+const mAcidCells = Array.from({ length: 16 }, () => { const c = document.createElement('span'); $('m-acid-steps').append(c); return c; });
+function acidDraw(steps = acidSteps()) {
+  steps.forEach((st, s) => {
+    const c = mAcidCells[s];
+    c.className = st ? (st.acc ? 'acc' : '') : 'rest';
+    if (!st) { c.innerHTML = '·<small></small>'; return; }
+    const n = 60 + acid.pitch + st.n;
+    c.innerHTML = `${NOTE_NAMES[((n % 12) + 12) % 12]}${st.n >= 12 ? '↑' : st.n < 0 ? '↓' : ''}<small>${st.slide ? 'slide' : ''}</small>`;
+  });
+}
+// the drum voices' parameters line up, so voice v's copy onto drum 1's
+const ACID_PARS = [0, 1, 2].map((v) => VOICE_PAGES[v].groups.flatMap((g) => g.params.map(([, name]) => PAR[name])));
+function acidVoice() {
+  const k = sourceKits[mRnd(sourceKits.length)].kit, v = mRnd(3), kit = Uint8Array.from(k);
+  ACID_PARS[0].forEach((par, i) => { kit[par] = k[ACID_PARS[v][i]]; });
+  kit[PAR.VELOD1] = Math.max(45, Math.min(85, kit[PAR.VELOD1] * 2));
+  kit[PAR.MODAMNT1] = Math.min(kit[PAR.MODAMNT1], 30);
+  kit[PAR.AMOUNT_LFO1] = 0; kit[PAR.VELO_MOD_AMT_1] = 0; kit[PAR.VOL1] = 100; kit[PAR.PAN1] = 64;
+  send({ type: 'acidKit', values: Array.from(kit) });
+}
+const acidFader = (label, key, min, max, show) => mFader($('m-acid-faders'), label, { min, max, get: () => acid[key],
+  set: (v) => { acid[key] = v; acidSend(); }, show, dflt: { density: 60, rotate: 0, pitch: 0, level: 70 }[key] });
+acidFader('density', 'density', 0, 100, (v) => `${Math.round(v / 100 * 16)}\nnotes`);
+acidFader('rotate', 'rotate', 0, 15, (v) => (v ? `+${v}` : '0') + '\nsteps');
+acidFader('pitch', 'pitch', -12, 12, (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v) + '\nst');
+acidFader('level', 'level', 0, 100, (v) => (v ? v + '%' : 'off'));
+$('m-acid-new').addEventListener('click', async () => { await startAudio(); acidNew(); acidSend(); });
+$('m-acid-alter').addEventListener('click', async () => { await startAudio(); acidAlter(); acidSend(); });
+$('m-acid-voice').addEventListener('click', async () => { await startAudio(); acidVoice(); });
+acidNew(); acidVoice(); acidSend();
+// the playing step lights up (stopped, none does)
+const mMarkStep = markStep;
+markStep = function (s) { mMarkStep(s); mAcidCells.forEach((c, i) => c.classList.toggle('now', i === s)); };
+new MutationObserver(() => { if ($('play').getAttribute('aria-pressed') !== 'true') mAcidCells.forEach((c) => c.classList.remove('now')); })
+  .observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
+
 mSync(); mUndo(); mName(); mCompOn(); mDrawAll();

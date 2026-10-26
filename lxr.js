@@ -1506,6 +1506,25 @@ export class LxrEngine {
   }
 
   /**
+   * Not in the firmware: render drum voice n on its own (the acid line runs a second engine for one voice), with its
+   * oscillators' pitch scaled by `bend` (a slide between notes, 1 = none). Returns its block, int16.
+   */
+  // and a new note for drum voice n without retriggering it (the acid line's slides)
+  setNote(n, note) { const v = this.drums[n]; osc_setBaseNote(v.osc, note); osc_setBaseNote(v.modOsc, note); }
+  renderVoice(n, bend = 1) {
+    this._resetTargets();
+    this._modUpdate(this.velocityModulators[n], this.velocityModulators[n].lastVal);
+    this._modUpdate(this.lfos[n].modTarget, lfo_calc(this.lfos[n], this.rng));
+    const v = this.drums[n], o = this.out[n];
+    SVF_recalcFreq(v.filter);
+    this._drumAsync(v);
+    v.osc.pitchMod = f(v.osc.pitchMod * bend); v.modOsc.pitchMod = f(bend);
+    osc_setFreq(v.osc); osc_setFreq(v.modOsc);
+    this._drumSync(n, o); this._decimate(n, o);
+    return o;
+  }
+
+  /**
    * The FX bus part of mixer_calcNextSampleBlock(): voices whose AUDIO_OUT is the FX bus
    * are panned into one stereo int16 buffer and run through the selected effect.
    * Returns this.fxOut: the bus's stereo output (interleaved int16) for the last renderBlock().
