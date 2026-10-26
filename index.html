@@ -1234,6 +1234,14 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 /* eight page buttons share the bar */
 .m-tabs { grid-template-columns: repeat(8, 1fr); gap: 2px; padding-left: 0; padding-right: 0; }
 .m .m-tabs button { font-size: min(var(--fs-s), 2.9vw) !important; letter-spacing: 0; padding: 0; }
+
+/* ---- the dividing lines: thin and pale, so they part the sections without shouting ---- */
+.m { --rule: 1px solid rgba(23, 32, 14, .32); }
+.m-top { border-bottom: var(--rule); }
+.m > .m-card.m-trans { border-bottom: var(--rule); }
+.m > .m-tabs { border-top: var(--rule); }
+[data-m-panel="play"] .m-rand-card { border-left: var(--rule) !important; }
+.m-pages .m-card + .m-card, .m-fx-row + .m-fx-row, .m-fx-btns, .m-comp-card .m-chead:not(:first-child), .m-plist { border-top: var(--rule); }
 </style>
 
 <main class="m" id="m">
