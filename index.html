@@ -1242,6 +1242,18 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m > .m-tabs { border-top: var(--rule); }
 [data-m-panel="play"] .m-rand-card { border-left: var(--rule) !important; }
 .m-pages .m-card + .m-card, .m-fx-row + .m-fx-row, .m-fx-btns, .m-comp-card .m-chead:not(:first-child), .m-plist { border-top: var(--rule); }
+
+/* ---- bigger small print: the readouts, fader labels, headings, notes and page buttons all step up (the narrow
+   ones scale with the screen so they still fit their column) ---- */
+.m { --fs-xs: 1.12rem; --fs-s: 1.25rem; }
+.m .m-vf output, #m-faders .m-vf output, #m-beat-faders .m-vf output { font-size: var(--fs-xs); }
+.m .m-flab, #m-faders .m-flab, #m-beat-faders .m-flab { font-size: var(--fs-xs); letter-spacing: .03em; }
+.m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab { font-size: min(1.05rem, 3.7vw); letter-spacing: 0; white-space: nowrap; }
+.m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output, .m .m-vset .m-vf output { font-size: min(var(--fs-xs), 3.9vw); }
+.m .m-voice .m-btn { font-size: min(1.05rem, 3.6vw) !important; }
+.m .m-tabs button { font-size: min(1.1rem, 3.5vw) !important; }
+.m-presets-card .m-foot { font-size: .95rem; }
+.m #m-faders .m-flab { font-size: min(var(--fs-xs), 3.75vw); letter-spacing: -.02em; }
 </style>
 
 <main class="m" id="m">
