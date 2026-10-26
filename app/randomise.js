@@ -29,12 +29,12 @@ const safeRange = (text, voice, name) => {
 // ---- the randomisers' settings (Elixir Mobile): the ranges and chances each randomise button uses, edited in the
 // hidden settings pop-up (tap ELIXIR) and kept in this browser. Percentages are 0..100; Lo/Hi pairs are ranges ----
 const RAND0 = {
-  every: { vary: 10, echoOn: 50, echoLo: 20, echoHi: 50, fbLo: 20, fbHi: 55, fbWild: 7, xfeed: 1, genre: 1, energyLo: 45, energyHi: 90, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 5, depthHi: 50 },
+  every: { vary: 10, pingpong: 60, panOn: 30, panMax: 50, echoOn: 50, echoLo: 20, echoHi: 50, fbLo: 20, fbHi: 55, fbWild: 7, xfeed: 1, genre: 1, energyLo: 45, energyHi: 90, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 5, depthHi: 50 },
   kit: { vary: 0 },
   alter: { amount: 10 },
   pattern: { genre: 1, energyLo: 35, energyHi: 95, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 50, depthHi: 100 },
   xfeed: { linksLo: 3, linksHi: 6, amtLo: 25, amtHi: 100, neg: 30 },
-  fx: { echoOn: 50, echoLo: 10, echoHi: 60, ringOn: 20, ringLo: 10, ringHi: 60, fbLo: 15, fbHi: 70, fbWild: 20, toneLo: 40, toneHi: 110, widthLo: 60, widthHi: 160 },
+  fx: { pingpong: 60, echoOn: 50, echoLo: 10, echoHi: 60, ringOn: 20, ringLo: 10, ringHi: 60, fbLo: 15, fbHi: 70, fbWild: 20, toneLo: 40, toneHi: 110, widthLo: 60, widthHi: 160 },
   alterfx: { amount: 10 },
 };
 const RAND_KEY = 'elixir-mobile-rand';

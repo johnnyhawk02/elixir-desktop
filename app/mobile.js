@@ -463,7 +463,9 @@ const fxF = (box, label, A) => mFader($(box), label, { min: A.min, max: A.max, s
 const fxSend = (k) => ({ ...mAllSend(k), show: (v) => mPct(v), dflt: 0 });
 const fxPar = (p, dflt) => ({ min: 0, max: 127, get: () => values[p], set: (v) => setValue(p, v, true), show: String, dflt });
 const fx3P = (i) => ({ min: 0, max: 127, get: () => fx3.dist.p[i], set: (v) => { fx3.dist.p[i] = v; sendMix(); }, show: String, dflt: FX3_0.dist.p[i] });
-// echo: send, its tempo-synced time (the nearest note length), tone, feedback and width
+// echo: ping pong (the box by its name), send, its tempo-synced time (the nearest note length), tone, feedback and width
+$('m-pp').addEventListener('change', () => { setValue(PAR.FX_DELAY_TYPE, $('m-pp').checked ? 1 : 0, true); setDirty(true); });
+mDraws.push(() => { $('m-pp').checked = values[PAR.FX_DELAY_TYPE] === 1; });
 fxF('m-fx-echo', 'send', fxSend('fx'));
 fxF('m-fx-echo', 'time', { min: 0, max: 1000, get: () => Math.round(delayPos * 1000), set: (v) => { delayPos = v / 1000; send({ type: 'delay', pos: delayPos }); },
   show: (v) => showDelay(v).replace(/^\d+% /, ''), dflt: Math.round(posOf(3 / 16) * 1000) });
@@ -499,12 +501,12 @@ XS.forEach((short, n) => {
 
 // random fx: new sends on every drum (each effect on some of them) and new settings for the echo and ring mod;
 // alter fx: every send already on, and every setting, moved up to 10% of its range either way. Undo takes either back
-const fxSnap = () => ({ fx: mix.fx.slice(), ring: mix.ring.slice(), fx3: structuredClone(fx3), pos: delayPos, p3: values[PAR.FX_P3], p4: values[PAR.FX_P4] });
+const fxSnap = () => ({ fx: mix.fx.slice(), ring: mix.ring.slice(), fx3: structuredClone(fx3), pos: delayPos, p3: values[PAR.FX_P3], p4: values[PAR.FX_P4], pp: values[PAR.FX_DELAY_TYPE] });
 function fxUse(q) {
   mix.fx.splice(0, 6, ...q.fx); mix.ring.splice(0, 6, ...q.ring);
   Object.assign(fx3.echo, q.fx3.echo); Object.assign(fx3.ring, q.fx3.ring);
   delayPos = q.pos; send({ type: 'delay', pos: delayPos });
-  setValue(PAR.FX_P3, q.p3, true); setValue(PAR.FX_P4, q.p4, true);
+  setValue(PAR.FX_P3, q.p3, true); setValue(PAR.FX_P4, q.p4, true); setValue(PAR.FX_DELAY_TYPE, q.pp, true);
   fxButtons.forEach((b) => b()); sendMix(); mDrawAll(); setDirty(true);
 }
 const rIn = (lo, hi) => lo + Math.round(Math.random() * (hi - lo));
@@ -522,6 +524,7 @@ $('m-fx-rand').addEventListener('click', async () => {
       q.ring[v] = rChance(F.ringOn) ? rRange(F.ringLo, F.ringHi) : 0;
     }
     q.pos = randomDelayPos(); // (musical lengths, as every randomiser)
+    q.pp = rChance(F.pingpong) ? 1 : 0;
     q.p3 = rRange(F.toneLo, F.toneHi); q.p4 = rChance(F.fbWild) ? rIn(70, 105) : rRange(F.fbLo, F.fbHi);
     q.fx3.echo.pct = rRange(F.widthLo, F.widthHi);
     q.fx3.ring.wave = rIn(0, RING_W.length - 1); q.fx3.ring.freq = rIn(5, 120);
@@ -788,7 +791,7 @@ function xyPick() { try { localStorage.setItem(XY_KEY, JSON.stringify(mXY)); } c
 // a page: [key in RAND, name, the button it presses, rows: [setting, label, min, max, how it reads]]
 const pc = (v) => `${v}%`, onoff = (v) => (v ? 'on' : 'off');
 const RS_PAGES = [
-  ['every', 'everything', 'm-everything', [['vary', 'sound vary', 0, 50, pc], ['echoOn', 'echo chance', 0, 100, pc], ['echoLo', 'echo min', 0, 100, String], ['echoHi', 'echo max', 0, 100, String],
+  ['every', 'everything', 'm-everything', [['vary', 'sound vary', 0, 50, pc], ['pingpong', 'ping pong', 0, 100, pc], ['panOn', 'pan chance', 0, 100, pc], ['panMax', 'pan max', 8, 63, String], ['echoOn', 'echo chance', 0, 100, pc], ['echoLo', 'echo min', 0, 100, String], ['echoHi', 'echo max', 0, 100, String],
     ['fbLo', 'feedback min', 0, 127, String], ['fbHi', 'feedback max', 0, 127, String], ['fbWild', 'wild feedback', 0, 100, pc], ['xfeed', 'crossfeed', 0, 1, onoff],
     ['genre', 'genre', 0, 1, onoff], ['energyLo', 'energy min', 0, 100, pc], ['energyHi', 'energy max', 0, 100, pc], ['fillsLo', 'fills min', 0, 100, pc], ['fillsHi', 'fills max', 0, 100, pc],
     ['groove', 'groove', 0, 1, onoff], ['depthLo', 'depth min', 0, 100, pc], ['depthHi', 'depth max', 0, 100, pc]]],
@@ -797,7 +800,7 @@ const RS_PAGES = [
   ['pattern', 'pattern', 'm-pattern', [['genre', 'genre', 0, 1, onoff], ['energyLo', 'energy min', 0, 100, pc], ['energyHi', 'energy max', 0, 100, pc], ['fillsLo', 'fills min', 0, 100, pc],
     ['fillsHi', 'fills max', 0, 100, pc], ['groove', 'groove', 0, 1, onoff], ['depthLo', 'depth min', 0, 100, pc], ['depthHi', 'depth max', 0, 100, pc]]],
   ['xfeed', 'crossfeed', 'm-xrand', [['linksLo', 'links min', 1, 36, String], ['linksHi', 'links max', 1, 36, String], ['amtLo', 'amount min', 5, 100, pc], ['amtHi', 'amount max', 5, 100, pc], ['neg', 'negative', 0, 100, pc]]],
-  ['fx', 'random fx', 'm-fx-rand', [['echoOn', 'echo chance', 0, 100, pc], ['echoLo', 'echo min', 0, 100, String], ['echoHi', 'echo max', 0, 100, String], ['ringOn', 'ring chance', 0, 100, pc],
+  ['fx', 'random fx', 'm-fx-rand', [['pingpong', 'ping pong', 0, 100, pc], ['echoOn', 'echo chance', 0, 100, pc], ['echoLo', 'echo min', 0, 100, String], ['echoHi', 'echo max', 0, 100, String], ['ringOn', 'ring chance', 0, 100, pc],
     ['ringLo', 'ring min', 0, 100, String], ['ringHi', 'ring max', 0, 100, String], ['fbLo', 'feedback min', 0, 127, String], ['fbHi', 'feedback max', 0, 127, String], ['fbWild', 'wild feedback', 0, 100, pc],
     ['toneLo', 'tone min', 0, 127, String], ['toneHi', 'tone max', 0, 127, String], ['widthLo', 'width min', 0, 200, pc], ['widthHi', 'width max', 0, 200, pc]]],
   ['alterfx', 'alter fx', 'm-fx-alter', [['amount', 'amount', 1, 50, pc]]],
