@@ -232,8 +232,7 @@ document.querySelectorAll('[data-m-undo]').forEach((b) => b.addEventListener('cl
 new MutationObserver(mUndo).observe($('undo'), { attributes: true, attributeFilter: ['disabled'] });
 
 // ---- the voice page: the strip at the top picks a drum; its twelve main parameters are on faders (a set per drum, so a
-// fader's step sequencer stays with its drum). The x/y page has the same strip and one big X/Y pad, which moves the two
-// of the drum's parameters picked in its drop-downs ----
+// fader's step sequencer stays with its drum) ----
 const VP_DRUM = (n) => [['pitch', `COARSE${n}`], ['decay', `VELOD${n}`], ['env amt', `MODAMNT${n}`], ['env time', `MOD_EG${n}`],
   ['fm amt', `FMAMNT${n}`], ['fm freq', `FM_FREQ${n}`], ['click', `TRANS${n}_VOL`], ['click frq', `TRANS${n}_FREQ`],
   ['cutoff', `FILTER_FREQ_${n}`], ['reso', `RESO_${n}`], ['drive', `DRIVE${n}`], ['rate', `VOICE_DECIMATION${n}`]];
@@ -246,12 +245,10 @@ const VOICE_PARS = [VP_DRUM(1), VP_DRUM(2), VP_DRUM(3),
     ['m2 amt', 'MOD_OSC_GAIN2'], ['click', 'TRANS6_VOL'], ['cutoff', 'FILTER_FREQ_6'], ['reso', 'RESO_6'], ['drive', 'HAT_DISTORTION'], ['rate', 'VOICE_DECIMATION6']]];
 let mVoice = 0;
 XN.forEach((name, v) => {
-  for (const strip of ['m-voice', 'm-voice-xy']) {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'm-btn'; b.textContent = name; b.setAttribute('role', 'tab');
-    b.addEventListener('click', () => { mVoice = v; mVoiceShow(); });
-    $(strip).append(b);
-  }
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'm-btn'; b.textContent = name; b.setAttribute('role', 'tab');
+  b.addEventListener('click', () => { mVoice = v; mVoiceShow(); });
+  $('m-voice').append(b);
   const box = document.createElement('div');
   box.className = 'm-faders m-vset'; box.id = `m-voice-${v + 1}`; $('m-vsets').append(box);
   for (const [label, name] of VOICE_PARS[v]) {
@@ -259,51 +256,10 @@ XN.forEach((name, v) => {
     mFader(box, label, { min: 0, max: spec(par).max, get: () => values[par], set: (x) => { setValue(par, x); setDirty(true); }, show: String, dflt: () => initValues[par] });
   }
 });
-// the pad's drop-downs list the drum's parameters, and keep their places when the drum changes
-const xySel = [$('m-xy-x'), $('m-xy-y')];
-xySel[1].dataset.i = 1;
 function mVoiceShow() {
-  for (const strip of ['m-voice', 'm-voice-xy']) [...$(strip).children].forEach((b, v) => b.setAttribute('aria-selected', v === mVoice));
+  [...$('m-voice').children].forEach((b, v) => b.setAttribute('aria-selected', v === mVoice));
   [...$('m-vsets').children].forEach((box, v) => { box.hidden = v !== mVoice; });
-  for (const sel of xySel) {
-    const i = Number(sel.dataset.i || 0);
-    sel.innerHTML = ''; VOICE_PARS[mVoice].forEach(([label], k) => sel.append(new Option(label, k)));
-    sel.value = i;
-  }
   mDrawAll();
-}
-for (const sel of xySel) sel.addEventListener('change', () => { sel.dataset.i = sel.value; mDrawAll(); });
-// the pad: a touch puts the cursor where it lands, and its centre stays XY_IN px inside the edges so it never hangs off them
-const XY_IN = 16; // (the CSS's 16px)
-{
-  const pad = document.createElement('div');
-  pad.className = 'm-xy'; pad.setAttribute('role', 'group');
-  pad.innerHTML = `<b class="m-xy-t"></b><span class="m-xy-x"></span><span class="m-xy-y"></span><i></i><output></output>`;
-  const out = pad.querySelector('output');
-  const axis = (k) => { const [label, name] = VOICE_PARS[mVoice][Number(xySel[k].value) || 0]; return { label, par: PAR[name] }; };
-  const fr = (p) => values[p] / spec(p).max;
-  const draw = () => {
-    const X = axis(0), Y = axis(1);
-    pad.querySelector('.m-xy-t').textContent = XN[mVoice];
-    pad.querySelector('.m-xy-x').textContent = `${X.label} →`; pad.querySelector('.m-xy-y').textContent = `↑ ${Y.label}`;
-    pad.setAttribute('aria-label', `${XN[mVoice]}: ${X.label} across, ${Y.label} up`);
-    pad.style.setProperty('--x', fr(X.par)); pad.style.setProperty('--y', fr(Y.par));
-    out.textContent = `${X.label} ${values[X.par]}\n${Y.label} ${values[Y.par]}`;
-  };
-  const at = (e) => {
-    const r = pad.getBoundingClientRect(), X = axis(0), Y = axis(1);
-    const val = (p, f) => Math.round(Math.max(0, Math.min(1, f)) * spec(p).max);
-    const x = val(X.par, (e.clientX - r.left - XY_IN) / (r.width - 2 * XY_IN)), y = val(Y.par, (r.bottom - XY_IN - e.clientY) / (r.height - 2 * XY_IN));
-    if (x !== values[X.par]) setValue(X.par, x);
-    if (y !== values[Y.par]) setValue(Y.par, y);
-    mDrawAll(); setDirty(true); // (the faders show the same parameters)
-  };
-  let held = false;
-  pad.addEventListener('pointerdown', (e) => { pad.setPointerCapture(e.pointerId); held = true; pad.classList.add('held'); at(e); });
-  pad.addEventListener('pointermove', (e) => { if (held) at(e); });
-  const end = () => { held = false; pad.classList.remove('held'); };
-  pad.addEventListener('pointerup', end); pad.addEventListener('pointercancel', end);
-  $('m-pads').append(pad); mDraws.push(draw);
 }
 mVoiceShow();
 const mPct = (v) => (v ? Math.round(v) + '%' : 'off');
@@ -714,6 +670,78 @@ $('m-install').addEventListener('click', async () => {
   mInstallEv.prompt(); await mInstallEv.userChoice.catch(() => {});
   mInstallEv = null; $('m-install').hidden = true;
 });
+
+
+// ---- the x/y page: one big pad, moving any two parameters. Each axis is picked in two short lists: first where it
+// lives (a drum, perform, fx, mix or master), then the parameter there (a drum's every parameter, grouped as on the
+// voice, or that page's faders), so neither list is long. The picks are kept in this browser ----
+const XY_IN = 16; // (the CSS's 16px)
+// the places and their parameters: { name, groups: [[heading, [axis…]]] }, an axis { label, min, max, get, set }
+const XY_PLACES = (() => {
+  const nice = (t) => t.toLowerCase().replace(/_/g, ' ');
+  const drums = XN.map((name, v) => ({ name, groups: VOICE_PAGES[v].groups.filter((g) => g.params.length).map((g) => [nice(g.name.replace(/ \(.*\)/, '')),
+    g.params.map(([text, pn]) => { const par = PAR[pn]; return { label: nice(text), min: 0, max: spec(par).max, get: () => values[par], set: (x) => setValue(par, x) }; })]) }));
+  // a page's faders, by their row
+  const faders = (rows) => rows.map(([heading, box]) => [heading, mFaders.filter((f) => f.key.startsWith(box + ':')).map((f) => ({ label: f.label, min: f.min, max: f.hiOf(), get: f.get, set: (x) => f.put(x) }))]);
+  return [...drums,
+    { name: 'perform', groups: faders([['beat', 'm-beat-faders'], ['play', 'm-faders']]) },
+    { name: 'fx', groups: faders([['echo', 'm-fx-echo'], ['ring mod', 'm-fx-ring']]) },
+    { name: 'mix', groups: faders([['echo send', 'm-mix-echo'], ['ring send', 'm-mix-ring'], ['level', 'm-mix-vol']]) },
+    { name: 'master', groups: faders([['sidechain', 'm-duck'], ['distortion', 'm-dist'], ['compressor', 'm-comp']]) }];
+})();
+const XY_KEY = 'elixir-mobile-xy';
+let mXY = (() => { try { return JSON.parse(localStorage.getItem(XY_KEY)); } catch (e) { return null; } })() || [[0, 0, 0], [0, 1, 1]]; // [place, group, item] per axis
+const xyAxis = (k) => { const [pl, g, i] = mXY[k], P = XY_PLACES[pl] || XY_PLACES[0], G = P.groups[g] || P.groups[0]; return { place: P.name, ...(G[1][i] || G[1][0]) }; };
+function xyLists() {
+  ['x', 'y'].forEach((ax, k) => {
+    const place = $(`m-xy-${ax}p`), par = $(`m-xy-${ax}`);
+    place.innerHTML = ''; XY_PLACES.forEach((P, i) => place.append(new Option(P.name, i)));
+    place.value = mXY[k][0];
+    par.innerHTML = '';
+    (XY_PLACES[mXY[k][0]] || XY_PLACES[0]).groups.forEach(([heading, axes], g) => {
+      const og = document.createElement('optgroup'); og.label = heading;
+      axes.forEach((A, i) => og.append(new Option(A.label, `${g}:${i}`)));
+      par.append(og);
+    });
+    par.value = `${mXY[k][1]}:${mXY[k][2]}`;
+  });
+}
+['x', 'y'].forEach((ax, k) => {
+  $(`m-xy-${ax}p`).addEventListener('change', (e) => { mXY[k] = [Number(e.target.value), 0, 0]; xyPick(); });
+  $(`m-xy-${ax}`).addEventListener('change', (e) => { const [g, i] = e.target.value.split(':').map(Number); mXY[k] = [mXY[k][0], g, i]; xyPick(); });
+});
+function xyPick() { try { localStorage.setItem(XY_KEY, JSON.stringify(mXY)); } catch (e) {} xyLists(); mDrawAll(); }
+{
+  const pad = document.createElement('div');
+  pad.className = 'm-xy'; pad.setAttribute('role', 'group');
+  pad.innerHTML = `<b class="m-xy-t"></b><span class="m-xy-x"></span><span class="m-xy-y"></span><i></i><output></output>`;
+  const out = pad.querySelector('output');
+  const fr = (A) => (A.get() - A.min) / ((A.max - A.min) || 1);
+  const show = (v) => (Number.isInteger(v) ? v : v.toFixed(2));
+  const draw = () => {
+    const X = xyAxis(0), Y = xyAxis(1);
+    pad.querySelector('.m-xy-t').textContent = X.place === Y.place ? X.place : `${X.place} / ${Y.place}`;
+    pad.querySelector('.m-xy-x').textContent = `${X.label} →`; pad.querySelector('.m-xy-y').textContent = `↑ ${Y.label}`;
+    pad.setAttribute('aria-label', `${X.place} ${X.label} across, ${Y.place} ${Y.label} up`);
+    pad.style.setProperty('--x', fr(X)); pad.style.setProperty('--y', fr(Y));
+    out.textContent = `${X.label} ${show(X.get())}\n${Y.label} ${show(Y.get())}`;
+  };
+  const at = (e) => {
+    const r = pad.getBoundingClientRect(), X = xyAxis(0), Y = xyAxis(1);
+    const val = (A, f) => A.min + Math.round(Math.max(0, Math.min(1, f)) * (A.max - A.min));
+    const x = val(X, (e.clientX - r.left - XY_IN) / (r.width - 2 * XY_IN)), y = val(Y, (r.bottom - XY_IN - e.clientY) / (r.height - 2 * XY_IN));
+    if (x !== X.get()) X.set(x);
+    if (y !== Y.get()) Y.set(y);
+    mDrawAll(); setDirty(true); // (the faders show the same parameters)
+  };
+  let held = false;
+  pad.addEventListener('pointerdown', (e) => { pad.setPointerCapture(e.pointerId); held = true; pad.classList.add('held'); at(e); });
+  pad.addEventListener('pointermove', (e) => { if (held) at(e); });
+  const end = () => { held = false; pad.classList.remove('held'); };
+  pad.addEventListener('pointerup', end); pad.addEventListener('pointercancel', end);
+  $('m-pads').append(pad); mDraws.push(draw);
+}
+xyLists();
 
 // ---- the glass isn't flat: each control's ink shadow deepens a little toward the top right of the screen (--d, used
 // by the CSS), worked out once from where it sits and again when the screen's size changes ----
