@@ -206,37 +206,66 @@ document.querySelectorAll('[data-m-undo]').forEach((b) => b.addEventListener('cl
 }));
 new MutationObserver(mUndo).observe($('undo'), { attributes: true, attributeFilter: ['disabled'] });
 
-// ---- the random page: everything, sequence, a button per drum (its sound from a random built-in kit) and the energy / rush pad ----
+// ---- the x/y page: randomise everything, the sequence or one drum (its sound from a random built-in kit), then six
+// X/Y pads, each moving two things at once ----
 $('m-d-everything').addEventListener('click', () => $('m-everything').click());
 $('m-d-pattern').addEventListener('click', mRandPattern);
 XN.forEach((name, v) => {
   const b = document.createElement('button');
-  b.className = 'm-btn'; b.type = 'button'; b.textContent = name;
+  b.className = 'm-btn'; b.type = 'button'; b.textContent = name; b.setAttribute('aria-label', `random ${name}`);
   b.addEventListener('click', () => { mUndoFn = null; randomOne(v); });
   $('m-voices').append(b);
 });
-// across is energy, up is rush; a touch puts the dot where it lands
-{
-  const pad = $('m-xy'), out = pad.querySelector('output'), XY_IN = 22;
+// a pad: x and y each { label, min, max, get, set, show }; a touch puts the cursor where it lands, and its centre stays
+// XY_IN px inside the edges so it never hangs off them
+const XY_IN = 16; // (the CSS's 16px)
+function mPad(title, X, Y) {
+  const pad = document.createElement('div');
+  pad.className = 'm-xy'; pad.setAttribute('role', 'group'); pad.setAttribute('aria-label', `${title}: ${X.label} across, ${Y.label} up`);
+  pad.innerHTML = `<b class="m-xy-t"></b><span class="m-xy-x"></span><span class="m-xy-y"></span><i></i><output></output>`;
+  pad.querySelector('.m-xy-t').textContent = title;
+  pad.querySelector('.m-xy-x').textContent = `${X.label} →`; pad.querySelector('.m-xy-y').textContent = `↑ ${Y.label}`;
+  const out = pad.querySelector('output'), fr = (A) => (A.get() - A.min) / (A.max - A.min);
   const draw = () => {
-    pad.style.setProperty('--x', perf.energy / 100); pad.style.setProperty('--y', perf.rush / 100);
-    out.textContent = `${perfText('energy')}\nrush ${perfText('rush')}`;
+    pad.style.setProperty('--x', fr(X)); pad.style.setProperty('--y', fr(Y));
+    out.textContent = `${X.show(X.get())}\n${Y.show(Y.get())}`;
   };
+  const val = (A, f) => A.min + Math.round(Math.max(0, Math.min(1, f)) * (A.max - A.min) * (A.res || 1)) / (A.res || 1);
   const at = (e) => {
-    const r = pad.getBoundingClientRect(), f = (x) => Math.round(Math.max(0, Math.min(1, x)) * 100);
-    // the cursor's centre stays XY_IN px inside the edges, so it never hangs off them
-    const en = f((e.clientX - r.left - XY_IN) / (r.width - 2 * XY_IN)), ru = f((r.bottom - XY_IN - e.clientY) / (r.height - 2 * XY_IN));
-    if (en !== perf.energy) setPerf('energy', en);
-    if (ru !== perf.rush) setPerf('rush', ru);
-    draw();
+    const r = pad.getBoundingClientRect();
+    const x = val(X, (e.clientX - r.left - XY_IN) / (r.width - 2 * XY_IN)), y = val(Y, (r.bottom - XY_IN - e.clientY) / (r.height - 2 * XY_IN));
+    if (x !== X.get()) X.set(x);
+    if (y !== Y.get()) Y.set(y);
+    draw(); setDirty(true);
   };
   let held = false;
   pad.addEventListener('pointerdown', (e) => { pad.setPointerCapture(e.pointerId); held = true; pad.classList.add('held'); at(e); });
   pad.addEventListener('pointermove', (e) => { if (held) at(e); });
   const end = () => { held = false; pad.classList.remove('held'); };
   pad.addEventListener('pointerup', end); pad.addEventListener('pointercancel', end);
-  mDraws.push(draw);
+  $('m-pads').append(pad); mDraws.push(draw);
 }
+const mPct = (v) => (v ? Math.round(v) + '%' : 'off');
+// the same send on every drum (the mixer's per-drum sends, all at once); an echo send routes the drum to the echo bus
+const mAllSend = (k) => ({ min: 0, max: 100, get: () => Math.max(...mix[k]), show: (v) => `send ${mPct(v)}`,
+  set: (v) => { mix[k].fill(v); if (k === 'fx') fxButtons.forEach((b) => b()); sendMix(); } });
+const mParAxis = (p, label) => ({ label, min: 0, max: 127, get: () => values[p], set: (v) => setValue(p, v, true), show: (v) => `${label} ${v}` });
+// echo: its tempo-synced time (the nearest note length) and feedback
+mPad('echo', { label: 'time', min: 0, max: 1, res: 1000, get: () => delayPos, set: (v) => { delayPos = v; send({ type: 'delay', pos: v }); },
+  show: (v) => showDelay(Math.round(v * 1000)).replace(/^\d+% /, '') }, mParAxis(PAR.FX_P4, 'feedback'));
+// how much of each drum reaches the echo, and its stereo width (100% is the firmware's own)
+mPad('echo send', { label: 'send', ...mAllSend('fx') }, { label: 'width', min: 0, max: 200, get: () => fx3.echo.pct,
+  set: (v) => { fx3.echo.pct = v; sendMix(); }, show: (v) => `width ${v}%` });
+// distortion: the drums' send into it and its drive
+mPad('distortion', { label: 'send', ...mAllSend('dist') }, { label: 'drive', min: 0, max: 127, get: () => fx3.dist.p[0],
+  set: (v) => { fx3.dist.p[0] = v; sendMix(); }, show: (v) => `drive ${v}` });
+// ring mod: the drums' send into it and its carrier's frequency
+mPad('ring mod', { label: 'send', ...mAllSend('ring') }, { label: 'freq', min: 0, max: 127, get: () => fx3.ring.freq,
+  set: (v) => { fx3.ring.freq = v; sendMix(); }, show: (v) => `freq ${v}` });
+// feel: how hard the unaccented hits play, and how much louder the accents are
+mPad('feel', { ...pf('vel'), label: 'velocity', show: (v) => `vel ${v}` }, { ...pf('accent'), label: 'accent', show: (v) => `accent +${v}dB` });
+// the drums' energy and the snare rush, as before
+mPad('energy', { ...pf('energy'), label: 'energy', show: () => perfText('energy').split(' · ')[0] }, { ...pf('rush'), label: 'rush', show: () => `rush ${perfText('rush')}` });
 
 // ---- presets: save, and a list to load or delete (kept in this browser, as on the desktop) ----
 const mLoad = (k) => { loadPreset(k); mDrawPresets(); };
