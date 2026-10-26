@@ -481,3 +481,5 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-ch-list .m-btn { min-height: 44px; font-size: min(var(--fs-xs), 3.6vw) !important; padding: 0 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .m .m-ch-list .m-btn[aria-pressed="true"], .m .m-ch-card .m-rs-tabs .m-btn[aria-selected="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
 .m-ch-card .m-rs-tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.m-rand-card .m-rand { grid-template-rows: auto auto repeat(6, minmax(0, 1fr)); }
+.m-rand-card .m-nextbar { justify-content: flex-start; padding-left: 6px; min-height: 30px; }

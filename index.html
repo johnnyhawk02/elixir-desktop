@@ -1329,6 +1329,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-ch-list .m-btn { min-height: 44px; font-size: min(var(--fs-xs), 3.6vw) !important; padding: 0 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .m .m-ch-list .m-btn[aria-pressed="true"], .m .m-ch-card .m-rs-tabs .m-btn[aria-selected="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
 .m-ch-card .m-rs-tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.m-rand-card .m-rand { grid-template-rows: auto auto repeat(6, minmax(0, 1fr)); }
+.m-rand-card .m-nextbar { justify-content: flex-start; padding-left: 6px; min-height: 30px; }
 </style>
 
 <main class="m" id="m">
@@ -1347,6 +1349,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     <section class="m-card m-rand-card" aria-label="randomise">
       <div class="m-rand">
         <label class="m-chk m-nextbar"><input id="m-nextbar" type="checkbox"><i aria-hidden="true"></i>next bar</label>
+        <label class="m-chk m-nextbar"><input id="m-assign" type="checkbox"><i aria-hidden="true"></i>assign</label>
         <button class="m-btn m-big" id="m-everything" type="button">everything</button>
         <button class="m-btn" id="m-kit" type="button">kit</button>
         <button class="m-btn" id="m-alter" type="button">alter</button>
@@ -8766,12 +8769,13 @@ $('m-rs-go').addEventListener('click', () => $(RS_PAGES[mRsPage][2]).click());
 $('m-rs-play').addEventListener('click', () => $('play').click());
 $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][0]; Object.assign(RAND[key], RAND0[key]); saveRand(); mRsDraw(); });
 
-// ---- the perf page's eight slots: each fader can do anything on the x/y lists. ASSIGN (the eighth slot's button) turns
-// on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
+// ---- the perf page's eight slots: each fader can do anything on the x/y lists, and MIDI CC 17..24 (any channel) moves
+// faders 1..8. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
 // grouped as on that page. The picks are kept in this browser, as [place, group, name], so they survive list changes ----
 const SLOT_KEY = 'elixir-mobile-perfmap';
-const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'], ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed']];
-let mSlots = (() => { try { const v = JSON.parse(localStorage.getItem(SLOT_KEY)); return Array.isArray(v) && v.length === 7 ? v : null; } catch (e) { return null; } })() || SLOT0.map((x) => x.slice());
+const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'], ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy']];
+let mSlots = (() => { try { const v = JSON.parse(localStorage.getItem(SLOT_KEY)); return Array.isArray(v) && v.length >= 7 ? v : null; } catch (e) { return null; } })() || SLOT0.map((x) => x.slice());
+while (mSlots.length < 8) mSlots.push(SLOT0[mSlots.length].slice());
 const slotAxis = ([pl, g, n]) => { const P = XY_PLACES.find((x) => x.name === pl), G = P && P.groups.find((x) => x[0] === g); return G && G[1].find((a) => a.label === n); };
 const mSlotEls = [];
 function mSlot(i) {
@@ -8783,20 +8787,22 @@ function mSlot(i) {
     : { min: A.min, max: A.max, get: A.get, set: (v) => { A.set(v); mDrawAll(); setDirty(true); }, show: String, dflt: () => initValues[A.par] });
   const el = mFaders[mFaders.length - 1].el;
   el.dataset.slot = i; mFaders[mFaders.length - 1].key = `m-faders:slot${i}`;
-  box.insertBefore(el, (mSlotEls[i + 1] && mSlotEls[i + 1].el) || $('m-assign').parentElement);
+  box.insertBefore(el, (mSlotEls[i + 1] && mSlotEls[i + 1].el) || null);
   mSlotEls[i] = { el, draw }; draw();
 }
-// the eighth cell: the assign button
-{
-  const cell = document.createElement('div'); cell.className = 'm-vf m-assign-cell';
-  cell.innerHTML = '<button class="m-btn" id="m-assign" type="button" aria-pressed="false">assign</button>';
-  $('m-faders').append(cell);
-}
-for (let i = 0; i < 7; i++) mSlot(i);
-$('m-assign').addEventListener('click', () => {
-  const on = $('m-assign').getAttribute('aria-pressed') !== 'true';
-  $('m-assign').setAttribute('aria-pressed', on); $('m-faders').classList.toggle('assigning', on);
-});
+for (let i = 0; i < 8; i++) mSlot(i);
+$('m-assign').addEventListener('change', () => { $('m-faders').classList.toggle('assigning', $('m-assign').checked); });
+// MIDI: CC 17..24 set faders 1..8 across their range (other CCs go to the PC4 map as before); MIDI starts at the
+// first touch, since the browser may ask first
+const mPc4Midi = pc4Midi;
+pc4Midi = function (cc, val) {
+  if (cc < 17 || cc > 24) return mPc4Midi(cc, val);
+  const el = mSlotEls[cc - 17] && mSlotEls[cc - 17].el, fd = el && mFaders.find((f) => f.el === el); if (!fd) return;
+  const v = fd.snap(fd.min + val / 127 * (fd.hiOf() - fd.min));
+  if (fd.base !== null) { fd.base = v; mSeqApply(fd); } else fd.put(v);
+  setDirty(true);
+};
+addEventListener('pointerdown', () => startMidi(), { once: true });
 // in assign mode a tap on a slot opens the chooser instead of moving it (on the click, once the finger is up, so the
 // tap can't land on the chooser too)
 $('m-faders').addEventListener('click', (e) => {
