@@ -28,22 +28,33 @@ function detail(text) { $('lcd-detail').innerHTML = text; }
 
 // ---- performance macros: global offsets on top of the kit, sent to the engine only (the kit keeps its own values) ----
 // fm, decay and filter go from -100% (every voice's value down to 0) through 0 (as the kit) to +100% (all the way up);
-// pitch moves every voice's coarse tune by up to two octaves either way
+// pitch moves every voice's tune by up to two octaves either way, freely: a whole number of semitones moves coarse
+// alone (as the firmware's knobs do), anything between splits across coarse and fine (fine spans a semitone, ±0.5)
 const MACROS = {
   fm: ['FMAMNT1', 'FMAMNT2', 'FMAMNT3', 'MOD_OSC_GAIN1_CYM', 'MOD_OSC_GAIN2_CYM', 'MOD_OSC_GAIN1', 'MOD_OSC_GAIN2'],
   decay: ['VELOD1', 'VELOD2', 'VELOD3', 'VELOD4', 'VELOD5', 'VELOD6_CLOSED', 'VELOD6_OPEN'],
-  pitch: ['COARSE1', 'COARSE2', 'COARSE3', 'COARSE4', 'COARSE5', 'COARSE6'],
+  pitch: ['COARSE1', 'COARSE2', 'COARSE3', 'COARSE4', 'COARSE5', 'COARSE6', 'FINE1', 'FINE2', 'FINE3', 'FINE4', 'FINE5', 'FINE6'],
   filter: ['FILTER_FREQ_1', 'FILTER_FREQ_2', 'FILTER_FREQ_3', 'FILTER_FREQ_4', 'FILTER_FREQ_5', 'FILTER_FREQ_6'],
 };
 const MACRO0 = { fm: 100, decay: 100, pitch: 24, filter: 100 }; // knob positions: 100 (24 for pitch) is the middle
 const macro = { ...MACRO0 };
 const macroOf = {};
 for (const m in MACROS) for (const n of MACROS[m]) if (PAR[n] !== undefined) macroOf[PAR[n]] = m;
+// each voice's coarse and fine, by either's parameter number
+const PITCH_PAIR = {};
+for (let i = 1; i <= 6; i++) { const c = PAR['COARSE' + i], fi = PAR['FINE' + i]; if (c !== undefined && fi !== undefined) PITCH_PAIR[c] = PITCH_PAIR[fi] = [c, fi]; }
 function eff(par, v) {
   const m = macroOf[par];
   if (!m || macro[m] === MACRO0[m]) return v;
   const max = spec(par).max;
-  if (m === 'pitch') return Math.max(0, Math.min(max, v + macro.pitch - 24));
+  if (m === 'pitch') {
+    const d = macro.pitch - 24, pair = PITCH_PAIR[par];
+    if (Number.isInteger(d) || !pair) return pair && par === pair[1] ? v : Math.max(0, Math.min(max, Math.round(v + d)));
+    // the voice's tune in semitones (fine's middle is 63.5), moved, then split back into coarse and fine
+    const [c, fi] = pair, t = values[c] + values[fi] / 127 - 0.5 + d;
+    const C = Math.max(0, Math.min(spec(c).max, Math.round(t)));
+    return par === c ? C : Math.max(0, Math.min(127, Math.round((t - C + 0.5) * 127)));
+  }
   const k = (macro[m] - 100) / 100;
   return Math.round(k > 0 ? v + (max - v) * k : v * (1 + k));
 }
@@ -58,6 +69,8 @@ function setValue(par, v, quiet) {
   if (mixInputs[par] && Number(mixInputs[par].value) !== v) { mixInputs[par].value = v; mixInputs[par].dispatchEvent(new Event('sync')); }
   if (!quiet) for (const k in homes) delete homes[k]; // a knob edit makes the current sound the new home
   send({ type: 'param', par, value: eff(par, v) });
+  // off the semitone grid, a voice's coarse and fine are split together, so an edit to either re-sends both
+  if (PITCH_PAIR[par] && !Number.isInteger(macro.pitch - 24)) for (const q of PITCH_PAIR[par]) if (q !== par) send({ type: 'param', par: q, value: eff(q, values[q]) });
   if (!quiet) scheduleScope();
 }
 

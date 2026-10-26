@@ -49,6 +49,7 @@ function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel =
   const hiOf = () => (typeof max === 'function' ? max() : max);
   const put = (v) => {
     const hi = hiOf(); v = Math.max(min, Math.min(hi, min + Math.round((v - min) / step) * step));
+    v = Math.round(v * 1e6) / 1e6; // a fractional step (pitch's hundredths) lands on its exact value
     if (v !== get()) set(v);
     draw();
   };
@@ -120,8 +121,9 @@ mFader($('m-faders'), 'sidechain', duckFader);
 // the sound macros, as on the desktop's pattern card: 100 (pitch 24) is the middle, the sound as it is
 for (const [m, label] of [['pitch', 'pitch'], ['decay', 'decay'], ['filter', 'filter'], ['fm', 'fm']]) {
   const pitch = m === 'pitch';
-  mFader($('m-faders'), label, { min: 0, max: pitch ? 48 : 200, get: () => macro[m], set: (v) => { setMacro(m, v); drawMacros(); },
-    show: (v) => (pitch ? (v === 24 ? '0 st' : (v > 24 ? '+' : '−') + Math.abs(v - 24) + ' st') : (v === 100 ? '0%' : (v > 100 ? '+' : '−') + Math.abs(v - 100) + '%')),
+  // pitch is free: hundredths of a semitone, over twice the track's height
+  mFader($('m-faders'), label, { min: 0, max: pitch ? 48 : 200, step: pitch ? 0.01 : 1, travel: pitch ? 2 : 1, get: () => macro[m], set: (v) => { setMacro(m, v); drawMacros(); },
+    show: (v) => (pitch ? (Math.abs(v - 24) < 0.005 ? '0 st' : (v > 24 ? '+' : '−') + Math.abs(v - 24).toFixed(2) + '\nst') : (v === 100 ? '0%' : (v > 100 ? '+' : '−') + Math.abs(v - 100) + '%')),
     dflt: MACRO0[m] });
 }
 const mDrawMacros = drawMacros;
@@ -343,7 +345,7 @@ async function mOffer(t, type) {
 // marked. Presets keep them ----
 const mSeqSteps = Array.from({ length: 16 }, (_, i) => { const c = document.createElement('i'); c.dataset.i = i; $('m-seq-steps').append(c); return c; });
 let mSeqF = null;
-const mSeqVal = (fd, f) => { const hi = fd.hiOf(); return Math.max(fd.min, Math.min(hi, fd.min + Math.round(f * (hi - fd.min) / fd.step) * fd.step)); };
+const mSeqVal = (fd, f) => { const hi = fd.hiOf(); return Math.round(Math.max(fd.min, Math.min(hi, fd.min + Math.round(f * (hi - fd.min) / fd.step) * fd.step)) * 1e6) / 1e6; };
 function mSeqOpen(fd) {
   if (!fd.seq) fd.seq = { on: true, len: 16, slew: 0, vals: new Array(16).fill(fd.get()) };
   mSeqF = fd; $('m-seq-name').textContent = fd.label;
