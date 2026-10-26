@@ -6506,7 +6506,10 @@ $('new-kit').addEventListener('click', async () => {
   send({ type: 'kit', values: effValues() });
   buildKnobs(); drawScope();
   randomiseX();
-  perf.beat = Math.floor(rnd() * 32); perf.energy = 45 + Math.floor(rnd() * 46); perf.fills = Math.floor(rnd() * 101);
+  // a new genre too (any built-in style, never user), and a beat from its grooves
+  const genres = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
+  setStyle(genres[Math.floor(rnd() * genres.length)]);
+  perf.beat = Math.floor(rnd() * STYLES[styleIdx].grooves.length); perf.energy = 45 + Math.floor(rnd() * 46); perf.fills = Math.floor(rnd() * 101);
   drawUserTools();
   if (view === 'steps') setTab('perform'); else generate();
   setDirty(true);
