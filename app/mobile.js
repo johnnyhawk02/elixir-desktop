@@ -298,6 +298,7 @@ const mFavs = new Set((() => { try { return JSON.parse(localStorage.getItem(FAV_
 for (const k of kitList) if (k.saved && k.fav) mFavs.add(k.name);
 const mFavStore = () => { try { localStorage.setItem(FAV_KEY, JSON.stringify([...mFavs])); } catch (e) {} };
 function mDrawPresets() {
+  mOverDraw();
   const list = $('m-plist'), cur = mPending ? mPlayingPreset : kitList[Number($('kit').value)];
   list.innerHTML = '';
   const group = (t) => { const li = document.createElement('li'); li.className = 'm-pgroup'; li.textContent = t; list.append(li); };
@@ -346,6 +347,27 @@ $('m-psave').addEventListener('click', () => {
   $('kit-save').click();
   const k = kitList[kitList.length - 1];
   $('m-pnote').textContent = `Saved as ${k.name}.`;
+  mDrawPresets();
+});
+// save over: the current sound and song replace the loaded preset's, name and star kept (to match levels across
+// presets). A built-in one's new version is kept in this browser over the factory one (and goes out with an export
+// of favourites); Init kit can't be overwritten
+const EDIT_KEY = 'elixir-mobile-factory-edits';
+const mEdits = (() => { try { return JSON.parse(localStorage.getItem(EDIT_KEY)) || {}; } catch (e) { return {}; } })();
+kitList.forEach((k, i) => { if (k.builtin && mEdits[k.name]) { const q = toCurrent(mEdits[k.name]); if (q) kitList[i] = { ...fromStored(q, { builtin: true }), edited: true }; } });
+const mOverTarget = () => { const k = mPending ? null : kitList[Number($('kit').value)]; return k && (k.saved || k.builtin) && k.kit !== factoryInit ? k : null; };
+function mOverDraw() {
+  const k = mOverTarget();
+  $('m-pover').disabled = !k; $('m-pover').textContent = k ? `save over ${k.name}` : 'save over';
+}
+$('m-pover').addEventListener('click', () => {
+  const k = mOverTarget();
+  if (!k || !confirm(`Save the current sound over ${k.name}?`)) return;
+  Object.assign(k, { kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice() }, fx: mix.fx.slice(), fx3: fx3Snapshot(), dpos: delayPos, song: songSnapshot() });
+  if (k.saved) storePresets();
+  else { k.edited = true; mEdits[k.name] = presetData(k); try { localStorage.setItem(EDIT_KEY, JSON.stringify(mEdits)); } catch (e) {} }
+  initValues.set(values); buildKnobs(); setDirty(false);
+  $('m-pnote').textContent = `Saved over ${k.name}.`;
   mDrawPresets();
 });
 

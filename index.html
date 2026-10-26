@@ -1296,6 +1296,9 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-rs-rows .m-seq-lenrow output { min-width: 0; text-align: right; white-space: nowrap; }
 .m-rs-card .m-chead { gap: 8px; }
 .m-rs-card .m-chead b { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* save new, and save over the loaded preset */
+.m-psaves { display: grid; grid-template-columns: 1fr 1.6fr; gap: 8px; }
+.m-psaves .m-btn { min-height: 56px; font-size: var(--fs-xs) !important; padding: 0 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
 
 <main class="m" id="m">
@@ -1371,7 +1374,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
   <div class="m-panel" data-m-panel="presets">
     <section class="m-card m-presets-card">
-      <button class="m-btn m-big m-wide" id="m-psave" type="button">save this sound</button>
+      <div class="m-psaves"><button class="m-btn m-big" id="m-psave" type="button">save new</button><button class="m-btn" id="m-pover" type="button">save over</button></div>
       <label class="m-chk"><input id="m-pbpm" type="checkbox" checked><i aria-hidden="true"></i>loading a preset uses its tempo</label>
       <p class="m-note" id="m-pnote" aria-live="polite"></p>
       <ul class="m-plist" id="m-plist"></ul>
@@ -8139,6 +8142,7 @@ const mFavs = new Set((() => { try { return JSON.parse(localStorage.getItem(FAV_
 for (const k of kitList) if (k.saved && k.fav) mFavs.add(k.name);
 const mFavStore = () => { try { localStorage.setItem(FAV_KEY, JSON.stringify([...mFavs])); } catch (e) {} };
 function mDrawPresets() {
+  mOverDraw();
   const list = $('m-plist'), cur = mPending ? mPlayingPreset : kitList[Number($('kit').value)];
   list.innerHTML = '';
   const group = (t) => { const li = document.createElement('li'); li.className = 'm-pgroup'; li.textContent = t; list.append(li); };
@@ -8187,6 +8191,27 @@ $('m-psave').addEventListener('click', () => {
   $('kit-save').click();
   const k = kitList[kitList.length - 1];
   $('m-pnote').textContent = `Saved as ${k.name}.`;
+  mDrawPresets();
+});
+// save over: the current sound and song replace the loaded preset's, name and star kept (to match levels across
+// presets). A built-in one's new version is kept in this browser over the factory one (and goes out with an export
+// of favourites); Init kit can't be overwritten
+const EDIT_KEY = 'elixir-mobile-factory-edits';
+const mEdits = (() => { try { return JSON.parse(localStorage.getItem(EDIT_KEY)) || {}; } catch (e) { return {}; } })();
+kitList.forEach((k, i) => { if (k.builtin && mEdits[k.name]) { const q = toCurrent(mEdits[k.name]); if (q) kitList[i] = { ...fromStored(q, { builtin: true }), edited: true }; } });
+const mOverTarget = () => { const k = mPending ? null : kitList[Number($('kit').value)]; return k && (k.saved || k.builtin) && k.kit !== factoryInit ? k : null; };
+function mOverDraw() {
+  const k = mOverTarget();
+  $('m-pover').disabled = !k; $('m-pover').textContent = k ? `save over ${k.name}` : 'save over';
+}
+$('m-pover').addEventListener('click', () => {
+  const k = mOverTarget();
+  if (!k || !confirm(`Save the current sound over ${k.name}?`)) return;
+  Object.assign(k, { kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice() }, fx: mix.fx.slice(), fx3: fx3Snapshot(), dpos: delayPos, song: songSnapshot() });
+  if (k.saved) storePresets();
+  else { k.edited = true; mEdits[k.name] = presetData(k); try { localStorage.setItem(EDIT_KEY, JSON.stringify(mEdits)); } catch (e) {} }
+  initValues.set(values); buildKnobs(); setDirty(false);
+  $('m-pnote').textContent = `Saved over ${k.name}.`;
   mDrawPresets();
 });
 
