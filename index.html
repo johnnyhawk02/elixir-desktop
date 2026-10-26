@@ -7597,13 +7597,14 @@ drawScope();
 try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
 const mRnd = (n) => Math.floor(Math.random() * n);
 
-// ---- pages: swipe between them, or tap a tab to scroll to one ----
+// ---- pages: swipe between them, or tap a tab to scroll to one. The tab changes once: at once for a tap, and for a
+// swipe when the pages come to rest (not for each page passed on the way) ----
 const mPages = $('m-pages');
-let mCur = 'play';
+let mCur = 'play', mSettle = 0;
 function mTab(t) {
   const el = document.querySelector(`[data-m-panel="${t}"]`);
-  mPages.scrollTo({ left: el.offsetLeft - mPages.offsetLeft, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   mShown(t);
+  mPages.scrollTo({ left: el.offsetLeft - mPages.offsetLeft, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
 }
 // the tab that shows which page is in view
 function mShown(t) {
@@ -7612,10 +7613,16 @@ function mShown(t) {
   document.querySelectorAll('[data-m-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.mTab === t));
   if (t === 'presets') mDrawPresets();
 }
-mPages.addEventListener('scroll', () => {
-  const panels = [...mPages.querySelectorAll('[data-m-panel]')], i = Math.round(mPages.scrollLeft / (mPages.scrollWidth / panels.length));
-  mShown(panels[Math.max(0, Math.min(panels.length - 1, i))].dataset.mPanel);
-}, { passive: true });
+// at rest: the page nearest the scroll position
+function mSettled() {
+  clearTimeout(mSettle);
+  const x = mPages.scrollLeft + mPages.offsetLeft;
+  const near = [...mPages.querySelectorAll('[data-m-panel]')].reduce((a, b) => (Math.abs(b.offsetLeft - x) < Math.abs(a.offsetLeft - x) ? b : a));
+  mShown(near.dataset.mPanel);
+}
+// scrollend where the browser has it; otherwise a pause in the scrolling
+mPages.addEventListener('scroll', () => { clearTimeout(mSettle); mSettle = setTimeout(mSettled, 150); }, { passive: true });
+mPages.addEventListener('scrollend', mSettled);
 document.querySelectorAll('[data-m-tab]').forEach((b) => b.addEventListener('click', () => mTab(b.dataset.mTab)));
 
 // ---- transport ----
