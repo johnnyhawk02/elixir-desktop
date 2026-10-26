@@ -26,16 +26,16 @@
 
   <div class="m-pages" id="m-pages">
   <div class="m-panel" data-m-panel="play">
-    <section class="m-card m-play-card"><div class="m-faders" id="m-faders">
+    <section class="m-card m-play-card"><div class="m-faders" id="m-faders"></div></section>
+    <section class="m-card m-rand-card" aria-label="randomise">
       <div class="m-rand">
-        <svg class="m-die" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="5.5" y="5.5" width="3.5" height="3.5"/><rect x="15" y="5.5" width="3.5" height="3.5"/><rect x="10.25" y="10.25" width="3.5" height="3.5"/><rect x="5.5" y="15" width="3.5" height="3.5"/><rect x="15" y="15" width="3.5" height="3.5"/></svg>
         <button class="m-btn m-big" id="m-everything" type="button">everything</button>
         <button class="m-btn" id="m-kit" type="button">kit</button>
         <button class="m-btn" id="m-pattern" type="button">pattern</button>
         <button class="m-btn" id="m-xrand" type="button">crossfeed</button>
         <button class="m-btn" id="m-undo" data-m-undo type="button" disabled>undo</button>
       </div>
-    </div></section>
+    </section>
   </div>
 
   <div class="m-panel" data-m-panel="dice">
@@ -91,6 +91,7 @@
       <div class="m-seq-steps" id="m-seq-steps" aria-label="steps"></div>
       <div class="m-seq-lenrow"><span>length</span><div class="m-seq-len" id="m-seq-len" role="slider" aria-label="length"><i></i></div><output id="m-seq-len-out"></output></div>
       <div class="m-seq-lenrow"><span>slew</span><div class="m-seq-len" id="m-seq-slew" role="slider" aria-label="slew"><i></i></div><output id="m-seq-slew-out"></output></div>
+      <div class="m-seq-lenrow"><span>speed</span><div class="m-seq-len" id="m-seq-speed" role="slider" aria-label="speed"><i></i></div><output id="m-seq-speed-out"></output></div>
       <div class="m-seq-btns"><button class="m-btn m-big" id="m-seq-rand" type="button">randomise</button><button class="m-btn" id="m-seq-close" type="button">done</button></div>
     </section>
   </div>
