@@ -67,26 +67,6 @@ class Player {
     this.duckEnv = 0; this.duckAt = 1; this.compEnv = 0; this.gr = 0; this.duckMin = 1;
     // level meters: each voice's peak after its fader, accent, mute and duck
     this.lvl = new Float32Array(6); this.lvlN = 0; this.lvlOn = false;
-    // the acid line: a second engine, of which only drum 1 plays, stepping through 16 notes (null = rest) on the
-    // straight grid; a slide doesn't retrigger, it glides into the note (bend: the pitch ratio still to go, easing to 1)
-    this.b = new LXR.LxrEngine({ seed: 0x1f2e3d4c }); this.b.loadInitKit();
-    this.acid = { steps: new Array(16).fill(null), level: 0, base: 60, space: 0, verb: 0 };
-    this.acidNote = 60; this.acidBend = 1; this.acidG = 1; this.acidGTo = 1;
-    // drum voices differ a lot in level, so the line is evened out: its peak, held and let go over a couple of seconds,
-    // sets a gain toward a fixed peak (acidNorm, eased so a change never jumps)
-    this.acidPk = 12000; this.acidNorm = 1; this.acidBuf = new Float32Array(64); this.acidOn = false;
-    // the spacer (after Trackspacer): eight bands, an octave apart from 60 Hz, each a band-pass on the acid line and on
-    // the drums (everything before the master); where the drums have energy in a band, that band of the line is turned
-    // down, by up to the space amount (100 = -20 dB). The line is its dry signal plus (gain - 1) times each band, so with
-    // the drums quiet it is untouched. The cut follows the drums with a 3 ms attack and an 80 ms release
-    this.spF = Array.from({ length: 8 }, (_, k) => Math.tan(Math.PI * 60 * Math.pow(2, k * 1.1) / LXR.REAL_FS));
-    this.spS = new Float64Array(32); this.spEnv = new Float32Array(8); this.spG = new Float32Array(8).fill(1);
-    this.spBand = Array.from({ length: 8 }, () => new Float32Array(64)); this.spGr = new Float32Array(8);
-    // the acid line's reverb, a send: a small Freeverb (four damped combs and two all-passes a side, the right side's
-    // delays a little longer for width), its input the line after the spacer
-    const comb = (n) => ({ b: new Float32Array(n), i: 0, z: 0 }), ap = (n) => ({ b: new Float32Array(n), i: 0 });
-    this.verb = [0, 23].map((sp) => ({ c: [1116, 1188, 1277, 1356].map((n) => comb(n + sp)), a: [556, 441].map((n) => ap(n + sp)) }));
-    this.verbTail = 0;
     this.events = [];
     this._render(this.A); this._render(this.B);
   }
@@ -95,9 +75,6 @@ class Player {
     else if (m.type === 'kit') this.e.loadKit(m.values);
     else if (m.type === 'trig') { this.e.trigger(m.voice, m.vel, 60); this.gainTo[Math.min(m.voice, 5)] = 1; }
     else if (m.type === 'rush') this.rush = m.v;
-    else if (m.type === 'acid') Object.assign(this.acid, m.acid);
-    else if (m.type === 'acidParam') this.b.setParam(m.par, m.value);
-    else if (m.type === 'acidKit') { this.b.loadKit(m.values); this.acidPk = 12000; }
     else if (m.type === 'rushSet') Object.assign(this.rs, m.set);
     else if (m.type === 'mute') m.muted.forEach((v, n) => { this.muted[n] = v ? 1 : 0; });
     else if (m.type === 'xmod') this.e.setCrossMod(m.amt, m.target);
@@ -149,7 +126,6 @@ class Player {
     const pg = this.pattern.pages ? bar % this.pattern.pages.length : 0;
     const P = this.pattern.pages ? this.pattern.pages[pg] : this.pattern; // pages: one bar each, in turn
     const hits = [], { on, acc, bar: cond } = P, G = this.groove, len = LXR.REAL_FS * 60 / this.bpm / 4;
-    if (this.acid.level && this.acid.steps[s]) this.queue.push({ at: Math.max(0, at0), acid: this.acid.steps[s] });
     if (this.rush && this.patternOn) { this.scheduleRush(s, bar, pg, P, at0, len, hits); return; }
     for (let t = 0; t < 7 && this.patternOn; t++) {
       if (!on[t][s] || !barOk(cond[t][s], bar) || this.muted[Math.min(t, 5)]) continue;
@@ -192,54 +168,6 @@ class Player {
       hits.push(3);
     }
     this.sched[s] = hits;
-  }
-  // the spacer: runs the line's bands and the drums' bands, follows each drum band's peak, and cuts the line's band under it
-  spacer(ab, L, R) {
-    const FS = LXR.REAL_FS, depth = this.acid.space / 100, floor = 1 - depth * 0.9, k = 1 / 1.4, S = this.spS;
-    const att = 1 - Math.exp(-64 / (0.003 * FS)), rel = Math.exp(-64 / (0.08 * FS));
-    const sc = this.busIn; // scratch: the drums in mono
-    for (let i = 0; i < 64; i++) sc[i] = (L[i] + R[i]) / 2;
-    for (let b = 0; b < 8; b++) {
-      const g = this.spF[b], a = 1 / (1 + g * (g + k)), o = b * 4, band = this.spBand[b];
-      let pk = 0;
-      // TPT state-variable band-pass, unity gain at the centre (k * bp), on the line (states o, o+1) and the drums (o+2, o+3)
-      for (let i = 0; i < 64; i++) {
-        let x = ab[i], s1 = S[o], s2 = S[o + 1], hp = (x - (g + k) * s1 - s2) * a, bp = g * hp + s1;
-        S[o] = g * hp + bp; S[o + 1] = s2 + 2 * g * bp; band[i] = bp * k;
-        x = sc[i]; s1 = S[o + 2]; s2 = S[o + 3]; hp = (x - (g + k) * s1 - s2) * a; const bq = g * hp + s1;
-        S[o + 2] = g * hp + bq; S[o + 3] = s2 + 2 * g * bq;
-        const m = bq < 0 ? -bq : bq; if (m > pk) pk = m;
-      }
-      pk *= k;
-      const e = this.spEnv[b] = pk > this.spEnv[b] ? this.spEnv[b] + (pk - this.spEnv[b]) * att : this.spEnv[b] * rel;
-      // full cut once the drums' band reaches about -28 dBFS; the gain ramps across the block
-      const g0 = this.spG[b], g1 = 1 - (1 - floor) * Math.min(1, e / 0.04);
-      for (let i = 0; i < 64; i++) ab[i] += (g0 + (g1 - g0) * (i + 1) / 64 - 1) * band[i];
-      this.spG[b] = g1; this.spGr[b] = Math.max(this.spGr[b], 1 - g1);
-    }
-  }
-  // the reverb: x (or silence) at the send into both sides, the wet added to L and R
-  reverb(x, L, R) {
-    const send = this.acid.verb / 100 * 0.06, fb = 0.84, damp = 0.25;
-    for (let ch = 0; ch < 2; ch++) {
-      const V = this.verb[ch], O = ch ? R : L;
-      for (let i = 0; i < 64; i++) {
-        const inp = x ? x[i] * send : 0;
-        let y = 0;
-        for (const c of V.c) { const o = c.b[c.i]; c.z = o * (1 - damp) + c.z * damp; c.b[c.i] = inp + c.z * fb; if (++c.i === c.b.length) c.i = 0; y += o; }
-        for (const a of V.a) { const o = a.b[a.i]; a.b[a.i] = y + o * 0.5; y = o - y; if (++a.i === a.b.length) a.i = 0; }
-        O[i] += y;
-      }
-    }
-  }
-  // an acid step: a new note retriggers drum 1 of the acid engine; a slide keeps it sounding and glides from the last note
-  acidHit(st) {
-    const note = Math.max(0, Math.min(127, this.acid.base + st.n));
-    if (st.slide && this.acidNote !== note) {
-      this.acidBend *= Math.pow(2, (this.acidNote - note) / 12);
-      this.b.setNote(0, note);
-    } else if (!st.slide) this.b.trigger(0, st.acc ? 127 : 90, note);
-    this.acidNote = note; this.acidGTo = st.acc ? 1 : 0.6;
   }
   clickAt(hi) { this.clk = { n: 0, ph: 0, w: 2 * Math.PI * (hi ? 1760 : 880) / LXR.REAL_FS }; }
   _render(dst) {
@@ -306,8 +234,7 @@ class Player {
       for (const q of this.queue) {
         // a voice muted after its step was booked is skipped too; above 80 the grid roll gives way to the free one, and
         // no snare plays within half a free-roll gap of the last
-        if (q.at < 64 && q.acid) this.acidHit(q.acid);
-        else if (q.at < 64 && this.rush > S.p32 && (q.roll || q.free) && (q.roll || this.clock - this.snareAt < this.rushGap)) { if (q.roll === 2) this.rushHead = q; }
+        if (q.at < 64 && this.rush > S.p32 && (q.roll || q.free) && (q.roll || this.clock - this.snareAt < this.rushGap)) { if (q.roll === 2) this.rushHead = q; }
         else if (q.at < 64) { if (q.t === 3) this.snareAt = this.clock; if (!this.muted[Math.min(q.t, 5)]) { const sw = q.sw || 1; this.e.trigger(q.t, q.acc ? 127 : Math.max(1, Math.round(this.vel * sw)), 60); this.gainTo[Math.min(q.t, 5)] = q.acc ? 1 : this.accGain * sw; } }
         else { q.at -= 64; keep.push(q); }
       }
@@ -318,22 +245,6 @@ class Player {
     const pans = [e.drums[0], e.drums[1], e.drums[2], e.snare, e.cymbal, e.hat];
     const [L, R] = dst;
     L.fill(0); R.fill(0);
-    // the acid line, mono in the middle, ducked like the drums; it joins the mix after the drums and their FX
-    // returns, through the spacer, before the rush high-pass and the compressor
-    if (this.acid.level || this.acidBend !== 1) {
-      this.acidBend = 1 + (this.acidBend - 1) * Math.exp(-64 / (0.06 * LXR.REAL_FS));
-      if (Math.abs(this.acidBend - 1) < 1e-4) this.acidBend = 1;
-      const ao = this.b.renderVoice(0, this.acidBend);
-      let pk = 0;
-      for (let i = 0; i < 64; i++) { const a = ao[i] < 0 ? -ao[i] : ao[i]; if (a > pk) pk = a; }
-      this.acidPk = Math.max(pk, this.acidPk * Math.exp(-64 / (2 * LXR.REAL_FS)), 500);
-      const n0 = this.acidNorm; this.acidNorm = Math.min(6, 14000 / this.acidPk);
-      const lv = this.acid.level / 100 * 0.9 / 32768;
-      const g0 = this.acidG * lv * n0 * this.duckAt, dg = (this.acidGTo * lv * this.acidNorm * (1 - (this.master.duckOn ? this.master.duck : 0) * Math.min(1, this.duckEnv / 0.3)) - g0) / 64;
-      const ab = this.acidBuf;
-      for (let i = 0; i < 64; i++) ab[i] = ao[i] * (g0 + dg * i);
-      this.acidG = this.acidGTo; this.acidOn = true;
-    } else this.acidOn = false;
     // sidechain: follow drum 1's level (instant attack, set release) and turn the rest down
     const M = this.master, k = out[0];
     const isDelay = e.fx.fxType === LXR.FX_DELAY;
@@ -387,13 +298,6 @@ class Player {
       if (any || bo.some((v) => v)) for (let i = 0; i < 64; i++) { const g = mk / 32768 * (fd0 + fdd * i); L[i] += bo[2 * i] * g; R[i] += bo[2 * i + 1] * g; }
     }
     for (let i = 0; i < 64; i++) { const g = (fd0 + fdd * i) / 32768; L[i] += fx[2 * i] * g; R[i] += fx[2 * i + 1] * g; }
-    if (this.acidOn) {
-      const ab = this.acidBuf;
-      if (this.acid.space) this.spacer(ab, L, R);
-      for (let i = 0; i < 64; i++) { L[i] += ab[i]; R[i] += ab[i]; }
-    }
-    if (this.acid.verb && this.acidOn) this.verbTail = 3 * LXR.REAL_FS;
-    if (this.verbTail > 0) { this.reverb(this.acidOn ? this.acidBuf : null, L, R); this.verbTail -= 64; }
     if (this.rush > S.hp || this.hpOn) this.highPass(L, R);
     if (M.comp) {
       // peak detector in dB, attack/release smoothing, gain = over * (1/ratio - 1) + makeup
