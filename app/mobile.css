@@ -233,3 +233,9 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 .m-voice { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
 .m .m-voice .m-btn { min-height: 44px; min-width: 0; padding: 0 1px; font-size: .85rem !important; letter-spacing: 0; overflow: hidden; }
 .m .m-voice .m-btn[aria-selected="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
+/* the mix page: three rows of sends and a taller row of levels, six across */
+[data-m-panel="mix"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
+.m-mix-card { grid-template-rows: 1fr 1fr 1fr 1.6fr; }
+/* six page buttons share the bar */
+.m-tabs { grid-template-columns: repeat(6, 1fr); }
+.m .m-tabs button { font-size: min(var(--fs-s), 3.7vw) !important; }

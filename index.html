@@ -1081,6 +1081,12 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 .m-voice { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
 .m .m-voice .m-btn { min-height: 44px; min-width: 0; padding: 0 1px; font-size: .85rem !important; letter-spacing: 0; overflow: hidden; }
 .m .m-voice .m-btn[aria-selected="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
+/* the mix page: three rows of sends and a taller row of levels, six across */
+[data-m-panel="mix"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
+.m-mix-card { grid-template-rows: 1fr 1fr 1fr 1.6fr; }
+/* six page buttons share the bar */
+.m-tabs { grid-template-columns: repeat(6, 1fr); }
+.m .m-tabs button { font-size: min(var(--fs-s), 3.7vw) !important; }
 </style>
 
 <main class="m" id="m">
@@ -1125,6 +1131,15 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
         <button class="m-btn" id="m-fx-alter" type="button">alter fx</button>
         <button class="m-btn" data-m-undo type="button" disabled>undo</button>
       </div>
+    </section>
+  </div>
+
+  <div class="m-panel" data-m-panel="mix">
+    <section class="m-card m-fx-card m-mix-card">
+      <div class="m-fx-row"><b>echo send</b><div class="m-faders" id="m-mix-echo"></div></div>
+      <div class="m-fx-row"><b>distortion send</b><div class="m-faders" id="m-mix-dist"></div></div>
+      <div class="m-fx-row"><b>ring mod send</b><div class="m-faders" id="m-mix-ring"></div></div>
+      <div class="m-fx-row m-mix-vol"><b>level</b><div class="m-faders" id="m-mix-vol"></div></div>
     </section>
   </div>
 
@@ -1179,6 +1194,7 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
     <button type="button" role="tab" data-m-tab="play" aria-selected="true">perf</button>
     <button type="button" role="tab" data-m-tab="dice" aria-selected="false">x/y</button>
     <button type="button" role="tab" data-m-tab="fx" aria-selected="false">fx</button>
+    <button type="button" role="tab" data-m-tab="mix" aria-selected="false">mix</button>
     <button type="button" role="tab" data-m-tab="comp" aria-selected="false">comp</button>
     <button type="button" role="tab" data-m-tab="presets" aria-selected="false">presets</button>
   </nav>
@@ -7631,7 +7647,7 @@ function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel =
   let last = 0;
   el.querySelector('.m-flab').addEventListener('click', () => {
     const t = performance.now();
-    if (t - last < 350 && dflt !== undefined) move(dflt); last = t;
+    if (t - last < 350 && dflt !== undefined) move(typeof dflt === 'function' ? dflt() : dflt); last = t;
   });
   fd.snap = snap;
   box.append(el); mDraws.push(draw); mFaders.push(fd);
@@ -7956,6 +7972,19 @@ fxF('m-fx-ring', 'send', fxSend('ring'));
 const RING_W = LXR.OSC_WAVE_NAMES.map((n) => n.toLowerCase());
 fxF('m-fx-ring', 'wave', { min: 0, max: RING_W.length - 1, get: () => fx3.ring.wave, set: (v) => { fx3.ring.wave = v; sendMix(); }, show: (v) => RING_W[v], dflt: 0 });
 fxF('m-fx-ring', 'freq', { min: 0, max: 127, get: () => fx3.ring.freq, set: (v) => { fx3.ring.freq = v; sendMix(); }, show: String, dflt: FX3_0.ring.freq });
+
+// ---- the mix page: each drum's echo, distortion and ring mod sends, then its level, a column a drum ----
+const XS = ['d1', 'd2', 'd3', 'sn', 'cy', 'hh'];
+XS.forEach((short, n) => {
+  // an echo send above 0 routes the drum to the echo bus (fxButtons does that, as the mixer's dial does)
+  for (const [k, box] of [['fx', 'm-mix-echo'], ['dist', 'm-mix-dist'], ['ring', 'm-mix-ring']]) {
+    mFader($(box), short, { min: 0, max: 100, get: () => mix[k][n], show: (v) => (v ? String(v) : 'off'), dflt: 0,
+      set: (v) => { mix[k][n] = v; if (k === 'fx') fxButtons[n](); sendMix(); setDirty(true); } });
+  }
+  const vol = PAR.VOL1 + n;
+  mFader($('m-mix-vol'), short, { min: 0, max: 127, get: () => values[vol], show: String, dflt: () => initValues[vol],
+    set: (v) => { setValue(vol, v, true); setDirty(true); } });
+});
 
 // random fx: new sends on every drum (each effect on some of them) and new settings for all three effects;
 // alter fx: every send already on, and every setting, moved up to 10% of its range either way. Undo takes either back

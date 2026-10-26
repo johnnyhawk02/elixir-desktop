@@ -59,6 +59,15 @@
     </section>
   </div>
 
+  <div class="m-panel" data-m-panel="mix">
+    <section class="m-card m-fx-card m-mix-card">
+      <div class="m-fx-row"><b>echo send</b><div class="m-faders" id="m-mix-echo"></div></div>
+      <div class="m-fx-row"><b>distortion send</b><div class="m-faders" id="m-mix-dist"></div></div>
+      <div class="m-fx-row"><b>ring mod send</b><div class="m-faders" id="m-mix-ring"></div></div>
+      <div class="m-fx-row m-mix-vol"><b>level</b><div class="m-faders" id="m-mix-vol"></div></div>
+    </section>
+  </div>
+
   <div class="m-panel" data-m-panel="comp">
     <section class="m-card m-faders">
       <div class="m-chead"><b>compressor</b><button class="m-toggle" id="m-comp-on" type="button" aria-pressed="true">on</button></div>
@@ -110,6 +119,7 @@
     <button type="button" role="tab" data-m-tab="play" aria-selected="true">perf</button>
     <button type="button" role="tab" data-m-tab="dice" aria-selected="false">x/y</button>
     <button type="button" role="tab" data-m-tab="fx" aria-selected="false">fx</button>
+    <button type="button" role="tab" data-m-tab="mix" aria-selected="false">mix</button>
     <button type="button" role="tab" data-m-tab="comp" aria-selected="false">comp</button>
     <button type="button" role="tab" data-m-tab="presets" aria-selected="false">presets</button>
   </nav>

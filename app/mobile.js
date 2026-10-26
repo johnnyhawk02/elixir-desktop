@@ -85,7 +85,7 @@ function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel =
   let last = 0;
   el.querySelector('.m-flab').addEventListener('click', () => {
     const t = performance.now();
-    if (t - last < 350 && dflt !== undefined) move(dflt); last = t;
+    if (t - last < 350 && dflt !== undefined) move(typeof dflt === 'function' ? dflt() : dflt); last = t;
   });
   fd.snap = snap;
   box.append(el); mDraws.push(draw); mFaders.push(fd);
@@ -410,6 +410,19 @@ fxF('m-fx-ring', 'send', fxSend('ring'));
 const RING_W = LXR.OSC_WAVE_NAMES.map((n) => n.toLowerCase());
 fxF('m-fx-ring', 'wave', { min: 0, max: RING_W.length - 1, get: () => fx3.ring.wave, set: (v) => { fx3.ring.wave = v; sendMix(); }, show: (v) => RING_W[v], dflt: 0 });
 fxF('m-fx-ring', 'freq', { min: 0, max: 127, get: () => fx3.ring.freq, set: (v) => { fx3.ring.freq = v; sendMix(); }, show: String, dflt: FX3_0.ring.freq });
+
+// ---- the mix page: each drum's echo, distortion and ring mod sends, then its level, a column a drum ----
+const XS = ['d1', 'd2', 'd3', 'sn', 'cy', 'hh'];
+XS.forEach((short, n) => {
+  // an echo send above 0 routes the drum to the echo bus (fxButtons does that, as the mixer's dial does)
+  for (const [k, box] of [['fx', 'm-mix-echo'], ['dist', 'm-mix-dist'], ['ring', 'm-mix-ring']]) {
+    mFader($(box), short, { min: 0, max: 100, get: () => mix[k][n], show: (v) => (v ? String(v) : 'off'), dflt: 0,
+      set: (v) => { mix[k][n] = v; if (k === 'fx') fxButtons[n](); sendMix(); setDirty(true); } });
+  }
+  const vol = PAR.VOL1 + n;
+  mFader($('m-mix-vol'), short, { min: 0, max: 127, get: () => values[vol], show: String, dflt: () => initValues[vol],
+    set: (v) => { setValue(vol, v, true); setDirty(true); } });
+});
 
 // random fx: new sends on every drum (each effect on some of them) and new settings for all three effects;
 // alter fx: every send already on, and every setting, moved up to 10% of its range either way. Undo takes either back
