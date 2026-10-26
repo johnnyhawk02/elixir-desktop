@@ -206,16 +206,7 @@ document.querySelectorAll('[data-m-undo]').forEach((b) => b.addEventListener('cl
 }));
 new MutationObserver(mUndo).observe($('undo'), { attributes: true, attributeFilter: ['disabled'] });
 
-// ---- the x/y page: randomise everything, the sequence or one drum (its sound from a random built-in kit), then six
-// X/Y pads, each moving two things at once ----
-$('m-d-everything').addEventListener('click', () => $('m-everything').click());
-$('m-d-pattern').addEventListener('click', mRandPattern);
-XN.forEach((name, v) => {
-  const b = document.createElement('button');
-  b.className = 'm-btn'; b.type = 'button'; b.textContent = name; b.setAttribute('aria-label', `random ${name}`);
-  b.addEventListener('click', () => { mUndoFn = null; randomOne(v); });
-  $('m-voices').append(b);
-});
+// ---- the x/y page: six X/Y pads, each moving two things at once ----
 // a pad: x and y each { label, min, max, get, set, show }; a touch puts the cursor where it lands, and its centre stays
 // XY_IN px inside the edges so it never hangs off them
 const XY_IN = 16; // (the CSS's 16px)
