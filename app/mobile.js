@@ -88,11 +88,12 @@ function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel =
 const mDrawAll = () => mDraws.forEach((d) => d());
 perfDraws.push(mDrawAll);
 // a preset load rebuilds the master section; the sliders follow
-// (the pattern button's undo; a preset load clears it, as it clears the desktop's)
-let mPatUndo = null;
-const mUndo = () => { document.querySelectorAll('[data-m-undo]').forEach((b) => { b.disabled = !mPatUndo && $('undo').disabled; }); };
+// (the undo for pattern and crossfeed, which the desktop's undo doesn't cover: a function that puts them back;
+// a preset load clears it, as it clears the desktop's)
+let mUndoFn = null;
+const mUndo = () => { document.querySelectorAll('[data-m-undo]').forEach((b) => { b.disabled = !mUndoFn && $('undo').disabled; }); };
 const mBuildMaster = buildMaster;
-buildMaster = function () { mBuildMaster(); mPatUndo = null; mUndo(); mDrawAll(); };
+buildMaster = function () { mBuildMaster(); mUndoFn = null; mUndo(); mDrawAll(); };
 
 const pf = (k) => ({ min: PERF_RANGE[k][0], max: PERF_RANGE[k][1], get: () => perfGet(k), set: (v) => setPerf(k, v), show: () => perfText(k), dflt: PERF_RANGE[k][2] });
 // the beat pop-up (the beat button by play and record): genre, beat, energy and rush.
@@ -165,10 +166,23 @@ grVu.set = (db) => {
 };
 
 // ---- randomisers ----
-// undo takes back the last randomise: the sound for everything and kit (the desktop's undo), the pattern for pattern
-$('m-everything').addEventListener('click', () => { mPatUndo = null; $('new-kit').click(); });
+// undo takes back the last randomise: the sound for everything and kit (the desktop's undo), the pattern for pattern,
+// the patch for crossfeed
+$('m-everything').addEventListener('click', () => { mUndoFn = null; $('new-kit').click(); });
 // kit: every drum voice from a random built-in kit; the pattern, mixer and FX stay
-$('m-kit').addEventListener('click', () => { mPatUndo = null; $('rand-all').click(); });
+$('m-kit').addEventListener('click', () => { mUndoFn = null; $('rand-all').click(); });
+// crossfeed: a new 6 x 6 patch (the desktop's crossfeed randomiser), which undo takes back
+$('m-xrand').addEventListener('click', async () => {
+  await startAudio();
+  const was = { amt: xm.amt.slice(), target: xm.target.slice() };
+  $('xrand').click();
+  undoValues = null; $('undo').disabled = true;
+  mUndoFn = () => {
+    xm.amt.splice(0, 36, ...was.amt); xm.target.splice(0, 6, ...was.target);
+    xSelects.forEach((s, d) => { s.value = xm.target[d]; }); xcells.forEach((d) => d()); sendX(); setDirty(true);
+  };
+  mUndo();
+});
 // pattern: style, beat, energy, fills, groove and its depth rolled; the sound, tempo, rush, mixer and FX stay
 const mPatGet = () => ({ style: styleIdx, beat: perf.beat, energy: perf.energy, fills: perf.fills, type: groove.type, depth: groove.depth });
 function mPatSet(p) {
@@ -185,11 +199,11 @@ const mRandPattern = async () => {
   const style = styles[mRnd(styles.length)];
   mPatSet({ style, beat: mRnd(STYLES[style].grooves.length), energy: 35 + mRnd(61), fills: mRnd(101),
     type: GROOVE_TYPES[mRnd(GROOVE_TYPES.length)].name, depth: 50 + mRnd(51) });
-  undoValues = null; $('undo').disabled = true; mPatUndo = was; mUndo();
+  undoValues = null; $('undo').disabled = true; mUndoFn = () => mPatSet(was); mUndo();
 };
 $('m-pattern').addEventListener('click', mRandPattern);
 document.querySelectorAll('[data-m-undo]').forEach((b) => b.addEventListener('click', () => {
-  if (mPatUndo) { const p = mPatUndo; mPatUndo = null; mPatSet(p); mUndo(); } else $('undo').click();
+  if (mUndoFn) { const fn = mUndoFn; mUndoFn = null; fn(); mUndo(); } else $('undo').click();
 }));
 new MutationObserver(mUndo).observe($('undo'), { attributes: true, attributeFilter: ['disabled'] });
 
@@ -199,7 +213,7 @@ $('m-d-pattern').addEventListener('click', mRandPattern);
 XN.forEach((name, v) => {
   const b = document.createElement('button');
   b.className = 'm-btn'; b.type = 'button'; b.textContent = name;
-  b.addEventListener('click', () => { mPatUndo = null; randomOne(v); });
+  b.addEventListener('click', () => { mUndoFn = null; randomOne(v); });
   $('m-voices').append(b);
 });
 // across is energy, up is rush; a touch puts the dot where it lands
