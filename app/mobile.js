@@ -330,4 +330,16 @@ async function mOffer(t, type) {
   mDownload(t);
 }
 
+// ---- installable: a service worker keeps the app for offline use, and the presets page offers to install it
+// where the browser allows (Chrome on Android also has Install app in its menu) ----
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js').catch(() => {});
+let mInstallEv = null;
+addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); mInstallEv = e; $('m-install').hidden = false; });
+addEventListener('appinstalled', () => { mInstallEv = null; $('m-install').hidden = true; });
+$('m-install').addEventListener('click', async () => {
+  if (!mInstallEv) return;
+  mInstallEv.prompt(); await mInstallEv.userChoice.catch(() => {});
+  mInstallEv = null; $('m-install').hidden = true;
+});
+
 mSync(); mUndo(); mName(); mCompOn(); mDrawAll();

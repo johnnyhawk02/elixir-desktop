@@ -3,6 +3,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#62bd8c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="description" content="Elixir: a six-voice drum machine in the browser, running a JavaScript port of the drum engine from the Erica Synths LXR-02 firmware.">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,12 +17,6 @@
 <main class="m" id="m">
   <header class="m-top">
     <b class="m-title">elixir</b>
-    <nav class="m-tabs" role="tablist">
-      <button type="button" role="tab" data-m-tab="play" aria-selected="true">play</button>
-      <button type="button" role="tab" data-m-tab="dice" aria-selected="false">random</button>
-      <button type="button" role="tab" data-m-tab="comp" aria-selected="false">comp</button>
-      <button type="button" role="tab" data-m-tab="presets" aria-selected="false">presets</button>
-    </nav>
   </header>
   <section class="m-card m-trans">
     <button class="m-play" id="m-play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 4.5v15l13-7.5z"/><rect class="i-stop" x="5.5" y="5.5" width="13" height="13" rx="2"/></svg><span>play</span></button>
@@ -74,9 +71,17 @@
       </div>
       <p class="m-note">Import reads a presets file exported from the full Elixir (star presets there, then export favourites). Export mine writes one the full Elixir can import.</p>
     </section>
+    <button class="m-btn m-wide m-install" id="m-install" type="button" hidden>install the app</button>
     <footer class="m-foot">Engine ported from the Erica Synths LXR-02 firmware (GPL-3.0). Unofficial. <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a></footer>
   </div>
   </div>
+
+  <nav class="m-tabs" role="tablist" aria-label="pages">
+    <button type="button" role="tab" data-m-tab="play" aria-selected="true">play</button>
+    <button type="button" role="tab" data-m-tab="dice" aria-selected="false">random</button>
+    <button type="button" role="tab" data-m-tab="comp" aria-selected="false">comp</button>
+    <button type="button" role="tab" data-m-tab="presets" aria-selected="false">presets</button>
+  </nav>
 </main>
 
 <div class="wrap" aria-hidden="true">

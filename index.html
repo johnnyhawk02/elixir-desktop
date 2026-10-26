@@ -3,6 +3,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#62bd8c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="description" content="Elixir: a six-voice drum machine in the browser, running a JavaScript port of the drum engine from the Erica Synths LXR-02 firmware.">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -846,7 +849,7 @@ pre { margin: 0; padding: 14px 18px; overflow: auto; max-width: 100%; background
 
 /* ---- the phone screen: one column of mustard cards on the green bench; the desktop panels are hidden ---- */
 .wrap { display: none !important; }
-body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(20px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(10px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
   min-height: 100dvh; -webkit-tap-highlight-color: transparent; }
 .m { max-width: 480px; margin: 0 auto; display: grid; gap: 10px; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
 .m-card { background: var(--panel); border-radius: 18px; padding: 16px; }
@@ -857,8 +860,9 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-pname { font-size: var(--fs-s) !important; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
   background: var(--tint) !important; border-radius: 10px; padding: 0 10px; }
 
-.m-tabs { flex: 1; max-width: 300px; display: grid; grid-template-columns: repeat(4, auto); gap: 2px; background: var(--tint); border-radius: 999px; padding: 3px; }
-.m-tabs button { background: none; padding: 0 10px; border-radius: 999px; min-height: 34px; font-size: var(--fs-s) !important; font-weight: 500; }
+/* the page buttons, along the bottom where a thumb reaches them */
+.m-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: var(--tint); border-radius: 18px; padding: 4px; }
+.m-tabs button { background: none; border-radius: 14px; min-height: 52px; font-size: var(--fs-m) !important; font-weight: 600; }
 .m-tabs button[aria-selected="true"] { background: var(--panel); }
 /* the pages sit side by side and snap: swipe between them, or tap a tab. The faders' tracks take their own
    touches (touch-action: none), so a drag on one never turns the page */
@@ -887,7 +891,7 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 #m-faders, #m-comp, #m-duck { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 10px; }
 /* the page is one screen high: header, tabs and transport, then the pages; on the play page three rows of
    faders take the rest (each track stretches to its row), then the randomisers. The other pages scroll inside */
-.m { height: calc(100dvh - max(10px, env(safe-area-inset-top, 0px)) - max(20px, env(safe-area-inset-bottom, 0px))); grid-template-rows: auto auto 1fr; }
+.m { height: calc(100dvh - max(10px, env(safe-area-inset-top, 0px)) - max(10px, env(safe-area-inset-bottom, 0px))); grid-template-rows: auto auto 1fr auto; }
 [data-m-panel="play"], [data-m-panel="dice"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
 /* the random page: the buttons, then the energy / rush pad in what's left */
 .m-dice-card { display: grid; grid-template-rows: auto 1fr; gap: 10px; min-height: 0; padding: 10px 8px; }
@@ -955,17 +959,13 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-pio { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
 .m-file { display: grid; place-items: center; cursor: pointer; position: relative; overflow: hidden; }
 .m-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
+.m-install { margin-top: 10px; }
+.m-install[hidden] { display: none; }
 </style>
 
 <main class="m" id="m">
   <header class="m-top">
     <b class="m-title">elixir</b>
-    <nav class="m-tabs" role="tablist">
-      <button type="button" role="tab" data-m-tab="play" aria-selected="true">play</button>
-      <button type="button" role="tab" data-m-tab="dice" aria-selected="false">random</button>
-      <button type="button" role="tab" data-m-tab="comp" aria-selected="false">comp</button>
-      <button type="button" role="tab" data-m-tab="presets" aria-selected="false">presets</button>
-    </nav>
   </header>
   <section class="m-card m-trans">
     <button class="m-play" id="m-play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 4.5v15l13-7.5z"/><rect class="i-stop" x="5.5" y="5.5" width="13" height="13" rx="2"/></svg><span>play</span></button>
@@ -1020,9 +1020,17 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
       </div>
       <p class="m-note">Import reads a presets file exported from the full Elixir (star presets there, then export favourites). Export mine writes one the full Elixir can import.</p>
     </section>
+    <button class="m-btn m-wide m-install" id="m-install" type="button" hidden>install the app</button>
     <footer class="m-foot">Engine ported from the Erica Synths LXR-02 firmware (GPL-3.0). Unofficial. <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a></footer>
   </div>
   </div>
+
+  <nav class="m-tabs" role="tablist" aria-label="pages">
+    <button type="button" role="tab" data-m-tab="play" aria-selected="true">play</button>
+    <button type="button" role="tab" data-m-tab="dice" aria-selected="false">random</button>
+    <button type="button" role="tab" data-m-tab="comp" aria-selected="false">comp</button>
+    <button type="button" role="tab" data-m-tab="presets" aria-selected="false">presets</button>
+  </nav>
 </main>
 
 <div class="wrap" aria-hidden="true">
@@ -7703,6 +7711,18 @@ async function mOffer(t, type) {
   }
   mDownload(t);
 }
+
+// ---- installable: a service worker keeps the app for offline use, and the presets page offers to install it
+// where the browser allows (Chrome on Android also has Install app in its menu) ----
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js').catch(() => {});
+let mInstallEv = null;
+addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); mInstallEv = e; $('m-install').hidden = false; });
+addEventListener('appinstalled', () => { mInstallEv = null; $('m-install').hidden = true; });
+$('m-install').addEventListener('click', async () => {
+  if (!mInstallEv) return;
+  mInstallEv.prompt(); await mInstallEv.userChoice.catch(() => {});
+  mInstallEv = null; $('m-install').hidden = true;
+});
 
 mSync(); mUndo(); mName(); mCompOn(); mDrawAll();
 </script>

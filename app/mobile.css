@@ -1,7 +1,7 @@
 
 /* ---- the phone screen: one column of mustard cards on the green bench; the desktop panels are hidden ---- */
 .wrap { display: none !important; }
-body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(20px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(10px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
   min-height: 100dvh; -webkit-tap-highlight-color: transparent; }
 .m { max-width: 480px; margin: 0 auto; display: grid; gap: 10px; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
 .m-card { background: var(--panel); border-radius: 18px; padding: 16px; }
@@ -12,8 +12,9 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-pname { font-size: var(--fs-s) !important; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
   background: var(--tint) !important; border-radius: 10px; padding: 0 10px; }
 
-.m-tabs { flex: 1; max-width: 300px; display: grid; grid-template-columns: repeat(4, auto); gap: 2px; background: var(--tint); border-radius: 999px; padding: 3px; }
-.m-tabs button { background: none; padding: 0 10px; border-radius: 999px; min-height: 34px; font-size: var(--fs-s) !important; font-weight: 500; }
+/* the page buttons, along the bottom where a thumb reaches them */
+.m-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: var(--tint); border-radius: 18px; padding: 4px; }
+.m-tabs button { background: none; border-radius: 14px; min-height: 52px; font-size: var(--fs-m) !important; font-weight: 600; }
 .m-tabs button[aria-selected="true"] { background: var(--panel); }
 /* the pages sit side by side and snap: swipe between them, or tap a tab. The faders' tracks take their own
    touches (touch-action: none), so a drag on one never turns the page */
@@ -42,7 +43,7 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 #m-faders, #m-comp, #m-duck { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 10px; }
 /* the page is one screen high: header, tabs and transport, then the pages; on the play page three rows of
    faders take the rest (each track stretches to its row), then the randomisers. The other pages scroll inside */
-.m { height: calc(100dvh - max(10px, env(safe-area-inset-top, 0px)) - max(20px, env(safe-area-inset-bottom, 0px))); grid-template-rows: auto auto 1fr; }
+.m { height: calc(100dvh - max(10px, env(safe-area-inset-top, 0px)) - max(10px, env(safe-area-inset-bottom, 0px))); grid-template-rows: auto auto 1fr auto; }
 [data-m-panel="play"], [data-m-panel="dice"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
 /* the random page: the buttons, then the energy / rush pad in what's left */
 .m-dice-card { display: grid; grid-template-rows: auto 1fr; gap: 10px; min-height: 0; padding: 10px 8px; }
@@ -110,3 +111,5 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-pio { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
 .m-file { display: grid; place-items: center; cursor: pointer; position: relative; overflow: hidden; }
 .m-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
+.m-install { margin-top: 10px; }
+.m-install[hidden] { display: none; }
