@@ -462,7 +462,8 @@ async function mOffer(t, type) {
   return true;
 }
 
-// ---- the fx page: the two send effects' settings on faders, a row each (the distortion is on the master page) ----
+// ---- the fx page: the two send effects' settings on faders, a row each (the distortion is on the master page; random
+// fx and alter fx are on the perf page) ----
 const fxF = (box, label, A) => mFader($(box), label, { min: A.min, max: A.max, step: A.step || 1, get: A.get, set: (v) => { A.set(v); setDirty(true); }, show: A.show, dflt: A.dflt });
 const fxSend = (k) => ({ ...mAllSend(k), show: (v) => mPct(v), dflt: 0 });
 const fxPar = (p, dflt) => ({ min: 0, max: 127, get: () => values[p], set: (v) => setValue(p, v, true), show: String, dflt });
@@ -726,7 +727,7 @@ const NB_KEY = 'elixir-mobile-nextbar';
 try { $('m-nextbar').checked = localStorage.getItem(NB_KEY) === '1'; } catch (e) {}
 $('m-nextbar').addEventListener('change', () => { try { localStorage.setItem(NB_KEY, $('m-nextbar').checked ? '1' : '0'); } catch (e) {} });
 const mBarBtns = new Set();
-for (const id of ['m-everything', 'm-kit', 'm-alter', 'm-pattern', 'm-xrand']) {
+for (const id of ['m-everything', 'm-kit', 'm-alter', 'm-pattern', 'm-xrand', 'm-fx-rand', 'm-fx-alter']) {
   // (before the button's own handler: everything it sends, now and in its awaited steps, goes to the bar)
   $(id).addEventListener('click', () => {
     if (!$('m-nextbar').checked || !playing) return;

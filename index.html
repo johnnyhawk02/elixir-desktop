@@ -1333,6 +1333,11 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-rand-card .m-nextbar { justify-content: flex-start; padding-left: 6px; min-height: 30px; }
 /* a fader moved by MIDI follows the knob straight away, without the LCD fade */
 .m .m-vf.cc .m-vtrack i { transition: none; }
+/* the perf page's randomise column: two boxes, then eight buttons (random fx and alter fx moved here from fx) */
+.m-rand-card .m-rand { grid-template-rows: auto auto repeat(8, minmax(0, 1fr)); gap: 6px; }
+.m .m-rand-card .m-rand .m-btn { font-size: min(var(--fs-xs), 3.7vw) !important; white-space: nowrap; }
+/* the fx page now just its two rows of faders */
+.m-fx-card { grid-template-rows: repeat(2, minmax(0, 1fr)); }
 </style>
 
 <main class="m" id="m">
@@ -1357,6 +1362,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-alter" type="button">alter</button>
         <button class="m-btn" id="m-pattern" type="button">pattern</button>
         <button class="m-btn" id="m-xrand" type="button">crossfeed</button>
+        <button class="m-btn" id="m-fx-rand" type="button">random fx</button>
+        <button class="m-btn" id="m-fx-alter" type="button">alter fx</button>
         <button class="m-btn" id="m-undo" data-m-undo type="button" disabled>undo</button>
       </div>
     </section>
@@ -1381,11 +1388,6 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     <section class="m-card m-fx-card">
       <div class="m-fx-row"><div class="m-fxhead"><b>echo</b><label class="m-chk"><input id="m-pp" type="checkbox"><i aria-hidden="true"></i>ping pong</label></div><div class="m-faders" id="m-fx-echo"></div></div>
       <div class="m-fx-row"><b>ring mod</b><div class="m-faders" id="m-fx-ring"></div></div>
-      <div class="m-fx-btns">
-        <button class="m-btn m-big" id="m-fx-rand" type="button">random fx</button>
-        <button class="m-btn" id="m-fx-alter" type="button">alter fx</button>
-        <button class="m-btn" data-m-undo type="button" disabled>undo</button>
-      </div>
     </section>
   </div>
 
@@ -8361,7 +8363,8 @@ async function mOffer(t, type) {
   return true;
 }
 
-// ---- the fx page: the two send effects' settings on faders, a row each (the distortion is on the master page) ----
+// ---- the fx page: the two send effects' settings on faders, a row each (the distortion is on the master page; random
+// fx and alter fx are on the perf page) ----
 const fxF = (box, label, A) => mFader($(box), label, { min: A.min, max: A.max, step: A.step || 1, get: A.get, set: (v) => { A.set(v); setDirty(true); }, show: A.show, dflt: A.dflt });
 const fxSend = (k) => ({ ...mAllSend(k), show: (v) => mPct(v), dflt: 0 });
 const fxPar = (p, dflt) => ({ min: 0, max: 127, get: () => values[p], set: (v) => setValue(p, v, true), show: String, dflt });
@@ -8625,7 +8628,7 @@ const NB_KEY = 'elixir-mobile-nextbar';
 try { $('m-nextbar').checked = localStorage.getItem(NB_KEY) === '1'; } catch (e) {}
 $('m-nextbar').addEventListener('change', () => { try { localStorage.setItem(NB_KEY, $('m-nextbar').checked ? '1' : '0'); } catch (e) {} });
 const mBarBtns = new Set();
-for (const id of ['m-everything', 'm-kit', 'm-alter', 'm-pattern', 'm-xrand']) {
+for (const id of ['m-everything', 'm-kit', 'm-alter', 'm-pattern', 'm-xrand', 'm-fx-rand', 'm-fx-alter']) {
   // (before the button's own handler: everything it sends, now and in its awaited steps, goes to the bar)
   $(id).addEventListener('click', () => {
     if (!$('m-nextbar').checked || !playing) return;
