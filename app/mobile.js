@@ -176,6 +176,13 @@ grVu.set = (db) => {
   const d = Math.max(0, Math.min(20, db || 0));
   $('m-gr').style.width = (Math.log1p(d) / Math.log1p(20) * 100).toFixed(1) + '%'; $('m-gr-out').textContent = `${d.toFixed(1)} dB`;
 };
+// and the sidechain's: how far drum 1 is turning the rest down, the same scale
+const mDkSet = duckVu.set;
+duckVu.set = (db) => {
+  mDkSet(db);
+  const d = Math.max(0, Math.min(20, db || 0));
+  $('m-dk').style.width = (Math.log1p(d) / Math.log1p(20) * 100).toFixed(1) + '%'; $('m-dk-out').textContent = `${d.toFixed(1)} dB`;
+};
 
 // ---- randomisers ----
 // undo takes back the last randomise: the sound for everything and kit (the desktop's undo), the pattern for pattern,
@@ -440,7 +447,8 @@ const RING_W = LXR.OSC_WAVE_NAMES.map((n) => n.toLowerCase());
 fxF('m-fx-ring', 'wave', { min: 0, max: RING_W.length - 1, get: () => fx3.ring.wave, set: (v) => { fx3.ring.wave = v; sendMix(); }, show: (v) => RING_W[v], dflt: 0 });
 fxF('m-fx-ring', 'freq', { min: 0, max: 127, get: () => fx3.ring.freq, set: (v) => { fx3.ring.freq = v; sendMix(); }, show: String, dflt: FX3_0.ring.freq });
 
-// ---- the master page's distortion: the whole mix through it, into the compressor. Mix (0 bypasses it), type (tube,
+// ---- the master page's distortion: the whole mix through it (after the sidechain's duck), into the compressor; the
+// page runs top to bottom in signal order: sidechain, distortion, compressor. Mix (0 bypasses it), type (tube,
 // fold or rat), drive, color, tone, volume ----
 fxF('m-dist', 'mix', { min: 0, max: 100, get: () => fx3.dist.mix || 0, set: (v) => { fx3.dist.mix = v; sendMix(); }, show: (v) => (v ? v + '%' : 'off'), dflt: 0 });
 const DIST_T = LXR.DIST_NAMES.map((n) => n.toLowerCase());
