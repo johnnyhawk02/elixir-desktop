@@ -70,11 +70,18 @@ class Player {
     // the acid line: a second engine, of which only drum 1 plays, stepping through 16 notes (null = rest) on the
     // straight grid; a slide doesn't retrigger, it glides into the note (bend: the pitch ratio still to go, easing to 1)
     this.b = new LXR.LxrEngine({ seed: 0x1f2e3d4c }); this.b.loadInitKit();
-    this.acid = { steps: new Array(16).fill(null), level: 0, base: 60 };
+    this.acid = { steps: new Array(16).fill(null), level: 0, base: 60, space: 0 };
     this.acidNote = 60; this.acidBend = 1; this.acidG = 1; this.acidGTo = 1;
     // drum voices differ a lot in level, so the line is evened out: its peak, held and let go over a couple of seconds,
     // sets a gain toward a fixed peak (acidNorm, eased so a change never jumps)
-    this.acidPk = 12000; this.acidNorm = 1;
+    this.acidPk = 12000; this.acidNorm = 1; this.acidBuf = new Float32Array(64); this.acidOn = false;
+    // the spacer (after Trackspacer): eight bands, an octave apart from 60 Hz, each a band-pass on the acid line and on
+    // the drums (everything before the master); where the drums have energy in a band, that band of the line is turned
+    // down, by up to the space amount (100 = -20 dB). The line is its dry signal plus (gain - 1) times each band, so with
+    // the drums quiet it is untouched. The cut follows the drums with a 3 ms attack and an 80 ms release
+    this.spF = Array.from({ length: 8 }, (_, k) => Math.tan(Math.PI * 60 * Math.pow(2, k * 1.1) / LXR.REAL_FS));
+    this.spS = new Float64Array(32); this.spEnv = new Float32Array(8); this.spG = new Float32Array(8).fill(1);
+    this.spBand = Array.from({ length: 8 }, () => new Float32Array(64)); this.spGr = new Float32Array(8);
     this.events = [];
     this._render(this.A); this._render(this.B);
   }
@@ -180,6 +187,31 @@ class Player {
     }
     this.sched[s] = hits;
   }
+  // the spacer: runs the line's bands and the drums' bands, follows each drum band's peak, and cuts the line's band under it
+  spacer(ab, L, R) {
+    const FS = LXR.REAL_FS, depth = this.acid.space / 100, floor = 1 - depth * 0.9, k = 1 / 1.4, S = this.spS;
+    const att = 1 - Math.exp(-64 / (0.003 * FS)), rel = Math.exp(-64 / (0.08 * FS));
+    const sc = this.busIn; // scratch: the drums in mono
+    for (let i = 0; i < 64; i++) sc[i] = (L[i] + R[i]) / 2;
+    for (let b = 0; b < 8; b++) {
+      const g = this.spF[b], a = 1 / (1 + g * (g + k)), o = b * 4, band = this.spBand[b];
+      let pk = 0;
+      // TPT state-variable band-pass, unity gain at the centre (k * bp), on the line (states o, o+1) and the drums (o+2, o+3)
+      for (let i = 0; i < 64; i++) {
+        let x = ab[i], s1 = S[o], s2 = S[o + 1], hp = (x - (g + k) * s1 - s2) * a, bp = g * hp + s1;
+        S[o] = g * hp + bp; S[o + 1] = s2 + 2 * g * bp; band[i] = bp * k;
+        x = sc[i]; s1 = S[o + 2]; s2 = S[o + 3]; hp = (x - (g + k) * s1 - s2) * a; const bq = g * hp + s1;
+        S[o + 2] = g * hp + bq; S[o + 3] = s2 + 2 * g * bq;
+        const m = bq < 0 ? -bq : bq; if (m > pk) pk = m;
+      }
+      pk *= k;
+      const e = this.spEnv[b] = pk > this.spEnv[b] ? this.spEnv[b] + (pk - this.spEnv[b]) * att : this.spEnv[b] * rel;
+      // full cut once the drums' band reaches about -28 dBFS; the gain ramps across the block
+      const g0 = this.spG[b], g1 = 1 - (1 - floor) * Math.min(1, e / 0.04);
+      for (let i = 0; i < 64; i++) ab[i] += (g0 + (g1 - g0) * (i + 1) / 64 - 1) * band[i];
+      this.spG[b] = g1; this.spGr[b] = Math.max(this.spGr[b], 1 - g1);
+    }
+  }
   // an acid step: a new note retriggers drum 1 of the acid engine; a slide keeps it sounding and glides from the last note
   acidHit(st) {
     const note = Math.max(0, Math.min(127, this.acid.base + st.n));
@@ -266,7 +298,8 @@ class Player {
     const pans = [e.drums[0], e.drums[1], e.drums[2], e.snare, e.cymbal, e.hat];
     const [L, R] = dst;
     L.fill(0); R.fill(0);
-    // the acid line, mono in the middle, before the FX returns and the compressor; ducked like the drums
+    // the acid line, mono in the middle, ducked like the drums; it joins the mix after the drums and their FX
+    // returns, through the spacer, before the rush high-pass and the compressor
     if (this.acid.level || this.acidBend !== 1) {
       this.acidBend = 1 + (this.acidBend - 1) * Math.exp(-64 / (0.06 * LXR.REAL_FS));
       if (Math.abs(this.acidBend - 1) < 1e-4) this.acidBend = 1;
@@ -277,9 +310,10 @@ class Player {
       const n0 = this.acidNorm; this.acidNorm = Math.min(6, 14000 / this.acidPk);
       const lv = this.acid.level / 100 * 0.9 / 32768;
       const g0 = this.acidG * lv * n0 * this.duckAt, dg = (this.acidGTo * lv * this.acidNorm * (1 - (this.master.duckOn ? this.master.duck : 0) * Math.min(1, this.duckEnv / 0.3)) - g0) / 64;
-      for (let i = 0; i < 64; i++) { const v = ao[i] * (g0 + dg * i); L[i] += v; R[i] += v; }
-      this.acidG = this.acidGTo;
-    }
+      const ab = this.acidBuf;
+      for (let i = 0; i < 64; i++) ab[i] = ao[i] * (g0 + dg * i);
+      this.acidG = this.acidGTo; this.acidOn = true;
+    } else this.acidOn = false;
     // sidechain: follow drum 1's level (instant attack, set release) and turn the rest down
     const M = this.master, k = out[0];
     const isDelay = e.fx.fxType === LXR.FX_DELAY;
@@ -333,6 +367,11 @@ class Player {
       if (any || bo.some((v) => v)) for (let i = 0; i < 64; i++) { const g = mk / 32768 * (fd0 + fdd * i); L[i] += bo[2 * i] * g; R[i] += bo[2 * i + 1] * g; }
     }
     for (let i = 0; i < 64; i++) { const g = (fd0 + fdd * i) / 32768; L[i] += fx[2 * i] * g; R[i] += fx[2 * i + 1] * g; }
+    if (this.acidOn) {
+      const ab = this.acidBuf;
+      if (this.acid.space) this.spacer(ab, L, R);
+      for (let i = 0; i < 64; i++) { L[i] += ab[i]; R[i] += ab[i]; }
+    }
     if (this.rush > S.hp || this.hpOn) this.highPass(L, R);
     if (M.comp) {
       // peak detector in dB, attack/release smoothing, gain = over * (1/ratio - 1) + makeup

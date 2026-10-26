@@ -332,9 +332,10 @@ async function mOffer(t, type) {
 // The line is sixteen steps of note, accent and slide; density turns steps on in a fixed order (so turning it up only adds
 // notes), rotate shifts the line round the bar, pitch transposes it. Random makes a new line, alter changes a few steps,
 // voice gives it a drum voice from a random built-in kit, held longer and with less pitch sweep so the notes read.
+// Space makes room for the drums: the line is cut, band by band, where the drums (the whole mix before the master) are.
 const ACID_SCALE = [0, 0, 0, 0, 3, 5, 7, 7, 10, 12, 12, -12, 15];
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const acid = { rank: [], note: [], acc: [], slide: [], density: 60, rotate: 0, pitch: 0, level: 70 };
+const acid = { rank: [], note: [], acc: [], slide: [], density: 60, rotate: 0, pitch: 0, level: 70, space: 50 };
 function acidNew() {
   // downbeats tend to come first, so a thin line still lands on the beat
   const w = Array.from({ length: 16 }, (_, s) => Math.random() - (s % 4 === 0 ? 0.35 : s % 2 === 0 ? 0.1 : 0));
@@ -354,7 +355,7 @@ const acidSteps = () => Array.from({ length: 16 }, (_, s) => {
 });
 function acidSend() {
   const steps = acidSteps();
-  send({ type: 'acid', acid: { steps, level: acid.level, base: 60 + acid.pitch } });
+  send({ type: 'acid', acid: { steps, level: acid.level, base: 60 + acid.pitch, space: acid.space } });
   acidDraw(steps);
 }
 const mAcidCells = Array.from({ length: 16 }, () => { const c = document.createElement('span'); $('m-acid-steps').append(c); return c; });
@@ -378,11 +379,13 @@ function acidVoice() {
   send({ type: 'acidKit', values: Array.from(kit) });
 }
 const acidFader = (label, key, min, max, show) => mFader($('m-acid-faders'), label, { min, max, get: () => acid[key],
-  set: (v) => { acid[key] = v; acidSend(); }, show, dflt: { density: 60, rotate: 0, pitch: 0, level: 70 }[key] });
+  set: (v) => { acid[key] = v; acidSend(); }, show, dflt: { density: 60, rotate: 0, pitch: 0, level: 70, space: 50 }[key] });
 acidFader('density', 'density', 0, 100, (v) => `${Math.round(v / 100 * 16)}\nnotes`);
 acidFader('rotate', 'rotate', 0, 15, (v) => (v ? `+${v}` : '0') + '\nsteps');
 acidFader('pitch', 'pitch', -12, 12, (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v) + '\nst');
 acidFader('level', 'level', 0, 100, (v) => (v ? v + '%' : 'off'));
+// space: the spacer, which cuts the line's frequencies wherever the drums are playing in them (after Trackspacer)
+acidFader('space', 'space', 0, 100, (v) => (v ? v + '%' : 'off'));
 $('m-acid-new').addEventListener('click', async () => { await startAudio(); acidNew(); acidSend(); });
 $('m-acid-alter').addEventListener('click', async () => { await startAudio(); acidAlter(); acidSend(); });
 $('m-acid-voice').addEventListener('click', async () => { await startAudio(); acidVoice(); });
