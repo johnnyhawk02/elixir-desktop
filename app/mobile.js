@@ -298,11 +298,15 @@ const mAllSend = (k) => ({ min: 0, max: 100, get: () => Math.max(...mix[k]), sho
   set: (v) => { mix[k].fill(v); if (k === 'fx') fxButtons.forEach((b) => b()); sendMix(); } });
 
 // ---- presets: save, and a list to load or delete (kept in this browser, as on the desktop) ----
-// while playing, a preset waits for the next bar to come in: until it's heard, its row flashes
-let mPending = null;
-const mLoad = (k) => { loadPreset(k); mPending = playing ? k : null; mDrawPresets(); };
+// while playing, a preset waits for the next bar to come in: until it's heard, the one playing stays marked and the
+// new one's row flashes
+let mPending = null, mPlayingPreset = null;
+const mLoad = (k) => {
+  if (!mPending) mPlayingPreset = kitList[Number($('kit').value)];
+  loadPreset(k); mPending = playing ? k : null; mDrawPresets();
+};
 function mDrawPresets() {
-  const list = $('m-plist'), cur = kitList[Number($('kit').value)];
+  const list = $('m-plist'), cur = mPending ? mPlayingPreset : kitList[Number($('kit').value)];
   list.innerHTML = '';
   const group = (t) => { const li = document.createElement('li'); li.className = 'm-pgroup'; li.textContent = t; list.append(li); };
   const row = (k) => {
