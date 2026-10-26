@@ -134,8 +134,7 @@ mFader($('m-faders'), 'crossfeed', { min: 0, max: 100, get: () => Number($('xdep
 // so the play page is three by three: tempo, fills, groove / sidechain, pitch, decay / filter, fm, crossfeed
 $('m-beat-open').addEventListener('click', () => { $('m-beat').hidden = false; mDrawAll(); });
 $('m-beat-close').addEventListener('click', () => { $('m-beat').hidden = true; });
-// the randomisers go in a row under the faders
-$('m-faders').after($('m-faders').querySelector('.m-rand'));
+// the randomisers stand in a column beside the faders (set in the CSS), apart from the page buttons along the bottom
 
 // ---- compressor tab ----
 const mMaster = (box, label, key, lo, hi, step, show) => mFader(box, label, { min: lo, max: hi, step, get: () => master[key],

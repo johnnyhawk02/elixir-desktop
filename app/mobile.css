@@ -56,8 +56,12 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-xy-x { right: 12px; bottom: 8px; }
 .m-xy-y { left: 12px; bottom: 8px; }
 .m-xy output { position: absolute; left: 12px; top: 10px; font-family: var(--mono); font-size: var(--fs-xs); line-height: 1.3; color: var(--muted); white-space: pre-line; pointer-events: none; }
-.m-play-card { display: grid; grid-template-rows: 1fr auto; gap: 10px; min-height: 0; padding: 10px 8px; }
-#m-faders { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 10px 6px; min-height: 0; }
+.m-play-card { display: grid; grid-template-rows: 1fr; gap: 10px; min-height: 0; padding: 10px 8px; }
+#m-faders { grid-template-columns: repeat(3, 1fr) minmax(0, .95fr); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 10px 6px; min-height: 0; }
+/* the randomisers: a column of four down the right of the faders */
+#m-faders .m-rand { grid-column: 4; grid-row: 1 / span 3; grid-template-columns: 1fr; grid-template-rows: repeat(4, 1fr); }
+#m-faders .m-rand { min-width: 0; }
+#m-faders .m-rand .m-btn { min-height: 0; min-width: 0; padding: 0 2px; font-size: var(--fs-xs) !important; letter-spacing: .02em; overflow: hidden; }
 #m-faders .m-vf, #m-beat-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 3px; }
 #m-faders .m-vf output, #m-beat-faders .m-vf output { font-size: .62rem; line-height: 1.25; height: 2.5em; display: flex; align-items: flex-end; justify-content: center; flex: none; align-self: stretch; }
 #m-faders .m-flab, #m-beat-faders .m-flab { font-size: var(--fs-xs); line-height: 1.2; }
