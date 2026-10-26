@@ -392,6 +392,7 @@ $('m-pimport').addEventListener('change', async (e) => {
         if (!q) { old++; continue; }
         if (kitList.some((k) => k.saved && k.name === q.name)) continue;
         kitList.push(fromStored(q, { saved: true })); n++;
+        if (q.fav) { mFavs.add(q.name); mFavStore(); }
       }
     } catch (err) { bad++; }
   }
@@ -400,12 +401,13 @@ $('m-pimport').addEventListener('change', async (e) => {
   $('m-pnote').textContent = (n ? `Imported ${n}.` : 'Nothing new to import.') + (old ? ` ${old} skipped: not a preset.` : '') + (bad ? ` ${bad} file${bad > 1 ? 's' : ''} not a presets file.` : '');
   mDrawPresets();
 });
+// export: the favourites, built in and saved alike (each marked fav, so an import stars them again)
 $('m-pexport').addEventListener('click', async () => {
-  const mine = kitList.filter((k) => k.saved).map(presetData);
-  if (!mine.length) { $('m-pnote').textContent = 'Save a preset first.'; return; }
-  const blob = new Blob([JSON.stringify({ elixir: 1, presets: mine }, null, 1)], { type: 'application/json' });
-  mOffer({ blob, name: 'elixir-mobile-presets.json' }, 'application/json');
-  $('m-pnote').textContent = `Exported ${mine.length}.`;
+  const favs = kitList.filter((k) => (k.saved || k.builtin) && mFavs.has(k.name)).map((k) => ({ ...presetData(k), fav: true }));
+  if (!favs.length) { $('m-pnote').textContent = 'Star some presets first.'; return; }
+  const blob = new Blob([JSON.stringify({ elixir: 1, presets: favs }, null, 1)], { type: 'application/json' });
+  mOffer({ blob, name: 'elixir-mobile-favourites.json' }, 'application/json');
+  $('m-pnote').textContent = `Exported ${favs.length} favourite${favs.length > 1 ? 's' : ''}.`;
 });
 
 // ---- record: free length, no count-in; starts now (and starts playback), the second press stops and saves ----
