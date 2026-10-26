@@ -7,7 +7,7 @@ const mix = { fx: new Array(6).fill(0), dist: new Array(6).fill(0), ring: new Ar
 // (the distortion is a master insert in Elixir Mobile: mix is how much of the whole mix goes through it, 0 = bypassed)
 const FX3_0 = { echo: { pct: 100 }, dist: { type: 0, p: [70, 64, 80, 90], mix: 0 }, ring: { wave: 0, freq: 40 } };
 const fx3 = structuredClone(FX3_0);
-const fx3Snapshot = () => ({ params: structuredClone(fx3), dsend: mix.dist.slice(), ring: mix.ring.slice() });
+const fx3Snapshot = () => ({ params: structuredClone(fx3), ring: mix.ring.slice() });
 const stripsEl = $('strips');
 const muted = new Array(6).fill(false);
 const fxButtons = [];

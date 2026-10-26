@@ -23,19 +23,33 @@ const sourceKits = BUNDLED_KITS.map((k) => parseSnd(Uint8Array.from(atob(k.data)
 for (const { kit } of sourceKits) for (let n = 1; n <= 6; n++) if (kit[PAR['TRANS' + n + '_WAVE']] >= 14) kit[PAR['TRANS' + n + '_WAVE']] %= 14;
 // ---- preset format ----
 // A preset is { v, name, kit, xm, fx, fx3, dpos, song, fav }; xm, fx, fx3 and song may be missing (a sound from a
-// kit file: the sends and FX then come from the kit's own FX settings). Only presets in the current format
-// (v = PRESET_V) are read; older ones are skipped. A change to the format bumps PRESET_V and rewrites the
-// built-in presets in presets/*.json to match (build.mjs refuses any in another format).
-const PRESET_V = 4;
+// kit file: the sends and FX then come from the kit's own FX settings). Elixir Mobile's own format is v5 (see
+// PRESETS.md): any preset with a kit is brought into it as it's read (built in, stored or imported), whatever it
+// sounded like before: the distortion sends go (the distortion is a master insert, fx3.params.dist.mix, 0 = off), the
+// master gets its spacer (0), and a song too old to have its pattern pages and rush settings is dropped (the preset
+// then loads its sound alone). build.mjs refuses a built-in preset in any other version.
+const PRESET_V = 5;
 const PRESET_FIELDS = ['name', 'kit', 'xm', 'fx', 'fx3', 'dpos', 'song', 'fav'];
-const isCurrent = (p) => !!(p && p.v === PRESET_V && p.kit);
+function toCurrent(p) {
+  if (!p || !p.kit) return null;
+  const q = structuredClone(p);
+  q.v = PRESET_V;
+  if (q.fx3) {
+    delete q.fx3.dsend;
+    const d = q.fx3.params && q.fx3.params.dist;
+    if (d && typeof d.mix !== 'number') d.mix = 0;
+  }
+  if (q.song && !(q.song.pattern && q.song.stepPages && q.song.rushSet)) delete q.song;
+  if (q.song && q.song.master && typeof q.song.master.space !== 'number') q.song.master.space = 0;
+  return q;
+}
 // a preset as stored and exported, from a kit list entry
 const presetData = (k) => ({ v: PRESET_V, ...Object.fromEntries(PRESET_FIELDS.map((f) => [f, k[f]])), kit: Array.from(k.kit), fav: !!k.fav });
 // a kit list entry from a stored, built-in or imported preset
 const fromStored = (p, extra) => ({ ...structuredClone(p), kit: Uint8Array.from(p.kit), fav: !!p.fav, userSamples: 0, ...extra });
 // presets: the init kit, the built-in presets (favourites baked into the build), then the ones saved here
 const kitList = [{ name: 'Init kit', kit: factoryInit, userSamples: 0, builtin: true },
-  ...BUILTIN_PRESETS.map((p) => fromStored(p, { builtin: true }))];
+  ...BUILTIN_PRESETS.map(toCurrent).filter(Boolean).map((p) => fromStored(p, { builtin: true }))];
 const kitSel = $('kit');
 // saved presets: the kit values, crossfeed, FX and mixer sends, plus the song (pattern, perform dials,
 // tempo, velocity, accent, master, snare rush and its settings), kept in this browser
@@ -49,7 +63,12 @@ function storePresets() {
   const list = kitList.filter((k) => k.saved).map(presetData);
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(list)); } catch (e) {}
 }
-for (const p of storedPresets().filter(isCurrent)) kitList.push(fromStored(p, { saved: true }));
+// (the ones stored here in an older format are rewritten in this one)
+{
+  const stored = storedPresets(), cur = stored.map(toCurrent).filter(Boolean);
+  for (const p of cur) kitList.push(fromStored(p, { saved: true }));
+  if (stored.some((p) => !p || p.v !== PRESET_V)) try { localStorage.setItem(SAVE_KEY, JSON.stringify(cur)); } catch (e) {}
+}
 function fillKits() {
   kitSel.innerHTML = '';
   const groups = [['built in', (k) => k.builtin], ['mine', (k) => k.saved]];
@@ -95,7 +114,7 @@ function useKit(k) {
   initValues.set(k.kit); asDelay(initValues); values.set(initValues);
   if (k.xm) { xm.amt.splice(0, 36, ...k.xm.amt); xm.target.splice(0, 6, ...k.xm.target); xm.target.forEach((t, d) => { xSelects[d].value = t; }); xcells.forEach((d) => d()); sendX(); }
   mix.fx.splice(0, 6, ...(k.fx || deflt(LXR.FX_DELAY)));
-  mix.dist.splice(0, 6, ...(k.fx3 ? k.fx3.dsend : deflt(LXR.FX_DISTORTION)));
+  mix.dist.fill(0); // (no distortion sends: it's on the master)
   mix.ring.splice(0, 6, ...(k.fx3 ? k.fx3.ring : deflt(LXR.FX_RING)));
   // a kit's own delay time, unless it has none worth keeping (another effect, or a time
   // under 1/32 of a bar, a comb more than an echo): then a dotted eighth

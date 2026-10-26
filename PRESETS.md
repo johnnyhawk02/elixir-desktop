@@ -1,11 +1,15 @@
-# Elixir Mobile preset format (v4)
+# Elixir Mobile preset format (v5)
 
 Elixir Mobile started as a copy of Elixir and shared its preset format. It is its own app now (from 2026-10-26)
 and its presets can change without regard to the full Elixir. It still reads presets exported from the full
 Elixir (they are this format, minus the additions below), but a preset saved here may not load there.
 
-Each version reads presets in its current format only (`PRESET_V` in `app/presets.js`) and skips any others;
-the built-in presets in `presets/*.json` must match it (`build.mjs` refuses one in any other version).
+Every preset with a kit is brought into the current format (`PRESET_V` in `app/presets.js`, `toCurrent`) as it's read,
+whether built in, stored in this browser (rewritten in place) or imported, even when that changes how it sounds: v5
+drops the distortion sends (`fx3.dsend`; the distortion is now an insert on the whole mix, `fx3.params.dist.mix`,
+0 = off), gives the master its spacer (`space: 0`), and drops a song too old to have its pattern pages and rush
+settings (the preset loads its sound alone). The built-in presets in `presets/*.json` are kept in the current
+format (`build.mjs` refuses one in any other version).
 
 ## Getting presets in and out
 
@@ -47,7 +51,7 @@ holds just the array of presets.
 | `kit` | 247 integers, 0–255 | the LXR-02 sound parameters, in the firmware's parameter order (`PAR` in `lxr-ui-data.js`), as in an `.SND` file after its 8-character name |
 | `xm` | `{ amt: [36], target: [6] }` | crossfeed: 6 × 6 depths (source × destination) and each destination's target |
 | `fx` | `[6]`, 0–100 | each voice's echo send |
-| `fx3` | `{ params: { echo, dist, ring }, dsend: [6], ring: [6] }` | the three FX: echo `{ pct }`, distortion `{ type, p: [4] }`, ring mod `{ wave, freq }`; distortion and ring mod sends per voice, 0–100 |
+| `fx3` | `{ params: { echo, dist, ring }, ring: [6] }` | the three FX: echo `{ pct }`, distortion `{ type, p: [4], mix }` (an insert on the whole mix before the compressor; `mix` 0–100, 0 = off), ring mod `{ wave, freq }`; ring mod sends per voice, 0–100 |
 | `dpos` | number, 0–1 | delay time position |
 | `song` | object | see below |
 | `fav` | boolean | starred in the preset manager |

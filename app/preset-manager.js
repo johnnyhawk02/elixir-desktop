@@ -52,9 +52,10 @@ $('pm-import').addEventListener('change', async (e) => {
     try {
       const data = JSON.parse(await f.text());
       for (const p of data.presets || []) {
-        if (!isCurrent(p)) { old++; continue; }
-        if (kitList.some((k) => k.saved && k.name === p.name)) continue;
-        kitList.push(fromStored(p, { saved: true })); n++;
+        const q = toCurrent(p);
+        if (!q) { old++; continue; }
+        if (kitList.some((k) => k.saved && k.name === q.name)) continue;
+        kitList.push(fromStored(q, { saved: true })); n++;
       }
     } catch (err) { $('pm-msg').textContent = `${f.name}: not a presets file`; }
   }

@@ -363,15 +363,16 @@ $('m-pimport').addEventListener('change', async (e) => {
   for (const f of e.target.files) {
     try {
       for (const p of JSON.parse(await f.text()).presets || []) {
-        if (!isCurrent(p)) { old++; continue; }
-        if (kitList.some((k) => k.saved && k.name === p.name)) continue;
-        kitList.push(fromStored(p, { saved: true })); n++;
+        const q = toCurrent(p); // (any preset with a kit, brought into this format)
+        if (!q) { old++; continue; }
+        if (kitList.some((k) => k.saved && k.name === q.name)) continue;
+        kitList.push(fromStored(q, { saved: true })); n++;
       }
     } catch (err) { bad++; }
   }
   e.target.value = '';
   if (n) { const v = $('kit').value; storePresets(); fillKits(); $('kit').value = v; }
-  $('m-pnote').textContent = (n ? `Imported ${n}.` : 'Nothing new to import.') + (old ? ` ${old} skipped: another preset version.` : '') + (bad ? ` ${bad} file${bad > 1 ? 's' : ''} not a presets file.` : '');
+  $('m-pnote').textContent = (n ? `Imported ${n}.` : 'Nothing new to import.') + (old ? ` ${old} skipped: not a preset.` : '') + (bad ? ` ${bad} file${bad > 1 ? 's' : ''} not a presets file.` : '');
   mDrawPresets();
 });
 $('m-pexport').addEventListener('click', async () => {
