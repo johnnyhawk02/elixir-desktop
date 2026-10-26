@@ -136,6 +136,8 @@ mMaster($('m-comp'), 'release', 'release', 20, 500, 10, (v) => v + ' ms');
 mMaster($('m-comp'), 'makeup', 'makeup', 0, 12, 1, (v) => '+' + v + ' dB');
 mFader($('m-duck'), 'amount', duckFader);
 mMaster($('m-duck'), 'release', 'duckRelease', 30, 600, 10, (v) => v + ' ms');
+// space: drum 1 also cuts the others' frequencies where it plays (a spacer, after Trackspacer), on the same switch and release
+mMaster($('m-duck'), 'space', 'space', 0, 100, 5, (v) => (v ? v + '%' : 'off'));
 const mCompOn = () => {
   const on = $('comp-on').getAttribute('aria-pressed') === 'true';
   $('m-comp-on').setAttribute('aria-pressed', on); $('m-comp-on').textContent = on ? 'on' : 'off';

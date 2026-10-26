@@ -4815,7 +4815,15 @@ class Player {
     this.hpOn = false; this.hpLog = Math.log(30); this.hpMix = 0; this.hpG = 0; this.hpS = new Float64Array(4);
     // master: drum 1 ducks the other voices (before the FX bus), then a compressor
     // on the whole mix, the same design as the LXR-02's FX compressor
-    this.master = { comp: true, thresh: -12, ratio: 3, attack: 5, release: 120, makeup: 0, duck: 0.4, duckRelease: 150, duckFx: false, duckOn: true };
+    this.master = { comp: true, thresh: -12, ratio: 3, attack: 5, release: 120, makeup: 0, duck: 0.4, duckRelease: 150, duckFx: false, duckOn: true, space: 0 };
+    // the sidechain's spacer (after Trackspacer): drum 1 also carves room for itself in the other voices, band by band.
+    // Eight band-passes an octave apart from 60 Hz run on drum 1 and on the others' mix; where drum 1 has energy in a band,
+    // that band of the others is turned down, by up to space (100 = -20 dB). Each band is a peaking cut, x + (gain - 1)
+    // times its band-pass, so with drum 1 quiet the others pass untouched. The cut follows drum 1 with a 3 ms attack and
+    // the sidechain's release
+    this.spF = Array.from({ length: 8 }, (_, k) => Math.tan(Math.PI * 60 * Math.pow(2, k * 1.1) / LXR.REAL_FS));
+    this.spS = new Float64Array(48); this.spEnv = new Float32Array(8); this.spG = new Float32Array(8).fill(1);
+    this.spL = new Float32Array(64); this.spR = new Float32Array(64); this.spKey = new Float32Array(64); this.spOn = false;
     // delay: tempo-synced time, 0 = 1/128 .. 1 = one bar, and run as a send effect (all wet,
     // the voices keep their dry path); not in the firmware
     this.delayPos = 1 + Math.log2(3 / 16) / 7;
@@ -4931,6 +4939,44 @@ class Player {
     }
     this.sched[s] = hits;
   }
+  // the spacer: each band's peak in the key, followed, sets that band's cut in the left and right of the others
+  spacer(key, XL, XR) {
+    const FS = LXR.REAL_FS, cut = this.master.space / 100 * 0.9, k = 1 / 1.4, S = this.spS;
+    const att = 1 - Math.exp(-64 / (0.003 * FS)), rel = Math.exp(-64000 / (this.master.duckRelease * FS));
+    for (let b = 0; b < 8; b++) {
+      const g = this.spF[b], a = 1 / (1 + g * (g + k)), o = b * 6;
+      // TPT state-variable band-pass (unity at the centre: k times bp); states o, o+1 the key, o+2.. the left and right
+      let pk = 0, s1 = S[o], s2 = S[o + 1];
+      for (let i = 0; i < 64; i++) {
+        const hp = (key[i] - (g + k) * s1 - s2) * a, bp = g * hp + s1;
+        s1 = g * hp + bp; s2 += 2 * g * bp;
+        const m = bp < 0 ? -bp : bp; if (m > pk) pk = m;
+      }
+      S[o] = s1; S[o + 1] = s2;
+      pk *= k;
+      const e = this.spEnv[b] = pk > this.spEnv[b] ? this.spEnv[b] + (pk - this.spEnv[b]) * att : this.spEnv[b] * rel;
+      // full cut once drum 1's band reaches about -28 dBFS; the gain ramps across the block
+      const g0 = this.spG[b], g1 = 1 - cut * Math.min(1, e / 0.04);
+      this.spG[b] = g1;
+      if (g0 === 1 && g1 === 1) { // nothing to cut: keep the filters running so a cut starts clean
+        for (let c = 0; c < 2; c++) {
+          const X = c ? XR : XL; let t1 = S[o + 2 + 2 * c], t2 = S[o + 3 + 2 * c];
+          for (let i = 0; i < 64; i++) { const hp = (X[i] - (g + k) * t1 - t2) * a, bp = g * hp + t1; t1 = g * hp + bp; t2 += 2 * g * bp; }
+          S[o + 2 + 2 * c] = t1; S[o + 3 + 2 * c] = t2;
+        }
+        continue;
+      }
+      for (let c = 0; c < 2; c++) {
+        const X = c ? XR : XL; let t1 = S[o + 2 + 2 * c], t2 = S[o + 3 + 2 * c];
+        for (let i = 0; i < 64; i++) {
+          const hp = (X[i] - (g + k) * t1 - t2) * a, bp = g * hp + t1;
+          t1 = g * hp + bp; t2 += 2 * g * bp;
+          X[i] += (g0 + (g1 - g0) * (i + 1) / 64 - 1) * bp * k;
+        }
+        S[o + 2 + 2 * c] = t1; S[o + 3 + 2 * c] = t2;
+      }
+    }
+  }
   clickAt(hi) { this.clk = { n: 0, ph: 0, w: 2 * Math.PI * (hi ? 1760 : 880) / LXR.REAL_FS }; }
   _render(dst) {
     const rc = this.rec;
@@ -5018,6 +5064,10 @@ class Player {
     this.duckEnv = Math.max(pk, this.duckEnv * Math.exp(-64000 / (M.duckRelease * LXR.REAL_FS)));
     const duck0 = this.duckAt, duck1 = 1 - (M.duckOn ? M.duck : 0) * Math.min(1, this.duckEnv / 0.3);
     this.duckAt = duck1; this.duckMin = Math.min(this.duckMin, duck1);
+    // with the spacer on, the other voices mix apart from drum 1 first, so it can cut them
+    const sp = M.duckOn && M.space > 0, XL = sp ? this.spL : L, XR = sp ? this.spR : R;
+    if (sp) { XL.fill(0); XR.fill(0); } else if (this.spOn) { this.spS.fill(0); this.spEnv.fill(0); this.spG.fill(1); }
+    this.spOn = sp;
     for (let n = 0; n < 6; n++) {
       // accent gain, ramped over the block, and the duck on every voice but drum 1
       const d0 = n ? duck0 : 1, d1 = n ? duck1 : 1;
@@ -5027,10 +5077,18 @@ class Player {
       const pl = pans[n].triggeredPanL / 32768, pr = pans[n].triggeredPanR / 32768;
       const o = out[n];
       let lv = 0;
-      for (let i = 0; i < 64; i++) { const v = o[i] * (g0 + dg * i); L[i] += v * pl; R[i] += v * pr; const a = v < 0 ? -v : v; if (a > lv) lv = a; }
+      const OL = n ? XL : L, OR = n ? XR : R;
+      for (let i = 0; i < 64; i++) { const v = o[i] * (g0 + dg * i); OL[i] += v * pl; OR[i] += v * pr; const a = v < 0 ? -v : v; if (a > lv) lv = a; }
       lv *= Math.max(pl, pr); if (lv > this.lvl[n]) this.lvl[n] = lv;
       this.fxGain[n] = g1 * fa;
       this.gain[n] = this.gainTo[n];
+    }
+    if (sp) {
+      // L and R hold drum 1 alone here: its mono is the key
+      const key = this.spKey;
+      for (let i = 0; i < 64; i++) key[i] = (L[i] + R[i]) / 2;
+      this.spacer(key, XL, XR);
+      for (let i = 0; i < 64; i++) { L[i] += XL[i]; R[i] += XR[i]; }
     }
     if (++this.lvlN >= 16) {
       this.lvlN = 0;
@@ -6683,7 +6741,7 @@ function genPage(g, pattern, energy, T, fill, fillOn, yields) {
   }
 }
 // ---- mixer ----
-const MASTER0 = { comp: true, thresh: -12, ratio: 3, attack: 5, release: 120, makeup: 0, duck: 0.4, duckRelease: 150, duckFx: false, duckOn: true };
+const MASTER0 = { comp: true, thresh: -12, ratio: 3, attack: 5, release: 120, makeup: 0, duck: 0.4, duckRelease: 150, duckFx: false, duckOn: true, space: 0 };
 const master = { ...MASTER0 };
 const CH = ['DRUM 1', 'DRUM 2', 'DRUM 3', 'SNARE', 'CYMBAL', 'HIHAT'];
 // sends per voice: fx = echo (the engine's FX bus), dist = distortion, ring = ring mod, 0..100
@@ -7452,6 +7510,8 @@ mMaster($('m-comp'), 'release', 'release', 20, 500, 10, (v) => v + ' ms');
 mMaster($('m-comp'), 'makeup', 'makeup', 0, 12, 1, (v) => '+' + v + ' dB');
 mFader($('m-duck'), 'amount', duckFader);
 mMaster($('m-duck'), 'release', 'duckRelease', 30, 600, 10, (v) => v + ' ms');
+// space: drum 1 also cuts the others' frequencies where it plays (a spacer, after Trackspacer), on the same switch and release
+mMaster($('m-duck'), 'space', 'space', 0, 100, 5, (v) => (v ? v + '%' : 'off'));
 const mCompOn = () => {
   const on = $('comp-on').getAttribute('aria-pressed') === 'true';
   $('m-comp-on').setAttribute('aria-pressed', on); $('m-comp-on').textContent = on ? 'on' : 'off';

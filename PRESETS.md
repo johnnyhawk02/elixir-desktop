@@ -60,7 +60,7 @@ the kit's own FX settings and the pattern stays as it is.
 | `pattern` | the perform pattern as played: `{ on, acc, bar }`, each 7 tracks × 16 steps |
 | `stepPages` | the steps grid, 1–4 pages of `{ on, acc, bar }` |
 | `view`, `source` | `perform` or `steps`; what plays (`perform`, `steps`, or `off` for MIDI in) |
-| `master` | `{ comp, thresh, ratio, attack, release, makeup, duck, duckRelease, duckFx, duckOn }` |
+| `master` | `{ comp, thresh, ratio, attack, release, makeup, duck, duckRelease, duckFx, duckOn, space }` (`space`, the sidechain's spacer 0..100, is Elixir Mobile's; missing means 0, and the full Elixir ignores it) |
 
 Tracks run in the app's row order (`ROW` in `app/styles.js`: `k`, `lo`, `hi`, `s`, `cy`, `ch`, `oh`). `on` holds
 the hits, `acc` the accents and `bar` the bar conditions, as `app/steps.js` reads them.
