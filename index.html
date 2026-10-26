@@ -857,8 +857,6 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 
 .m-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 2px; }
 .m-title { font-family: var(--display); font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em; }
-.m-pname { font-size: var(--fs-s) !important; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
-  background: var(--tint) !important; border-radius: 10px; padding: 0 10px; }
 
 /* the page buttons, along the bottom where a thumb reaches them */
 .m-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: var(--tint); border-radius: 18px; padding: 4px; }
@@ -871,7 +869,7 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-pages::-webkit-scrollbar { display: none; }
 .m-panel { display: grid; gap: 12px; align-content: start; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; scroll-snap-align: start; scroll-snap-stop: always; }
 
-.m-trans { padding: 8px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: stretch; }
+.m-trans { padding: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: stretch; }
 .m-play { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; border-radius: 10px; background: var(--ink) !important;
   color: var(--panel) !important; font-size: 1rem !important; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
 .m-play svg { width: 20px; height: 20px; fill: currentColor; }
@@ -970,7 +968,6 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
   <section class="m-card m-trans">
     <button class="m-play" id="m-play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 4.5v15l13-7.5z"/><rect class="i-stop" x="5.5" y="5.5" width="13" height="13" rx="2"/></svg><span>play</span></button>
     <button class="m-rec" id="m-rec" type="button" aria-pressed="false" aria-label="Record"><i></i><span id="m-rec-t">rec</span></button>
-    <button class="m-pname" id="m-pname" type="button" title="Presets">preset</button>
   </section>
 
   <div class="m-pages" id="m-pages">
@@ -7407,7 +7404,6 @@ mPages.addEventListener('scroll', () => {
   mShown(panels[Math.max(0, Math.min(panels.length - 1, i))].dataset.mPanel);
 }, { passive: true });
 document.querySelectorAll('[data-m-tab]').forEach((b) => b.addEventListener('click', () => mTab(b.dataset.mTab)));
-$('m-pname').addEventListener('click', () => mTab('presets'));
 
 // ---- transport ----
 const mPlay = $('m-play'), mRec = $('m-rec');
@@ -7596,12 +7592,7 @@ XN.forEach((name, v) => {
 }
 
 // ---- presets: save, and a list to load or delete (kept in this browser, as on the desktop) ----
-// (a star once it's changed, as on the desktop's save button)
-const mName = () => { const o = kitList[Number($('kit').value)]; $('m-pname').textContent = (o ? o.name : 'new sound') + ($('dirty').classList.contains('on') ? ' *' : ''); };
-new MutationObserver(mName).observe($('kit'), { childList: true, subtree: true, attributes: true });
-new MutationObserver(mName).observe($('dirty'), { attributes: true, attributeFilter: ['class'] });
-$('kit').addEventListener('change', mName);
-const mLoad = (k) => { loadPreset(k); mName(); mDrawPresets(); };
+const mLoad = (k) => { loadPreset(k); mDrawPresets(); };
 function mDrawPresets() {
   const list = $('m-plist'), cur = kitList[Number($('kit').value)];
   list.innerHTML = '';
@@ -7619,7 +7610,7 @@ function mDrawPresets() {
         const wasCur = k === kitList[Number($('kit').value)], keep = kitList[Number($('kit').value)];
         kitList.splice(kitList.indexOf(k), 1); storePresets(); fillKits();
         $('kit').value = wasCur ? 0 : kitList.indexOf(keep);
-        mName(); mDrawPresets();
+        mDrawPresets();
       });
       li.append(d);
     }
@@ -7636,7 +7627,7 @@ $('m-psave').addEventListener('click', () => {
   $('kit-save').click();
   const k = kitList[kitList.length - 1];
   $('m-pnote').textContent = `Saved as ${k.name}.`;
-  mName(); mDrawPresets();
+  mDrawPresets();
 });
 
 // presets files: the full Elixir's format, { elixir: 1, presets: [...] } (PRESETS.md); only the current
@@ -7655,7 +7646,7 @@ $('m-pimport').addEventListener('change', async (e) => {
   e.target.value = '';
   if (n) { const v = $('kit').value; storePresets(); fillKits(); $('kit').value = v; }
   $('m-pnote').textContent = (n ? `Imported ${n}.` : 'Nothing new to import.') + (old ? ` ${old} skipped: another preset version.` : '') + (bad ? ` ${bad} file${bad > 1 ? 's' : ''} not a presets file.` : '');
-  mName(); mDrawPresets();
+  mDrawPresets();
 });
 $('m-pexport').addEventListener('click', async () => {
   const mine = kitList.filter((k) => k.saved).map(presetData);
@@ -7724,5 +7715,5 @@ $('m-install').addEventListener('click', async () => {
   mInstallEv = null; $('m-install').hidden = true;
 });
 
-mSync(); mUndo(); mName(); mCompOn(); mDrawAll();
+mSync(); mUndo(); mCompOn(); mDrawAll();
 </script>

@@ -9,8 +9,6 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 
 .m-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 2px; }
 .m-title { font-family: var(--display); font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em; }
-.m-pname { font-size: var(--fs-s) !important; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
-  background: var(--tint) !important; border-radius: 10px; padding: 0 10px; }
 
 /* the page buttons, along the bottom where a thumb reaches them */
 .m-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: var(--tint); border-radius: 18px; padding: 4px; }
@@ -23,7 +21,7 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
 .m-pages::-webkit-scrollbar { display: none; }
 .m-panel { display: grid; gap: 12px; align-content: start; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; scroll-snap-align: start; scroll-snap-stop: always; }
 
-.m-trans { padding: 8px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: stretch; }
+.m-trans { padding: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: stretch; }
 .m-play { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; border-radius: 10px; background: var(--ink) !important;
   color: var(--panel) !important; font-size: 1rem !important; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
 .m-play svg { width: 20px; height: 20px; fill: currentColor; }

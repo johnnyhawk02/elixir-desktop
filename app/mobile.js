@@ -25,7 +25,6 @@ mPages.addEventListener('scroll', () => {
   mShown(panels[Math.max(0, Math.min(panels.length - 1, i))].dataset.mPanel);
 }, { passive: true });
 document.querySelectorAll('[data-m-tab]').forEach((b) => b.addEventListener('click', () => mTab(b.dataset.mTab)));
-$('m-pname').addEventListener('click', () => mTab('presets'));
 
 // ---- transport ----
 const mPlay = $('m-play'), mRec = $('m-rec');
@@ -214,12 +213,7 @@ XN.forEach((name, v) => {
 }
 
 // ---- presets: save, and a list to load or delete (kept in this browser, as on the desktop) ----
-// (a star once it's changed, as on the desktop's save button)
-const mName = () => { const o = kitList[Number($('kit').value)]; $('m-pname').textContent = (o ? o.name : 'new sound') + ($('dirty').classList.contains('on') ? ' *' : ''); };
-new MutationObserver(mName).observe($('kit'), { childList: true, subtree: true, attributes: true });
-new MutationObserver(mName).observe($('dirty'), { attributes: true, attributeFilter: ['class'] });
-$('kit').addEventListener('change', mName);
-const mLoad = (k) => { loadPreset(k); mName(); mDrawPresets(); };
+const mLoad = (k) => { loadPreset(k); mDrawPresets(); };
 function mDrawPresets() {
   const list = $('m-plist'), cur = kitList[Number($('kit').value)];
   list.innerHTML = '';
@@ -237,7 +231,7 @@ function mDrawPresets() {
         const wasCur = k === kitList[Number($('kit').value)], keep = kitList[Number($('kit').value)];
         kitList.splice(kitList.indexOf(k), 1); storePresets(); fillKits();
         $('kit').value = wasCur ? 0 : kitList.indexOf(keep);
-        mName(); mDrawPresets();
+        mDrawPresets();
       });
       li.append(d);
     }
@@ -254,7 +248,7 @@ $('m-psave').addEventListener('click', () => {
   $('kit-save').click();
   const k = kitList[kitList.length - 1];
   $('m-pnote').textContent = `Saved as ${k.name}.`;
-  mName(); mDrawPresets();
+  mDrawPresets();
 });
 
 // presets files: the full Elixir's format, { elixir: 1, presets: [...] } (PRESETS.md); only the current
@@ -273,7 +267,7 @@ $('m-pimport').addEventListener('change', async (e) => {
   e.target.value = '';
   if (n) { const v = $('kit').value; storePresets(); fillKits(); $('kit').value = v; }
   $('m-pnote').textContent = (n ? `Imported ${n}.` : 'Nothing new to import.') + (old ? ` ${old} skipped: another preset version.` : '') + (bad ? ` ${bad} file${bad > 1 ? 's' : ''} not a presets file.` : '');
-  mName(); mDrawPresets();
+  mDrawPresets();
 });
 $('m-pexport').addEventListener('click', async () => {
   const mine = kitList.filter((k) => k.saved).map(presetData);
@@ -342,4 +336,4 @@ $('m-install').addEventListener('click', async () => {
   mInstallEv = null; $('m-install').hidden = true;
 });
 
-mSync(); mUndo(); mName(); mCompOn(); mDrawAll();
+mSync(); mUndo(); mCompOn(); mDrawAll();
