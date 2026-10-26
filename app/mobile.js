@@ -15,7 +15,7 @@ function mTab(t) {
 }
 // the tab that shows which page is in view
 // the page's name, beside the title
-const M_PAGE_NAMES = { play: 'perform', beat: 'beat', dice: 'voice', xy: 'x/y pad', fx: 'effects', mix: 'mixer', comp: 'master', presets: 'presets' };
+const M_PAGE_NAMES = { play: 'perform', beat: 'beat', dice: 'voice', xy: 'x/y pads', fx: 'effects', mix: 'mixer', comp: 'master', presets: 'presets' };
 function mShown(t) {
   if (t === mCur) return;
   mCur = t;
@@ -676,7 +676,7 @@ $('m-install').addEventListener('click', async () => {
 });
 
 
-// ---- the x/y page: one big pad, moving any two parameters. Each axis is picked in two short lists: first where it
+// ---- the x/y page: two pads, each moving any two parameters. Each axis is picked in two short lists: first where it
 // lives (a drum, perform, fx, mix or master), then the parameter there (a drum's every parameter, grouped as on the
 // voice, or that page's faders), so neither list is long. The picks are kept in this browser ----
 const XY_IN = 16; // (the CSS's 16px)
@@ -694,29 +694,33 @@ const XY_PLACES = (() => {
     { name: 'mix', groups: faders([['echo send', 'm-mix-echo'], ['ring send', 'm-mix-ring'], ['level', 'm-mix-vol']]) },
     { name: 'master', groups: faders([['sidechain', 'm-duck'], ['distortion', 'm-dist'], ['compressor', 'm-comp']]) }];
 })();
+// two pads, one above the other, each with its own x and y picks: [pad][axis] = [place, group, item]
 const XY_KEY = 'elixir-mobile-xy';
-let mXY = (() => { try { return JSON.parse(localStorage.getItem(XY_KEY)); } catch (e) { return null; } })() || [[0, 0, 0], [0, 1, 1]]; // [place, group, item] per axis
-const xyAxis = (k) => { const [pl, g, i] = mXY[k], P = XY_PLACES[pl] || XY_PLACES[0], G = P.groups[g] || P.groups[0]; return { place: P.name, ...(G[1][i] || G[1][0]) }; };
-function xyLists() {
-  ['x', 'y'].forEach((ax, k) => {
-    const place = $(`m-xy-${ax}p`), par = $(`m-xy-${ax}`);
+let mXY = (() => { try { return JSON.parse(localStorage.getItem(XY_KEY)); } catch (e) { return null; } })();
+if (!Array.isArray(mXY) || !Array.isArray(mXY[0]) || !Array.isArray(mXY[0][0])) mXY = [mXY && Array.isArray(mXY[0]) ? mXY : [[0, 0, 0], [0, 1, 1]], [[0, 5, 0], [0, 5, 1]]];
+if (!mXY[1]) mXY[1] = [[0, 5, 0], [0, 5, 1]];
+const xyAxis = (n, k) => { const [pl, g, i] = mXY[n][k], P = XY_PLACES[pl] || XY_PLACES[0], G = P.groups[g] || P.groups[0]; return { place: P.name, ...(G[1][i] || G[1][0]) }; };
+function xyPick() { try { localStorage.setItem(XY_KEY, JSON.stringify(mXY)); } catch (e) {} mDrawAll(); }
+[0, 1].forEach((n) => {
+  const box = document.createElement('div'); box.className = 'm-xybox';
+  box.innerHTML = ['x', 'y'].map((ax) => `<div class="m-xyrow"><span>${ax}</span><select aria-label="pad ${n + 1} ${ax === 'x' ? 'across' : 'up'}: where"></select><select aria-label="pad ${n + 1} ${ax === 'x' ? 'across' : 'up'}: parameter"></select></div>`).join('');
+  const sels = [...box.querySelectorAll('select')]; // place, parameter for x, then for y
+  const lists = () => [0, 1].forEach((k) => {
+    const place = sels[k * 2], par = sels[k * 2 + 1];
     place.innerHTML = ''; XY_PLACES.forEach((P, i) => place.append(new Option(P.name, i)));
-    place.value = mXY[k][0];
+    place.value = mXY[n][k][0];
     par.innerHTML = '';
-    (XY_PLACES[mXY[k][0]] || XY_PLACES[0]).groups.forEach(([heading, axes], g) => {
+    (XY_PLACES[mXY[n][k][0]] || XY_PLACES[0]).groups.forEach(([heading, axes], g) => {
       const og = document.createElement('optgroup'); og.label = heading;
       axes.forEach((A, i) => og.append(new Option(A.label, `${g}:${i}`)));
       par.append(og);
     });
-    par.value = `${mXY[k][1]}:${mXY[k][2]}`;
+    par.value = `${mXY[n][k][1]}:${mXY[n][k][2]}`;
   });
-}
-['x', 'y'].forEach((ax, k) => {
-  $(`m-xy-${ax}p`).addEventListener('change', (e) => { mXY[k] = [Number(e.target.value), 0, 0]; xyPick(); });
-  $(`m-xy-${ax}`).addEventListener('change', (e) => { const [g, i] = e.target.value.split(':').map(Number); mXY[k] = [mXY[k][0], g, i]; xyPick(); });
-});
-function xyPick() { try { localStorage.setItem(XY_KEY, JSON.stringify(mXY)); } catch (e) {} xyLists(); mDrawAll(); }
-{
+  [0, 1].forEach((k) => {
+    sels[k * 2].addEventListener('change', (e) => { mXY[n][k] = [Number(e.target.value), 0, 0]; lists(); xyPick(); });
+    sels[k * 2 + 1].addEventListener('change', (e) => { const [g, i] = e.target.value.split(':').map(Number); mXY[n][k] = [mXY[n][k][0], g, i]; xyPick(); });
+  });
   const pad = document.createElement('div');
   pad.className = 'm-xy'; pad.setAttribute('role', 'group');
   pad.innerHTML = `<b class="m-xy-t"></b><span class="m-xy-x"></span><span class="m-xy-y"></span><i></i><output></output>`;
@@ -724,15 +728,15 @@ function xyPick() { try { localStorage.setItem(XY_KEY, JSON.stringify(mXY)); } c
   const fr = (A) => (A.get() - A.min) / ((A.max - A.min) || 1);
   const show = (v) => (Number.isInteger(v) ? v : v.toFixed(2));
   const draw = () => {
-    const X = xyAxis(0), Y = xyAxis(1);
+    const X = xyAxis(n, 0), Y = xyAxis(n, 1);
     pad.querySelector('.m-xy-t').textContent = X.place === Y.place ? X.place : `${X.place} / ${Y.place}`;
     pad.querySelector('.m-xy-x').textContent = `${X.label} →`; pad.querySelector('.m-xy-y').textContent = `↑ ${Y.label}`;
-    pad.setAttribute('aria-label', `${X.place} ${X.label} across, ${Y.place} ${Y.label} up`);
+    pad.setAttribute('aria-label', `pad ${n + 1}: ${X.place} ${X.label} across, ${Y.place} ${Y.label} up`);
     pad.style.setProperty('--x', fr(X)); pad.style.setProperty('--y', fr(Y));
     out.textContent = `${X.label} ${show(X.get())}\n${Y.label} ${show(Y.get())}`;
   };
   const at = (e) => {
-    const r = pad.getBoundingClientRect(), X = xyAxis(0), Y = xyAxis(1);
+    const r = pad.getBoundingClientRect(), X = xyAxis(n, 0), Y = xyAxis(n, 1);
     const val = (A, f) => A.min + Math.round(Math.max(0, Math.min(1, f)) * (A.max - A.min));
     const x = val(X, (e.clientX - r.left - XY_IN) / (r.width - 2 * XY_IN)), y = val(Y, (r.bottom - XY_IN - e.clientY) / (r.height - 2 * XY_IN));
     if (x !== X.get()) X.set(x);
@@ -744,9 +748,9 @@ function xyPick() { try { localStorage.setItem(XY_KEY, JSON.stringify(mXY)); } c
   pad.addEventListener('pointermove', (e) => { if (held) at(e); });
   const end = () => { held = false; pad.classList.remove('held'); };
   pad.addEventListener('pointerup', end); pad.addEventListener('pointercancel', end);
-  $('m-pads').append(pad); mDraws.push(draw);
-}
-xyLists();
+  box.append(pad); $('m-xy-card').append(box); mDraws.push(draw);
+  lists();
+});
 
 // ---- the glass isn't flat: each control's ink shadow deepens a little toward the top right of the screen (--d, used
 // by the CSS), worked out once from where it sits and again when the screen's size changes ----

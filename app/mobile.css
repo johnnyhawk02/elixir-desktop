@@ -423,3 +423,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-fx-card.m-mix-card { grid-template-rows: auto auto minmax(0, 1fr); }
 .m #m-mix-echo .m-vtrack, .m #m-mix-ring .m-vtrack { flex: none; height: clamp(18px, 4vh, 40px); min-height: 0; }
 #m-beat-faders .m-vtrack { min-height: 16px; }
+/* the x/y page: two pads, one above the other, each under its own x and y picks */
+.m-xy-card { grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.m-xybox { display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 6px; min-height: 0; }
+.m-xybox + .m-xybox { border-top: var(--rule); padding-top: 8px; }
+.m-xybox .m-xyrow select { min-height: 34px; }
