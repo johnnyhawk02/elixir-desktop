@@ -1054,6 +1054,8 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 #m-beat-faders { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; height: min(42vh, 320px); }
 .m-pop { z-index: 9; }
 .m .m-beat-open { min-height: 46px; }
+/* a die heads the randomise column, drawn in the LCD's ink with its shadow */
+.m-die { width: 44px; height: 44px; justify-self: center; align-self: center; fill: var(--ink); color: var(--ink); filter: drop-shadow(1.5px 1.5px 0 rgba(23, 32, 14, .16)); }
 </style>
 
 <main class="m" id="m">
@@ -1070,6 +1072,7 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
   <div class="m-panel" data-m-panel="play">
     <section class="m-card m-play-card"><div class="m-faders" id="m-faders">
       <div class="m-rand">
+        <svg class="m-die" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="5.5" y="5.5" width="3.5" height="3.5"/><rect x="15" y="5.5" width="3.5" height="3.5"/><rect x="10.25" y="10.25" width="3.5" height="3.5"/><rect x="5.5" y="15" width="3.5" height="3.5"/><rect x="15" y="15" width="3.5" height="3.5"/></svg>
         <button class="m-btn m-big" id="m-everything" type="button">everything</button>
         <button class="m-btn" id="m-kit" type="button">kit</button>
         <button class="m-btn" id="m-pattern" type="button">pattern</button>

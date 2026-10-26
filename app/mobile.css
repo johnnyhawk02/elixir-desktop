@@ -206,3 +206,5 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 #m-beat-faders { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; height: min(42vh, 320px); }
 .m-pop { z-index: 9; }
 .m .m-beat-open { min-height: 46px; }
+/* a die heads the randomise column, drawn in the LCD's ink with its shadow */
+.m-die { width: 44px; height: 44px; justify-self: center; align-self: center; fill: var(--ink); color: var(--ink); filter: drop-shadow(1.5px 1.5px 0 rgba(23, 32, 14, .16)); }
