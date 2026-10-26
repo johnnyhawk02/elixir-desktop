@@ -411,9 +411,9 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-pages { overflow-x: hidden; }
 .m > .m-tabs { gap: 2px; padding-left: 0; padding-right: 0; }
 .m .m-tabs button { font-size: min(1.4rem, 4.9vw) !important; letter-spacing: 0; padding: 0; min-height: 56px; }
-/* bigger still: the page buttons in two rows of four, so each has twice the room */
-.m > .m-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
-.m .m-tabs button { font-size: min(1.75rem, 6.6vw) !important; letter-spacing: .04em; min-height: 46px; }
+/* the page buttons on one line, as big as eight fit (the page's full name is on the title line) */
+.m > .m-tabs { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 2px; }
+.m .m-tabs button { font-size: min(1.4rem, 4.9vw) !important; letter-spacing: 0; min-height: 56px; }
 /* the page's name, at the right of the title line */
 .m-top { justify-content: space-between; align-items: baseline; }
 .m-pagename { font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
