@@ -217,28 +217,51 @@ document.querySelectorAll('[data-m-undo]').forEach((b) => b.addEventListener('cl
 }));
 new MutationObserver(mUndo).observe($('undo'), { attributes: true, attributeFilter: ['disabled'] });
 
-// ---- the x/y page: six X/Y pads, each moving two things at once ----
-// a pad: x and y each { label, min, max, get, set, show }; a touch puts the cursor where it lands, and its centre stays
-// XY_IN px inside the edges so it never hangs off them
+// ---- the x/y page: a voice's sound on six X/Y pads. The strip at the top picks the voice; each pad moves two of its
+// parameters at once ----
+// the pads per voice: [title, [x label, x parameter], [y label, y parameter]]
+const XY_DRUM = (n) => [['tune', ['pitch', `COARSE${n}`], ['decay', `VELOD${n}`]], ['pitch env', ['amount', `MODAMNT${n}`], ['time', `MOD_EG${n}`]],
+  ['fm', ['amount', `FMAMNT${n}`], ['freq', `FM_FREQ${n}`]], ['click', ['level', `TRANS${n}_VOL`], ['freq', `TRANS${n}_FREQ`]],
+  ['filter', ['cutoff', `FILTER_FREQ_${n}`], ['reso', `RESO_${n}`]], ['grit', ['drive', `DRIVE${n}`], ['rate', `VOICE_DECIMATION${n}`]]];
+const XY_VOICES = [XY_DRUM(1), XY_DRUM(2), XY_DRUM(3),
+  [['tune', ['pitch', 'COARSE4'], ['decay', 'VELOD4']], ['snap', ['noise', 'NOISE_FREQ1'], ['mix', 'MIX1']], ['pitch env', ['amount', 'MODAMNT4'], ['time', 'MOD_EG4']],
+    ['click', ['level', 'TRANS4_VOL'], ['freq', 'TRANS4_FREQ']], ['filter', ['cutoff', 'FILTER_FREQ_4'], ['reso', 'RESO_4']], ['grit', ['drive', 'SNARE_DISTORTION'], ['rate', 'VOICE_DECIMATION4']]],
+  [['tune', ['pitch', 'COARSE5'], ['decay', 'VELOD5']], ['metal 1', ['freq', 'MOD_OSC_F1_CYM'], ['amount', 'MOD_OSC_GAIN1_CYM']], ['metal 2', ['freq', 'MOD_OSC_F2_CYM'], ['amount', 'MOD_OSC_GAIN2_CYM']],
+    ['click', ['level', 'TRANS5_VOL'], ['freq', 'TRANS5_FREQ']], ['filter', ['cutoff', 'FILTER_FREQ_5'], ['reso', 'RESO_5']], ['grit', ['drive', 'CYMBAL_DISTORTION'], ['rate', 'VOICE_DECIMATION5']]],
+  [['tune', ['pitch', 'COARSE6'], ['closed', 'VELOD6_CLOSED']], ['metal 1', ['freq', 'MOD_OSC_F1'], ['amount', 'MOD_OSC_GAIN1']], ['metal 2', ['freq', 'MOD_OSC_F2'], ['amount', 'MOD_OSC_GAIN2']],
+    ['click', ['level', 'TRANS6_VOL'], ['freq', 'TRANS6_FREQ']], ['filter', ['cutoff', 'FILTER_FREQ_6'], ['reso', 'RESO_6']], ['open', ['decay', 'VELOD6_OPEN'], ['drive', 'HAT_DISTORTION']]]];
+let mVoice = 0;
+XN.forEach((name, v) => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'm-btn'; b.textContent = name; b.setAttribute('role', 'tab');
+  b.addEventListener('click', () => { mVoice = v; mDrawAll(); });
+  $('m-voice').append(b);
+});
+mDraws.push(() => [...$('m-voice').children].forEach((b, v) => b.setAttribute('aria-selected', v === mVoice)));
+// a pad: a touch puts the cursor where it lands, and its centre stays XY_IN px inside the edges so it never hangs off them
 const XY_IN = 16; // (the CSS's 16px)
-function mPad(title, X, Y) {
+function mPad(i) {
   const pad = document.createElement('div');
-  pad.className = 'm-xy'; pad.setAttribute('role', 'group'); pad.setAttribute('aria-label', `${title}: ${X.label} across, ${Y.label} up`);
+  pad.className = 'm-xy'; pad.setAttribute('role', 'group');
   pad.innerHTML = `<b class="m-xy-t"></b><span class="m-xy-x"></span><span class="m-xy-y"></span><i></i><output></output>`;
-  pad.querySelector('.m-xy-t').textContent = title;
-  pad.querySelector('.m-xy-x').textContent = `${X.label} →`; pad.querySelector('.m-xy-y').textContent = `↑ ${Y.label}`;
-  const out = pad.querySelector('output'), fr = (A) => (A.get() - A.min) / (A.max - A.min);
+  const out = pad.querySelector('output');
+  const cfg = () => { const [title, [xl, xn], [yl, yn]] = XY_VOICES[mVoice][i]; return { title, xl, yl, x: PAR[xn], y: PAR[yn] }; };
+  const fr = (p) => values[p] / spec(p).max;
   const draw = () => {
-    pad.style.setProperty('--x', fr(X)); pad.style.setProperty('--y', fr(Y));
-    out.textContent = `${X.show(X.get())}\n${Y.show(Y.get())}`;
+    const c = cfg();
+    pad.querySelector('.m-xy-t').textContent = c.title;
+    pad.querySelector('.m-xy-x').textContent = `${c.xl} →`; pad.querySelector('.m-xy-y').textContent = `↑ ${c.yl}`;
+    pad.setAttribute('aria-label', `${XN[mVoice]} ${c.title}: ${c.xl} across, ${c.yl} up`);
+    pad.style.setProperty('--x', fr(c.x)); pad.style.setProperty('--y', fr(c.y));
+    out.textContent = `${c.xl} ${values[c.x]}\n${c.yl} ${values[c.y]}`;
   };
-  const val = (A, f) => A.min + Math.round(Math.max(0, Math.min(1, f)) * (A.max - A.min) * (A.res || 1)) / (A.res || 1);
   const at = (e) => {
-    const r = pad.getBoundingClientRect();
-    const x = val(X, (e.clientX - r.left - XY_IN) / (r.width - 2 * XY_IN)), y = val(Y, (r.bottom - XY_IN - e.clientY) / (r.height - 2 * XY_IN));
-    if (x !== X.get()) X.set(x);
-    if (y !== Y.get()) Y.set(y);
-    mDrawAll(); setDirty(true); // (the fx page's faders show the same settings)
+    const r = pad.getBoundingClientRect(), c = cfg();
+    const val = (p, f) => Math.round(Math.max(0, Math.min(1, f)) * spec(p).max);
+    const x = val(c.x, (e.clientX - r.left - XY_IN) / (r.width - 2 * XY_IN)), y = val(c.y, (r.bottom - XY_IN - e.clientY) / (r.height - 2 * XY_IN));
+    if (x !== values[c.x]) setValue(c.x, x);
+    if (y !== values[c.y]) setValue(c.y, y);
+    draw(); setDirty(true);
   };
   let held = false;
   pad.addEventListener('pointerdown', (e) => { pad.setPointerCapture(e.pointerId); held = true; pad.classList.add('held'); at(e); });
@@ -247,27 +270,11 @@ function mPad(title, X, Y) {
   pad.addEventListener('pointerup', end); pad.addEventListener('pointercancel', end);
   $('m-pads').append(pad); mDraws.push(draw);
 }
+for (let i = 0; i < 6; i++) mPad(i);
 const mPct = (v) => (v ? Math.round(v) + '%' : 'off');
 // the same send on every drum (the mixer's per-drum sends, all at once); an echo send routes the drum to the echo bus
 const mAllSend = (k) => ({ min: 0, max: 100, get: () => Math.max(...mix[k]), show: (v) => `send ${mPct(v)}`,
   set: (v) => { mix[k].fill(v); if (k === 'fx') fxButtons.forEach((b) => b()); sendMix(); } });
-const mParAxis = (p, label) => ({ label, min: 0, max: 127, get: () => values[p], set: (v) => setValue(p, v, true), show: (v) => `${label} ${v}` });
-// echo: its tempo-synced time (the nearest note length) and feedback
-mPad('echo', { label: 'time', min: 0, max: 1, res: 1000, get: () => delayPos, set: (v) => { delayPos = v; send({ type: 'delay', pos: v }); },
-  show: (v) => showDelay(Math.round(v * 1000)).replace(/^\d+% /, '') }, mParAxis(PAR.FX_P4, 'feedback'));
-// how much of each drum reaches the echo, and its stereo width (100% is the firmware's own)
-mPad('echo send', { label: 'send', ...mAllSend('fx') }, { label: 'width', min: 0, max: 200, get: () => fx3.echo.pct,
-  set: (v) => { fx3.echo.pct = v; sendMix(); }, show: (v) => `width ${v}%` });
-// distortion: the drums' send into it and its drive
-mPad('distortion', { label: 'send', ...mAllSend('dist') }, { label: 'drive', min: 0, max: 127, get: () => fx3.dist.p[0],
-  set: (v) => { fx3.dist.p[0] = v; sendMix(); }, show: (v) => `drive ${v}` });
-// ring mod: the drums' send into it and its carrier's frequency
-mPad('ring mod', { label: 'send', ...mAllSend('ring') }, { label: 'freq', min: 0, max: 127, get: () => fx3.ring.freq,
-  set: (v) => { fx3.ring.freq = v; sendMix(); }, show: (v) => `freq ${v}` });
-// feel: how hard the unaccented hits play, and how much louder the accents are
-mPad('feel', { ...pf('vel'), label: 'velocity', show: (v) => `vel ${v}` }, { ...pf('accent'), label: 'accent', show: (v) => `accent +${v}dB` });
-// the drums' energy and the snare rush, as before
-mPad('energy', { ...pf('energy'), label: 'energy', show: () => perfText('energy').split(' · ')[0] }, { ...pf('rush'), label: 'rush', show: () => `rush ${perfText('rush')}` });
 
 // ---- presets: save, and a list to load or delete (kept in this browser, as on the desktop) ----
 const mLoad = (k) => { loadPreset(k); mDrawPresets(); };

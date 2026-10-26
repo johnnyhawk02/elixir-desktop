@@ -43,8 +43,8 @@ body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area
    faders take the rest (each track stretches to its row), then the randomisers. The other pages scroll inside */
 .m { height: calc(100dvh - max(10px, env(safe-area-inset-top, 0px)) - max(10px, env(safe-area-inset-bottom, 0px))); grid-template-rows: auto auto 1fr auto; }
 [data-m-panel="play"], [data-m-panel="dice"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
-/* the x/y page: six pads, two across */
-.m-dice-card { display: grid; grid-template-rows: minmax(0, 1fr); gap: 10px; min-height: 0; padding: 10px 8px; }
+/* the x/y page: the voice strip, then six pads, two across */
+.m-dice-card { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 10px; min-height: 0; padding: 10px 8px; }
 .m-pads { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px; min-height: 0; }
 .m-xy { position: relative; min-height: 0; border-radius: 14px; background: var(--tint-2); touch-action: none; cursor: crosshair; overflow: hidden; }
 .m-xy i { position: absolute; left: calc(16px + (100% - 32px) * var(--x, 0)); bottom: calc(16px + (100% - 32px) * var(--y, 0)); width: 24px; height: 24px; margin: 0 0 -12px -12px;
@@ -230,3 +230,6 @@ body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; 
 /* a fader with a sequencer moving it: its setting is a bar across the track */
 .m .m-vtrack.mod b { display: block; left: -3px; right: -3px; height: 4px; border-radius: 0; bottom: calc(var(--b) * (100% - 4px)); background: var(--ink); box-shadow: 0 0 0 2px var(--panel); }
 .m .m-vtrack.mod { overflow: visible; }
+.m-voice { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+.m .m-voice .m-btn { min-height: 44px; min-width: 0; padding: 0 1px; font-size: .85rem !important; letter-spacing: 0; overflow: hidden; }
+.m .m-voice .m-btn[aria-selected="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
