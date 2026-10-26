@@ -1143,7 +1143,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m #m-comp .m-vf output, .m #m-duck .m-vf output { font-size: var(--fs-xs); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; white-space: nowrap; }
 .m #m-comp .m-flab, .m #m-duck .m-flab { font-size: .85rem; letter-spacing: .02em; }
 .m #m-comp .m-vtrack, .m #m-duck .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 30px; }
-.m-presets-card { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto auto; gap: 6px; min-height: 0; padding: 8px 2px; }
+.m-presets-card { display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto auto; gap: 6px; min-height: 0; padding: 8px 2px; }
 .m-presets-card .m-note { margin: 0; min-height: 1.2em; }
 .m-plist { min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; border-top: 1px solid var(--ink); padding-top: 4px; }
 .m-pio { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); margin-top: 0; }
@@ -1222,6 +1222,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-pfav { min-height: 46px; min-width: 44px; padding: 0 6px; background: none !important; border: 0 !important; box-shadow: none !important; font-size: 1.5rem !important; line-height: 1; color: var(--ink); }
 .m .m-pfav[aria-pressed="false"] { opacity: .45; }
 .m .m-pdel { min-width: 40px; padding: 0; text-align: center; font-size: 1.2rem !important; }
+/* a checkbox drawn as an LCD box: a ticked one is filled */
+.m-chk { position: relative; display: flex; align-items: center; gap: 10px; min-height: 40px; text-transform: uppercase; font-size: var(--fs-xs); cursor: pointer; }
+.m-chk input { position: absolute; left: 0; top: 0; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.m-chk i { flex: none; width: 24px; height: 24px; border: 2px solid var(--ink); border-radius: 2px; box-shadow: inset 0 0 0 3px var(--panel); }
+.m-chk input:checked + i { background: var(--ink); }
+.m-chk input:focus-visible + i { outline: 2px dashed var(--ink); outline-offset: 2px; }
 </style>
 
 <main class="m" id="m">
@@ -1298,6 +1304,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   <div class="m-panel" data-m-panel="presets">
     <section class="m-card m-presets-card">
       <button class="m-btn m-big m-wide" id="m-psave" type="button">save this sound</button>
+      <label class="m-chk"><input id="m-pbpm" type="checkbox" checked><i aria-hidden="true"></i>loading a preset uses its tempo</label>
       <p class="m-note" id="m-pnote" aria-live="polite"></p>
       <ul class="m-plist" id="m-plist"></ul>
       <div class="m-pio">
@@ -8055,6 +8062,10 @@ const mLoad = (k) => {
   if (!mPending) mPlayingPreset = kitList[Number($('kit').value)];
   loadPreset(k); mPending = playing ? k : null; mDrawPresets();
 };
+// the tempo box: ticked, loading a preset brings its saved tempo; unticked, the tempo stays (the desktop's bpm box,
+// remembered in this browser)
+$('m-pbpm').checked = presetBpm.checked;
+$('m-pbpm').addEventListener('change', () => { presetBpm.checked = $('m-pbpm').checked; presetBpm.dispatchEvent(new Event('change')); });
 // favourites: a star on any preset, mine or built in, keeps it in a group at the top of the list. Kept in this browser
 // by name (a saved one also carries fav, so an export keeps it)
 const FAV_KEY = 'elixir-mobile-favs';

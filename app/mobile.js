@@ -319,6 +319,10 @@ const mLoad = (k) => {
   if (!mPending) mPlayingPreset = kitList[Number($('kit').value)];
   loadPreset(k); mPending = playing ? k : null; mDrawPresets();
 };
+// the tempo box: ticked, loading a preset brings its saved tempo; unticked, the tempo stays (the desktop's bpm box,
+// remembered in this browser)
+$('m-pbpm').checked = presetBpm.checked;
+$('m-pbpm').addEventListener('change', () => { presetBpm.checked = $('m-pbpm').checked; presetBpm.dispatchEvent(new Event('change')); });
 // favourites: a star on any preset, mine or built in, keeps it in a group at the top of the list. Kept in this browser
 // by name (a saved one also carries fav, so an export keeps it)
 const FAV_KEY = 'elixir-mobile-favs';
