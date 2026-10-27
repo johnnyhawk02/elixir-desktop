@@ -56,21 +56,20 @@ function fxChange(fn) {
   fn(q); fxUse(q);
   undoValues = null; $('undo').disabled = true; mUndoFn = () => fxUse(was); mUndo();
 }
-$('m-fx-rand').addEventListener('click', async () => {
-  await startAudio();
-  fxChange((q) => {
-    const F = RAND.fx;
-    for (let v = 0; v < 6; v++) {
-      q.fx[v] = rChance(F.echoOn) ? rRange(F.echoLo, F.echoHi) : 0;
-      q.ring[v] = rChance(F.ringOn) ? rRange(F.ringLo, F.ringHi) : 0;
-    }
-    q.pos = randomDelayPos(); // (musical lengths, as every randomiser)
-    q.pp = rChance(F.pingpong) ? 1 : 0;
-    q.p3 = rRange(F.toneLo, F.toneHi); q.p4 = rChance(F.fbWild) ? rIn(70, 105) : rRange(F.fbLo, F.fbHi);
-    q.fx3.echo.pct = rRange(F.widthLo, F.widthHi);
-    q.fx3.ring.wave = rIn(0, RING_W.length - 1); q.fx3.ring.freq = rIn(5, 120);
-  });
-});
+// random fx: new sends and effect settings, by the fx randomiser's settings (EVERYTHING uses it too)
+function mFxRandomise(q) {
+  const F = RAND.fx;
+  for (let v = 0; v < 6; v++) {
+    q.fx[v] = rChance(F.echoOn) ? rRange(F.echoLo, F.echoHi) : 0;
+    q.ring[v] = rChance(F.ringOn) ? rRange(F.ringLo, F.ringHi) : 0;
+  }
+  q.pos = randomDelayPos(); // (musical lengths, as every randomiser)
+  q.pp = rChance(F.pingpong) ? 1 : 0;
+  q.p3 = rRange(F.toneLo, F.toneHi); q.p4 = rChance(F.fbWild) ? rIn(70, 105) : rRange(F.fbLo, F.fbHi);
+  q.fx3.echo.pct = rRange(F.widthLo, F.widthHi);
+  q.fx3.ring.wave = rIn(0, RING_W.length - 1); q.fx3.ring.freq = rIn(5, 120);
+}
+$('m-fx-rand').addEventListener('click', async () => { await startAudio(); fxChange(mFxRandomise); });
 $('m-fx-alter').addEventListener('click', async () => {
   await startAudio();
   const a = RAND.alterfx.amount / 100, nudge = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v + (Math.random() * 2 - 1) * a * (hi - lo))));

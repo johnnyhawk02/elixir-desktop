@@ -3,8 +3,7 @@
 // a page: [key in RAND, name, the button it presses, rows: [setting, label, min, max, how it reads]]
 const pc = (v) => `${v}%`, onoff = (v) => (v ? 'on' : 'off');
 const RS_PAGES = [
-  ['every', 'everything', 'm-everything', [['rushVoice', 'rush voice', 0, 1, onoff], ['vary', 'sound vary', 0, 50, pc], ['pingpong', 'ping pong', 0, 100, pc], ['panOn', 'pan chance', 0, 100, pc], ['panMax', 'pan max', 8, 63, String], ['echoOn', 'echo chance', 0, 100, pc], ['echoLo', 'echo min', 0, 100, String], ['echoHi', 'echo max', 0, 100, String],
-    ['fbLo', 'feedback min', 0, 127, String], ['fbHi', 'feedback max', 0, 127, String], ['fbWild', 'wild feedback', 0, 100, pc], ['xfeed', 'crossfeed', 0, 1, onoff],
+  ['every', 'everything', 'm-everything', [['rushVoice', 'rush voice', 0, 1, onoff], ['vary', 'sound vary', 0, 50, pc], ['panOn', 'pan chance', 0, 100, pc], ['panMax', 'pan max', 8, 63, String], ['xfeed', 'crossfeed', 0, 1, onoff],
     ['genre', 'genre', 0, 1, onoff], ['energyLo', 'energy min', 0, 100, pc], ['energyHi', 'energy max', 0, 100, pc], ['fillsLo', 'fills min', 0, 100, pc], ['fillsHi', 'fills max', 0, 100, pc],
     ['groove', 'groove', 0, 1, onoff], ['depthLo', 'depth min', 0, 100, pc], ['depthHi', 'depth max', 0, 100, pc]]],
   ['kit', 'kit', 'm-kit', [['vary', 'vary', 0, 50, pc]]],

@@ -29,7 +29,7 @@ const safeRange = (text, voice, name) => {
 // ---- the randomisers' settings (Elixir Mobile): the ranges and chances each randomise button uses, edited in the
 // hidden settings pop-up (tap ELIXIR) and kept in this browser. Percentages are 0..100; Lo/Hi pairs are ranges ----
 const RAND0 = {
-  every: { rushVoice: 1, vary: 10, pingpong: 60, panOn: 30, panMax: 50, echoOn: 50, echoLo: 20, echoHi: 50, fbLo: 20, fbHi: 55, fbWild: 7, xfeed: 1, genre: 1, energyLo: 45, energyHi: 90, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 5, depthHi: 50 },
+  every: { rushVoice: 1, vary: 10, panOn: 30, panMax: 50, xfeed: 1, genre: 1, energyLo: 45, energyHi: 90, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 5, depthHi: 50 },
   kit: { vary: 0 },
   alter: { amount: 10 },
   pattern: { genre: 1, energyLo: 35, energyHi: 95, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 50, depthHi: 100 },

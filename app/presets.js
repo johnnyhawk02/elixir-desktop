@@ -214,16 +214,12 @@ $('new-kit').addEventListener('click', async () => {
   useKit({ name: '', kit, xm: { amt: new Array(36).fill(0), target: xm.target.slice() }, userSamples: 0 });
   const E = RAND.every; // (its settings: see RAND0)
   for (let v = 0; v < 6; v++) randomiseVoice(v, E.vary / 100);
-  // each drum's echo send: on by chance, within its range, routing the drum to the echo when it's on
-  for (let v = 0; v < 6; v++) mix.fx[v] = rChance(E.echoOn) ? rRange(E.echoLo, E.echoHi) : 0;
-  fxButtons.forEach((b) => b()); sendMix();
-  // ping-pong or a normal echo (ping-pong the given share of the time)
-  setValue(PAR.FX_DELAY_TYPE, rChance(E.pingpong) ? 1 : 0, true);
+  // the effects exactly as RANDOM FX makes them, by its settings (RAND.fx): each drum's sends, the echo (a musical
+  // time, ping-pong by chance, tone, feedback, width) and the ring mod
+  { const q = fxSnap(); mFxRandomise(q); fxUse(q); }
   // the pans: the kick (drum 1) in the middle; each other drum off centre by chance, up to panMax either way
   for (let v = 0; v < 6; v++) setValue(PAR.PAN1 + v, v && rChance(E.panOn) ? Math.max(0, Math.min(127, 64 + (rnd() < 0.5 ? -1 : 1) * rRange(8, Math.max(8, E.panMax)))) : 64, true);
-  // echo feedback within its range, now and then (the wild chance) slammed up to 75..110
-  setValue(PAR.FX_P4, rChance(E.fbWild) ? rRange(75, 110) : rRange(E.fbLo, E.fbHi), true);
-  delayPos = randomDelayPos(); send({ type: 'delay', pos: delayPos }); syncFx();
+  syncFx();
   initValues.set(values);
   for (const h in homes) delete homes[h];
   send({ type: 'kit', values: effValues() });
