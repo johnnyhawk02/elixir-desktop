@@ -1,15 +1,16 @@
 // ---- crossfeed matrix ----
 const XN = ['drum 1', 'drum 2', 'drum 3', 'snare', 'cymbal', 'hihat'];
 // a drum's hit pushes a setting of the drums it feeds (the column's target), which glides back over xm.glide ms
-const X_TARGETS = ['pitch', 'decay', 'filter', 'drive', 'volume'];
+// (dark closes the filter, duck turns the drum down: so a positive amount always does something you hear)
+const X_TARGETS = ['pitch', 'decay', 'drive', 'dark', 'duck'];
 // each target's parameter on each drum, and how far a full push moves it (of its whole range)
 const X_PARS = { pitch: ['COARSE1', 'COARSE2', 'COARSE3', 'COARSE4', 'COARSE5', 'COARSE6'], decay: ['VELOD1', 'VELOD2', 'VELOD3', 'VELOD4', 'VELOD5', 'VELOD6_CLOSED'],
-  filter: ['FILTER_FREQ_1', 'FILTER_FREQ_2', 'FILTER_FREQ_3', 'FILTER_FREQ_4', 'FILTER_FREQ_5', 'FILTER_FREQ_6'],
-  drive: ['DRIVE1', 'DRIVE2', 'DRIVE3', 'SNARE_DISTORTION', 'CYMBAL_DISTORTION', 'HAT_DISTORTION'], volume: ['VOL1', 'VOL2', 'VOL3', 'VOL4', 'VOL5', 'VOL6'] };
-const X_RANGE = { pitch: 24 / 127, decay: 0.5, filter: 0.5, drive: 0.6, volume: 0.7 };
+  dark: ['FILTER_FREQ_1', 'FILTER_FREQ_2', 'FILTER_FREQ_3', 'FILTER_FREQ_4', 'FILTER_FREQ_5', 'FILTER_FREQ_6'],
+  drive: ['DRIVE1', 'DRIVE2', 'DRIVE3', 'SNARE_DISTORTION', 'CYMBAL_DISTORTION', 'HAT_DISTORTION'], duck: ['VOL1', 'VOL2', 'VOL3', 'VOL4', 'VOL5', 'VOL6'] };
+const X_RANGE = { pitch: 24 / 127, decay: 0.5, drive: 0.6, dark: -0.6, duck: -0.8 };
 // (the old audio crossfeed's targets, from presets saved before it changed)
-const xTarget = (t) => (X_TARGETS.includes(t) ? t : { fm: 'pitch', ring: 'volume' }[t] || 'filter');
-const xm = { amt: new Array(36).fill(0), target: ['pitch', 'pitch', 'filter', 'decay', 'filter', 'volume'], glide: 300 };
+const xTarget = (t) => (X_TARGETS.includes(t) ? t : { fm: 'pitch', ring: 'duck', volume: 'duck' }[t] || 'dark');
+const xm = { amt: new Array(36).fill(0), target: ['pitch', 'duck', 'dark', 'decay', 'dark', 'duck'], glide: 300 };
 const xgrid = $('xgrid');
 const xDepth = () => Number($('xdepth').value) / 100;
 const sendX = () => send({ type: 'xmod', amt: xm.amt.map((a) => a / 100 * xDepth()), pars: xm.target.map((t, d) => PAR[X_PARS[t][d]]),

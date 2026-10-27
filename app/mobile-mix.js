@@ -83,7 +83,7 @@ $('m-fx-alter').addEventListener('click', async () => {
 });
 
 // the fx page's crossfeed matrix: a row for each drum whose hits push, a column for each drum pushed, the column's head
-// what gets pushed there (tap: pitch, decay, filter, drive, volume). Drag a cell up or down for -100..100, double tap for
+// what gets pushed there (tap: pitch, decay, drive, dark = filter closing, duck = quieter). Drag a cell up or down for -100..100, double tap for
 // none; the glide bar is how long a push takes to wear off. It is the desktop's matrix (xm), and redraws with it (its
 // draws join xcells)
 {
@@ -94,7 +94,7 @@ $('m-fx-alter').addEventListener('click', async () => {
     const h = document.createElement('button'); h.type = 'button'; h.className = 'm-xhead';
     h.setAttribute('aria-label', `what crossfeed into ${XN[d]} modulates`);
     h.addEventListener('click', () => { xm.target[d] = T[(T.indexOf(xm.target[d]) + 1) % T.length]; xSelects[d].value = xm.target[d]; changed(); });
-    xcells.push(() => { h.innerHTML = `${n}<small>${xm.target[d]}</small>`; });
+    xcells.push(() => { h.innerHTML = `<small>${n}</small>${xm.target[d]}`; });
     grid.append(h);
   });
   SH.forEach((n, s) => {
