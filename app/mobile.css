@@ -139,6 +139,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 /* (tapping the title opens the randomisers' settings) */
 .m-title { font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); cursor: pointer; }
 .m-ver { margin-left: .5em; font-size: .7em; letter-spacing: .06em; text-transform: none; opacity: .7; }
+.m-setbtn { align-self: center; margin-right: auto; min-width: 0 !important; min-height: 30px !important; padding: 0 6px; display: grid; place-items: center; }
+.m-setbtn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+.m-setlist { display: grid; gap: 8px; }
+.m .m-setlist .m-btn { min-height: 50px; font-size: var(--fs-s) !important; }
 .m-pagename { font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
 
 /* play, rec, rec loop */
