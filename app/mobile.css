@@ -234,6 +234,28 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 /* ---- fx and mix: a row of faders per effect (fx) or per send (mix), its name above it ---- */
 .m-fx-card { display: grid; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px; min-height: 0; padding: 8px 2px; }
+/* the fx page: echo and ring mod side by side (five faders and three), taking what the crossfeed matrix under them leaves */
+[data-m-panel="fx"] .m-fx-card { grid-template-columns: minmax(0, 5fr) minmax(0, 3fr); grid-template-rows: minmax(0, 1fr) auto; column-gap: 0; }
+#m-fx-echo { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+#m-fx-ring { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+[data-m-panel="fx"] .m-fx-row + .m-fx-row { border-top: 0; padding-top: 0; border-left: var(--rule); padding-left: 4px; margin-left: 4px; }
+[data-m-panel="fx"] .m-fx-row.m-xrow { grid-column: 1 / -1; border-left: 0; padding-left: 0; margin-left: 0; border-top: var(--rule); padding-top: 6px; }
+/* the crossfeed matrix: drum names down the side (from) and along the top (into, with what it modulates); each cell
+   fills with segments from the bottom as it goes up, from the top when it's negative */
+.m-xrow { grid-template-rows: auto auto; }
+.m-xgrid { display: grid; grid-template-columns: 2.2em repeat(6, minmax(0, 1fr)); grid-auto-rows: clamp(22px, 3.7vh, 36px); gap: 3px; touch-action: none; }
+.m .m-xhead { min-height: 0; padding: 0; border: 0; background: none; display: grid; place-items: center; line-height: .9; font-size: min(var(--fs-xs), 3.7vw, 15.2px); text-transform: uppercase; }
+.m .m-xhead small { font-size: .8em; opacity: .75; }
+.m-xlab { display: grid; place-items: center start; font-size: min(var(--fs-xs), 3.7vw, 15.2px); text-transform: uppercase; }
+.m-xcell { --a: 0; position: relative; border: 1.5px solid var(--ink); border-radius: 2px; display: grid; place-items: center; font-size: min(var(--fs-xs), 3.5vw, 14.4px); font-variant-numeric: tabular-nums; cursor: ns-resize; touch-action: none;
+  background: linear-gradient(to top, var(--ink) 0 calc(var(--a) * 100%), transparent calc(var(--a) * 100%)); }
+.m-xcell.neg { background: repeating-linear-gradient(135deg, var(--ink) 0 2px, transparent 2px 5px) top / 100% calc(var(--a) * 100%) no-repeat; }
+.m-xcell.diag { border-style: dashed; }
+.m-xcell.held { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* (the number stays readable on the fill: it inverts once the fill passes the middle) */
+.m-xcell b { position: relative; font-weight: 400; padding: 0 2px; background: var(--panel); line-height: 1; }
+.m-xcell.hi { color: var(--panel); text-shadow: none; }
+.m-xcell.hi b { background: none; }
 /* the mix page: the two send rows keep a short fixed track, the levels take the rest */
 .m-fx-card.m-mix-card { grid-template-rows: auto auto minmax(0, 1fr); }
 .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { flex: none; height: clamp(18px, 4vh, 40px); min-height: 0; }

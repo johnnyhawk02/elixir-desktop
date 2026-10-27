@@ -1082,6 +1082,28 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 /* ---- fx and mix: a row of faders per effect (fx) or per send (mix), its name above it ---- */
 .m-fx-card { display: grid; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px; min-height: 0; padding: 8px 2px; }
+/* the fx page: echo and ring mod side by side (five faders and three), taking what the crossfeed matrix under them leaves */
+[data-m-panel="fx"] .m-fx-card { grid-template-columns: minmax(0, 5fr) minmax(0, 3fr); grid-template-rows: minmax(0, 1fr) auto; column-gap: 0; }
+#m-fx-echo { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+#m-fx-ring { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+[data-m-panel="fx"] .m-fx-row + .m-fx-row { border-top: 0; padding-top: 0; border-left: var(--rule); padding-left: 4px; margin-left: 4px; }
+[data-m-panel="fx"] .m-fx-row.m-xrow { grid-column: 1 / -1; border-left: 0; padding-left: 0; margin-left: 0; border-top: var(--rule); padding-top: 6px; }
+/* the crossfeed matrix: drum names down the side (from) and along the top (into, with what it modulates); each cell
+   fills with segments from the bottom as it goes up, from the top when it's negative */
+.m-xrow { grid-template-rows: auto auto; }
+.m-xgrid { display: grid; grid-template-columns: 2.2em repeat(6, minmax(0, 1fr)); grid-auto-rows: clamp(22px, 3.7vh, 36px); gap: 3px; touch-action: none; }
+.m .m-xhead { min-height: 0; padding: 0; border: 0; background: none; display: grid; place-items: center; line-height: .9; font-size: min(var(--fs-xs), 3.7vw, 15.2px); text-transform: uppercase; }
+.m .m-xhead small { font-size: .8em; opacity: .75; }
+.m-xlab { display: grid; place-items: center start; font-size: min(var(--fs-xs), 3.7vw, 15.2px); text-transform: uppercase; }
+.m-xcell { --a: 0; position: relative; border: 1.5px solid var(--ink); border-radius: 2px; display: grid; place-items: center; font-size: min(var(--fs-xs), 3.5vw, 14.4px); font-variant-numeric: tabular-nums; cursor: ns-resize; touch-action: none;
+  background: linear-gradient(to top, var(--ink) 0 calc(var(--a) * 100%), transparent calc(var(--a) * 100%)); }
+.m-xcell.neg { background: repeating-linear-gradient(135deg, var(--ink) 0 2px, transparent 2px 5px) top / 100% calc(var(--a) * 100%) no-repeat; }
+.m-xcell.diag { border-style: dashed; }
+.m-xcell.held { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* (the number stays readable on the fill: it inverts once the fill passes the middle) */
+.m-xcell b { position: relative; font-weight: 400; padding: 0 2px; background: var(--panel); line-height: 1; }
+.m-xcell.hi { color: var(--panel); text-shadow: none; }
+.m-xcell.hi b { background: none; }
 /* the mix page: the two send rows keep a short fixed track, the levels take the rest */
 .m-fx-card.m-mix-card { grid-template-rows: auto auto minmax(0, 1fr); }
 .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { flex: none; height: clamp(18px, 4vh, 40px); min-height: 0; }
@@ -1238,7 +1260,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v112</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v113</small></b>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
@@ -1287,6 +1309,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     <section class="m-card m-fx-card">
       <div class="m-fx-row"><div class="m-fxhead"><b>echo</b><label class="m-chk"><input id="m-pp" type="checkbox"><i aria-hidden="true"></i>ping pong</label></div><div class="m-faders" id="m-fx-echo"></div></div>
       <div class="m-fx-row"><b>ring mod</b><div class="m-faders" id="m-fx-ring"></div></div>
+      <div class="m-fx-row m-xrow"><div class="m-fxhead"><b>crossfeed</b><button class="m-toggle" id="m-xclear" type="button">clear</button></div><div class="m-xgrid" id="m-xgrid" role="grid" aria-label="crossfeed: from each drum (rows) into each drum (columns)"></div></div>
     </section>
   </div>
 
@@ -1320,7 +1343,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves every starred preset, built in or yours, to a file">export favourites</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v112, 27 Oct, 19:26</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v113, 27 Oct, 19:39</footer>
     </section>
   </div>
   </div>
@@ -8453,6 +8476,44 @@ $('m-fx-alter').addEventListener('click', async () => {
   });
 });
 
+// the fx page's crossfeed matrix: a row for each drum it comes from, a column for each it goes into, the column's head
+// what it modulates there (tap: fm, filter, ring). Drag a cell up or down for -100..100, double tap for none. It is the
+// desktop's matrix (xm), and redraws with it (its draws join xcells)
+{
+  const grid = $('m-xgrid'), SH = ['d1', 'd2', 'd3', 'sn', 'cy', 'hh'], T = ['fm', 'filter', 'ring'];
+  const changed = () => { xcells.forEach((d) => d()); sendX(); setDirty(true); };
+  grid.append(document.createElement('span'));
+  SH.forEach((n, d) => {
+    const h = document.createElement('button'); h.type = 'button'; h.className = 'm-xhead';
+    h.setAttribute('aria-label', `what crossfeed into ${XN[d]} modulates`);
+    h.addEventListener('click', () => { xm.target[d] = T[(T.indexOf(xm.target[d]) + 1) % 3]; xSelects[d].value = xm.target[d]; changed(); });
+    xcells.push(() => { h.innerHTML = `${n}<small>${xm.target[d]}</small>`; });
+    grid.append(h);
+  });
+  SH.forEach((n, s) => {
+    const lab = document.createElement('span'); lab.className = 'm-xlab'; lab.textContent = n; grid.append(lab);
+    SH.forEach((_, d) => {
+      const k = s * 6 + d, c = document.createElement('div');
+      c.className = 'm-xcell' + (s === d ? ' diag' : ''); c.setAttribute('role', 'slider'); c.tabIndex = 0;
+      c.setAttribute('aria-label', `${XN[s]} into ${XN[d]}`);
+      const draw = () => { const a = xm.amt[k]; c.style.setProperty('--a', Math.abs(a) / 100); c.classList.toggle('neg', a < 0); c.classList.toggle('hi', a >= 50); c.innerHTML = a ? `<b>${a}</b>` : ''; c.setAttribute('aria-valuenow', a); };
+      const set = (v) => { v = Math.max(-100, Math.min(100, Math.round(v / 5) * 5)); if (v !== xm.amt[k]) { xm.amt[k] = v; changed(); } };
+      let drag = null, lastTap = 0;
+      c.addEventListener('pointerdown', (e) => { c.setPointerCapture(e.pointerId); drag = { y: e.clientY, v: xm.amt[k] }; c.classList.add('held'); });
+      c.addEventListener('pointermove', (e) => { if (drag) set(drag.v + (drag.y - e.clientY) * 1.5); });
+      const up = (e) => {
+        if (!drag) return;
+        if (Math.abs(drag.y - e.clientY) < 4) { if (e.timeStamp - lastTap < 350) set(0); lastTap = e.timeStamp; }
+        drag = null; c.classList.remove('held');
+      };
+      c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
+      c.addEventListener('keydown', (e) => { const st = { ArrowUp: 5, ArrowDown: -5, PageUp: 25, PageDown: -25 }[e.key]; if (st) { e.preventDefault(); set(xm.amt[k] + st); } else if (e.key === '0' || e.key === 'Delete') set(0); });
+      xcells.push(draw); grid.append(c);
+    });
+  });
+  $('m-xclear').addEventListener('click', () => { xm.amt.fill(0); changed(); });
+  xcells.forEach((d) => d());
+}
 // ---- step sequencers: holding a fader opens one for it: 2 to 16 steps, each an offset from the fader's setting (up or
 // down, up to depth of its range) that it takes while playing (the step is the bar's 16th counted from the start,
 // wrapped at the length, so short ones run against the bar), jumping to it or, with slew, gliding to it over up to a
