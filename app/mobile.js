@@ -424,26 +424,36 @@ $('m-pexport').addEventListener('click', async () => {
   mDrawPresets();
 });
 
-// ---- record: free length, no count-in; starts now (and starts playback), the second press stops and saves ----
-let mTimer = 0;
+// ---- record: free length, no count-in; starts now (and starts playback), the second press stops and saves. Rec loop
+// records exactly LOOP_BARS bars from the start of the next bar (from bar 1 if stopped), cut to loop seamlessly, and
+// downloads it by itself; pressing it again while it runs stops it early ----
+const LOOP_BARS = 4;
+let mTimer = 0, mRecKind = null;
 function mRecUi() {
   const on = recState !== 'off';
-  mRec.setAttribute('aria-pressed', on); mRec.classList.toggle('on', on);
+  if (!on) mRecKind = null;
+  for (const [b, k] of [[mRec, 'free'], [$('m-loop'), 'loop']]) { const mine = on && mRecKind === k; b.setAttribute('aria-pressed', mine); b.classList.toggle('on', mine); b.disabled = on && !mine; }
   clearInterval(mTimer);
-  if (on) {
+  if (on && mRecKind === 'free') {
     const tick = () => { const t = Math.max(0, (performance.now() - recT0) / 1000); $('m-rec-t').textContent = `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`; };
     tick(); mTimer = setInterval(tick, 250);
   } else $('m-rec-t').textContent = 'rec';
+  $('m-loop-t').textContent = on && mRecKind === 'loop' ? (recState === 'on' ? `${Math.min(recBars + 1, LOOP_BARS)}/${LOOP_BARS}` : 'wait') : 'loop';
 }
+const mRecStop = () => { const m = { type: 'recStop' }; if (node) node.port.postMessage(m); else if (fallback) fallback.msg(m); };
 mRec.addEventListener('click', async () => {
   if (recState === 'off') {
-    recSet.len = 0; recSet.count = false; // the recorder's own settings stay at 44.1k 16-bit, not normalised
+    recSet.len = 0; recSet.count = false; mRecKind = 'free'; // the recorder's own settings stay at 44.1k 16-bit, not normalised
     await recStart();
     if (!playing) $('play').click();
-  } else {
-    $('m-rec-t').textContent = 'saving';
-    const m = { type: 'recStop' }; if (node) node.port.postMessage(m); else if (fallback) fallback.msg(m);
-  }
+  } else { $('m-rec-t').textContent = 'saving'; mRecStop(); }
+  mRecUi();
+});
+$('m-loop').addEventListener('click', async () => {
+  if (recState === 'off') {
+    recSet.len = LENS.indexOf(LOOP_BARS); recSet.count = false; mRecKind = 'loop';
+    await recStart(); // (a loop starts the transport itself)
+  } else mRecStop();
   mRecUi();
 });
 const mRecEvent = recEvent;

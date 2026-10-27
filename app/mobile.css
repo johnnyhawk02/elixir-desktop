@@ -501,3 +501,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 #m-beat-faders { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px 4px; }
 .m #m-beat-faders .m-flab { font-size: min(var(--fs-xs), 4vw); }
 .m #m-beat-faders .m-vf output { font-size: min(var(--fs-xs), 3.8vw); }
+/* rec loop: beside rec, a loop symbol */
+.m-trans { grid-template-columns: 1.3fr 1fr 1fr; }
+.m .m-loop svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.m .m-rec:disabled { opacity: .35; }

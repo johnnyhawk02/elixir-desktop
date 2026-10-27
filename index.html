@@ -1349,6 +1349,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 #m-beat-faders { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px 4px; }
 .m #m-beat-faders .m-flab { font-size: min(var(--fs-xs), 4vw); }
 .m #m-beat-faders .m-vf output { font-size: min(var(--fs-xs), 3.8vw); }
+/* rec loop: beside rec, a loop symbol */
+.m-trans { grid-template-columns: 1.3fr 1fr 1fr; }
+.m .m-loop svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.m .m-rec:disabled { opacity: .35; }
 </style>
 
 <main class="m" id="m">
@@ -1359,6 +1363,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   <section class="m-card m-trans">
     <button class="m-play" id="m-play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 4.5v15l13-7.5z"/><rect class="i-stop" x="5.5" y="5.5" width="13" height="13" rx="2"/></svg><span>play</span></button>
     <button class="m-rec" id="m-rec" type="button" aria-pressed="false" aria-label="Record"><i></i><span id="m-rec-t">rec</span></button>
+    <button class="m-rec m-loop" id="m-loop" type="button" aria-pressed="false" aria-label="Record a loop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h9a4 4 0 0 1 0 8h-1"/><path d="M17 17H8a4 4 0 0 1 0-8h1"/><path d="M14 4l3 3-3 3"/><path d="M10 20l-3-3 3-3"/></svg><span id="m-loop-t">loop</span></button>
   </section>
 
   <div class="m-pages" id="m-pages">
@@ -8337,26 +8342,36 @@ $('m-pexport').addEventListener('click', async () => {
   mDrawPresets();
 });
 
-// ---- record: free length, no count-in; starts now (and starts playback), the second press stops and saves ----
-let mTimer = 0;
+// ---- record: free length, no count-in; starts now (and starts playback), the second press stops and saves. Rec loop
+// records exactly LOOP_BARS bars from the start of the next bar (from bar 1 if stopped), cut to loop seamlessly, and
+// downloads it by itself; pressing it again while it runs stops it early ----
+const LOOP_BARS = 4;
+let mTimer = 0, mRecKind = null;
 function mRecUi() {
   const on = recState !== 'off';
-  mRec.setAttribute('aria-pressed', on); mRec.classList.toggle('on', on);
+  if (!on) mRecKind = null;
+  for (const [b, k] of [[mRec, 'free'], [$('m-loop'), 'loop']]) { const mine = on && mRecKind === k; b.setAttribute('aria-pressed', mine); b.classList.toggle('on', mine); b.disabled = on && !mine; }
   clearInterval(mTimer);
-  if (on) {
+  if (on && mRecKind === 'free') {
     const tick = () => { const t = Math.max(0, (performance.now() - recT0) / 1000); $('m-rec-t').textContent = `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`; };
     tick(); mTimer = setInterval(tick, 250);
   } else $('m-rec-t').textContent = 'rec';
+  $('m-loop-t').textContent = on && mRecKind === 'loop' ? (recState === 'on' ? `${Math.min(recBars + 1, LOOP_BARS)}/${LOOP_BARS}` : 'wait') : 'loop';
 }
+const mRecStop = () => { const m = { type: 'recStop' }; if (node) node.port.postMessage(m); else if (fallback) fallback.msg(m); };
 mRec.addEventListener('click', async () => {
   if (recState === 'off') {
-    recSet.len = 0; recSet.count = false; // the recorder's own settings stay at 44.1k 16-bit, not normalised
+    recSet.len = 0; recSet.count = false; mRecKind = 'free'; // the recorder's own settings stay at 44.1k 16-bit, not normalised
     await recStart();
     if (!playing) $('play').click();
-  } else {
-    $('m-rec-t').textContent = 'saving';
-    const m = { type: 'recStop' }; if (node) node.port.postMessage(m); else if (fallback) fallback.msg(m);
-  }
+  } else { $('m-rec-t').textContent = 'saving'; mRecStop(); }
+  mRecUi();
+});
+$('m-loop').addEventListener('click', async () => {
+  if (recState === 'off') {
+    recSet.len = LENS.indexOf(LOOP_BARS); recSet.count = false; mRecKind = 'loop';
+    await recStart(); // (a loop starts the transport itself)
+  } else mRecStop();
   mRecUi();
 });
 const mRecEvent = recEvent;
