@@ -53,5 +53,7 @@ const page = read('index.src.html')
   .replace('/*@KITS@*/', () => `const BUNDLED_KITS = ${JSON.stringify(kits)};`)
   .replace('/*@PRESETS@*/', () => `const BUILTIN_PRESETS = ${JSON.stringify(presets).replace(/<\/script/gi, '<\\/script')};`)
   .replace('/*@SOURCES@*/', () => `const SOURCES = ${JSON.stringify(sources).replace(/<\/script/gi, '<\\/script')};`);
-writeFileSync(outFile || new URL('index.html', here), page);
+// the footer's version: when it was built (UK time), so a phone shows which one it has
+const built = new Date().toLocaleString('en-GB', { timeZone: 'Europe/London', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+writeFileSync(outFile || new URL('index.html', here), page.replace('@BUILT@', () => built));
 console.log(`${outFile || 'index.html'}: ${(page.length / 1024).toFixed(1)} KB`);
