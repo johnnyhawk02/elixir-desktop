@@ -22,7 +22,7 @@ mFader($('m-beat-faders'), 'groove', { ...pf('groove'), show: () => perfText('gr
 mFader($('m-beat-faders'), 'depth', { ...pf('depth'), show: (v) => `${v}%` });
 mFader($('m-beat-faders'), 'accent', { ...pf('accent'), show: (v) => `+${v} dB` });
 // ---- the perf page's own controls: tempo, the sidechain, the sound macros and crossfeed. They live in a hidden box;
-// the page shows eight assignable slots (below, after the x/y page's lists), these seven by default ----
+// the page shows twelve assignable slots (below, after the x/y page's lists), these seven by default ----
 mFader($('m-perf-src'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
 // the drum 1 sidechain duck: above 0 it switches the sidechain on
 const setDuck = (v) => {

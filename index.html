@@ -1021,10 +1021,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-tabs button[aria-selected="true"] { border-color: var(--ink); }
 .m .m-tabs button { min-height: 56px; padding: 0; font-size: min(1.4rem, min(4.9vw, 20.2px)) !important; letter-spacing: 0; }
 
-/* ---- perf: eight faders, four by two, and the randomise column beside them ---- */
+/* ---- perf: twelve faders, four by three (as beat and voice), and the randomise column beside them ---- */
 [data-m-panel="play"] { grid-template-columns: minmax(0, 1fr) 92px; gap: 8px; }
 .m-play-card { display: grid; grid-template-rows: 1fr; gap: 10px; min-height: 0; padding: 6px 2px; }
-#m-faders { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 10px 6px; min-height: 0; }
+#m-faders { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px 4px; min-height: 0; }
 .m-pages .m-rand-card { display: grid; min-height: 0; padding: 6px 2px 6px 8px; border-top: var(--rule); border-left: var(--rule); }
 /* two boxes (next bar, assign), then eight buttons sharing the column evenly */
 .m-rand { display: grid; }
@@ -1212,7 +1212,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v104</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v105</small></b>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
   <section class="m-card m-trans">
@@ -1293,7 +1293,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves every starred preset, built in or yours, to a file">export favourites</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v104, 27 Oct, 16:47</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v105, 27 Oct, 16:53</footer>
     </section>
   </div>
   </div>
@@ -7938,7 +7938,7 @@ mFader($('m-beat-faders'), 'groove', { ...pf('groove'), show: () => perfText('gr
 mFader($('m-beat-faders'), 'depth', { ...pf('depth'), show: (v) => `${v}%` });
 mFader($('m-beat-faders'), 'accent', { ...pf('accent'), show: (v) => `+${v} dB` });
 // ---- the perf page's own controls: tempo, the sidechain, the sound macros and crossfeed. They live in a hidden box;
-// the page shows eight assignable slots (below, after the x/y page's lists), these seven by default ----
+// the page shows twelve assignable slots (below, after the x/y page's lists), these seven by default ----
 mFader($('m-perf-src'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
 // the drum 1 sidechain duck: above 0 it switches the sidechain on
 const setDuck = (v) => {
@@ -8742,13 +8742,14 @@ $('m-rs-go').addEventListener('click', () => $(RS_PAGES[mRsPage][2]).click());
 $('m-rs-play').addEventListener('click', () => $('play').click());
 $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][0]; Object.assign(RAND[key], RAND0[key]); saveRand(); mRsDraw(); });
 
-// ---- the perf page's eight slots: each fader can do anything on the x/y lists, and MIDI CC 17..24 (any channel) moves
-// faders 1..8. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
+// ---- the perf page's twelve slots: each fader can do anything on the x/y lists, and MIDI CC 17..28 (any channel) moves
+// faders 1..12. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
 // grouped as on that page. The picks are kept in this browser, as [place, group, name], so they survive list changes ----
 const SLOT_KEY = 'elixir-mobile-perfmap';
-const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'], ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy']];
+const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'], ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
+  ['beat', 'beat', 'rush'], ['beat', 'beat', 'fills'], ['fx', 'echo', 'send'], ['master', 'distortion', 'mix']];
 let mSlots = (() => { try { const v = JSON.parse(localStorage.getItem(SLOT_KEY)); return Array.isArray(v) && v.length >= 7 ? v : null; } catch (e) { return null; } })() || SLOT0.map((x) => x.slice());
-while (mSlots.length < 8) mSlots.push(SLOT0[mSlots.length].slice());
+while (mSlots.length < SLOT0.length) mSlots.push(SLOT0[mSlots.length].slice());
 const slotAxis = ([pl, g, n]) => { const P = XY_PLACES.find((x) => x.name === pl), G = P && P.groups.find((x) => x[0] === g); return G && G[1].find((a) => a.label === n); };
 const mSlotEls = [];
 function mSlot(i) {
@@ -8756,16 +8757,18 @@ function mSlot(i) {
   if (old) { const k = mFaders.findIndex((f) => f.el === old.el); if (k >= 0) { mDraws.splice(mDraws.indexOf(old.draw), 1); mFaders.splice(k, 1); } old.el.remove(); }
   const A = slotAxis(mSlots[i]) || slotAxis(SLOT0[i]), fd = A.fd;
   // a page's fader keeps its own steps, readout and reset; a drum's parameter is whole steps 0..its top
-  const draw = mFader(box, A.label, fd ? { min: fd.min, max: () => fd.hiOf(), step: fd.step, get: fd.get, set: (v) => { fd.put(v); mDrawAll(); }, show: fd.show, dflt: fd.dflt }
+  // (a label that only makes sense on its own page takes its group's name: echo send, dist mix)
+  const [pl, g] = mSlots[i], label = ['fx', 'mix', 'master'].includes(pl) && !A.label.includes(' ') ? `${g.split(' ')[0].slice(0, 4)} ${A.label}` : A.label;
+  const draw = mFader(box, label, fd ? { min: fd.min, max: () => fd.hiOf(), step: fd.step, get: fd.get, set: (v) => { fd.put(v); mDrawAll(); }, show: fd.show, dflt: fd.dflt }
     : { min: A.min, max: A.max, get: A.get, set: (v) => { A.set(v); mDrawAll(); setDirty(true); }, show: String, dflt: () => initValues[A.par] });
   const el = mFaders[mFaders.length - 1].el;
   el.dataset.slot = i; mFaders[mFaders.length - 1].key = `m-faders:slot${i}`;
   box.insertBefore(el, (mSlotEls[i + 1] && mSlotEls[i + 1].el) || null);
   mSlotEls[i] = { el, draw }; draw();
 }
-for (let i = 0; i < 8; i++) mSlot(i);
+for (let i = 0; i < SLOT0.length; i++) mSlot(i);
 $('m-assign').addEventListener('change', () => { $('m-faders').classList.toggle('assigning', $('m-assign').checked); });
-// MIDI: CC 17..24 set faders 1..8 across their range (other CCs go to the PC4 map as before); MIDI starts at the
+// MIDI: CC 17..28 set faders 1..12 across their range (other CCs go to the PC4 map as before); MIDI starts at the
 // first touch, since the browser may ask first
 const mPc4Midi = pc4Midi;
 // (a controller sends many CCs a second: only each fader's latest is kept, applied once a frame, and the moving
@@ -8773,7 +8776,7 @@ const mPc4Midi = pc4Midi;
 const mCcNext = new Map();
 let mCcFrame = 0;
 pc4Midi = function (cc, val) {
-  if (cc < 17 || cc > 24) return mPc4Midi(cc, val);
+  if (cc < 17 || cc > 16 + SLOT0.length) return mPc4Midi(cc, val);
   mCcNext.set(cc - 17, val);
   if (!mCcFrame) mCcFrame = requestAnimationFrame(mCcApply);
 };

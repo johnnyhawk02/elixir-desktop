@@ -173,10 +173,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-tabs button[aria-selected="true"] { border-color: var(--ink); }
 .m .m-tabs button { min-height: 56px; padding: 0; font-size: min(1.4rem, min(4.9vw, 20.2px)) !important; letter-spacing: 0; }
 
-/* ---- perf: eight faders, four by two, and the randomise column beside them ---- */
+/* ---- perf: twelve faders, four by three (as beat and voice), and the randomise column beside them ---- */
 [data-m-panel="play"] { grid-template-columns: minmax(0, 1fr) 92px; gap: 8px; }
 .m-play-card { display: grid; grid-template-rows: 1fr; gap: 10px; min-height: 0; padding: 6px 2px; }
-#m-faders { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 10px 6px; min-height: 0; }
+#m-faders { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px 4px; min-height: 0; }
 .m-pages .m-rand-card { display: grid; min-height: 0; padding: 6px 2px 6px 8px; border-top: var(--rule); border-left: var(--rule); }
 /* two boxes (next bar, assign), then eight buttons sharing the column evenly */
 .m-rand { display: grid; }
