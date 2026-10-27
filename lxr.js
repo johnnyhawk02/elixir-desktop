@@ -15,6 +15,7 @@ import {
   INIT_KIT, PARAMETER_ORDER, PAR, CC, CC2,
 } from './lxr-tables.js';
 import { MOD_TARGETS } from './lxr-ui-data.js';
+import { EXTRA_CLICKS } from './lxr-clicks.js';
 
 export { PAR, CC, CC2 };
 
@@ -390,8 +391,24 @@ const TRANSIENT_LEN = 2205;
 const TRANSIENT_END = 2311061504; // 2204 << 20
 
 function makeTransient() { return { phase: 0, pitch: 1, waveform: 0, volume: 1 }; }
-function transient_setWaveform(t, w) { t.waveform = w < NUM_TRANSIENTS + 2 ? w : 0; }
+// Mobile: waves past the firmware's 14 are the extra int16 clicks in lxr-clicks.js.
+export const NUM_WAVES = NUM_TRANSIENTS + 2 + EXTRA_CLICKS.length;
+function transient_setWaveform(t, w) { t.waveform = w < NUM_WAVES ? w : 0; }
+// Extra clicks: same phase field (u32, 20-bit fraction) but each sample has its own length.
+function extra_calcBlock(t, buf, size) {
+  const d = EXTRA_CLICKS[t.waveform - NUM_TRANSIENTS - 2], end = d.length - 1;
+  const inc = t.pitch * 1048576;
+  for (let i = 0; i < size; i++) {
+    const idx = t.phase / 1048576;
+    if (idx < end) {
+      const k = idx | 0, fr = idx - k;
+      buf[i] = toI16(t.volume * (d[k] + (d[k + 1] - d[k]) * fr));
+      t.phase += inc;
+    } else buf[i] = 0;
+  }
+}
 function transient_calcBlock(t, buf, size) {
+  if (t.waveform >= NUM_TRANSIENTS + 2) { extra_calcBlock(t, buf, size); return; }
   if (t.waveform <= 1 || t.phase >= TRANSIENT_END) { buf.fill(0, 0, size); return; }
   const base = (t.waveform - 2) * TRANSIENT_LEN;
   const inc = f(t.pitch * 1048576);
@@ -1703,10 +1720,10 @@ export class LxrEngine {
 
     switch (num) {
       case CC2.TRANS1_WAVE: case CC2.TRANS2_WAVE: case CC2.TRANS3_WAVE:
-        transient_setWaveform(drums[num - CC2.TRANS1_WAVE].transGen, wave(NUM_TRANSIENTS)); break;
-      case CC2.TRANS4_WAVE: transient_setWaveform(sn.transGen, wave(NUM_TRANSIENTS)); break;
-      case CC2.TRANS5_WAVE: transient_setWaveform(cy.transGen, wave(NUM_TRANSIENTS)); break;
-      case CC2.TRANS6_WAVE: transient_setWaveform(hh.transGen, wave(NUM_TRANSIENTS)); break;
+        transient_setWaveform(drums[num - CC2.TRANS1_WAVE].transGen, wave(NUM_WAVES)); break;
+      case CC2.TRANS4_WAVE: transient_setWaveform(sn.transGen, wave(NUM_WAVES)); break;
+      case CC2.TRANS5_WAVE: transient_setWaveform(cy.transGen, wave(NUM_WAVES)); break;
+      case CC2.TRANS6_WAVE: transient_setWaveform(hh.transGen, wave(NUM_WAVES)); break;
       case CC2.TRANS1_VOL: case CC2.TRANS2_VOL: case CC2.TRANS3_VOL:
         drums[num - CC2.TRANS1_VOL].transGen.volume = flt; break;
       case CC2.TRANS4_VOL: sn.transGen.volume = flt; break;
