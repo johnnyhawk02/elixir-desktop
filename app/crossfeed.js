@@ -1,15 +1,25 @@
 // ---- crossfeed matrix ----
 const XN = ['drum 1', 'drum 2', 'drum 3', 'snare', 'cymbal', 'hihat'];
-const xm = { amt: new Array(36).fill(0), target: ['fm', 'fm', 'fm', 'filter', 'fm', 'ring'] };
+// a drum's hit pushes a setting of the drums it feeds (the column's target), which glides back over xm.glide ms
+const X_TARGETS = ['pitch', 'decay', 'filter', 'drive', 'volume'];
+// each target's parameter on each drum, and how far a full push moves it (of its whole range)
+const X_PARS = { pitch: ['COARSE1', 'COARSE2', 'COARSE3', 'COARSE4', 'COARSE5', 'COARSE6'], decay: ['VELOD1', 'VELOD2', 'VELOD3', 'VELOD4', 'VELOD5', 'VELOD6_CLOSED'],
+  filter: ['FILTER_FREQ_1', 'FILTER_FREQ_2', 'FILTER_FREQ_3', 'FILTER_FREQ_4', 'FILTER_FREQ_5', 'FILTER_FREQ_6'],
+  drive: ['DRIVE1', 'DRIVE2', 'DRIVE3', 'SNARE_DISTORTION', 'CYMBAL_DISTORTION', 'HAT_DISTORTION'], volume: ['VOL1', 'VOL2', 'VOL3', 'VOL4', 'VOL5', 'VOL6'] };
+const X_RANGE = { pitch: 24 / 127, decay: 0.5, filter: 0.5, drive: 0.6, volume: 0.7 };
+// (the old audio crossfeed's targets, from presets saved before it changed)
+const xTarget = (t) => (X_TARGETS.includes(t) ? t : { fm: 'pitch', ring: 'volume' }[t] || 'filter');
+const xm = { amt: new Array(36).fill(0), target: ['pitch', 'pitch', 'filter', 'decay', 'filter', 'volume'], glide: 300 };
 const xgrid = $('xgrid');
 const xDepth = () => Number($('xdepth').value) / 100;
-const sendX = () => send({ type: 'xmod', amt: xm.amt.map((a) => a / 100 * xDepth()), target: xm.target.slice() });
+const sendX = () => send({ type: 'xmod', amt: xm.amt.map((a) => a / 100 * xDepth()), pars: xm.target.map((t, d) => PAR[X_PARS[t][d]]),
+  ranges: xm.target.map((t) => X_RANGE[t]), glide: xm.glide });
 xgrid.appendChild(document.createElement('span'));
 XN.forEach((name, d) => {
   const col = document.createElement('div'); col.className = 'col';
   col.innerHTML = `<span class="full">${name}</span><span class="short">${['d1', 'd2', 'd3', 'sn', 'cy', 'hh'][d]}</span>`;
   const sel = document.createElement('select'); sel.setAttribute('aria-label', `What crossfeed into ${name} modulates`);
-  for (const t of ['fm', 'filter', 'ring']) sel.appendChild(new Option(t, t));
+  for (const t of X_TARGETS) sel.appendChild(new Option(t, t));
   sel.value = xm.target[d];
   sel.addEventListener('change', () => { xm.target[d] = sel.value; sendX(); });
   col.appendChild(sel); xgrid.appendChild(col);
@@ -52,7 +62,7 @@ function randomiseX() {
   for (let d = 0; d < 6; d++) {
     if (![0, 1, 2, 3, 4, 5].some((sIdx) => xm.amt[sIdx * 6 + d])) continue;
     const r = rnd();
-    xm.target[d] = r < 0.5 ? 'fm' : r < 0.75 ? 'filter' : 'ring';
+    xm.target[d] = X_TARGETS[Math.floor(r * X_TARGETS.length)];
     xSelects[d].value = xm.target[d];
   }
   xcells.forEach((d) => d()); sendX();

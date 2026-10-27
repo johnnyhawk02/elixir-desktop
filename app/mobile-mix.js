@@ -82,17 +82,18 @@ $('m-fx-alter').addEventListener('click', async () => {
   });
 });
 
-// the fx page's crossfeed matrix: a row for each drum it comes from, a column for each it goes into, the column's head
-// what it modulates there (tap: fm, filter, ring). Drag a cell up or down for -100..100, double tap for none. It is the
-// desktop's matrix (xm), and redraws with it (its draws join xcells)
+// the fx page's crossfeed matrix: a row for each drum whose hits push, a column for each drum pushed, the column's head
+// what gets pushed there (tap: pitch, decay, filter, drive, volume). Drag a cell up or down for -100..100, double tap for
+// none; the glide bar is how long a push takes to wear off. It is the desktop's matrix (xm), and redraws with it (its
+// draws join xcells)
 {
-  const grid = $('m-xgrid'), SH = ['d1', 'd2', 'd3', 'sn', 'cy', 'hh'], T = ['fm', 'filter', 'ring'];
+  const grid = $('m-xgrid'), SH = ['d1', 'd2', 'd3', 'sn', 'cy', 'hh'], T = X_TARGETS;
   const changed = () => { xcells.forEach((d) => d()); sendX(); setDirty(true); };
   grid.append(document.createElement('span'));
   SH.forEach((n, d) => {
     const h = document.createElement('button'); h.type = 'button'; h.className = 'm-xhead';
     h.setAttribute('aria-label', `what crossfeed into ${XN[d]} modulates`);
-    h.addEventListener('click', () => { xm.target[d] = T[(T.indexOf(xm.target[d]) + 1) % 3]; xSelects[d].value = xm.target[d]; changed(); });
+    h.addEventListener('click', () => { xm.target[d] = T[(T.indexOf(xm.target[d]) + 1) % T.length]; xSelects[d].value = xm.target[d]; changed(); });
     xcells.push(() => { h.innerHTML = `${n}<small>${xm.target[d]}</small>`; });
     grid.append(h);
   });
@@ -118,5 +119,11 @@ $('m-fx-alter').addEventListener('click', async () => {
     });
   });
   $('m-xclear').addEventListener('click', () => { xm.amt.fill(0); changed(); });
+  // the glide: 20 ms .. 2 s, on a log scale
+  const gb = $('m-xglide'), gl = (v) => Math.log(v / 20) / Math.log(100);
+  const gset = (e) => { const r = gb.getBoundingClientRect(), u = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); xm.glide = Math.round(20 * Math.pow(100, u) / 10) * 10 || 20; changed(); };
+  gb.addEventListener('pointerdown', (e) => { gb.setPointerCapture(e.pointerId); gset(e); });
+  gb.addEventListener('pointermove', (e) => { if (gb.hasPointerCapture(e.pointerId)) gset(e); });
+  xcells.push(() => { gb.style.setProperty('--w', gl(xm.glide)); $('m-xglide-out').textContent = xm.glide < 1000 ? `${xm.glide} ms` : `${(xm.glide / 1000).toFixed(1)} s`; });
   xcells.forEach((d) => d());
 }
