@@ -252,7 +252,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-xcell.neg { background: repeating-linear-gradient(135deg, var(--ink) 0 2px, transparent 2px 5px) top / 100% calc(var(--a) * 100%) no-repeat; }
 .m-xcell.diag { border-style: dashed; }
 .m-xcell.held { outline: 2px solid var(--ink); outline-offset: 2px; }
-/* (the number stays readable on the fill: it inverts once the fill passes the middle) */
+/* (the number stays readable: on a box of glass, inverted once the fill covers it) */
 .m-xcell b { position: relative; font-weight: 400; padding: 0 2px; background: var(--panel); line-height: 1; }
 .m-xcell.hi { color: var(--panel); text-shadow: none; }
 .m-xcell.hi b { background: none; }

@@ -102,7 +102,7 @@ $('m-fx-alter').addEventListener('click', async () => {
       const k = s * 6 + d, c = document.createElement('div');
       c.className = 'm-xcell' + (s === d ? ' diag' : ''); c.setAttribute('role', 'slider'); c.tabIndex = 0;
       c.setAttribute('aria-label', `${XN[s]} into ${XN[d]}`);
-      const draw = () => { const a = xm.amt[k]; c.style.setProperty('--a', Math.abs(a) / 100); c.classList.toggle('neg', a < 0); c.classList.toggle('hi', a >= 50); c.innerHTML = a ? `<b>${a}</b>` : ''; c.setAttribute('aria-valuenow', a); };
+      const draw = () => { const a = xm.amt[k]; c.style.setProperty('--a', Math.abs(a) / 100); c.classList.toggle('neg', a < 0); c.classList.toggle('hi', a >= 70); c.innerHTML = a ? `<b>${a}</b>` : ''; c.setAttribute('aria-valuenow', a); };
       const set = (v) => { v = Math.max(-100, Math.min(100, Math.round(v / 5) * 5)); if (v !== xm.amt[k]) { xm.amt[k] = v; changed(); } };
       let drag = null, lastTap = 0;
       c.addEventListener('pointerdown', (e) => { c.setPointerCapture(e.pointerId); drag = { y: e.clientY, v: xm.amt[k] }; c.classList.add('held'); });
