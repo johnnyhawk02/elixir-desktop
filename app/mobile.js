@@ -352,9 +352,9 @@ function mDrawPresets() {
   const favs = kitList.filter((k) => mFavs.has(k.name) && (k.saved || k.builtin));
   if (favs.length) { group('favourites'); favs.forEach(row); }
   const mine = kitList.filter((k) => k.saved && !mFavs.has(k.name));
-  group('mine');
-  if (mine.length) mine.slice().reverse().forEach(row);
-  else { const li = document.createElement('li'); li.className = 'm-pempty'; li.textContent = favs.some((k) => k.saved) ? 'All starred.' : 'None yet. Save makes one.'; list.append(li); }
+  // (an empty group is one line, its heading and why, so it doesn't push the list down)
+  if (mine.length) { group('mine'); mine.slice().reverse().forEach(row); }
+  else group(favs.some((k) => k.saved) ? 'mine: all starred' : 'mine: none yet, save makes one');
   group('built in');
   kitList.filter((k) => k.builtin && !mFavs.has(k.name)).forEach(row);
 }

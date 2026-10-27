@@ -1284,7 +1284,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-rs[hidden] { display: none; }
 .m-rs-card { width: 100%; max-width: 480px; height: 100%; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 10px; min-height: 0;
   box-shadow: 0 0 0 100vmax rgba(10, 11, 9, .55), inset 0 3px 10px rgba(0, 0, 0, .28); }
-.m-rs-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.m-rs-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
 .m .m-rs-tabs .m-btn { min-height: 40px; font-size: min(var(--fs-xs), 3.8vw) !important; padding: 0 2px; letter-spacing: 0; }
 .m .m-rs-tabs .m-btn[aria-selected="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
 .m-rs-rows { display: grid; align-content: start; gap: 10px; overflow-y: auto; overscroll-behavior: contain; min-height: 0; padding: 4px 2px; border-top: var(--rule); }
@@ -1360,6 +1360,16 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-looplens .m-btn { min-height: 56px; font-size: min(var(--fs-xs), 3.8vw) !important; padding: 0 2px; }
 .m .m-looplens .m-btn[aria-pressed="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
 .m .m-loop { -webkit-touch-callout: none; }
+
+/* tidy-up pass: the loop button keeps "loop 4" on one line on narrow phones, an empty preset note takes no room,
+   the preset file buttons stay on one line, and the master page's three rows share one 6-column grid */
+.m .m-loop span { white-space: nowrap; }
+.m .m-rec { gap: min(10px, 2vw) !important; }
+.m-presets-card .m-note:empty { min-height: 0; height: 0; margin-top: -6px; }
+.m-pio .m-btn { white-space: nowrap; letter-spacing: 0; padding: 0 4px; }
+#m-comp, #m-duck { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.m-rs-card { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+.m .m-rs-tabs .m-btn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
 
 <main class="m" id="m">
@@ -1467,7 +1477,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
   <div class="m-rs" id="m-rs" hidden>
     <section class="m-card m-rs-card" role="dialog" aria-labelledby="m-rs-title">
-      <div class="m-chead"><b id="m-rs-title">randomise settings</b><button class="m-toggle" id="m-rs-copy" type="button">copy</button><button class="m-toggle" id="m-rs-close" type="button">done</button></div>
+      <div class="m-chead"><b id="m-rs-title">randomisers</b><button class="m-toggle" id="m-rs-copy" type="button">copy</button><button class="m-toggle" id="m-rs-close" type="button">done</button></div>
       <div class="m-rs-tabs" id="m-rs-tabs" role="tablist"></div>
       <div class="m-rs-rows" id="m-rs-rows"></div>
       <div class="m-rs-btns"><button class="m-btn m-big" id="m-rs-go" type="button">randomise</button><button class="m-btn" id="m-rs-play" type="button">play</button><button class="m-btn" id="m-rs-reset" type="button">reset</button></div>
@@ -5754,7 +5764,7 @@ const LABELS = {
   SYNC_LFO: 'SYNC', MOD_LFO: 'AMOUNT', WAVE_LFO: 'WAVE', RETRIGGER_LFO: 'RETRIG', OFFSET_LFO: 'OFFSET', VOLUME: 'VOLUME', PAN: 'PAN',
   SAMPLE_RATE: 'S RATE', DRIVE: 'DRIVE', NOISE: 'NOISE', MIX: 'MIX',
 };
-const TRANSIENT_NAMES = ['Snap', 'Offset', 'Click', 'Click 2', 'Tick', 'Kick', 'Rim', 'Drop', 'Hat', 'Clap', 'Kick 2', 'Snare', 'Tom', 'Snap 2', ...LXR.EXTRA_CLICK_NAMES];
+const TRANSIENT_NAMES = ['snap', 'offset', 'click', 'click 2', 'tick', 'kick', 'rim', 'drop', 'hat', 'clap', 'kick 2', 'snare', 'tom', 'snap 2', ...LXR.EXTRA_CLICK_NAMES];
 const LFO_WAVES = ['sin', 'tri', 'saw up', 'saw dn', 'square', 'random', 'exp up', 'exp dn'];
 const AROUND_60 = new Set(['COARSE1', 'COARSE2', 'COARSE3', 'COARSE4', 'COARSE5', 'COARSE6', 'FM_FREQ1', 'FM_FREQ2', 'FM_FREQ3',
   'MOD_OSC_F1_CYM', 'MOD_OSC_F2_CYM', 'MOD_OSC_F1', 'MOD_OSC_F2'].map((n) => PAR[n]));
@@ -8317,9 +8327,9 @@ function mDrawPresets() {
   const favs = kitList.filter((k) => mFavs.has(k.name) && (k.saved || k.builtin));
   if (favs.length) { group('favourites'); favs.forEach(row); }
   const mine = kitList.filter((k) => k.saved && !mFavs.has(k.name));
-  group('mine');
-  if (mine.length) mine.slice().reverse().forEach(row);
-  else { const li = document.createElement('li'); li.className = 'm-pempty'; li.textContent = favs.some((k) => k.saved) ? 'All starred.' : 'None yet. Save makes one.'; list.append(li); }
+  // (an empty group is one line, its heading and why, so it doesn't push the list down)
+  if (mine.length) { group('mine'); mine.slice().reverse().forEach(row); }
+  else group(favs.some((k) => k.saved) ? 'mine: all starred' : 'mine: none yet, save makes one');
   group('built in');
   kitList.filter((k) => k.builtin && !mFavs.has(k.name)).forEach(row);
 }

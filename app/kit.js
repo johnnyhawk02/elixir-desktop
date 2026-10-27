@@ -30,7 +30,7 @@ const LABELS = {
   SYNC_LFO: 'SYNC', MOD_LFO: 'AMOUNT', WAVE_LFO: 'WAVE', RETRIGGER_LFO: 'RETRIG', OFFSET_LFO: 'OFFSET', VOLUME: 'VOLUME', PAN: 'PAN',
   SAMPLE_RATE: 'S RATE', DRIVE: 'DRIVE', NOISE: 'NOISE', MIX: 'MIX',
 };
-const TRANSIENT_NAMES = ['Snap', 'Offset', 'Click', 'Click 2', 'Tick', 'Kick', 'Rim', 'Drop', 'Hat', 'Clap', 'Kick 2', 'Snare', 'Tom', 'Snap 2', ...LXR.EXTRA_CLICK_NAMES];
+const TRANSIENT_NAMES = ['snap', 'offset', 'click', 'click 2', 'tick', 'kick', 'rim', 'drop', 'hat', 'clap', 'kick 2', 'snare', 'tom', 'snap 2', ...LXR.EXTRA_CLICK_NAMES];
 const LFO_WAVES = ['sin', 'tri', 'saw up', 'saw dn', 'square', 'random', 'exp up', 'exp dn'];
 const AROUND_60 = new Set(['COARSE1', 'COARSE2', 'COARSE3', 'COARSE4', 'COARSE5', 'COARSE6', 'FM_FREQ1', 'FM_FREQ2', 'FM_FREQ3',
   'MOD_OSC_F1_CYM', 'MOD_OSC_F2_CYM', 'MOD_OSC_F1', 'MOD_OSC_F2'].map((n) => PAR[n]));
