@@ -58,3 +58,15 @@ $('m-rs-go').addEventListener('click', () => $(RS_PAGES[mRsPage][2]).click());
 $('m-rs-play').addEventListener('click', () => $('play').click());
 $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][0]; Object.assign(RAND[key], RAND0[key]); saveRand(); mRsDraw(); });
 
+// holding a randomise button (half a second) opens these settings on its page, and that press doesn't also randomise
+{
+  let hold = 0, held = false;
+  const page = (el) => { const b = el.closest && el.closest('.m-rand .m-btn'); return b ? RS_PAGES.findIndex((P) => P[2] === b.id) : -1; };
+  const rand = document.querySelector('.m-rand');
+  rand.addEventListener('pointerdown', (e) => {
+    const i = page(e.target); held = false; clearTimeout(hold); if (i < 0) return;
+    hold = setTimeout(() => { held = true; mRsPage = i; $('m-rs').hidden = false; mRsDraw(); }, 500);
+  });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) rand.addEventListener(ev, () => clearTimeout(hold));
+  rand.addEventListener('click', (e) => { if (held) { held = false; e.stopPropagation(); e.preventDefault(); } }, { capture: true });
+}

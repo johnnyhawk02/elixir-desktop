@@ -1239,7 +1239,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v110</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v111</small></b>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
@@ -1321,7 +1321,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves every starred preset, built in or yours, to a file">export favourites</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v110, 27 Oct, 19:11</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v111, 27 Oct, 19:16</footer>
     </section>
   </div>
   </div>
@@ -8779,6 +8779,18 @@ $('m-rs-go').addEventListener('click', () => $(RS_PAGES[mRsPage][2]).click());
 $('m-rs-play').addEventListener('click', () => $('play').click());
 $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][0]; Object.assign(RAND[key], RAND0[key]); saveRand(); mRsDraw(); });
 
+// holding a randomise button (half a second) opens these settings on its page, and that press doesn't also randomise
+{
+  let hold = 0, held = false;
+  const page = (el) => { const b = el.closest && el.closest('.m-rand .m-btn'); return b ? RS_PAGES.findIndex((P) => P[2] === b.id) : -1; };
+  const rand = document.querySelector('.m-rand');
+  rand.addEventListener('pointerdown', (e) => {
+    const i = page(e.target); held = false; clearTimeout(hold); if (i < 0) return;
+    hold = setTimeout(() => { held = true; mRsPage = i; $('m-rs').hidden = false; mRsDraw(); }, 500);
+  });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) rand.addEventListener(ev, () => clearTimeout(hold));
+  rand.addEventListener('click', (e) => { if (held) { held = false; e.stopPropagation(); e.preventDefault(); } }, { capture: true });
+}
 // ---- the perf page's twelve slots: each fader can do anything on the x/y lists, and MIDI CC 13..24 (any channel) moves
 // faders 1..12. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
 // grouped as on that page. The picks are kept in this browser, as [place, group, name], so they survive list changes ----
