@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Elixir Mobile help</title>
+<meta name="theme-color" content="#a7b58c">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap">
+<style>
+  :root { --panel: #a7b58c; --ink: #17200e; --muted: rgba(23, 32, 14, .68); --line: rgba(23, 32, 14, .22); }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #1d2216; color: var(--ink); font: 20px/1.3 "VT323", ui-monospace, monospace; }
+  main { max-width: 640px; margin: 0 auto; padding: 16px; }
+  .lcd { background: var(--panel); border-radius: 10px; padding: 18px 18px 8px; box-shadow: inset 0 2px 8px rgba(0, 0, 0, .35); }
+  h1 { margin: 0 0 4px; font-size: 2.1rem; letter-spacing: -.02em; }
+  h2 { margin: 22px 0 6px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 1.35rem; text-transform: uppercase; }
+  p, li { margin: 0 0 8px; }
+  ul { padding-left: 20px; margin: 0 0 8px; }
+  b { font-weight: 400; text-transform: uppercase; background: var(--ink); color: var(--panel); padding: 0 4px; border-radius: 2px; }
+  .lead { color: var(--muted); }
+  a { color: var(--ink); }
+  .back { display: inline-block; margin: 16px 0 6px; font-size: 1.2rem; }
+</style>
+</head>
+<body>
+<main>
+<div class="lcd">
+  <h1>elixir mobile</h1>
+  <p class="lead">A six voice drum machine for your phone, built on the LXR-02 engine. Press play, then start pressing the randomise buttons. Everything below is optional.</p>
+
+  <h2>The basics</h2>
+  <ul>
+    <li><b>play</b> starts and stops the beat.</li>
+    <li>The buttons along the bottom switch pages. The page you're on is named next to the ELIXIR title.</li>
+    <li>Drag any fader up or down to change it.</li>
+    <li><b>undo</b> on the PERF page takes back the last randomise.</li>
+  </ul>
+
+  <h2>perf</h2>
+  <p>Eight faders for playing live, plus the randomise buttons.</p>
+  <ul>
+    <li><b>everything</b> makes a whole new beat: a new genre, groove, kit, effects and mix.</li>
+    <li><b>kit</b> changes the sounds and <b>pattern</b> changes the beat. <b>alter</b> nudges the current sounds by about 10%.</li>
+    <li><b>crossfeed</b> randomises how the voices modulate each other.</li>
+    <li><b>random fx</b> sets new effects and sends. <b>alter fx</b> nudges them. Echo times stay musical.</li>
+    <li>Tick <b>next bar</b> to make every randomise land on the start of the next bar.</li>
+    <li>Tick <b>assign</b>, then tap a fader to choose what it controls.</li>
+  </ul>
+
+  <h2>beat</h2>
+  <p>Tempo, genre, beat and energy, plus fills, the rush (a roll that builds on one drum while the others fall away), velocity, groove, depth and accent.</p>
+
+  <h2>voice</h2>
+  <p>Every setting for one drum. Choose the drum along the top and the section (oscillator, click, filter and so on) below it. The CLICK wave fader picks the attack sample: the 14 built in ones, then the extra clicks.</p>
+
+  <h2>x/y</h2>
+  <p>Two pads. Use the menus above each pad to choose what left-right and up-down control, then drag your finger around.</p>
+
+  <h2>fx, mix and mstr</h2>
+  <ul>
+    <li><b>fx</b> sets up the echo (tick ping pong to bounce it left and right) and the ring mod.</li>
+    <li><b>mix</b> has each drum's level and how much it sends to the two effects.</li>
+    <li><b>mstr</b> is the master chain: the drum 1 sidechain duck, then distortion, then the compressor.</li>
+  </ul>
+
+  <h2>prst (presets)</h2>
+  <ul>
+    <li>Tap a preset to load it. It flashes until the next bar, then takes over.</li>
+    <li>Tap the star to make it a favourite.</li>
+    <li><b>save new</b> stores what you hear. <b>save over</b> replaces the loaded preset.</li>
+    <li>Untick the tempo box to keep your tempo when loading.</li>
+    <li><b>export favourites</b> saves your starred presets to a file. <b>import</b> reads one back.</li>
+  </ul>
+
+  <h2>Step sequencers</h2>
+  <p>Hold any fader for half a second to open a step sequencer for it. Set the number of steps (2 to 16), the note length, depth and slew, or randomise the steps. The steps move the fader up and down from wherever you leave it, so you can still play it.</p>
+
+  <h2>Recording</h2>
+  <ul>
+    <li><b>rec</b> starts recording. Press it again to stop, and the WAV downloads.</li>
+    <li><b>loop</b> records an exact, loopable WAV of a set number of bars and downloads it. Hold it to choose 1, 2, 4, 8 or 16 bars.</li>
+  </ul>
+
+  <h2>Hidden extras</h2>
+  <ul>
+    <li>Tap the ELIXIR title to open the randomiser settings. Each randomise button has a page of ranges and chances you can change.</li>
+    <li>MIDI CC 17 to 24 move the eight PERF faders, in Chrome with a MIDI controller plugged in.</li>
+    <li>To install it as an app, use <b>install app</b> on the presets page, or your browser's "Add to home screen".</li>
+  </ul>
+
+  <a class="back" href="./">&larr; back to elixir</a>
+</div>
+</main>
+</body>
+</html>

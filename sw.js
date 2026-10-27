@@ -1,8 +1,8 @@
 // Elixir Mobile's service worker: keeps the app (one page, its manifest and icons) for offline use.
 // The page is fetched from the network first, so a new version arrives as soon as there is a connection;
 // the cached copy is the fallback. The fonts are kept as they're first fetched.
-const CACHE = 'elixir-mobile-v2';
-const APP = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png'];
+const CACHE = 'elixir-mobile-v3';
+const APP = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png', 'help.html'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(APP)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
