@@ -1049,10 +1049,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
    4 by 3 grid as the beat page, any spare places left empty at the end ---- */
 .m-dice-card { display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 10px; min-height: 0; padding: 10px 2px; }
 .m-voice { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
-.m-vsec { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.m-vsec { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; align-items: end; border-bottom: 2px solid var(--ink); }
 .m .m-voice .m-btn { min-height: 44px; min-width: 0; padding: 0 1px; font-size: min(1.05rem, min(3.6vw, 14.8px)) !important; letter-spacing: 0; overflow: hidden; }
-.m .m-vsec .m-btn { min-height: 38px; }
-.m-vsets { display: grid; min-height: 0; }
+/* the pages are tabs: the chosen one opens into a frame round its faders, the others sit on the line */
+.m .m-vsec .m-btn { min-height: 40px; margin-bottom: -2px; border-color: transparent; border-bottom: 0; border-radius: 4px 4px 0 0; box-shadow: none; opacity: .8; }
+.m .m-vsec .m-btn[aria-selected="true"] { position: relative; z-index: 1; background: var(--panel) !important; color: var(--ink) !important; border-color: var(--ink); opacity: 1; text-shadow: inherit; }
+.m-vsets { display: grid; min-height: 0; margin-top: -10px; padding: 14px 4px 6px; border: 2px solid var(--ink); border-top: 0; }
 .m-vset { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px 4px; min-height: 0; }
 .m-vset[hidden] { display: none; }
 
@@ -1212,7 +1214,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v106</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v107</small></b>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
   <section class="m-card m-trans">
@@ -1293,7 +1295,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves every starred preset, built in or yours, to a file">export favourites</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v106, 27 Oct, 16:55</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v107, 27 Oct, 17:13</footer>
     </section>
   </div>
   </div>
