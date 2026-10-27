@@ -1053,6 +1053,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-vsets { display: grid; min-height: 0; }
 .m-vset { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px 6px; min-height: 0; }
 .m-vset[hidden] { display: none; }
+/* a section of three or fewer is one row, its faders the full height */
+.m-vset:not(:has(> .m-vf:nth-child(4))) { grid-template-rows: minmax(0, 1fr); }
+/* and four sit in one row of four */
+.m-vset:has(> .m-vf:nth-child(4)):not(:has(> .m-vf:nth-child(5))) { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }
 
 /* ---- x/y: two pads, one above the other, each under its own x and y picks ---- */
 .m-xy-card { display: grid; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px; min-height: 0; padding: 10px 2px; }
@@ -1083,8 +1087,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-fx-row { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 2px; min-height: 0; }
 .m-fx-row + .m-fx-row { border-top: var(--rule); padding-top: 6px; }
 .m-fx-row b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); padding-left: 4px; }
+/* (the row headings the same size as the master page's) */
+.m-fx-row > b, .m-fxhead b { font-size: var(--fs-m); }
 /* the echo row's heading, with its ping pong box */
-.m-fxhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-left: 4px; }
+.m-fxhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .m-fxhead b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); }
 .m-fxhead .m-chk { min-height: 30px; gap: 8px; }
 .m-fxhead .m-chk i { width: 20px; height: 20px; }
@@ -1208,7 +1214,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v100</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v101</small></b>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
   <section class="m-card m-trans">
@@ -1289,7 +1295,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves every starred preset, built in or yours, to a file">export favourites</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v100, 27 Oct, 15:52</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v101, 27 Oct, 16:00</footer>
     </section>
   </div>
   </div>
