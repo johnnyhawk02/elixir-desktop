@@ -92,11 +92,3 @@ $('m-ch-reset').addEventListener('click', () => {
   mSlot(mChSlot); $('m-ch').hidden = true;
 });
 
-// ---- settings (the button by the title): for now, copy the perf faders' picks, to be baked in as SLOT0 ----
-$('m-set-open').addEventListener('click', () => { $('m-set').hidden = false; });
-$('m-set-close').addEventListener('click', () => { $('m-set').hidden = true; });
-$('m-set-slots').addEventListener('click', async () => {
-  const b = $('m-set-slots'), text = `Elixir Mobile perf faders\n${JSON.stringify(mSlots)}`;
-  try { await navigator.clipboard.writeText(text); b.textContent = 'copied'; setTimeout(() => { b.textContent = 'copy perf faders'; }, 1500); }
-  catch (e) { prompt('Copy the perf faders:', text); }
-});
