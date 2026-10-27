@@ -65,7 +65,7 @@
     <section class="m-card m-fx-card">
       <div class="m-fx-row"><div class="m-fxhead"><b>echo</b><label class="m-chk"><input id="m-pp" type="checkbox"><i aria-hidden="true"></i>ping pong</label></div><div class="m-faders" id="m-fx-echo"></div></div>
       <div class="m-fx-row"><b>ring mod</b><div class="m-faders" id="m-fx-ring"></div></div>
-      <div class="m-fx-row m-xrow"><div class="m-fxhead m-xhead-row"><b>crossfeed</b><span class="m-xglide-lab">glide</span><div class="m-seq-len m-xglide" id="m-xglide" role="slider" aria-label="crossfeed glide"><i></i></div><output id="m-xglide-out"></output><button class="m-toggle" id="m-xclear" type="button">clear</button></div><div class="m-xgrid" id="m-xgrid" role="grid" aria-label="crossfeed: from each drum (rows) into each drum (columns)"></div></div>
+      <div class="m-fx-row m-xrow"><div class="m-fxhead"><b>crossfeed</b><button class="m-toggle" id="m-xclear" type="button">clear</button></div><div class="m-xgrid" id="m-xgrid" role="grid" aria-label="crossfeed: from each drum (rows) into each drum (columns)"></div></div>
     </section>
   </div>
 
@@ -117,12 +117,6 @@
         <div class="m-rs-rows m-rush-glides" id="m-rush-glides"></div>
         <div class="m-rush-btns"><output id="m-rush-say" aria-live="polite">drag a point</output><button class="m-btn" id="m-rush-reset" type="button">reset</button></div>
       </div>
-    </section>
-  </div>
-  <div class="m-rs m-small" id="m-xpick" hidden>
-    <section class="m-card m-rs-card" role="dialog" aria-labelledby="m-xpick-title">
-      <div class="m-chead"><b id="m-xpick-title">crossfeed into</b><button class="m-toggle" id="m-xpick-close" type="button">done</button></div>
-      <div class="m-xpicks" id="m-xpicks"></div>
     </section>
   </div>
   <div class="m-rs m-small" id="m-looplen" hidden>

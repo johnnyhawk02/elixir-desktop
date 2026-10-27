@@ -112,7 +112,7 @@ function useKit(k) {
   const routed = [0, 1, 2, 3, 4, 5].map((n) => k.kit[PAR.AUDIO_OUT1 + n] === LXR.MIXER_ROUTING_FX_BUS);
   const deflt = (t, on = 25) => routed.map((r) => (r && (kitFx === t || (t === LXR.FX_DELAY && kitFx !== LXR.FX_DISTORTION && kitFx !== LXR.FX_RING)) ? on : 0));
   initValues.set(k.kit); asDelay(initValues); values.set(initValues);
-  if (k.xm) { xm.amt.splice(0, 36, ...k.xm.amt); xm.target.splice(0, 6, ...k.xm.target.map(xTarget)); xm.glide = typeof k.xm.glide === 'number' ? k.xm.glide : 300; xm.target.forEach((t, d) => { xSelects[d].value = t; }); xcells.forEach((d) => d()); sendX(); }
+  if (k.xm) { xm.amt.splice(0, 36, ...k.xm.amt); xm.target.splice(0, 6, ...k.xm.target); xm.target.forEach((t, d) => { xSelects[d].value = t; }); xcells.forEach((d) => d()); sendX(); }
   mix.fx.splice(0, 6, ...(k.fx || deflt(LXR.FX_DELAY)));
   mix.dist.fill(0); // (no distortion sends: it's on the master)
   mix.ring.splice(0, 6, ...(k.fx3 ? k.fx3.ring : deflt(LXR.FX_RING)));
@@ -187,7 +187,7 @@ function useSong(g, keepTempo) {
   Object.assign(macro, g.macro); drawMacros(); sendMacros();
 }
 $('kit-save').addEventListener('click', () => {
-  const k = { name: presetName(), kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice(), glide: xm.glide }, fx: mix.fx.slice(),
+  const k = { name: presetName(), kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice() }, fx: mix.fx.slice(),
     fx3: fx3Snapshot(), dpos: delayPos, song: songSnapshot(), saved: true, userSamples: 0 };
   kitList.push(k); storePresets(); fillKits();
   kitSel.value = kitList.length - 1;
@@ -211,7 +211,7 @@ $('new-kit').addEventListener('click', async () => {
   const kit = Uint8Array.from(src.length ? pick(src).kit : values);
   if (src.length) for (let v = 0; v < 6; v++) { const k = pick(src); for (const par of voiceOwned(v)) kit[par] = k.kit[par]; }
   for (let v = 0; v < 6; v++) kit[PAR.VOL1 + v] = values[PAR.VOL1 + v]; // the mixer levels stay as they are
-  useKit({ name: '', kit, xm: { amt: new Array(36).fill(0), target: xm.target.slice(), glide: xm.glide }, userSamples: 0 });
+  useKit({ name: '', kit, xm: { amt: new Array(36).fill(0), target: xm.target.slice() }, userSamples: 0 });
   const E = RAND.every; // (its settings: see RAND0)
   for (let v = 0; v < 6; v++) randomiseVoice(v, E.vary / 100);
   // the effects exactly as RANDOM FX makes them, by its settings (RAND.fx): each drum's sends, the echo (a musical

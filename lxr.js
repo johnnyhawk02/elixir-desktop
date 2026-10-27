@@ -1171,45 +1171,72 @@ export class LxrEngine {
     this._buf3 = new Int16Array(BLOCK);
     this.fx = new FxBus(); // FxBus_init()
     this.fxOut = new Int16Array(BLOCK * 2);
-    this.xmod = null; // crossfeed, see setCrossMod(); null = the firmware's own behaviour
+    this.xmod = null; // crossfeed matrix, see setCrossMod(); null = the firmware's signal path
   }
 
   /**
-   * Crossfeed (not in the firmware): a drum's hit pushes a parameter of other drums, which then glides back.
-   * amounts[src * 6 + dst] is -1..1; pars[dst] is the parameter number the hits push on drum dst (null: none) and
-   * ranges[dst] how far a full push moves it (0..1 of its range); glideMs is the time constant of the way back.
-   * Each hit adds its amount to the target's push (held to -1..1). Pass null amounts to switch it off.
+   * Crossfeed (not in the firmware): feeds each voice's output into other voices.
+   * amounts[src * 6 + dst] is -1..1; targets[dst] is 'fm' (audio-rate phase modulation of the
+   * voice's main oscillator), 'filter' (the source's level moves the cutoff, up to 4 octaves
+   * either way) or 'ring' (ring modulation of the voice's output). Sources are read one
+   * block (64 samples) late, so a voice can also modulate itself. Pass null to switch it off.
    */
-  setCrossMod(amounts, pars, ranges, glideMs = 300) {
-    const was = this.xmod;
+  setCrossMod(amounts, targets) {
     if (!amounts || !amounts.some((a) => a !== 0)) {
-      if (was) for (const p of was.pars) if (p != null) this._setOriginal(p);
       this.xmod = null;
+      for (const o of this._xOscs()) o.pm = null;
       return;
     }
-    if (!was) this.xmod = { amt: new Float32Array(36), pars: [], ranges: [], push: new Float32Array(6), fall: 1 };
-    const x = this.xmod;
-    // a target that changed parameter lets go of the old one
-    for (let d = 0; d < 6; d++) if (x.pars[d] != null && x.pars[d] !== pars[d]) { this._setOriginal(x.pars[d]); x.push[d] = 0; }
-    x.amt.set(amounts); x.pars = pars.slice(); x.ranges = ranges.slice();
-    x.fall = Math.exp(-BLOCK / (Math.max(5, glideMs) / 1000 * REAL_FS));
-  }
-  // a hit on voice v (0..6; both hats are the hihat's row) pushes the drums it feeds
-  _xmodHit(v) {
-    const x = this.xmod, s = Math.min(v, 5);
-    for (let d = 0; d < 6; d++) { const a = x.amt[s * 6 + d]; if (a) x.push[d] = Math.max(-1, Math.min(1, x.push[d] + a)); }
-  }
-  // each block: every pushed parameter set to its own value plus the push, the push gliding back toward none
-  _xmodApply() {
-    const x = this.xmod;
-    for (let d = 0; d < 6; d++) {
-      const par = x.pars[d], p = x.push[d];
-      if (par == null || !p) continue;
-      const nv = this.activeParameters[par] / 127 + p * x.ranges[d];
-      this._dispatch(par, 0, true, nv < 0 ? 0 : nv > 1 ? 1 : nv);
-      x.push[d] = Math.abs(p) < 0.002 ? 0 : p * x.fall;
-      if (!x.push[d]) this._setOriginal(par);
+    if (!this.xmod) {
+      this.xmod = { amt: new Float32Array(36), target: [], prev: Array.from({ length: 6 }, () => new Int16Array(BLOCK)),
+        env: new Float32Array(6), pm: Array.from({ length: 6 }, () => new Uint32Array(BLOCK)) };
     }
+    this.xmod.amt.set(amounts);
+    this.xmod.target = targets.slice();
+  }
+  _xOscs() { return [this.drums[0].osc, this.drums[1].osc, this.drums[2].osc, this.snare.osc, this.cymbal.osc, this.hat.osc]; }
+  _xmodBefore() {
+    const x = this.xmod, oscs = this._xOscs();
+    const filters = [this.drums[0].filter, this.drums[1].filter, this.drums[2].filter, this.snare.filter, this.cymbal.filter, this.hat.filter];
+    // envelope follower on last block's outputs: instant attack, ~30 ms release
+    for (let n = 0; n < 6; n++) {
+      let pk = 0; for (const v of x.prev[n]) { const a = v < 0 ? -v : v; if (a > pk) pk = a; }
+      x.env[n] = Math.max(pk / 32768, x.env[n] * 0.955);
+    }
+    for (let d = 0; d < 6; d++) {
+      const t = x.target[d];
+      let any = false; for (let sIdx = 0; sIdx < 6; sIdx++) if (x.amt[sIdx * 6 + d]) any = true;
+      oscs[d].pm = null;
+      if (!any) continue;
+      if (t === 'fm') {
+        // up to 1.5 cycles of phase shift per full-scale source
+        const pm = x.pm[d];
+        for (let i = 0; i < BLOCK; i++) {
+          let c = 0;
+          for (let sIdx = 0; sIdx < 6; sIdx++) { const a = x.amt[sIdx * 6 + d]; if (a) c += x.prev[sIdx][i] / 32768 * a * 1.5; }
+          pm[i] = ((c - Math.floor(c)) * 4294967296) >>> 0;
+        }
+        oscs[d].pm = pm;
+      } else if (t === 'filter') {
+        let oct = 0; for (let sIdx = 0; sIdx < 6; sIdx++) oct += x.amt[sIdx * 6 + d] * x.env[sIdx] * 4;
+        const fl = filters[d], fc = Math.min(0.449, Math.max(0.0003, fl.f * Math.pow(2, oct)));
+        fl.g = fastTan(Math.PI * fc);
+      }
+    }
+  }
+  _xmodAfter() {
+    const x = this.xmod, o = this.out;
+    for (let d = 0; d < 6; d++) {
+      if (x.target[d] !== 'ring') continue;
+      let sum = 0; for (let sIdx = 0; sIdx < 6; sIdx++) sum += Math.abs(x.amt[sIdx * 6 + d]);
+      if (!sum) continue;
+      const dry = Math.max(0, 1 - sum), buf = o[d];
+      for (let i = 0; i < BLOCK; i++) {
+        let m = 0; for (let sIdx = 0; sIdx < 6; sIdx++) { const a = x.amt[sIdx * 6 + d]; if (a) m += x.prev[sIdx][i] / 32768 * a * 2; }
+        buf[i] = ssat16(Math.round(buf[i] * (dry + m)));
+      }
+    }
+    for (let n = 0; n < 6; n++) x.prev[n].set(o[n]);
   }
 
   /** load the firmware's init kit, sending the parameters in preset-load order */
@@ -1258,7 +1285,6 @@ export class LxrEngine {
 
   /** voiceControl_noteOn: voice 0..2 drums, 3 snare, 4 cymbal, 5 closed hat, 6 open hat */
   trigger(voice, velocity = 127, note = SEQ_DEFAULT_NOTE) {
-    if (this.xmod) this._xmodHit(voice);
     if (voice < 3) this._drumTrigger(voice, velocity, note);
     else if (voice < 4) this._snareTrigger(velocity, note);
     else if (voice < 5) this._cymbalTrigger(velocity, note);
@@ -1476,13 +1502,13 @@ export class LxrEngine {
     this._resetTargets();
     for (const vm of this.velocityModulators) this._modUpdate(vm, vm.lastVal);
     for (const lfo of this.lfos) this._modUpdate(lfo.modTarget, lfo_calc(lfo, this.rng));
-    if (this.xmod) this._xmodApply();
     SVF_recalcFreq(this.drums[0].filter);
     SVF_recalcFreq(this.drums[1].filter);
     SVF_recalcFreq(this.drums[2].filter);
     SVF_recalcFreq(this.snare.filter);
     SVF_recalcFreq(this.cymbal.filter);
     SVF_recalcFreq(this.hat.filter);
+    if (this.xmod) this._xmodBefore();
     for (const d of this.drums) this._drumAsync(d);
     this._snareAsync(this.snare);
     this._metalAsync(this.cymbal);
@@ -1492,6 +1518,7 @@ export class LxrEngine {
     this._snareSync(o[3]); this._decimate(3, o[3]);
     this._metalSync(this.cymbal, 1, 4, o[4]); this._decimate(4, o[4]);
     this._metalSync(this.hat, f(0.5), 5, o[5]); this._decimate(5, o[5]);
+    if (this.xmod) this._xmodAfter();
     return o;
   }
 
