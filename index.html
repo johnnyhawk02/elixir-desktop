@@ -853,7 +853,8 @@ pre { margin: 0; padding: 14px 18px; overflow: auto; max-width: 100%; background
    boxes that invert when pressed or chosen; faders and meters are segmented bar graphs. Sections inside the screen
    are parted by thin ink lines; the sheets that open over it (sequencer, settings, chooser, loop length) are panes of
    their own. The desktop panels stay in the page, hidden, so the engine, presets and randomisers run as they do there.
-   Nothing scrolls but the presets list and the pop-ups' lists. */
+   Nothing scrolls but the presets list and the pop-ups' lists. Sizes that follow the screen's width (Nvw) stop
+   growing past a 412 px screen (a Pixel 9a), so on a wider screen or a desktop browser the text still fits. */
 
 /* ---- the page and the screen ---- */
 .wrap { display: none !important; }
@@ -963,19 +964,19 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 #m-faders .m-vf, #m-beat-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 3px; }
 #m-faders .m-vf output, #m-beat-faders .m-vf output { font-size: var(--fs-xs); line-height: 1; color: var(--ink); height: 2.5em; display: flex; align-items: flex-end; justify-content: center; flex: none; align-self: stretch; }
 #m-faders .m-flab, #m-beat-faders .m-flab { line-height: 1.2; }
-.m #m-faders .m-flab { font-size: min(var(--fs-xs), 3.75vw); letter-spacing: -.02em; }
-.m #m-beat-faders .m-flab { font-size: min(var(--fs-xs), 4vw); letter-spacing: -.02em; white-space: nowrap; }
-.m #m-beat-faders .m-vf output { font-size: min(var(--fs-xs), 3.8vw); }
+.m #m-faders .m-flab { font-size: min(var(--fs-xs), min(3.75vw, 15.5px)); letter-spacing: -.02em; }
+.m #m-beat-faders .m-flab { font-size: min(var(--fs-xs), min(4vw, 16.5px)); letter-spacing: -.02em; white-space: nowrap; }
+.m #m-beat-faders .m-vf output { font-size: min(var(--fs-xs), min(3.8vw, 15.7px)); }
 #m-faders .m-vtrack, #m-beat-faders .m-vtrack { width: min(56px, 100%); flex: 1; height: auto; min-height: 48px; }
 #m-beat-faders .m-vtrack { min-height: 16px; }
 
 /* the small faders (voice, fx, mix, master): a one-line readout, a narrow label */
 .m-fx-row .m-vf, #m-comp .m-vf, #m-duck .m-vf, #m-dist .m-vf, .m-vset .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
 .m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output, .m .m-vset .m-vf output {
-  font-size: min(var(--fs-xs), 3.9vw); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; }
+  font-size: min(var(--fs-xs), min(3.9vw, 16.1px)); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; }
 .m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output { white-space: nowrap; }
 .m .m-fx-row .m-vf output { display: flex; align-items: flex-end; justify-content: center; }
-.m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab { font-size: min(1.05rem, 3.7vw); letter-spacing: 0; white-space: nowrap; }
+.m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab { font-size: min(1.05rem, min(3.7vw, 15.2px)); letter-spacing: 0; white-space: nowrap; }
 .m .m-vset .m-flab, .m .m-vset .m-vf output { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 .m .m-fx-row .m-vtrack, .m #m-comp .m-vtrack, .m #m-duck .m-vtrack, .m #m-dist .m-vtrack, .m .m-vset .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 12px; }
 .m .m-fx-row .m-vtrack { width: min(44px, 100%); }
@@ -997,7 +998,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-play svg { width: 20px; height: 20px; fill: currentColor; }
 .m-play .i-stop, .m-play[aria-pressed="true"] .i-play { display: none; }
 .m-play[aria-pressed="true"] .i-stop { display: inline; }
-.m .m-rec { display: grid; grid-auto-flow: column; justify-content: center; place-items: center; align-content: center; gap: min(10px, 2vw) !important; min-height: 46px; }
+.m .m-rec { display: grid; grid-auto-flow: column; justify-content: center; place-items: center; align-content: center; gap: min(10px, min(2vw, 8.2px)) !important; min-height: 46px; }
 .m-rec i { width: 16px; height: 16px; border-radius: 2px; background: var(--ink); }
 .m-rec span { font-family: var(--mono); font-size: var(--fs-s); font-variant-numeric: tabular-nums; }
 .m-rec.on i { width: 16px; height: 16px; border-radius: 4px; background: var(--panel); animation: m-blink 1s steps(1) infinite; }
@@ -1018,19 +1019,19 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m > .m-tabs { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 2px; margin-top: 6px; padding: 8px 0 0; border-top: var(--rule); }
 .m-tabs button { border-color: transparent; min-width: 0; }
 .m-tabs button[aria-selected="true"] { border-color: var(--ink); }
-.m .m-tabs button { min-height: 56px; padding: 0; font-size: min(1.4rem, 4.9vw) !important; letter-spacing: 0; }
+.m .m-tabs button { min-height: 56px; padding: 0; font-size: min(1.4rem, min(4.9vw, 20.2px)) !important; letter-spacing: 0; }
 
 /* ---- perf: eight faders, four by two, and the randomise column beside them ---- */
 [data-m-panel="play"] { grid-template-columns: minmax(0, 1fr) 92px; gap: 8px; }
 .m-play-card { display: grid; grid-template-rows: 1fr; gap: 10px; min-height: 0; padding: 6px 2px; }
 #m-faders { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 10px 6px; min-height: 0; }
-.m-pages .m-rand-card { display: grid; min-height: 0; padding: 6px 0 6px 8px; border-top: var(--rule); border-left: var(--rule); }
+.m-pages .m-rand-card { display: grid; min-height: 0; padding: 6px 2px 6px 8px; border-top: var(--rule); border-left: var(--rule); }
 /* two boxes (next bar, assign), then eight buttons sharing the column evenly */
 .m-rand { display: grid; }
 .m-rand-card .m-rand { grid-template-columns: 1fr; grid-template-rows: auto auto repeat(8, minmax(0, 1fr)); grid-auto-rows: auto; gap: 6px; align-content: stretch; min-width: 0; height: 100%; }
 .m-rand-card .m-rand .m-btn { min-height: 0; min-width: 0; padding: 0 2px; letter-spacing: .02em; overflow: hidden; }
-.m .m-rand-card .m-rand .m-btn { font-size: min(var(--fs-xs), 3.7vw) !important; white-space: nowrap; }
-.m-nextbar { gap: 6px; font-size: min(var(--fs-xs), 3.6vw); white-space: nowrap; }
+.m .m-rand-card .m-rand .m-btn { font-size: min(var(--fs-xs), min(3.7vw, 15.2px)) !important; white-space: nowrap; }
+.m-nextbar { gap: 6px; font-size: min(var(--fs-xs), min(3.6vw, 14.8px)); white-space: nowrap; }
 .m-rand-card .m-nextbar { justify-content: flex-start; padding-left: 6px; min-height: 30px; }
 .m-nextbar i { width: 18px; height: 18px; }
 /* next bar: a button waiting for the bar flashes */
@@ -1048,7 +1049,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-dice-card { display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 10px; min-height: 0; padding: 10px 2px; }
 .m-voice { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
 .m-vsec { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.m .m-voice .m-btn { min-height: 44px; min-width: 0; padding: 0 1px; font-size: min(1.05rem, 3.6vw) !important; letter-spacing: 0; overflow: hidden; }
+.m .m-voice .m-btn { min-height: 44px; min-width: 0; padding: 0 1px; font-size: min(1.05rem, min(3.6vw, 14.8px)) !important; letter-spacing: 0; overflow: hidden; }
 .m .m-vsec .m-btn { min-height: 38px; }
 .m-vsets { display: grid; min-height: 0; }
 .m-vset { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px 6px; min-height: 0; }
@@ -1180,7 +1181,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-rs-card .m-chead { gap: 8px; }
 .m-rs-card .m-chead b { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .m-rs-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
-.m .m-rs-tabs .m-btn { min-height: 40px; font-size: min(var(--fs-xs), 3.8vw) !important; padding: 0 2px; letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m .m-rs-tabs .m-btn { min-height: 40px; font-size: min(var(--fs-xs), min(3.8vw, 15.7px)) !important; padding: 0 2px; letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .m-rs-rows { display: grid; align-content: start; gap: 10px; overflow-y: auto; overscroll-behavior: contain; min-height: 0; padding: 4px 2px; border-top: var(--rule); }
 .m-rs-rows .m-seq-lenrow { grid-template-columns: 7.2em minmax(0, 1fr) 3.6em; gap: 8px; font-size: var(--fs-xs); }
 .m-rs-rows .m-seq-lenrow output { min-width: 0; text-align: right; white-space: nowrap; }
@@ -1192,12 +1193,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-ch-list { overflow-y: auto; overscroll-behavior: contain; min-height: 0; display: grid; align-content: start; gap: 6px; border-top: var(--rule); padding-top: 6px; }
 .m-ch-list > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); margin-top: 4px; }
 .m-ch-list > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-.m .m-ch-list .m-btn { min-height: 44px; font-size: min(var(--fs-xs), 3.6vw) !important; padding: 0 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.m .m-ch-list .m-btn { min-height: 44px; font-size: min(var(--fs-xs), min(3.6vw, 14.8px)) !important; padding: 0 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 /* the loop length */
 .m-small { align-items: flex-start; padding-top: 120px; }
 .m-small .m-rs-card { height: auto; grid-template-rows: auto auto; }
 .m-looplens { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
-.m .m-looplens .m-btn { min-height: 56px; font-size: min(var(--fs-xs), 3.8vw) !important; padding: 0 2px; }
+.m .m-looplens .m-btn { min-height: 56px; font-size: min(var(--fs-xs), min(3.8vw, 15.7px)) !important; padding: 0 2px; }
 
 /* ---- LCD fade: liquid crystal is slow, so segments come on quickly and linger a moment going off. The faders' and
    meters' lit segments, the step bars and the inverted buttons and tabs ease rather than jump (off slower than on);
@@ -1214,7 +1215,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v101</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v102</small></b>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
   <section class="m-card m-trans">
@@ -1295,7 +1296,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves every starred preset, built in or yours, to a file">export favourites</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v101, 27 Oct, 16:00</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v102, 27 Oct, 16:04</footer>
     </section>
   </div>
   </div>
