@@ -1212,7 +1212,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v105</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v106</small></b>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
   <section class="m-card m-trans">
@@ -1293,7 +1293,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves every starred preset, built in or yours, to a file">export favourites</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v105, 27 Oct, 16:53</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v106, 27 Oct, 16:55</footer>
     </section>
   </div>
   </div>
@@ -8742,7 +8742,7 @@ $('m-rs-go').addEventListener('click', () => $(RS_PAGES[mRsPage][2]).click());
 $('m-rs-play').addEventListener('click', () => $('play').click());
 $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][0]; Object.assign(RAND[key], RAND0[key]); saveRand(); mRsDraw(); });
 
-// ---- the perf page's twelve slots: each fader can do anything on the x/y lists, and MIDI CC 17..28 (any channel) moves
+// ---- the perf page's twelve slots: each fader can do anything on the x/y lists, and MIDI CC 13..24 (any channel) moves
 // faders 1..12. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
 // grouped as on that page. The picks are kept in this browser, as [place, group, name], so they survive list changes ----
 const SLOT_KEY = 'elixir-mobile-perfmap';
@@ -8768,16 +8768,16 @@ function mSlot(i) {
 }
 for (let i = 0; i < SLOT0.length; i++) mSlot(i);
 $('m-assign').addEventListener('change', () => { $('m-faders').classList.toggle('assigning', $('m-assign').checked); });
-// MIDI: CC 17..28 set faders 1..12 across their range (other CCs go to the PC4 map as before); MIDI starts at the
-// first touch, since the browser may ask first
-const mPc4Midi = pc4Midi;
+// MIDI: CC 13..24 set faders 1..12 across their range, and nothing else listens (no other CCs, no notes); MIDI starts
+// at the first touch, since the browser may ask first
+onMidi = (e) => { const [st, cc, val] = e.data; if ((st & 0xf0) === 0xb0) pc4Midi(cc, val); };
 // (a controller sends many CCs a second: only each fader's latest is kept, applied once a frame, and the moving
 // fader skips the LCD fade so it keeps up with the knob)
 const mCcNext = new Map();
 let mCcFrame = 0;
 pc4Midi = function (cc, val) {
-  if (cc < 17 || cc > 16 + SLOT0.length) return mPc4Midi(cc, val);
-  mCcNext.set(cc - 17, val);
+  if (cc < 13 || cc > 12 + SLOT0.length) return;
+  mCcNext.set(cc - 13, val);
   if (!mCcFrame) mCcFrame = requestAnimationFrame(mCcApply);
 };
 function mCcApply() {

@@ -1,4 +1,4 @@
-// ---- the perf page's twelve slots: each fader can do anything on the x/y lists, and MIDI CC 17..28 (any channel) moves
+// ---- the perf page's twelve slots: each fader can do anything on the x/y lists, and MIDI CC 13..24 (any channel) moves
 // faders 1..12. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
 // grouped as on that page. The picks are kept in this browser, as [place, group, name], so they survive list changes ----
 const SLOT_KEY = 'elixir-mobile-perfmap';
@@ -24,16 +24,16 @@ function mSlot(i) {
 }
 for (let i = 0; i < SLOT0.length; i++) mSlot(i);
 $('m-assign').addEventListener('change', () => { $('m-faders').classList.toggle('assigning', $('m-assign').checked); });
-// MIDI: CC 17..28 set faders 1..12 across their range (other CCs go to the PC4 map as before); MIDI starts at the
-// first touch, since the browser may ask first
-const mPc4Midi = pc4Midi;
+// MIDI: CC 13..24 set faders 1..12 across their range, and nothing else listens (no other CCs, no notes); MIDI starts
+// at the first touch, since the browser may ask first
+onMidi = (e) => { const [st, cc, val] = e.data; if ((st & 0xf0) === 0xb0) pc4Midi(cc, val); };
 // (a controller sends many CCs a second: only each fader's latest is kept, applied once a frame, and the moving
 // fader skips the LCD fade so it keeps up with the knob)
 const mCcNext = new Map();
 let mCcFrame = 0;
 pc4Midi = function (cc, val) {
-  if (cc < 17 || cc > 16 + SLOT0.length) return mPc4Midi(cc, val);
-  mCcNext.set(cc - 17, val);
+  if (cc < 13 || cc > 12 + SLOT0.length) return;
+  mCcNext.set(cc - 13, val);
   if (!mCcFrame) mCcFrame = requestAnimationFrame(mCcApply);
 };
 function mCcApply() {
