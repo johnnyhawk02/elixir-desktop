@@ -847,321 +847,34 @@ pre { margin: 0; padding: 14px 18px; overflow: auto; max-width: 100%; background
 /* a narrow desk: the pattern card's nine faders get a larger share of the top row */
 @media (min-width: 1120px) and (max-width: 1250px) { .tab-perform > .bay-a { grid-template-columns: minmax(0, 9fr) minmax(0, 4fr); } }
 
-/* ---- the phone screen: one column of cards (LCD glass, styled at the end of this file); the desktop panels are hidden ---- */
+/* ==== Elixir Mobile: the phone screen ====
+   One pane of reflective LCD glass in a black bezel on a dark case. One ink (the segments), a faint ghost of the unlit
+   segments, the offset shadow real LCD type casts on its backplane, and a pixel font throughout. Buttons are outlined
+   boxes that invert when pressed or chosen; faders and meters are segmented bar graphs. Sections inside the screen
+   are parted by thin ink lines; the sheets that open over it (sequencer, settings, chooser, loop length) are panes of
+   their own. The desktop panels stay in the page, hidden, so the engine, presets and randomisers run as they do there.
+   Nothing scrolls but the presets list and the pop-ups' lists. */
+
+/* ---- the page and the screen ---- */
 .wrap { display: none !important; }
-body { padding: max(10px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(10px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
-  min-height: 100dvh; -webkit-tap-highlight-color: transparent; }
-.m { max-width: 480px; margin: 0 auto; display: grid; gap: 10px; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
-.m-card { background: var(--panel); border-radius: 18px; padding: 16px; }
-.m button { font: inherit; color: var(--ink); border: 0; cursor: pointer; touch-action: manipulation; }
-
-.m-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 2px; }
-.m-title { font-family: var(--display); font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em; }
-
-/* the page buttons, along the bottom where a thumb reaches them */
-.m-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: var(--tint); border-radius: 18px; padding: 4px; }
-.m-tabs button { background: none; border-radius: 14px; min-height: 52px; font-size: var(--fs-m) !important; font-weight: 600; }
-.m-tabs button[aria-selected="true"] { background: var(--panel); }
-/* the pages sit side by side and snap: swipe between them, or tap a tab. The faders' tracks take their own
-   touches (touch-action: none), so a drag on one never turns the page */
-.m-pages { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; column-gap: 16px; min-height: 0; overflow-x: auto; overflow-y: hidden;
-  scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
-.m-pages::-webkit-scrollbar { display: none; }
-.m-panel { display: grid; gap: 12px; align-content: start; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; scroll-snap-align: start; scroll-snap-stop: always; }
-
-.m-trans { padding: 8px; display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; align-items: stretch; }
-.m-play { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; border-radius: 10px; background: var(--ink) !important;
-  color: var(--panel) !important; font-size: 1rem !important; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
-.m-play svg { width: 20px; height: 20px; fill: currentColor; }
-.m-play .i-stop, .m-play[aria-pressed="true"] .i-play { display: none; }
-.m-play[aria-pressed="true"] .i-stop { display: inline; }
-.m-play:active { transform: scale(.98); }
-.m-rec { border-radius: 10px; grid-auto-flow: column; justify-content: center; gap: 10px !important; min-height: 46px; background: var(--tint) !important; display: grid; place-items: center; align-content: center; gap: 6px; }
-.m-rec i { width: 20px; height: 20px; border-radius: 50%; background: var(--led); box-shadow: 0 0 0 3px var(--panel), 0 0 0 5px var(--led); }
-.m-rec span { font-family: var(--mono); font-size: var(--fs-s); font-variant-numeric: tabular-nums; }
-.m-rec.on { background: var(--led) !important; color: #fff !important; }
-.m-rec.on i { border-radius: 4px; width: 16px; height: 16px; background: #fff; box-shadow: none; animation: m-blink 1s steps(1) infinite; }
-@keyframes m-blink { 50% { opacity: .35; } }
-@media (prefers-reduced-motion: reduce) { .m-rec.on i { animation: none; } }
-
-/* vertical faders, three to a row (four on the play tab, where the randomisers take the last two places) */
-.m-faders { display: grid; gap: 14px; }
-#m-faders, #m-comp, #m-duck { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 10px; }
-/* the page is one screen high: header, tabs and transport, then the pages; on the play page three rows of
-   faders take the rest (each track stretches to its row), then the randomisers. The other pages scroll inside */
-.m { height: calc(100dvh - max(10px, env(safe-area-inset-top, 0px)) - max(10px, env(safe-area-inset-bottom, 0px))); grid-template-rows: auto auto 1fr auto; }
-[data-m-panel="play"], [data-m-panel="dice"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
-/* the voice page: the drum strip, then its faders (four across, three down) */
-.m-dice-card { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 10px; min-height: 0; padding: 10px 8px; }
-.m-pads { display: grid; min-height: 0; }
-.m-vsets { display: grid; min-height: 0; }
-.m-vset { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 4px 6px; min-height: 0; }
-.m-vset[hidden] { display: none; }
-.m-vset .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
-.m .m-vset .m-vf output { font-size: var(--fs-xs); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; }
-.m .m-vset .m-flab { font-size: .85rem; letter-spacing: .02em; white-space: nowrap; }
-.m .m-vset .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 24px; }
-.m-xyrow { display: grid; grid-template-columns: auto 1fr 1.3fr; gap: 8px; align-items: center; text-transform: uppercase; }
-.m-xyrow label { display: flex; align-items: center; gap: 6px; text-transform: uppercase; font-size: var(--fs-xs); }
-.m-xyrow select { flex: 1; min-width: 0; min-height: 38px; font: inherit; font-size: var(--fs-s); text-transform: uppercase; color: var(--ink);
-  background: transparent; border: 2px solid var(--ink); border-radius: 3px; padding: 0 6px; }
-.m-xy { position: relative; min-height: 0; border-radius: 14px; background: var(--tint-2); touch-action: none; cursor: crosshair; overflow: hidden; }
-.m-xy i { position: absolute; left: calc(16px + (100% - 32px) * var(--x, 0)); bottom: calc(16px + (100% - 32px) * var(--y, 0)); width: 24px; height: 24px; margin: 0 0 -12px -12px;
-  border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 3px var(--panel); pointer-events: none; }
-.m-xy.held i { background: var(--led); }
-.m-xy span, .m-xy b { position: absolute; font-size: var(--fs-xs); font-weight: 600; pointer-events: none; line-height: 1; }
-.m-xy span { opacity: .6; }
-.m-xy-t { left: 8px; top: 7px; }
-.m-xy-x { right: 8px; bottom: 7px; }
-.m-xy-y { left: 8px; bottom: 7px; }
-.m-xy output { position: absolute; left: 8px; top: 24px; text-align: left; font-family: var(--mono); font-size: var(--fs-xs); line-height: 1.05; color: var(--muted); white-space: pre-line; pointer-events: none; }
-.m-play-card { display: grid; grid-template-rows: 1fr; gap: 10px; min-height: 0; padding: 10px 8px; }
-#m-faders { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 10px 6px; min-height: 0; }
-/* the randomisers: their own card, a column down the right of the faders' card */
-[data-m-panel="play"] { grid-template-columns: minmax(0, 1fr) 92px; gap: 8px; }
-.m-rand-card { padding: 10px 6px; display: grid; min-height: 0; }
-.m-rand-card .m-rand { grid-template-columns: 1fr; grid-auto-rows: minmax(40px, 54px); align-content: center; min-width: 0; }
-.m-rand-card .m-rand .m-btn { min-height: 0; min-width: 0; padding: 0 2px; font-size: var(--fs-xs) !important; letter-spacing: .02em; overflow: hidden; }
-#m-faders .m-vf, #m-beat-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 3px; }
-#m-faders .m-vf output, #m-beat-faders .m-vf output { font-size: .62rem; line-height: 1.25; height: 2.5em; display: flex; align-items: flex-end; justify-content: center; flex: none; align-self: stretch; }
-#m-faders .m-flab, #m-beat-faders .m-flab { font-size: var(--fs-xs); line-height: 1.2; }
-#m-faders .m-vtrack, #m-beat-faders .m-vtrack { width: min(56px, 100%); flex: 1; height: auto; min-height: 48px; }
-.m-vf { display: grid; grid-template-rows: 2.6em auto auto; justify-items: center; gap: 6px; min-width: 0; }
-.m-vf output { font-family: var(--mono); font-size: var(--fs-xs); line-height: 1.3; color: var(--muted); text-align: center; white-space: pre-line;
-  align-self: end; overflow: hidden; max-width: 100%; font-variant-numeric: tabular-nums; }
-.m-vtrack { --f: 0; position: relative; width: 56px; height: 150px; border-radius: 14px; background: var(--tint-2); touch-action: none; cursor: ns-resize; overflow: hidden; }
-.m-vtrack i { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--f) * 100%); background: var(--ink); }
-.m-vtrack b { position: absolute; left: 6px; right: 6px; height: 10px; bottom: calc(var(--f) * (100% - 22px) + 6px); border-radius: 5px; background: var(--panel); }
-.m-vf.held .m-vtrack b { background: var(--led); }
-.m-vf .m-flab { font-size: var(--fs-s); font-weight: 600; }
-.m-rand { display: grid; gap: 8px; grid-template-columns: 1.4fr 1fr 1fr 1fr; }
-.m-btn { min-height: 56px; border-radius: 12px; background: var(--tint) !important; font-size: var(--fs-m) !important; font-weight: 500; }
-.m-btn:active { background: var(--ink) !important; color: var(--panel) !important; }
-.m-btn:disabled { opacity: .4; }
-.m-big { background: var(--ink) !important; color: var(--panel) !important; font-weight: 600; font-size: 1.1rem !important; }
-.m-big:active { transform: scale(.98); }
-
-
-.m-foot { font-size: var(--fs-xs); color: var(--ink); opacity: .75; text-align: center; padding: 4px 8px; line-height: 1.5; }
-.m-foot a { color: inherit; }
-
-.m-rand .m-btn { min-height: 48px; font-size: var(--fs-s) !important; padding: 0 4px; }
-.m-chead { display: flex; align-items: center; justify-content: space-between; }
-.m-chead b { font-size: var(--fs-m); font-weight: 700; }
-.m-toggle { min-width: 64px; min-height: 36px; border-radius: 999px; background: var(--tint) !important; font-size: var(--fs-s) !important; font-weight: 600; }
-.m-toggle[aria-pressed="true"] { background: var(--ink) !important; color: var(--panel) !important; }
-#m-comp, #m-duck { display: grid; gap: 14px; }
-#m-comp.off { opacity: .4; }
-.m-gr { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; font-size: var(--fs-s); }
-.m-gr i { height: 10px; border-radius: 5px; background: var(--tint-2); overflow: hidden; display: flex; justify-content: flex-end; }
-.m-gr i b { height: 100%; width: 0; background: var(--led); border-radius: 5px; transition: width .08s linear; }
-.m-gr output { font-family: var(--mono); font-size: var(--fs-xs); color: var(--muted); min-width: 4.5em; text-align: right; font-variant-numeric: tabular-nums; }
-
-.m-wide { width: 100%; }
-.m-note { margin: 8px 2px 0; min-height: 1.4em; font-size: var(--fs-s); color: var(--muted); }
-.m-plist { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 4px; }
-.m-plist li { display: flex; align-items: center; gap: 6px; }
-.m-pgroup { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 10px 4px 2px; }
-.m-pempty { font-size: var(--fs-s); color: var(--muted); padding: 4px; }
-.m-pload { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left;
-  min-height: 46px; padding: 0 14px; border-radius: 10px; background: var(--tint) !important; }
-.m-pload b { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.m-pload small { font-family: var(--mono); font-size: var(--fs-xs); color: var(--muted); flex: none; }
-.m-plist li.cur .m-pload { background: var(--ink) !important; color: var(--panel); }
-.m-plist li.cur .m-pload small { color: inherit; opacity: .7; }
-.m-pdel { min-height: 46px; padding: 0 12px; border-radius: 10px; background: none; font-size: var(--fs-s) !important; color: var(--muted) !important; }
-.m-pio { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-.m-file { display: grid; place-items: center; cursor: pointer; position: relative; overflow: hidden; }
-.m-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
-.m-install { margin-top: 10px; }
-.m-install[hidden] { display: none; }
-
-/* ---- the LCD look: every card is a pane of reflective LCD glass in a black bezel on a dark plastic case.
-   One ink (the segments), with a faint ghost of the unlit segments and the offset shadow real LCD type casts on its
-   backplane; a pixel font throughout; buttons are outlined boxes that invert when pressed or chosen; faders and
-   meters are segmented bar graphs. Layout as above: this only restyles it ---- */
-body { background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; }
+body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-inset-right, 0px)) max(6px, env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px));
+  min-height: 100dvh; -webkit-tap-highlight-color: transparent; background: radial-gradient(120% 80% at 50% 0%, #2a2d28, #161815) fixed; }
 .m {
   --panel: #a7b58c; --ink: #17200e; --muted: rgba(23, 32, 14, .62);
   --tint: rgba(23, 32, 14, .07); --tint-2: rgba(23, 32, 14, .12); --ghost: rgba(23, 32, 14, .1); --led: #17200e;
   --display: "VT323", ui-monospace, monospace; --body: "VT323", ui-monospace, monospace; --mono: "VT323", ui-monospace, monospace;
-  --fs-xs: .95rem; --fs-s: 1.1rem; --fs-m: 1.3rem; --fs-l: 1.6rem;
+  --fs-xs: 1.12rem; --fs-s: 1.25rem; --fs-m: 1.3rem; --fs-l: 1.6rem;
+  --rule: 1px solid rgba(23, 32, 14, .32);
+  position: relative; max-width: 480px; margin: 0 auto; display: grid; grid-template-rows: auto auto 1fr auto; gap: 0;
+  height: calc(100dvh - max(6px, env(safe-area-inset-top, 0px)) - max(6px, env(safe-area-inset-bottom, 0px))); padding: 8px 8px 10px;
   font-family: var(--body); color: var(--ink);
-}
-.m-card, .m-tabs {
-  background-color: var(--panel);
-  background-image: linear-gradient(170deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, .06)),
-    repeating-linear-gradient(0deg, rgba(0, 0, 0, .03) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0, 0, 0, .03) 0 1px, transparent 1px 3px);
-  border: 4px solid #0b0c0a; border-radius: 8px;
-  box-shadow: inset 0 3px 10px rgba(0, 0, 0, .28), inset 0 0 0 1px rgba(255, 255, 255, .1), 0 1px 0 rgba(255, 255, 255, .07);
-}
-.m, .m button { text-shadow: 1.5px 1.5px 0 rgba(23, 32, 14, .16); }
-.m-title { font-family: var(--display); font-size: 1.9rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: #a7b58c; text-shadow: 0 0 10px rgba(167, 181, 140, .25); }
-
-/* buttons: an outlined box, inverted when pressed or chosen */
-.m .m-btn, .m .m-rec, .m .m-toggle, .m .m-pload, .m-tabs button {
-  background: transparent !important; border: 2px solid var(--ink); border-radius: 3px; font-weight: 400; text-transform: uppercase; letter-spacing: .06em; }
-.m .m-btn:active, .m .m-big, .m .m-play, .m-tabs button[aria-selected="true"], .m .m-toggle[aria-pressed="true"], .m .m-plist li.cur .m-pload, .m .m-rec.on {
-  background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
-.m .m-big:active, .m .m-play:active { transform: none; background: transparent !important; color: var(--ink) !important; }
-.m .m-play { border: 2px solid var(--ink); border-radius: 3px; font-weight: 400; letter-spacing: .1em; font-size: var(--fs-m) !important; }
-.m .m-btn:disabled { opacity: .3; }
-.m .m-pdel { text-transform: uppercase; }
-.m-tabs { padding: 6px; gap: 6px; }
-.m-tabs button { font-size: var(--fs-m) !important; border-color: transparent; }
-.m-tabs button[aria-selected="true"] { border-color: var(--ink); }
-.m-rec i { border-radius: 2px; background: var(--ink); box-shadow: none; width: 16px; height: 16px; }
-.m-rec.on i { background: var(--panel); }
-
-/* faders: a column of segments, the unlit ones a faint ghost; the value is the top lit segment */
-.m .m-vtrack { border-radius: 2px; background: repeating-linear-gradient(to top, var(--ghost) 0 5px, transparent 5px 8px); background-position: bottom; }
-.m .m-vtrack i { height: round(down, calc(var(--f) * 100%), 8px); background: repeating-linear-gradient(to top, var(--ink) 0 5px, transparent 5px 8px); background-position: bottom; }
-.m .m-vtrack b { display: none; }
-.m .m-vf.held .m-vtrack { outline: 2px solid var(--ink); outline-offset: 3px; }
-.m .m-vf output, #m-faders .m-vf output, #m-beat-faders .m-vf output { font-size: var(--fs-xs); line-height: 1; color: var(--ink); }
-.m .m-flab, #m-faders .m-flab, #m-beat-faders .m-flab { font-weight: 400; text-transform: uppercase; letter-spacing: .06em; font-size: var(--fs-xs); }
-
-/* the energy / rush pad: a dot grid with a square cursor */
-.m .m-xy { border-radius: 2px; background: radial-gradient(circle, var(--ghost) 1.2px, transparent 1.6px) 0 0 / 12px 12px; border: 2px solid var(--ink); }
-.m .m-xy i { width: 22px; height: 22px; margin: 0 0 -11px -11px; border-radius: 2px; background: var(--ink); box-shadow: 0 0 0 3px var(--panel), 0 0 0 5px var(--ink); }
-.m .m-xy.held i { background: var(--panel); }
-.m .m-xy span, .m .m-xy b, .m .m-xy output { color: var(--ink); opacity: .8; font-weight: 400; text-transform: uppercase; }
-.m .m-xy b { opacity: 1; letter-spacing: .06em; }
-
-/* the compressor's reduction meter, segmented */
-.m .m-gr i { border-radius: 0; background: repeating-linear-gradient(to left, var(--ghost) 0 5px, transparent 5px 8px); height: 14px; }
-.m .m-gr i b { border-radius: 0; background: repeating-linear-gradient(to left, var(--ink) 0 5px, transparent 5px 8px); background-position: right; }
-.m .m-gr output, .m .m-pload small, .m .m-note, .m .m-pempty, .m .m-pgroup { color: var(--muted); }
-.m .m-chead b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; }
-.m-foot { color: #a7b58c; opacity: .7; }
-
-/* the step sequencer: a sheet over the bottom of the screen, leaving play and record above it free; sixteen step bars in two rows (the ones past the length
-   faint), the length, slew and speed as horizontal segmented bars, then randomise and done */
-.m-seq { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; pointer-events: none; display: flex; align-items: flex-end; justify-content: center;
-  padding: 16px max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
-.m-seq[hidden] { display: none; }
-.m-seq-card { width: 100%; max-width: 480px; display: grid; gap: 14px; pointer-events: auto; box-shadow: 0 -8px 30px rgba(0, 0, 0, .5), inset 0 3px 10px rgba(0, 0, 0, .28); }
-.m-seq .m-chead { gap: 10px; }
-.m-seq .m-chead output { flex: 1; text-align: right; color: var(--muted); font-size: var(--fs-s); }
-.m-seq-steps { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; height: min(34vh, 280px); touch-action: none; }
-.m-seq-steps i { --up: 0; --dn: 0; position: relative; border-radius: 2px;
-  background: linear-gradient(var(--ink), var(--ink)) center / 100% 2px no-repeat, repeating-linear-gradient(to top, var(--ghost) 0 5px, transparent 5px 8px); }
-/* a step's offset: lit up from the middle line, or down from it */
-.m-seq-steps i::after, .m-seq-steps i::before { content: ""; position: absolute; left: 0; right: 0; background: repeating-linear-gradient(to top, var(--ink) 0 5px, transparent 5px 8px); }
-.m-seq-steps i::after { bottom: 50%; height: calc(var(--up) * 50%); background-position: bottom; }
-.m-seq-steps i::before { top: 50%; height: calc(var(--dn) * 50%); background: repeating-linear-gradient(to bottom, var(--ink) 0 5px, transparent 5px 8px); }
-.m-seq-steps i.off { opacity: .25; }
-.m-seq-steps i.now { outline: 2px solid var(--ink); outline-offset: 2px; }
-.m-seq-lenrow { display: grid; grid-template-columns: 4.5em 1fr 5.5em; gap: 12px; align-items: center; text-transform: uppercase; }
-.m-seq-len { --f: 1; position: relative; height: 36px; touch-action: none; border: 2px solid var(--ink); border-radius: 2px;
-  background: repeating-linear-gradient(to right, var(--ghost) 0 5px, transparent 5px 8px) 4px 4px / calc(100% - 8px) calc(100% - 8px) no-repeat; }
-.m-seq-len i { position: absolute; left: 4px; top: 4px; bottom: 4px; width: calc((100% - 8px) * var(--w, 1));
-  background: repeating-linear-gradient(to right, var(--ink) 0 5px, transparent 5px 8px); }
-.m-seq-lenrow output { min-width: 5.5em; text-align: right; }
-.m-seq-btns { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; }
-.m-seq-btns .m-btn { min-height: 52px; }
-/* a fader with a sequencer running: its label is inverted */
-.m .m-vf.seq .m-flab { background: var(--ink); color: var(--panel); padding: 0 4px; text-shadow: none; }
-/* a long hold mustn't bring up the phone's own menus */
-.m { -webkit-touch-callout: none; }
-
-/* the beat pop-up: genre, beat, energy and rush in a sheet like the sequencer's (opened under it, so a fader's
-   sequencer opens over it) */
-
-/* the fx page: a row of faders per effect, its name above it */
-[data-m-panel="fx"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
-.m-fx-card { display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)) auto; gap: 8px; min-height: 0; padding: 8px; }
-.m-fx-row { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 2px; min-height: 0; }
-.m-fx-row b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); padding-left: 4px; }
-.m-fx-row .m-faders { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
-.m-fx-row .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
-.m .m-fx-row .m-vf output { font-size: var(--fs-xs); line-height: 1; height: 1.1em; display: flex; align-items: flex-end; justify-content: center; flex: none; align-self: stretch; overflow: hidden; white-space: nowrap; }
-.m .m-fx-row .m-flab { font-size: .85rem; letter-spacing: .02em; }
-.m .m-fx-row .m-vtrack { width: min(44px, 100%); flex: 1; height: auto; min-height: 30px; }
-/* five page buttons share the bar */
-.m-tabs { grid-template-columns: repeat(5, 1fr); }
-.m-tabs button { font-size: var(--fs-s) !important; letter-spacing: 0; padding: 0 1px; min-width: 0; }
-.m-fx-btns { display: grid; grid-template-columns: 1.3fr 1.3fr 1fr; gap: 8px; }
-.m-fx-btns .m-btn { min-height: 46px; font-size: var(--fs-xs) !important; padding: 0 2px; }
-/* a fader with a sequencer moving it: its setting is a bar across the track */
-.m .m-vtrack.mod b { display: block; left: -3px; right: -3px; height: 4px; border-radius: 0; bottom: calc(var(--b) * (100% - 4px)); background: var(--ink); box-shadow: 0 0 0 2px var(--panel); }
-.m .m-vtrack.mod { overflow: visible; }
-.m-voice { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
-.m .m-voice .m-btn { min-height: 44px; min-width: 0; padding: 0 1px; font-size: .85rem !important; letter-spacing: 0; overflow: hidden; }
-.m .m-voice .m-btn[aria-selected="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
-/* the mix page: three rows of sends and a taller row of levels, six across */
-[data-m-panel="mix"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
-.m-mix-card { grid-template-rows: 1fr 1fr 1fr 1.6fr; }
-/* six page buttons share the bar */
-.m-tabs { grid-template-columns: repeat(6, 1fr); }
-.m .m-tabs button { font-size: min(var(--fs-s), 3.7vw) !important; }
-/* the x/y page: the drum strip, the pad's drop-downs, then the pad in what's left */
-[data-m-panel="xy"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
-.m-xy-card { display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 10px; min-height: 0; padding: 10px 8px; }
-/* seven page buttons share the bar */
-.m-tabs { grid-template-columns: repeat(7, 1fr); gap: 3px; padding: 5px; }
-.m .m-tabs button { font-size: min(var(--fs-s), 3.2vw) !important; }
-/* a preset waiting for the next bar: its row flashes on and off */
-.m .m-plist li.pending .m-pload { animation: m-flash .5s steps(1) infinite; }
-@keyframes m-flash { 50% { opacity: .25; } }
-@media (prefers-reduced-motion: reduce) { .m .m-plist li.pending .m-pload { animation: none; outline: 2px dashed var(--ink); outline-offset: 2px; } }
-
-/* ---- one screen: the whole app is a single pane of LCD glass in one bezel; the sections inside it are told apart by
-   thin ink lines instead of panels of their own (the sheets that open over it keep their own glass) ---- */
-body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-inset-right, 0px)) max(6px, env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px)); }
-.m { height: calc(100dvh - max(6px, env(safe-area-inset-top, 0px)) - max(6px, env(safe-area-inset-bottom, 0px)));
-  padding: 8px 8px 10px; gap: 0; background-color: var(--panel);
-  background-image: linear-gradient(170deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, .06)),
-    repeating-linear-gradient(0deg, rgba(0, 0, 0, .03) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0, 0, 0, .03) 0 1px, transparent 1px 3px);
+  touch-action: manipulation; -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none; /* a long hold mustn't bring up the phone's own menus */
   border: 5px solid #0b0c0a; border-radius: 10px;
-  box-shadow: inset 0 3px 12px rgba(0, 0, 0, .28), inset 0 0 0 1px rgba(255, 255, 255, .1), 0 1px 0 rgba(255, 255, 255, .07); }
-.m > .m-card, .m > .m-tabs, .m-pages .m-card { background: none; border: 0; border-radius: 0; box-shadow: none; }
-.m-title { color: var(--ink); text-shadow: 1.5px 1.5px 0 rgba(23, 32, 14, .16); font-size: 1.5rem; }
-.m-top { padding: 0 4px 6px; border-bottom: 2px solid var(--ink); }
-.m-trans { padding: 8px 0; border-bottom: 2px solid var(--ink); }
-.m-pages { padding-top: 6px; }
-.m > .m-tabs { padding: 8px 0 0; border-top: 2px solid var(--ink); margin-top: 6px; }
-/* inside a page, side-by-side parts get a line between them, stacked ones a line above */
-[data-m-panel="play"] .m-rand-card { border-left: 2px solid var(--ink) !important; padding-left: 8px; }
-.m-pages .m-card { padding-left: 2px; padding-right: 2px; }
-.m-pages .m-card + .m-card, .m-fx-row + .m-fx-row, .m-fx-btns { border-top: 1px solid var(--ink); padding-top: 6px; }
-.m > .m-card.m-trans { border-bottom: 2px solid var(--ink); border-radius: 0; }
-[data-m-panel="play"] .m-card.m-rand-card { border-top: 0; padding-top: 10px; }
-
-/* ---- nothing scrolls but the presets list: the comp page is two rows of faders, the presets page keeps save at the
-   top and its buttons at the foot while the list between them scrolls, the sequencer sheet fits under play and record ---- */
-[data-m-panel="comp"], [data-m-panel="presets"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
-.m-comp-card { display: grid; grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 6px; min-height: 0; padding: 8px 2px; }
-.m-comp-card .m-chead { gap: 10px; }
-.m-comp-card .m-chead + .m-chead, .m-comp-card #m-comp + .m-chead { border-top: 1px solid var(--ink); padding-top: 6px; }
-.m-comp-card .m-gr { flex: 1; grid-template-columns: 1fr auto; gap: 8px; }
-#m-comp, #m-duck { grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
-#m-comp .m-vf, #m-duck .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
-.m #m-comp .m-vf output, .m #m-duck .m-vf output { font-size: var(--fs-xs); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; white-space: nowrap; }
-.m #m-comp .m-flab, .m #m-duck .m-flab { font-size: .85rem; letter-spacing: .02em; }
-.m #m-comp .m-vtrack, .m #m-duck .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 30px; }
-.m-presets-card { display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto auto; gap: 6px; min-height: 0; padding: 8px 2px; }
-.m-presets-card .m-note { margin: 0; min-height: 1.2em; }
-.m-plist { min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; border-top: 1px solid var(--ink); padding-top: 4px; }
-.m-pio { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); margin-top: 0; }
-.m-pio .m-btn { min-height: 46px; font-size: var(--fs-xs) !important; }
-.m-presets-card .m-foot { color: var(--muted); opacity: 1; padding: 0; font-size: .8rem; line-height: 1.2; }
-.m-seq-card { height: min(calc(100dvh - 150px), 640px); grid-template-rows: auto minmax(0, 1fr) auto auto auto auto auto; }
-.m-seq-card .m-seq-steps { height: auto; min-height: 60px; }
-/* the perf page: the randomise buttons share their column evenly, beside the three rows of faders */
-.m-rand-card .m-rand { grid-auto-rows: auto; grid-template-rows: repeat(6, minmax(0, 1fr)); align-content: stretch; height: 100%; }
-.m-rand-card .m-rand .m-btn { min-height: 0; }
-[data-m-panel="play"] .m-card.m-rand-card { padding: 6px 0 6px 8px; }
-.m-play-card { padding: 6px 4px 6px 0; }
-[data-m-panel="comp"], [data-m-panel="presets"] { grid-template-columns: minmax(0, 1fr); }
-.m-comp-card .m-chead b { white-space: nowrap; }
-.m-comp-card .m-toggle { min-width: 52px; }
-.m-pages .m-card.m-comp-card { padding-right: 6px; padding-left: 4px; }
-
-/* ---- uneven backlighting: the screen is lit from LEDs along its lower edge, as a cheap LCD is, so it glows brighter
-   and warmer near the bottom corners, fades toward the top, and has a dim patch where the light doesn't quite
-   reach; the glass texture sits over it (all behind the ink, so the type stays as dark) ---- */
-.m {
+  /* uneven backlighting: lit from LEDs along the lower edge, as a cheap LCD is, so it glows brighter and warmer near
+     the bottom corners, fades toward the top, and has a dim patch where the light doesn't quite reach; the glass
+     texture sits over it (all behind the ink, so the type stays as dark) */
+  background-color: var(--panel);
   background-image: linear-gradient(170deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, 0) 38%, rgba(0, 0, 0, .05)),
     repeating-linear-gradient(0deg, rgba(0, 0, 0, .03) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0, 0, 0, .03) 0 1px, transparent 1px 3px),
     radial-gradient(60% 34% at 12% 100%, rgba(255, 252, 195, .6), rgba(255, 252, 200, 0) 70%),
@@ -1171,29 +884,313 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     radial-gradient(30% 18% at 22% 30%, rgba(255, 255, 230, .08), rgba(255, 255, 230, 0) 70%),
     linear-gradient(180deg, rgba(30, 38, 20, .22) 0%, rgba(30, 38, 20, 0) 30%),
     radial-gradient(130% 100% at 50% 60%, rgba(0, 0, 0, 0) 55%, rgba(20, 26, 12, .3) 100%);
+  /* depth: it sits deep in its bezel, the inner shadow heaviest at the top right */
+  box-shadow: inset 0 6px 16px rgba(0, 0, 0, .36), inset -8px 8px 18px rgba(0, 0, 0, .2), inset 0 0 0 1px rgba(255, 255, 255, .1), 0 1px 0 rgba(255, 255, 255, .07);
 }
-
-/* ---- depth: the screen sits deeper in its bezel (a heavier inner shadow, heaviest at the top right), and the ink casts
-   a deeper shadow on the backplane, the gap between them a little wider toward the top-right corner, since the glass
-   isn't quite flat (--d, set per control from where it sits: 1 at the bottom left, about 1.7 at the top right) ---- */
-.m { box-shadow: inset 0 6px 16px rgba(0, 0, 0, .36), inset -8px 8px 18px rgba(0, 0, 0, .2), inset 0 0 0 1px rgba(255, 255, 255, .1), 0 1px 0 rgba(255, 255, 255, .07); }
+/* faded patches: an old LCD loses contrast in places, so a few soft patches show their ink paler (a glass-coloured
+   veil, clearest at the top right, a smaller one low on the left, a faint band down the right edge; it never takes a
+   touch, and the sheets open above it) */
+.m::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 5;
+  background: radial-gradient(34% 17% at 76% 24%, rgba(167, 181, 140, .42), rgba(167, 181, 140, 0) 100%),
+    radial-gradient(22% 12% at 16% 66%, rgba(167, 181, 140, .38), rgba(167, 181, 140, 0) 100%),
+    radial-gradient(14% 9% at 58% 83%, rgba(167, 181, 140, .3), rgba(167, 181, 140, 0) 100%),
+    linear-gradient(90deg, rgba(167, 181, 140, 0) 88%, rgba(167, 181, 140, .22) 97%, rgba(167, 181, 140, .1)); }
+/* the ink's shadow on the backplane, the gap a little wider toward the top right, since the glass isn't quite flat
+   (--d, set per control by mobile-glass.js: 1 at the bottom left, about 1.7 at the top right) */
 .m, .m button, .m-title, .m .m-flab, .m .m-vf output { --d: 1; text-shadow: calc(2px * var(--d)) calc(2.2px * var(--d)) calc(.3px * var(--d)) rgba(23, 32, 14, calc(.16 + .04 * var(--d))); }
 .m .m-vtrack i, .m .m-seq-steps i::after, .m .m-seq-steps i::before, .m .m-gr i b { filter: drop-shadow(calc(2px * var(--d, 1)) calc(2.2px * var(--d, 1)) 0 rgba(23, 32, 14, .17)); }
 .m .m-btn, .m .m-toggle, .m .m-pload, .m .m-tabs button, .m .m-xy, .m .m-seq-len, .m .m-xyrow select { box-shadow: calc(2px * var(--d, 1)) calc(2.2px * var(--d, 1)) 0 rgba(23, 32, 14, .14); }
 .m .m-tabs button:not([aria-selected="true"]) { box-shadow: none; }
 
-/* the master page: distortion, compressor and sidechain, a row each; the mix page's three rows; the fx page's two */
-.m-comp-card { grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); }
-.m-comp-card .m-chead:not(:first-child) { border-top: 1px solid var(--ink); padding-top: 6px; }
-.m-chint { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: right; color: var(--muted); font-size: var(--fs-xs); text-transform: uppercase; }
-#m-dist { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
-#m-dist .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
-.m #m-dist .m-vf output { font-size: var(--fs-xs); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; white-space: nowrap; }
-.m #m-dist .m-flab { font-size: .85rem; letter-spacing: .02em; }
-.m #m-dist .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 24px; }
-.m-fx-card { grid-template-rows: repeat(2, minmax(0, 1fr)) auto; }
-/* the mix page: the two send rows small, the levels big */
-.m-fx-card.m-mix-card { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2.6fr); }
+/* cards: the sheets are glass of their own; the sections inside the screen are bare */
+.m-card { padding: 16px; border: 4px solid #0b0c0a; border-radius: 8px; background-color: var(--panel);
+  background-image: linear-gradient(170deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, .06)),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, .03) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0, 0, 0, .03) 0 1px, transparent 1px 3px);
+  box-shadow: inset 0 3px 10px rgba(0, 0, 0, .28), inset 0 0 0 1px rgba(255, 255, 255, .1), 0 1px 0 rgba(255, 255, 255, .07); }
+.m > .m-card, .m-pages .m-card { background: none; border: 0; border-radius: 0; box-shadow: none; }
+
+/* ---- controls ---- */
+.m button { font: inherit; color: var(--ink); border: 0; cursor: pointer; touch-action: manipulation; }
+/* buttons: an outlined box, inverted when pressed or chosen */
+.m-btn { min-height: 56px; font-size: var(--fs-m) !important; }
+.m-big { font-size: 1.1rem !important; }
+.m-toggle { min-width: 64px; min-height: 36px; font-size: var(--fs-s) !important; }
+.m .m-btn, .m .m-rec, .m .m-toggle, .m .m-pload, .m-tabs button {
+  background: transparent !important; border: 2px solid var(--ink); border-radius: 3px; font-weight: 400; text-transform: uppercase; letter-spacing: .06em; }
+.m .m-btn:active, .m .m-big, .m .m-play, .m-tabs button[aria-selected="true"], .m .m-toggle[aria-pressed="true"], .m .m-plist li.cur .m-pload, .m .m-rec.on,
+.m .m-voice .m-btn[aria-selected="true"], .m .m-rs-tabs .m-btn[aria-selected="true"], .m .m-ch-list .m-btn[aria-pressed="true"], .m .m-looplens .m-btn[aria-pressed="true"] {
+  background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
+.m .m-big:active, .m .m-play:active { transform: none; background: transparent !important; color: var(--ink) !important; }
+.m .m-btn:disabled { opacity: .3; }
+
+/* a checkbox drawn as an LCD box: a ticked one is filled */
+.m-chk { position: relative; display: flex; align-items: center; gap: 10px; min-height: 40px; text-transform: uppercase; font-size: var(--fs-xs); cursor: pointer; }
+.m-chk input { position: absolute; left: 0; top: 0; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.m-chk i { flex: none; width: 24px; height: 24px; border: 2px solid var(--ink); border-radius: 2px; box-shadow: inset 0 0 0 3px var(--panel); }
+.m-chk input:checked + i { background: var(--ink); }
+.m-chk input:focus-visible + i { outline: 2px dashed var(--ink); outline-offset: 2px; }
+
+/* a heading with its controls */
+.m-chead { display: flex; align-items: center; justify-content: space-between; }
+.m-chead b { font-size: var(--fs-m); }
+.m .m-chead b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; }
+
+/* a meter (the sidechain's duck, the compressor's reduction), segmented */
+.m-gr { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; font-size: var(--fs-s); }
+.m .m-gr i { height: 14px; border-radius: 0; overflow: hidden; display: flex; justify-content: flex-end;
+  background: repeating-linear-gradient(to left, var(--ghost) 0 5px, transparent 5px 8px); }
+.m .m-gr i b { height: 100%; width: 0; border-radius: 0; background: repeating-linear-gradient(to left, var(--ink) 0 5px, transparent 5px 8px); background-position: right; }
+.m-gr output { font-family: var(--mono); font-size: var(--fs-xs); color: var(--muted); min-width: 4.5em; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* faders: a column of segments, the unlit ones a faint ghost, the value the top lit segment; readout above, label under */
+.m-faders { display: grid; gap: 14px; }
+.m-vf { display: grid; grid-template-rows: 2.6em auto auto; justify-items: center; gap: 6px; min-width: 0; }
+.m-vf output { font-family: var(--mono); text-align: center; white-space: pre-line; align-self: end; overflow: hidden; max-width: 100%; font-variant-numeric: tabular-nums; }
+.m .m-vf output { font-size: var(--fs-xs); line-height: 1; color: var(--ink); }
+.m .m-flab { font-size: var(--fs-xs); font-weight: 400; text-transform: uppercase; letter-spacing: .03em; }
+.m .m-vtrack { --f: 0; position: relative; width: 56px; height: 150px; border-radius: 2px; touch-action: none; cursor: ns-resize; overflow: hidden;
+  background: repeating-linear-gradient(to top, var(--ghost) 0 5px, transparent 5px 8px); background-position: bottom; }
+.m .m-vtrack i { position: absolute; left: 0; right: 0; bottom: 0; height: round(down, calc(var(--f) * 100%), 8px);
+  background: repeating-linear-gradient(to top, var(--ink) 0 5px, transparent 5px 8px); background-position: bottom; }
+.m .m-vtrack b { position: absolute; display: none; }
+.m .m-vf.held .m-vtrack { outline: 2px solid var(--ink); outline-offset: 3px; }
+/* a fader with a sequencer moving it: its label inverted, its own setting a bar across the track */
+.m .m-vf.seq .m-flab { background: var(--ink); color: var(--panel); padding: 0 4px; text-shadow: none; }
+.m .m-vtrack.mod { overflow: visible; }
+.m .m-vtrack.mod b { display: block; left: -3px; right: -3px; height: 4px; border-radius: 0; bottom: calc(var(--b) * (100% - 4px)); background: var(--ink); box-shadow: 0 0 0 2px var(--panel); }
+
+/* the big faders (perf and beat): a two-line readout, tracks as tall as their row */
+#m-faders .m-vf, #m-beat-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 3px; }
+#m-faders .m-vf output, #m-beat-faders .m-vf output { font-size: var(--fs-xs); line-height: 1; color: var(--ink); height: 2.5em; display: flex; align-items: flex-end; justify-content: center; flex: none; align-self: stretch; }
+#m-faders .m-flab, #m-beat-faders .m-flab { line-height: 1.2; }
+.m #m-faders .m-flab { font-size: min(var(--fs-xs), 3.75vw); letter-spacing: -.02em; }
+.m #m-beat-faders .m-flab { font-size: min(var(--fs-xs), 4vw); letter-spacing: -.02em; white-space: nowrap; }
+.m #m-beat-faders .m-vf output { font-size: min(var(--fs-xs), 3.8vw); }
+#m-faders .m-vtrack, #m-beat-faders .m-vtrack { width: min(56px, 100%); flex: 1; height: auto; min-height: 48px; }
+#m-beat-faders .m-vtrack { min-height: 16px; }
+
+/* the small faders (voice, fx, mix, master): a one-line readout, a narrow label */
+.m-fx-row .m-vf, #m-comp .m-vf, #m-duck .m-vf, #m-dist .m-vf, .m-vset .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
+.m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output, .m .m-vset .m-vf output {
+  font-size: min(var(--fs-xs), 3.9vw); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; }
+.m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output { white-space: nowrap; }
+.m .m-fx-row .m-vf output { display: flex; align-items: flex-end; justify-content: center; }
+.m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab { font-size: min(1.05rem, 3.7vw); letter-spacing: 0; white-space: nowrap; }
+.m .m-vset .m-flab, .m .m-vset .m-vf output { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.m .m-fx-row .m-vtrack, .m #m-comp .m-vtrack, .m #m-duck .m-vtrack, .m #m-dist .m-vtrack, .m .m-vset .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 12px; }
+.m .m-fx-row .m-vtrack { width: min(44px, 100%); }
+.m .m-vset .m-vtrack { width: min(64px, 100%); }
+
+/* ---- the frame: title line, transport, pages, page buttons ---- */
+.m-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 0 4px 6px; border-bottom: var(--rule); }
+/* (tapping the title opens the randomisers' settings) */
+.m-title { font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); cursor: pointer; }
+.m-pagename { font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
+
+/* play, rec, rec loop */
+.m-trans { padding: 8px 0; display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; align-items: stretch; }
+.m > .m-card.m-trans { border-bottom: var(--rule); }
+.m-play { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; background: var(--ink) !important;
+  color: var(--panel) !important; font-weight: 400; text-transform: uppercase; }
+.m .m-play { border: 2px solid var(--ink); border-radius: 3px; letter-spacing: .1em; font-size: var(--fs-m) !important; }
+.m-play svg { width: 20px; height: 20px; fill: currentColor; }
+.m-play .i-stop, .m-play[aria-pressed="true"] .i-play { display: none; }
+.m-play[aria-pressed="true"] .i-stop { display: inline; }
+.m .m-rec { display: grid; grid-auto-flow: column; justify-content: center; place-items: center; align-content: center; gap: min(10px, 2vw) !important; min-height: 46px; }
+.m-rec i { width: 16px; height: 16px; border-radius: 2px; background: var(--ink); }
+.m-rec span { font-family: var(--mono); font-size: var(--fs-s); font-variant-numeric: tabular-nums; }
+.m-rec.on i { width: 16px; height: 16px; border-radius: 4px; background: var(--panel); animation: m-blink 1s steps(1) infinite; }
+@keyframes m-blink { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .m-rec.on i { animation: none; } }
+.m .m-rec:disabled { opacity: .35; }
+.m .m-loop { -webkit-touch-callout: none; }
+.m .m-loop span { white-space: nowrap; }
+.m .m-loop svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* the pages sit side by side; a page button jumps to one (they don't swipe). Each page is one screen, no scrolling */
+.m-pages { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; column-gap: 16px; min-height: 0; padding-top: 6px; overflow: hidden;
+  scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
+.m-pages::-webkit-scrollbar { display: none; }
+.m-panel { display: grid; grid-template-rows: 1fr; gap: 12px; align-content: stretch; min-height: 0; overflow: hidden; scroll-snap-align: start; scroll-snap-stop: always; }
+
+/* the page buttons, one line of eight along the bottom where a thumb reaches them (each page's full name is on the title line) */
+.m > .m-tabs { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 2px; margin-top: 6px; padding: 8px 0 0; border-top: var(--rule); }
+.m-tabs button { border-color: transparent; min-width: 0; }
+.m-tabs button[aria-selected="true"] { border-color: var(--ink); }
+.m .m-tabs button { min-height: 56px; padding: 0; font-size: min(1.4rem, 4.9vw) !important; letter-spacing: 0; }
+
+/* ---- perf: eight faders, four by two, and the randomise column beside them ---- */
+[data-m-panel="play"] { grid-template-columns: minmax(0, 1fr) 92px; gap: 8px; }
+.m-play-card { display: grid; grid-template-rows: 1fr; gap: 10px; min-height: 0; padding: 6px 2px; }
+#m-faders { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 10px 6px; min-height: 0; }
+.m-pages .m-rand-card { display: grid; min-height: 0; padding: 6px 0 6px 8px; border-top: var(--rule); border-left: var(--rule); }
+/* two boxes (next bar, assign), then eight buttons sharing the column evenly */
+.m-rand { display: grid; }
+.m-rand-card .m-rand { grid-template-columns: 1fr; grid-template-rows: auto auto repeat(8, minmax(0, 1fr)); grid-auto-rows: auto; gap: 6px; align-content: stretch; min-width: 0; height: 100%; }
+.m-rand-card .m-rand .m-btn { min-height: 0; min-width: 0; padding: 0 2px; letter-spacing: .02em; overflow: hidden; }
+.m .m-rand-card .m-rand .m-btn { font-size: min(var(--fs-xs), 3.7vw) !important; white-space: nowrap; }
+.m-nextbar { gap: 6px; font-size: min(var(--fs-xs), 3.6vw); white-space: nowrap; }
+.m-rand-card .m-nextbar { justify-content: flex-start; padding-left: 6px; min-height: 30px; }
+.m-nextbar i { width: 18px; height: 18px; }
+/* next bar: a button waiting for the bar flashes */
+.m .m-rand .m-btn.pending { animation: m-flash .5s steps(1) infinite; }
+@media (prefers-reduced-motion: reduce) { .m .m-rand .m-btn.pending { animation: none; outline: 2px dashed var(--ink); outline-offset: 2px; } }
+/* assign mode: every slot dashed, tap one to choose what it does */
+#m-faders.assigning .m-vf[data-slot] { outline: 2px dashed var(--ink); outline-offset: 2px; cursor: pointer; }
+#m-faders.assigning .m-vf[data-slot] .m-vtrack { pointer-events: none; }
+
+/* ---- beat: tempo, genre, beat, energy / fills, rush, rush on, velocity / groove, depth, accent ---- */
+.m-beat-card { display: grid; min-height: 0; padding: 6px 2px; }
+#m-beat-faders { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px 4px; min-height: 0; }
+
+/* ---- voice: the drum strip, the section strip, then the section's faders (up to six, three by two) ---- */
+.m-dice-card { display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 10px; min-height: 0; padding: 10px 2px; }
+.m-voice { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+.m-vsec { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.m .m-voice .m-btn { min-height: 44px; min-width: 0; padding: 0 1px; font-size: min(1.05rem, 3.6vw) !important; letter-spacing: 0; overflow: hidden; }
+.m .m-vsec .m-btn { min-height: 38px; }
+.m-vsets { display: grid; min-height: 0; }
+.m-vset { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px 6px; min-height: 0; }
+.m-vset[hidden] { display: none; }
+
+/* ---- x/y: two pads, one above the other, each under its own x and y picks ---- */
+.m-xy-card { display: grid; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px; min-height: 0; padding: 10px 2px; }
+.m-xybox { display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 6px; min-height: 0; }
+.m-xybox + .m-xybox { border-top: var(--rule); padding-top: 8px; }
+.m-xyrow { display: grid; grid-template-columns: auto 1fr 1.3fr; gap: 8px; align-items: center; text-transform: uppercase; }
+.m-xyrow select { flex: 1; min-width: 0; min-height: 34px; font: inherit; font-size: var(--fs-s); text-transform: uppercase; color: var(--ink);
+  background: transparent; border: 2px solid var(--ink); border-radius: 3px; padding: 0 6px; }
+/* the pad: a dot grid with a square cursor */
+.m .m-xy { position: relative; min-height: 0; border: 2px solid var(--ink); border-radius: 2px; touch-action: none; cursor: crosshair; overflow: hidden;
+  background: radial-gradient(circle, var(--ghost) 1.2px, transparent 1.6px) 0 0 / 12px 12px; }
+.m .m-xy i { position: absolute; left: calc(16px + (100% - 32px) * var(--x, 0)); bottom: calc(16px + (100% - 32px) * var(--y, 0)); width: 22px; height: 22px; margin: 0 0 -11px -11px;
+  border-radius: 2px; background: var(--ink); box-shadow: 0 0 0 3px var(--panel), 0 0 0 5px var(--ink); pointer-events: none; }
+.m .m-xy.held i { background: var(--panel); }
+.m-xy span, .m-xy b { position: absolute; font-size: var(--fs-xs); pointer-events: none; line-height: 1; }
+.m-xy output { position: absolute; left: 8px; top: 24px; text-align: left; font-family: var(--mono); font-size: var(--fs-xs); line-height: 1.05; white-space: pre-line; pointer-events: none; }
+.m .m-xy span, .m .m-xy b, .m .m-xy output { color: var(--ink); opacity: .8; font-weight: 400; text-transform: uppercase; }
+.m .m-xy b { opacity: 1; letter-spacing: .06em; }
+.m-xy-t { left: 8px; top: 7px; }
+.m-xy-x { right: 8px; bottom: 7px; }
+.m-xy-y { left: 8px; bottom: 7px; }
+
+/* ---- fx and mix: a row of faders per effect (fx) or per send (mix), its name above it ---- */
+.m-fx-card { display: grid; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px; min-height: 0; padding: 8px 2px; }
+/* the mix page: the two send rows keep a short fixed track, the levels take the rest */
+.m-fx-card.m-mix-card { grid-template-rows: auto auto minmax(0, 1fr); }
+.m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { flex: none; height: clamp(18px, 4vh, 40px); min-height: 0; }
+.m-fx-row { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 2px; min-height: 0; }
+.m-fx-row + .m-fx-row { border-top: var(--rule); padding-top: 6px; }
+.m-fx-row b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); padding-left: 4px; }
+/* the echo row's heading, with its ping pong box */
+.m-fxhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-left: 4px; }
+.m-fxhead b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); }
+.m-fxhead .m-chk { min-height: 30px; gap: 8px; }
+.m-fxhead .m-chk i { width: 20px; height: 20px; }
+/* six to a row everywhere small faders sit in rows, so the columns line up (the master page's rows too) */
+.m-fx-row .m-faders, #m-comp, #m-duck, #m-dist { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+
+/* ---- mstr: the drum 1 sidechain, then distortion, then the compressor, each a heading and a row ---- */
+.m-comp-card { display: grid; grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 6px; min-height: 0; padding: 8px 6px 8px 4px; }
+.m-comp-card .m-chead { gap: 10px; }
+.m-comp-card .m-chead:not(:first-child) { border-top: var(--rule); padding-top: 6px; }
+.m-comp-card .m-chead b { white-space: nowrap; }
+.m-comp-card .m-gr { flex: 1; grid-template-columns: 1fr auto; gap: 8px; }
+.m-comp-card .m-toggle { min-width: 52px; }
+#m-comp.off { opacity: .4; }
+
+/* ---- prst: save at the top, the list between (it scrolls), the file buttons and credits at the foot ---- */
+[data-m-panel="comp"], [data-m-panel="presets"] { grid-template-columns: minmax(0, 1fr); }
+.m-presets-card { display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto auto; gap: 6px; min-height: 0; padding: 8px 2px; }
+/* save new, and save over the loaded preset */
+.m-psaves { display: grid; grid-template-columns: 1fr 1.6fr; gap: 8px; }
+.m-psaves .m-btn { min-height: 56px; font-size: var(--fs-xs) !important; padding: 0 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* a passing note under them, taking no room while empty */
+.m-note { margin: 0; min-height: 1.2em; font-size: var(--fs-s); color: var(--muted); }
+.m-presets-card .m-note:empty { min-height: 0; height: 0; margin-top: -6px; }
+.m-plist { list-style: none; margin: 4px 0 0; padding: 4px 0 0; display: grid; gap: 4px; align-content: start; min-height: 0;
+  overflow-y: auto; overscroll-behavior: contain; border-top: var(--rule); }
+.m-plist li { display: flex; align-items: center; gap: 6px; }
+.m-pgroup { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 10px 4px 2px; }
+.m-pload { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left; min-height: 46px; padding: 0 14px; }
+.m-pload b { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m-pload small { font-family: var(--mono); font-size: var(--fs-xs); color: var(--muted); flex: none; }
+.m-plist li.cur .m-pload small { color: inherit; opacity: .7; }
+/* a preset waiting for the next bar: its row flashes on and off */
+.m .m-plist li.pending .m-pload { animation: m-flash .5s steps(1) infinite; }
+@keyframes m-flash { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .m .m-plist li.pending .m-pload { animation: none; outline: 2px dashed var(--ink); outline-offset: 2px; } }
+/* a preset's star, filled when it's a favourite, and a saved one's delete */
+.m .m-pfav { min-height: 46px; min-width: 44px; padding: 0 6px; background: none !important; border: 0 !important; box-shadow: none !important; font-size: 1.5rem !important; line-height: 1; color: var(--ink); }
+.m .m-pfav[aria-pressed="false"] { opacity: .45; }
+.m-pdel { border-radius: 10px; background: none; color: var(--muted) !important; }
+.m .m-pdel { min-height: 46px; min-width: 40px; padding: 0; text-align: center; font-size: 1.2rem !important; text-transform: uppercase; }
+.m-pio { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 10px; }
+.m-pio .m-btn { min-height: 46px; font-size: var(--fs-xs) !important; white-space: nowrap; letter-spacing: 0; padding: 0 4px; }
+.m-file { display: grid; place-items: center; cursor: pointer; position: relative; overflow: hidden; }
+.m-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
+.m-install { margin-top: 10px; }
+.m-install[hidden] { display: none; }
+.m-foot { color: var(--muted); text-align: center; padding: 0; font-size: .95rem; line-height: 1.2; }
+.m-foot a { color: inherit; }
+
+/* ---- the step sequencer: a sheet over the bottom of the screen, leaving play and record above it free; sixteen step
+   bars in two rows (the ones past the length faint), length, slew, speed and depth as horizontal segmented bars,
+   then randomise and done ---- */
+.m-seq { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; pointer-events: none; display: flex; align-items: flex-end; justify-content: center;
+  padding: 16px max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.m-seq[hidden] { display: none; }
+.m-seq-card { width: 100%; max-width: 480px; height: min(calc(100dvh - 150px), 640px); display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto auto auto auto; gap: 14px;
+  pointer-events: auto; box-shadow: 0 -8px 30px rgba(0, 0, 0, .5), inset 0 3px 10px rgba(0, 0, 0, .28); }
+.m-seq .m-chead { gap: 10px; }
+.m-seq .m-chead output { flex: 1; text-align: right; color: var(--muted); font-size: var(--fs-s); }
+.m-seq-steps { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; height: auto; min-height: 60px; touch-action: none; }
+.m-seq-steps i { --up: 0; --dn: 0; position: relative; border-radius: 2px;
+  background: linear-gradient(var(--ink), var(--ink)) center / 100% 2px no-repeat, repeating-linear-gradient(to top, var(--ghost) 0 5px, transparent 5px 8px); }
+/* a step's offset: lit up from the middle line, or down from it */
+.m-seq-steps i::after, .m-seq-steps i::before { content: ""; position: absolute; left: 0; right: 0; background: repeating-linear-gradient(to top, var(--ink) 0 5px, transparent 5px 8px); }
+.m-seq-steps i::after { bottom: 50%; height: calc(var(--up) * 50%); background-position: bottom; }
+.m-seq-steps i::before { top: 50%; height: calc(var(--dn) * 50%); background: repeating-linear-gradient(to bottom, var(--ink) 0 5px, transparent 5px 8px); }
+.m-seq-steps i.off { opacity: .25; }
+.m-seq-steps i.now { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* a horizontal bar (also the randomisers' settings) */
+.m-seq-lenrow { display: grid; grid-template-columns: 4.5em 1fr 5.5em; gap: 12px; align-items: center; text-transform: uppercase; }
+.m-seq-lenrow output { min-width: 5.5em; text-align: right; }
+.m-seq-len { --f: 1; position: relative; height: 36px; touch-action: none; border: 2px solid var(--ink); border-radius: 2px;
+  background: repeating-linear-gradient(to right, var(--ghost) 0 5px, transparent 5px 8px) 4px 4px / calc(100% - 8px) calc(100% - 8px) no-repeat; }
+.m-seq-len i { position: absolute; left: 4px; top: 4px; bottom: 4px; width: calc((100% - 8px) * var(--w, 1));
+  background: repeating-linear-gradient(to right, var(--ink) 0 5px, transparent 5px 8px); }
+.m-seq-btns { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; }
+.m-seq-btns .m-btn { min-height: 52px; }
+
+/* ---- pop-ups over the whole screen: the randomisers' settings (tap the title), the perf slot chooser, and the loop
+   length (a small card near the top). Each: a heading, a strip of tabs, a list, then buttons ---- */
+.m-rs { position: fixed; inset: 0; z-index: 11; display: flex; justify-content: center;
+  padding: max(8px, env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px)) max(8px, env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
+.m-rs[hidden] { display: none; }
+.m-rs-card { width: 100%; max-width: 480px; height: 100%; min-width: 0; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 10px;
+  box-shadow: 0 0 0 100vmax rgba(10, 11, 9, .55), inset 0 3px 10px rgba(0, 0, 0, .28); }
+.m-rs-card .m-chead { gap: 8px; }
+.m-rs-card .m-chead b { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m-rs-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.m .m-rs-tabs .m-btn { min-height: 40px; font-size: min(var(--fs-xs), 3.8vw) !important; padding: 0 2px; letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-rs-rows { display: grid; align-content: start; gap: 10px; overflow-y: auto; overscroll-behavior: contain; min-height: 0; padding: 4px 2px; border-top: var(--rule); }
+.m-rs-rows .m-seq-lenrow { grid-template-columns: 7.2em minmax(0, 1fr) 3.6em; gap: 8px; font-size: var(--fs-xs); }
+.m-rs-rows .m-seq-lenrow output { min-width: 0; text-align: right; white-space: nowrap; }
+.m-rs-rows .m-seq-len { height: 34px; }
+.m-rs-btns { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 8px; }
+.m .m-rs-btns .m-btn { min-height: 50px; font-size: var(--fs-xs) !important; padding: 0 4px; }
+/* the slot chooser: where along the top, then what, in groups of buttons */
+.m-ch-card { grid-template-rows: auto auto minmax(0, 1fr); }
+.m-ch-list { overflow-y: auto; overscroll-behavior: contain; min-height: 0; display: grid; align-content: start; gap: 6px; border-top: var(--rule); padding-top: 6px; }
+.m-ch-list > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); margin-top: 4px; }
+.m-ch-list > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.m .m-ch-list .m-btn { min-height: 44px; font-size: min(var(--fs-xs), 3.6vw) !important; padding: 0 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+/* the loop length */
+.m-small { align-items: flex-start; padding-top: 120px; }
+.m-small .m-rs-card { height: auto; grid-template-rows: auto auto; }
+.m-looplens { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.m .m-looplens .m-btn { min-height: 56px; font-size: min(var(--fs-xs), 3.8vw) !important; padding: 0 2px; }
 
 /* ---- LCD fade: liquid crystal is slow, so segments come on quickly and linger a moment going off. The faders' and
    meters' lit segments, the step bars and the inverted buttons and tabs ease rather than jump (off slower than on);
@@ -1203,173 +1200,9 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-btn, .m .m-toggle, .m .m-pload, .m .m-tabs button, .m .m-trans button { transition: background-color .22s ease-out, color .22s ease-out, opacity .22s ease-out; }
 .m .m-btn:active, .m .m-tabs button[aria-selected="true"], .m .m-toggle[aria-pressed="true"], .m .m-play[aria-pressed="true"] { transition-duration: .06s; }
 .m .m-seq-steps i.now, .m .m-xy i { transition: outline-color .2s ease-out, left .07s linear, bottom .07s linear; }
-@media (prefers-reduced-motion: reduce) { .m .m-vtrack i, .m .m-gr i b, .m .m-seq-steps i::after, .m .m-seq-steps i::before, .m .m-btn, .m .m-toggle, .m .m-pload, .m .m-tabs button, .m .m-trans button, .m .m-xy i { transition: none; } }
-
-/* ---- faded patches: an old LCD loses contrast in places, so a few soft patches of the screen show their ink paler,
-   as if the crystal there has tired (a glass-coloured veil over the screen, clearest at the top right, a smaller
-   one low on the left, a faint band down the right edge; it never takes a touch, and the sheets open above it) ---- */
-.m { position: relative; }
-.m::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 5;
-  background: radial-gradient(34% 17% at 76% 24%, rgba(167, 181, 140, .42), rgba(167, 181, 140, 0) 100%),
-    radial-gradient(22% 12% at 16% 66%, rgba(167, 181, 140, .38), rgba(167, 181, 140, 0) 100%),
-    radial-gradient(14% 9% at 58% 83%, rgba(167, 181, 140, .3), rgba(167, 181, 140, 0) 100%),
-    linear-gradient(90deg, rgba(167, 181, 140, 0) 88%, rgba(167, 181, 140, .22) 97%, rgba(167, 181, 140, .1)); }
-/* a preset's star: filled when it's a favourite */
-.m .m-pfav { min-height: 46px; min-width: 44px; padding: 0 6px; background: none !important; border: 0 !important; box-shadow: none !important; font-size: 1.5rem !important; line-height: 1; color: var(--ink); }
-.m .m-pfav[aria-pressed="false"] { opacity: .45; }
-.m .m-pdel { min-width: 40px; padding: 0; text-align: center; font-size: 1.2rem !important; }
-/* a checkbox drawn as an LCD box: a ticked one is filled */
-.m-chk { position: relative; display: flex; align-items: center; gap: 10px; min-height: 40px; text-transform: uppercase; font-size: var(--fs-xs); cursor: pointer; }
-.m-chk input { position: absolute; left: 0; top: 0; opacity: 0; width: 1px; height: 1px; margin: 0; }
-.m-chk i { flex: none; width: 24px; height: 24px; border: 2px solid var(--ink); border-radius: 2px; box-shadow: inset 0 0 0 3px var(--panel); }
-.m-chk input:checked + i { background: var(--ink); }
-.m-chk input:focus-visible + i { outline: 2px dashed var(--ink); outline-offset: 2px; }
-
-/* the beat page: nine faders, three by three, filling the page; the perf page now four by two beside the randomisers */
-[data-m-panel="beat"] { grid-template-rows: 1fr; align-content: stretch; overflow: hidden; }
-.m-beat-card { display: grid; min-height: 0; padding: 6px 2px; }
-#m-beat-faders { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 10px 6px; min-height: 0; }
-#m-faders { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
-.m-trans { grid-template-columns: 1.3fr 1fr; }
-/* eight page buttons share the bar */
-.m-tabs { grid-template-columns: repeat(8, 1fr); gap: 2px; padding-left: 0; padding-right: 0; }
-.m .m-tabs button { font-size: min(var(--fs-s), 2.9vw) !important; letter-spacing: 0; padding: 0; }
-
-/* ---- the dividing lines: thin and pale, so they part the sections without shouting ---- */
-.m { --rule: 1px solid rgba(23, 32, 14, .32); }
-.m-top { border-bottom: var(--rule); }
-.m > .m-card.m-trans { border-bottom: var(--rule); }
-.m > .m-tabs { border-top: var(--rule); }
-[data-m-panel="play"] .m-rand-card { border-left: var(--rule) !important; }
-.m-pages .m-card + .m-card, .m-fx-row + .m-fx-row, .m-fx-btns, .m-comp-card .m-chead:not(:first-child), .m-plist { border-top: var(--rule); }
-
-/* ---- bigger small print: the readouts, fader labels, headings, notes and page buttons all step up (the narrow
-   ones scale with the screen so they still fit their column) ---- */
-.m { --fs-xs: 1.12rem; --fs-s: 1.25rem; }
-.m .m-vf output, #m-faders .m-vf output, #m-beat-faders .m-vf output { font-size: var(--fs-xs); }
-.m .m-flab, #m-faders .m-flab, #m-beat-faders .m-flab { font-size: var(--fs-xs); letter-spacing: .03em; }
-.m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab { font-size: min(1.05rem, 3.7vw); letter-spacing: 0; white-space: nowrap; }
-.m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output, .m .m-vset .m-vf output { font-size: min(var(--fs-xs), 3.9vw); }
-.m .m-voice .m-btn { font-size: min(1.05rem, 3.6vw) !important; }
-.m .m-tabs button { font-size: min(1.1rem, 3.5vw) !important; }
-.m-presets-card .m-foot { font-size: .95rem; }
-.m #m-faders .m-flab { font-size: min(var(--fs-xs), 3.75vw); letter-spacing: -.02em; }
-
-/* ---- pages turn only with their buttons: the pages don't swipe, and the buttons' text is as big as fits ---- */
-.m-pages { overflow-x: hidden; }
-.m > .m-tabs { gap: 2px; padding-left: 0; padding-right: 0; }
-.m .m-tabs button { font-size: min(1.4rem, 4.9vw) !important; letter-spacing: 0; padding: 0; min-height: 56px; }
-/* the page buttons on one line, as big as eight fit (the page's full name is on the title line) */
-.m > .m-tabs { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 2px; }
-.m .m-tabs button { font-size: min(1.4rem, 4.9vw) !important; letter-spacing: 0; min-height: 56px; }
-/* the page's name, at the right of the title line */
-.m-top { justify-content: space-between; align-items: baseline; }
-.m-pagename { font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
-.m .m-fx-row .m-vtrack, .m #m-comp .m-vtrack, .m #m-duck .m-vtrack, .m #m-dist .m-vtrack, .m .m-vset .m-vtrack { min-height: 12px; }
-/* short screens: the mix page's send rows keep a fixed short track and the levels take the rest; the beat page's
-   tracks may shrink further */
-.m-fx-card.m-mix-card { grid-template-rows: auto auto minmax(0, 1fr); }
-.m #m-mix-echo .m-vtrack, .m #m-mix-ring .m-vtrack { flex: none; height: clamp(18px, 4vh, 40px); min-height: 0; }
-#m-beat-faders .m-vtrack { min-height: 16px; }
-/* the x/y page: two pads, one above the other, each under its own x and y picks */
-.m-xy-card { grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.m-xybox { display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 6px; min-height: 0; }
-.m-xybox + .m-xybox { border-top: var(--rule); padding-top: 8px; }
-.m-xybox .m-xyrow select { min-height: 34px; }
-
-/* the randomisers' settings pop-up: over the whole screen, its page tabs, a list of bars, then the buttons */
-.m-title { cursor: pointer; }
-.m-rs { position: fixed; inset: 0; z-index: 11; display: flex; justify-content: center;
-  padding: max(8px, env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px)) max(8px, env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
-.m-rs[hidden] { display: none; }
-.m-rs-card { width: 100%; max-width: 480px; height: 100%; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 10px; min-height: 0;
-  box-shadow: 0 0 0 100vmax rgba(10, 11, 9, .55), inset 0 3px 10px rgba(0, 0, 0, .28); }
-.m-rs-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
-.m .m-rs-tabs .m-btn { min-height: 40px; font-size: min(var(--fs-xs), 3.8vw) !important; padding: 0 2px; letter-spacing: 0; }
-.m .m-rs-tabs .m-btn[aria-selected="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
-.m-rs-rows { display: grid; align-content: start; gap: 10px; overflow-y: auto; overscroll-behavior: contain; min-height: 0; padding: 4px 2px; border-top: var(--rule); }
-.m-rs-rows .m-seq-lenrow { grid-template-columns: 7.5em 1fr 3.5em; gap: 8px; font-size: var(--fs-xs); }
-.m-rs-rows .m-seq-len { height: 34px; }
-.m-rs-btns { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 8px; }
-.m .m-rs-btns .m-btn { min-height: 50px; font-size: var(--fs-xs) !important; padding: 0 4px; }
-.m-rs-rows .m-seq-lenrow { grid-template-columns: 7.2em minmax(0, 1fr) 3.6em; }
-.m-rs-rows .m-seq-lenrow output { min-width: 0; text-align: right; white-space: nowrap; }
-.m-rs-card .m-chead { gap: 8px; }
-.m-rs-card .m-chead b { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* save new, and save over the loaded preset */
-.m-psaves { display: grid; grid-template-columns: 1fr 1.6fr; gap: 8px; }
-.m-psaves .m-btn { min-height: 56px; font-size: var(--fs-xs) !important; padding: 0 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* the echo row's heading, with its ping pong box */
-.m-fxhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-left: 4px; }
-.m-fxhead b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); }
-.m-fxhead .m-chk { min-height: 30px; gap: 8px; }
-.m-fxhead .m-chk i { width: 20px; height: 20px; }
-/* next bar: its box heads the randomise column, and a button waiting for the bar flashes */
-.m-rand-card .m-rand { grid-template-rows: auto repeat(6, minmax(0, 1fr)); }
-.m-nextbar { min-height: 34px; gap: 6px; font-size: min(var(--fs-xs), 3.6vw); justify-content: center; white-space: nowrap; }
-.m-nextbar i { width: 18px; height: 18px; }
-.m .m-rand .m-btn.pending { animation: m-flash .5s steps(1) infinite; }
-@media (prefers-reduced-motion: reduce) { .m .m-rand .m-btn.pending { animation: none; outline: 2px dashed var(--ink); outline-offset: 2px; } }
-/* the beat page: ten faders, five by two */
-#m-beat-faders { grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 10px 4px; }
-.m #m-beat-faders .m-flab { font-size: min(var(--fs-xs), 3.6vw); letter-spacing: -.02em; white-space: nowrap; }
-.m #m-beat-faders .m-vf output { font-size: min(var(--fs-xs), 3.5vw); }
-
-/* the perf page's assign button (in the eighth slot) and assign mode: every slot dashed, tap one to choose */
-.m-assign-cell { justify-content: flex-end; }
-.m .m-assign-cell .m-btn { width: 100%; min-height: 52px; font-size: min(var(--fs-xs), 3.6vw) !important; padding: 0 2px; }
-.m .m-assign-cell .m-btn[aria-pressed="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
-#m-faders.assigning .m-vf[data-slot] { outline: 2px dashed var(--ink); outline-offset: 2px; cursor: pointer; }
-#m-faders.assigning .m-vf[data-slot] .m-vtrack { pointer-events: none; }
-/* the chooser: where along the top, then what, in groups of buttons */
-.m-ch-card { grid-template-rows: auto auto minmax(0, 1fr); }
-.m-ch-list { overflow-y: auto; overscroll-behavior: contain; min-height: 0; display: grid; align-content: start; gap: 6px; border-top: var(--rule); padding-top: 6px; }
-.m-ch-list > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); margin-top: 4px; }
-.m-ch-list > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-.m .m-ch-list .m-btn { min-height: 44px; font-size: min(var(--fs-xs), 3.6vw) !important; padding: 0 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.m .m-ch-list .m-btn[aria-pressed="true"], .m .m-ch-card .m-rs-tabs .m-btn[aria-selected="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
-.m-ch-card .m-rs-tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.m-rand-card .m-rand { grid-template-rows: auto auto repeat(6, minmax(0, 1fr)); }
-.m-rand-card .m-nextbar { justify-content: flex-start; padding-left: 6px; min-height: 30px; }
-/* a fader moved by MIDI follows the knob straight away, without the LCD fade */
+/* a fader moved by MIDI follows the knob straight away */
 .m .m-vf.cc .m-vtrack i { transition: none; }
-/* the perf page's randomise column: two boxes, then eight buttons (random fx and alter fx moved here from fx) */
-.m-rand-card .m-rand { grid-template-rows: auto auto repeat(8, minmax(0, 1fr)); gap: 6px; }
-.m .m-rand-card .m-rand .m-btn { font-size: min(var(--fs-xs), 3.7vw) !important; white-space: nowrap; }
-/* the fx page now just its two rows of faders */
-.m-fx-card { grid-template-rows: repeat(2, minmax(0, 1fr)); }
-/* the voice page: drum strip, section strip, then the section's faders (up to six, three by two) */
-.m-dice-card { grid-template-rows: auto auto minmax(0, 1fr); }
-.m-vsec { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.m .m-vsec .m-btn { min-height: 38px; }
-.m-vset { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px 6px; }
-.m .m-vset .m-vtrack { width: min(64px, 100%); }
-.m .m-vset .m-flab, .m .m-vset .m-vf output { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-/* the beat page: tempo back first, four by three */
-#m-beat-faders { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px 4px; }
-.m #m-beat-faders .m-flab { font-size: min(var(--fs-xs), 4vw); }
-.m #m-beat-faders .m-vf output { font-size: min(var(--fs-xs), 3.8vw); }
-/* rec loop: beside rec, a loop symbol */
-.m-trans { grid-template-columns: 1.3fr 1fr 1fr; }
-.m .m-loop svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-.m .m-rec:disabled { opacity: .35; }
-/* the loop length chooser: a small card near the top */
-.m-small { align-items: flex-start; padding-top: 120px; }
-.m-small .m-rs-card { height: auto; grid-template-rows: auto auto; }
-.m-looplens { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
-.m .m-looplens .m-btn { min-height: 56px; font-size: min(var(--fs-xs), 3.8vw) !important; padding: 0 2px; }
-.m .m-looplens .m-btn[aria-pressed="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
-.m .m-loop { -webkit-touch-callout: none; }
-
-/* tidy-up pass: the loop button keeps "loop 4" on one line on narrow phones, an empty preset note takes no room,
-   the preset file buttons stay on one line, and the master page's three rows share one 6-column grid */
-.m .m-loop span { white-space: nowrap; }
-.m .m-rec { gap: min(10px, 2vw) !important; }
-.m-presets-card .m-note:empty { min-height: 0; height: 0; margin-top: -6px; }
-.m-pio .m-btn { white-space: nowrap; letter-spacing: 0; padding: 0 4px; }
-#m-comp, #m-duck { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-.m-rs-card { min-width: 0; grid-template-columns: minmax(0, 1fr); }
-.m .m-rs-tabs .m-btn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .m .m-vtrack i, .m .m-gr i b, .m .m-seq-steps i::after, .m .m-seq-steps i::before, .m .m-btn, .m .m-toggle, .m .m-pload, .m .m-tabs button, .m .m-trans button, .m .m-xy i { transition: none; } }
 </style>
 
 <main class="m" id="m">
@@ -7355,19 +7188,6 @@ const fx3Snapshot = () => ({ params: structuredClone(fx3), ring: mix.ring.slice(
 const stripsEl = $('strips');
 const muted = new Array(6).fill(false);
 const fxButtons = [];
-// small slider for the groove's per-track swing share and push, 0..100
-function miniSlider(label, aria, get, set, dflt, max = 100, show = (v) => v + '%', center = false) {
-  const el = document.createElement('div'); el.className = 'sdial';
-  const put = (v) => { v = Math.max(0, Math.min(max, Math.round(v))); if (v !== get()) { set(v); draw(); } };
-  const s = slider(aria, { max, get, show, center: center ? Math.floor(max / 2) : undefined, put });
-  const dial = s.el;
-  el.append(dial); el.insertAdjacentHTML('beforeend', `<span>${label}</span>`);
-  const draw = () => { s.draw(); dial.title = `${label} ${show(get())}`; };
-  stepKeys(dial, get, put);
-  dial.addEventListener('dblclick', () => put(dflt));
-  draw();
-  return { el, draw };
-}
 // small dial for the mixer's sends, 0..100
 function miniDial(label, aria, get, set, dflt, max = 100, show = (v) => v + '%', center = false) {
   const el = document.createElement('div'); el.className = 'sdial';
@@ -7973,9 +7793,12 @@ new MutationObserver(drawScope).observe(document.documentElement, { attributes: 
 buildKnobs();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawScope); else drawScope();
 drawScope();
-// ---- the phone screen: play, record, sliders, randomisers, the compressor and presets, driving the full app underneath ----
+// ---- the phone screen, driving the full app underneath ----
 // The desktop panels stay in the page (hidden) so the engine, presets and randomisers run as they do there;
-// the buttons here press theirs and the sliders write the same state.
+// the buttons here press theirs and the sliders write the same state. This file: pages, transport and the faders
+// every page uses. Then, in build order: mobile-pages (beat, perf, master, randomisers, voice), mobile-presets,
+// mobile-record, mobile-mix (fx, distortion, mix), mobile-seq (step sequencers), mobile-extras (install, next bar),
+// mobile-xy, mobile-settings (the randomisers' settings), mobile-slots (perf slots and MIDI CC), mobile-glass.
 // iOS: play Web Audio through the ringer switch like a music app
 try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
 const mRnd = (n) => Math.floor(Math.random() * n);

@@ -11,19 +11,6 @@ const fx3Snapshot = () => ({ params: structuredClone(fx3), ring: mix.ring.slice(
 const stripsEl = $('strips');
 const muted = new Array(6).fill(false);
 const fxButtons = [];
-// small slider for the groove's per-track swing share and push, 0..100
-function miniSlider(label, aria, get, set, dflt, max = 100, show = (v) => v + '%', center = false) {
-  const el = document.createElement('div'); el.className = 'sdial';
-  const put = (v) => { v = Math.max(0, Math.min(max, Math.round(v))); if (v !== get()) { set(v); draw(); } };
-  const s = slider(aria, { max, get, show, center: center ? Math.floor(max / 2) : undefined, put });
-  const dial = s.el;
-  el.append(dial); el.insertAdjacentHTML('beforeend', `<span>${label}</span>`);
-  const draw = () => { s.draw(); dial.title = `${label} ${show(get())}`; };
-  stepKeys(dial, get, put);
-  dial.addEventListener('dblclick', () => put(dflt));
-  draw();
-  return { el, draw };
-}
 // small dial for the mixer's sends, 0..100
 function miniDial(label, aria, get, set, dflt, max = 100, show = (v) => v + '%', center = false) {
   const el = document.createElement('div'); el.className = 'sdial';
