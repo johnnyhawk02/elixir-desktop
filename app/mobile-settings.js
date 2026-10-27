@@ -1,4 +1,4 @@
-// ---- the randomisers' settings: tapping ELIXIR opens a pop-up with a page for each randomise button, its ranges and
+// ---- the randomisers' settings: holding a randomise button opens a pop-up with a page for each randomise button, its ranges and
 // chances on bars (RAND, kept in this browser), that randomiser's button and play / stop ----
 // a page: [key in RAND, name, the button it presses, rows: [setting, label, min, max, how it reads]]
 const pc = (v) => `${v}%`, onoff = (v) => (v ? 'on' : 'off');
@@ -45,7 +45,6 @@ function mRsDraw() {
 }
 const mRsPlay = () => { $('m-rs-play').textContent = $('play').getAttribute('aria-pressed') === 'true' ? 'stop' : 'play'; };
 new MutationObserver(mRsPlay).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
-$('m-title').addEventListener('click', () => { $('m-rs').hidden = false; mRsDraw(); });
 $('m-rs-close').addEventListener('click', () => { $('m-rs').hidden = true; });
 // copy: every page's settings as text, to paste back as the new defaults (RAND0); where the clipboard is refused, a
 // box with the text selected instead

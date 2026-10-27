@@ -984,8 +984,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 /* ---- the frame: title line, transport, pages, page buttons ---- */
 .m-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 0 4px 6px; border-bottom: var(--rule); }
-/* (tapping the title opens the randomisers' settings) */
-.m-title { font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); cursor: pointer; }
+.m-title { font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
 .m-ver { margin-left: .5em; font-size: .7em; letter-spacing: .06em; text-transform: none; opacity: .7; }
 .m-setbtn { align-self: center; margin-right: auto; min-width: 0 !important; min-height: 30px !important; padding: 0 6px; display: grid; place-items: center; }
 .m-setbtn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
@@ -1239,7 +1238,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v111</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v112</small></b>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
@@ -1321,7 +1320,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves every starred preset, built in or yours, to a file">export favourites</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v111, 27 Oct, 19:16</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v112, 27 Oct, 19:26</footer>
     </section>
   </div>
   </div>
@@ -8719,7 +8718,7 @@ function xyPick() { try { localStorage.setItem(XY_KEY, JSON.stringify(mXY)); } c
   lists();
 });
 
-// ---- the randomisers' settings: tapping ELIXIR opens a pop-up with a page for each randomise button, its ranges and
+// ---- the randomisers' settings: holding a randomise button opens a pop-up with a page for each randomise button, its ranges and
 // chances on bars (RAND, kept in this browser), that randomiser's button and play / stop ----
 // a page: [key in RAND, name, the button it presses, rows: [setting, label, min, max, how it reads]]
 const pc = (v) => `${v}%`, onoff = (v) => (v ? 'on' : 'off');
@@ -8766,7 +8765,6 @@ function mRsDraw() {
 }
 const mRsPlay = () => { $('m-rs-play').textContent = $('play').getAttribute('aria-pressed') === 'true' ? 'stop' : 'play'; };
 new MutationObserver(mRsPlay).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
-$('m-title').addEventListener('click', () => { $('m-rs').hidden = false; mRsDraw(); });
 $('m-rs-close').addEventListener('click', () => { $('m-rs').hidden = true; });
 // copy: every page's settings as text, to paste back as the new defaults (RAND0); where the clipboard is refused, a
 // box with the text selected instead

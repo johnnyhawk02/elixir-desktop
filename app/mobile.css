@@ -136,8 +136,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 /* ---- the frame: title line, transport, pages, page buttons ---- */
 .m-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 0 4px 6px; border-bottom: var(--rule); }
-/* (tapping the title opens the randomisers' settings) */
-.m-title { font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); cursor: pointer; }
+.m-title { font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
 .m-ver { margin-left: .5em; font-size: .7em; letter-spacing: .06em; text-transform: none; opacity: .7; }
 .m-setbtn { align-self: center; margin-right: auto; min-width: 0 !important; min-height: 30px !important; padding: 0 6px; display: grid; place-items: center; }
 .m-setbtn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
