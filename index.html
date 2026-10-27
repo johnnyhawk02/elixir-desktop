@@ -1245,6 +1245,11 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-rush-btns { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
 .m-rush-btns output { font-size: var(--fs-xs); text-transform: uppercase; color: var(--muted); }
 .m .m-rush-btns .m-btn { min-height: 46px; min-width: 96px; font-size: var(--fs-xs) !important; }
+/* the crossfeed target pick: six choices, three by two, each with what it does */
+.m-xpicks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.m .m-xpicks .m-btn { min-height: 64px; padding: 0 2px; display: grid; place-content: center; gap: 2px; font-size: var(--fs-s) !important; }
+.m .m-xpicks .m-btn small { font-size: min(var(--fs-xs), 3.4vw, 14px); text-transform: none; letter-spacing: 0; opacity: .8; }
+.m .m-xpicks .m-btn[aria-pressed="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
 /* the loop length */
 .m-small { align-items: flex-start; padding-top: 120px; }
 .m-small .m-rs-card { height: auto; grid-template-rows: auto auto; }
@@ -1266,7 +1271,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v116</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v117</small></b>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
@@ -1349,7 +1354,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves every starred preset, built in or yours, to a file">export favourites</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v116, 27 Oct, 22:34</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v117, 27 Oct, 23:10</footer>
     </section>
   </div>
   </div>
@@ -1367,6 +1372,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <div class="m-rs-rows m-rush-glides" id="m-rush-glides"></div>
         <div class="m-rush-btns"><output id="m-rush-say" aria-live="polite">drag a point</output><button class="m-btn" id="m-rush-reset" type="button">reset</button></div>
       </div>
+    </section>
+  </div>
+  <div class="m-rs m-small" id="m-xpick" hidden>
+    <section class="m-card m-rs-card" role="dialog" aria-labelledby="m-xpick-title">
+      <div class="m-chead"><b id="m-xpick-title">crossfeed into</b><button class="m-toggle" id="m-xpick-close" type="button">done</button></div>
+      <div class="m-xpicks" id="m-xpicks"></div>
     </section>
   </div>
   <div class="m-rs m-small" id="m-looplen" hidden>
@@ -7710,14 +7721,17 @@ if (pc4Map.some(Boolean)) startMidi(); // the mapped knobs work from load, not j
 const XN = ['drum 1', 'drum 2', 'drum 3', 'snare', 'cymbal', 'hihat'];
 // a drum's hit pushes a setting of the drums it feeds (the column's target), which glides back over xm.glide ms
 // (dark closes the filter, duck turns the drum down: so a positive amount always does something you hear)
-const X_TARGETS = ['pitch', 'decay', 'drive', 'dark', 'duck'];
+const X_TARGETS = ['pitch', 'decay', 'fm', 'drive', 'dark', 'duck'];
 // each target's parameter on each drum, and how far a full push moves it (of its whole range)
 const X_PARS = { pitch: ['COARSE1', 'COARSE2', 'COARSE3', 'COARSE4', 'COARSE5', 'COARSE6'], decay: ['VELOD1', 'VELOD2', 'VELOD3', 'VELOD4', 'VELOD5', 'VELOD6_CLOSED'],
+  // (fm: the drums' fm amount, the cymbal's and hat's first mod oscillator's gain; the snare has no fm, so its pitch
+  // envelope's amount)
+  fm: ['FMAMNT1', 'FMAMNT2', 'FMAMNT3', 'MODAMNT4', 'MOD_OSC_GAIN1_CYM', 'MOD_OSC_GAIN1'],
   dark: ['FILTER_FREQ_1', 'FILTER_FREQ_2', 'FILTER_FREQ_3', 'FILTER_FREQ_4', 'FILTER_FREQ_5', 'FILTER_FREQ_6'],
   drive: ['DRIVE1', 'DRIVE2', 'DRIVE3', 'SNARE_DISTORTION', 'CYMBAL_DISTORTION', 'HAT_DISTORTION'], duck: ['VOL1', 'VOL2', 'VOL3', 'VOL4', 'VOL5', 'VOL6'] };
-const X_RANGE = { pitch: 24 / 127, decay: 0.5, drive: 0.6, dark: -0.6, duck: -0.8 };
+const X_RANGE = { pitch: 24 / 127, decay: 0.5, fm: 0.6, drive: 0.6, dark: -0.6, duck: -0.8 };
 // (the old audio crossfeed's targets, from presets saved before it changed)
-const xTarget = (t) => (X_TARGETS.includes(t) ? t : { fm: 'pitch', ring: 'duck', volume: 'duck' }[t] || 'dark');
+const xTarget = (t) => (X_TARGETS.includes(t) ? t : { ring: 'duck', volume: 'duck' }[t] || 'dark');
 const xm = { amt: new Array(36).fill(0), target: ['pitch', 'duck', 'dark', 'decay', 'dark', 'duck'], glide: 300 };
 const xgrid = $('xgrid');
 const xDepth = () => Number($('xdepth').value) / 100;
@@ -8467,7 +8481,7 @@ $('m-fx-alter').addEventListener('click', async () => {
 });
 
 // the fx page's crossfeed matrix: a row for each drum whose hits push, a column for each drum pushed, the column's head
-// what gets pushed there (tap: pitch, decay, drive, dark = filter closing, duck = quieter). Drag a cell up or down for -100..100, double tap for
+// what gets pushed there (tap it for a pop-up: pitch, decay, fm, drive, dark = filter closing, duck = quieter). Drag a cell up or down for -100..100, double tap for
 // none; the glide bar is how long a push takes to wear off. It is the desktop's matrix (xm), and redraws with it (its
 // draws join xcells)
 {
@@ -8477,7 +8491,7 @@ $('m-fx-alter').addEventListener('click', async () => {
   SH.forEach((n, d) => {
     const h = document.createElement('button'); h.type = 'button'; h.className = 'm-xhead';
     h.setAttribute('aria-label', `what crossfeed into ${XN[d]} modulates`);
-    h.addEventListener('click', () => { xm.target[d] = T[(T.indexOf(xm.target[d]) + 1) % T.length]; xSelects[d].value = xm.target[d]; changed(); });
+    h.addEventListener('click', () => xPick(d));
     xcells.push(() => { h.innerHTML = `<small>${n}</small>${xm.target[d]}`; });
     grid.append(h);
   });
@@ -8503,6 +8517,20 @@ $('m-fx-alter').addEventListener('click', async () => {
     });
   });
   $('m-xclear').addEventListener('click', () => { xm.amt.fill(0); changed(); });
+  // the pick for a column: a pop-up of the targets, the current one lit
+  const X_SAY = { pitch: 'pitch bends', decay: 'decay stretches', fm: 'fm deepens', drive: 'drive grows', dark: 'filter closes', duck: 'gets quieter' };
+  function xPick(d) {
+    $('m-xpick-title').textContent = `pushes into ${XN[d]}`;
+    const box = $('m-xpicks'); box.innerHTML = '';
+    for (const t of T) {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'm-btn'; b.setAttribute('aria-pressed', xm.target[d] === t);
+      b.innerHTML = `${t}<small>${X_SAY[t]}</small>`;
+      b.addEventListener('click', () => { xm.target[d] = t; xSelects[d].value = t; changed(); $('m-xpick').hidden = true; });
+      box.append(b);
+    }
+    $('m-xpick').hidden = false;
+  }
+  $('m-xpick-close').addEventListener('click', () => { $('m-xpick').hidden = true; });
   // the glide: 20 ms .. 2 s, on a log scale
   const gb = $('m-xglide'), gl = (v) => Math.log(v / 20) / Math.log(100);
   const gset = (e) => { const r = gb.getBoundingClientRect(), u = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); xm.glide = Math.round(20 * Math.pow(100, u) / 10) * 10 || 20; changed(); };

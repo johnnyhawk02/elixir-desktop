@@ -2,14 +2,17 @@
 const XN = ['drum 1', 'drum 2', 'drum 3', 'snare', 'cymbal', 'hihat'];
 // a drum's hit pushes a setting of the drums it feeds (the column's target), which glides back over xm.glide ms
 // (dark closes the filter, duck turns the drum down: so a positive amount always does something you hear)
-const X_TARGETS = ['pitch', 'decay', 'drive', 'dark', 'duck'];
+const X_TARGETS = ['pitch', 'decay', 'fm', 'drive', 'dark', 'duck'];
 // each target's parameter on each drum, and how far a full push moves it (of its whole range)
 const X_PARS = { pitch: ['COARSE1', 'COARSE2', 'COARSE3', 'COARSE4', 'COARSE5', 'COARSE6'], decay: ['VELOD1', 'VELOD2', 'VELOD3', 'VELOD4', 'VELOD5', 'VELOD6_CLOSED'],
+  // (fm: the drums' fm amount, the cymbal's and hat's first mod oscillator's gain; the snare has no fm, so its pitch
+  // envelope's amount)
+  fm: ['FMAMNT1', 'FMAMNT2', 'FMAMNT3', 'MODAMNT4', 'MOD_OSC_GAIN1_CYM', 'MOD_OSC_GAIN1'],
   dark: ['FILTER_FREQ_1', 'FILTER_FREQ_2', 'FILTER_FREQ_3', 'FILTER_FREQ_4', 'FILTER_FREQ_5', 'FILTER_FREQ_6'],
   drive: ['DRIVE1', 'DRIVE2', 'DRIVE3', 'SNARE_DISTORTION', 'CYMBAL_DISTORTION', 'HAT_DISTORTION'], duck: ['VOL1', 'VOL2', 'VOL3', 'VOL4', 'VOL5', 'VOL6'] };
-const X_RANGE = { pitch: 24 / 127, decay: 0.5, drive: 0.6, dark: -0.6, duck: -0.8 };
+const X_RANGE = { pitch: 24 / 127, decay: 0.5, fm: 0.6, drive: 0.6, dark: -0.6, duck: -0.8 };
 // (the old audio crossfeed's targets, from presets saved before it changed)
-const xTarget = (t) => (X_TARGETS.includes(t) ? t : { fm: 'pitch', ring: 'duck', volume: 'duck' }[t] || 'dark');
+const xTarget = (t) => (X_TARGETS.includes(t) ? t : { ring: 'duck', volume: 'duck' }[t] || 'dark');
 const xm = { amt: new Array(36).fill(0), target: ['pitch', 'duck', 'dark', 'decay', 'dark', 'duck'], glide: 300 };
 const xgrid = $('xgrid');
 const xDepth = () => Number($('xdepth').value) / 100;

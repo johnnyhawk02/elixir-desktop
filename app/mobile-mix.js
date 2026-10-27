@@ -83,7 +83,7 @@ $('m-fx-alter').addEventListener('click', async () => {
 });
 
 // the fx page's crossfeed matrix: a row for each drum whose hits push, a column for each drum pushed, the column's head
-// what gets pushed there (tap: pitch, decay, drive, dark = filter closing, duck = quieter). Drag a cell up or down for -100..100, double tap for
+// what gets pushed there (tap it for a pop-up: pitch, decay, fm, drive, dark = filter closing, duck = quieter). Drag a cell up or down for -100..100, double tap for
 // none; the glide bar is how long a push takes to wear off. It is the desktop's matrix (xm), and redraws with it (its
 // draws join xcells)
 {
@@ -93,7 +93,7 @@ $('m-fx-alter').addEventListener('click', async () => {
   SH.forEach((n, d) => {
     const h = document.createElement('button'); h.type = 'button'; h.className = 'm-xhead';
     h.setAttribute('aria-label', `what crossfeed into ${XN[d]} modulates`);
-    h.addEventListener('click', () => { xm.target[d] = T[(T.indexOf(xm.target[d]) + 1) % T.length]; xSelects[d].value = xm.target[d]; changed(); });
+    h.addEventListener('click', () => xPick(d));
     xcells.push(() => { h.innerHTML = `<small>${n}</small>${xm.target[d]}`; });
     grid.append(h);
   });
@@ -119,6 +119,20 @@ $('m-fx-alter').addEventListener('click', async () => {
     });
   });
   $('m-xclear').addEventListener('click', () => { xm.amt.fill(0); changed(); });
+  // the pick for a column: a pop-up of the targets, the current one lit
+  const X_SAY = { pitch: 'pitch bends', decay: 'decay stretches', fm: 'fm deepens', drive: 'drive grows', dark: 'filter closes', duck: 'gets quieter' };
+  function xPick(d) {
+    $('m-xpick-title').textContent = `pushes into ${XN[d]}`;
+    const box = $('m-xpicks'); box.innerHTML = '';
+    for (const t of T) {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'm-btn'; b.setAttribute('aria-pressed', xm.target[d] === t);
+      b.innerHTML = `${t}<small>${X_SAY[t]}</small>`;
+      b.addEventListener('click', () => { xm.target[d] = t; xSelects[d].value = t; changed(); $('m-xpick').hidden = true; });
+      box.append(b);
+    }
+    $('m-xpick').hidden = false;
+  }
+  $('m-xpick-close').addEventListener('click', () => { $('m-xpick').hidden = true; });
   // the glide: 20 ms .. 2 s, on a log scale
   const gb = $('m-xglide'), gl = (v) => Math.log(v / 20) / Math.log(100);
   const gset = (e) => { const r = gb.getBoundingClientRect(), u = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); xm.glide = Math.round(20 * Math.pow(100, u) / 10) * 10 || 20; changed(); };
