@@ -179,10 +179,7 @@ function mVoiceBox(v, k) {
   const id = `m-voice-${v + 1}-${VP_PAGES[k][0]}`;
   if (mVBoxes[id]) return mVBoxes[id];
   const sec = vpSections(v)[k], box = document.createElement('div');
-  // (columns: three for six or nine, else four; as many rows as that needs)
-  const n = sec.params.length, cols = n === 6 || n === 9 ? 3 : 4;
   box.className = 'm-faders m-vset'; box.id = id; $('m-vsets').append(box);
-  box.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`; box.style.gridTemplateRows = `repeat(${Math.ceil(n / cols)}, minmax(0, 1fr))`;
   for (const [label, pn] of sec.params) {
     const par = PAR[pn], sp = spec(par);
     mFader(box, label, { min: 0, max: sp.max, get: () => values[par], set: (x) => { setValue(par, x); setDirty(true); },
