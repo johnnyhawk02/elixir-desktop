@@ -1345,6 +1345,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-vset { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px 6px; }
 .m .m-vset .m-vtrack { width: min(64px, 100%); }
 .m .m-vset .m-flab, .m .m-vset .m-vf output { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+/* the beat page: tempo back first, four by three */
+#m-beat-faders { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px 4px; }
+.m #m-beat-faders .m-flab { font-size: min(var(--fs-xs), 4vw); }
+.m #m-beat-faders .m-vf output { font-size: min(var(--fs-xs), 3.8vw); }
 </style>
 
 <main class="m" id="m">
@@ -8024,6 +8028,7 @@ const pf = (k) => ({ min: PERF_RANGE[k][0], max: PERF_RANGE[k][1], get: () => pe
 // groove, its depth, accent. Genre steps through the built-in styles (not user); a preset in the user style shows it
 // with the slider at the bottom ----
 const mGenres = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
+mFader($('m-beat-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
 mFader($('m-beat-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () => Math.max(0, mGenres.indexOf(styleIdx)),
   set: (v) => {
     setStyle(mGenres[v]); perf.beat = Math.min(perf.beat, STYLES[styleIdx].grooves.length - 1);

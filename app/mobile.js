@@ -115,6 +115,7 @@ const pf = (k) => ({ min: PERF_RANGE[k][0], max: PERF_RANGE[k][1], get: () => pe
 // groove, its depth, accent. Genre steps through the built-in styles (not user); a preset in the user style shows it
 // with the slider at the bottom ----
 const mGenres = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
+mFader($('m-beat-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
 mFader($('m-beat-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () => Math.max(0, mGenres.indexOf(styleIdx)),
   set: (v) => {
     setStyle(mGenres[v]); perf.beat = Math.min(perf.beat, STYLES[styleIdx].grooves.length - 1);
