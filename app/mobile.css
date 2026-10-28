@@ -117,6 +117,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 #m-faders .m-vf output, #m-beat-faders .m-vf output { font-size: var(--fs-xs); line-height: 1; color: var(--ink); height: 2.5em; display: flex; align-items: flex-end; justify-content: center; flex: none; align-self: stretch; }
 #m-faders .m-flab, #m-beat-faders .m-flab { line-height: 1.2; }
 .m #m-faders .m-flab { font-size: min(var(--fs-xs), min(3.75vw, 15.5px)); letter-spacing: -.02em; }
+/* (a slot's full name, dr1 pitch slope, may take two lines) */
+.m #m-faders .m-flab { white-space: normal; text-align: center; line-height: 1.05; max-width: 100%; }
 .m #m-beat-faders .m-flab { font-size: min(var(--fs-xs), min(4vw, 16.5px)); letter-spacing: -.02em; white-space: nowrap; }
 .m #m-beat-faders .m-vf output { font-size: min(var(--fs-xs), min(3.8vw, 15.7px)); }
 #m-faders .m-vtrack, #m-beat-faders .m-vtrack { width: min(56px, 100%); flex: 1; height: auto; min-height: 48px; }

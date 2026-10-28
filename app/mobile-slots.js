@@ -13,8 +13,10 @@ function mSlot(i) {
   if (old) { const k = mFaders.findIndex((f) => f.el === old.el); if (k >= 0) { mDraws.splice(mDraws.indexOf(old.draw), 1); mFaders.splice(k, 1); } old.el.remove(); }
   const A = slotAxis(mSlots[i]) || slotAxis(SLOT0[i]), fd = A.fd;
   // a page's fader keeps its own steps, readout and reset; a drum's parameter is whole steps 0..its top
-  // (a label that only makes sense on its own page takes its group's name: echo send, dist mix)
-  const [pl, g] = mSlots[i], label = ['fx', 'mix', 'master'].includes(pl) && !A.label.includes(' ') ? `${g.split(' ')[0].slice(0, 4)} ${A.label}` : A.label;
+  // (its full name: a drum's setting starts with the drum, dr1 decay; a label that only makes sense on its own page takes
+  // its group's name, echo send, dist mix; the perf and beat faders are the whole kit's, so they keep their own)
+  const [pl, g] = mSlots[i], dr = XN.indexOf(pl), grp = { distortion: 'dist', compressor: 'comp', sidechain: 'side' }[g] || g.split(' ')[0];
+  const label = dr >= 0 ? `${['dr1', 'dr2', 'dr3', 'sn', 'cy', 'hh'][dr]} ${A.label}` : ['fx', 'mix', 'master'].includes(pl) && !A.label.includes(' ') ? `${grp} ${A.label}` : A.label;
   const draw = mFader(box, label, fd ? { min: fd.min, max: () => fd.hiOf(), step: fd.step, get: fd.get, set: (v) => { fd.put(v); mDrawAll(); }, show: fd.show, dflt: fd.dflt }
     : { min: A.min, max: A.max, get: A.get, set: (v) => { A.set(v); mDrawAll(); setDirty(true); }, show: String, dflt: () => initValues[A.par] });
   const el = mFaders[mFaders.length - 1].el;
