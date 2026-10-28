@@ -136,6 +136,16 @@ new MutationObserver(() => {
   if (mPending) { mPending = null; mDrawPresets(); }
 }).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
 // on each 16th (as the audio thread reaches it, ahead of the output), every running sequencer steps its fader
+// following the groove (user settings, seq tab; on unless switched off, kept in this browser)
+const SEQ_GROOVE_KEY = 'elixir-mobile-seqgroove';
+let mSeqGroove = (() => { try { return localStorage.getItem(SEQ_GROOVE_KEY) !== '0'; } catch (e) { return true; } })();
+let mSeqLast = -2;
+// the drum (groove track) a fader belongs to: a voice page's drum, a perf slot set to a drum's setting; else -1
+function mSeqTrack(f) {
+  const v = /^m-voice-(\d)/.exec(f.key); if (v) return Number(v[1]) - 1;
+  const sl = /^m-faders:slot(\d+)/.exec(f.key); if (sl) { const d = XN.indexOf(mSlots[Number(sl[1])][0]); if (d >= 0) return d; }
+  return -1;
+}
 const mOnEvent = onEvent;
 onEvent = function (ev) {
   // the bar waiting randomises come in on: stop their buttons' flash as that bar is heard
@@ -148,14 +158,22 @@ onEvent = function (ev) {
     const p = mPending; setTimeout(() => { if (mPending === p) { mPending = null; mDrawPresets(); } }, ctx && ctx.outputLatency ? ctx.outputLatency * 1000 : 0);
   }
   if (ev.type === 'step' && playing) {
-    const n = ev.bar * 16 + ev.step, stepMs = 60000 / perf.tempo / 4;
-    for (const f of mFaders) {
-      const q = f.seq; if (!q || !q.on) continue;
-      // a step each time the count reaches the step length
-      const len = q.step || 1;
-      if (n % len === 0) mSeqStep(f, n / len, stepMs * len);
+    const n = ev.bar * 16 + ev.step, stepMs = 60000 / perf.tempo / 4, fresh = n !== mSeqLast + 1;
+    mSeqLast = n;
+    // a step each time the count reaches the step length: on the grid; or, following the groove, each 16th as late or
+    // early as the groove puts that 16th's hits on the fader's drum (all the drums' average for a fader that isn't one
+    // drum's), booked a 16th ahead so an early one can still land before its grid time
+    const off = mSeqGroove ? grooveMsg().off : null;
+    const due = (k) => mFaders.filter((f) => f.seq && f.seq.on && k % (f.seq.step || 1) === 0);
+    if (!off || fresh) for (const f of due(n)) mSeqStep(f, n / (f.seq.step || 1), stepMs * (f.seq.step || 1));
+    if (off) {
+      const k = n + 1, s16 = k % 16;
+      for (const f of due(k)) {
+        const t = mSeqTrack(f), o = t >= 0 ? off[t][s16] : off.reduce((a, r) => a + r[s16], 0) / off.length;
+        setTimeout(() => { if (playing && f.seq && f.seq.on) mSeqStep(f, k / (f.seq.step || 1), stepMs * (f.seq.step || 1)); }, Math.max(0, stepMs * (1 + o)));
+      }
     }
-  }
+  } else if (ev.type === 'step') mSeqLast = -2;
   mOnEvent(ev);
 };
 

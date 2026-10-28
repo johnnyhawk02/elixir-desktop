@@ -130,13 +130,18 @@
   <div class="m-rs" id="m-user" hidden>
     <section class="m-card m-rs-card m-set-card" role="dialog" aria-labelledby="m-user-title">
       <div class="m-chead"><b id="m-user-title">user settings</b><button class="m-toggle" id="m-user-close" type="button">done</button></div>
-      <div class="m-rs-tabs m-user-tabs" role="tablist"><button class="m-btn" type="button" role="tab" aria-selected="true">midi</button></div>
-      <div class="m-setpane m-midipane">
+      <div class="m-rs-tabs m-user-tabs" id="m-user-tabs" role="tablist"><button class="m-btn" type="button" role="tab" data-user="midi" aria-selected="true">midi</button><button class="m-btn" type="button" role="tab" data-user="seq" aria-selected="false">seq</button></div>
+      <div class="m-setpane m-midipane" data-user-pane="midi">
         <b class="m-userhead">cc presets</b>
         <div class="m-ccpresets" id="m-ccpresets"></div>
         <b class="m-userhead">perf faders: tap one to set its cc</b>
         <div class="m-ccgrid" id="m-ccgrid"></div>
         <button class="m-btn" id="m-ccsave" type="button">save as midi cc preset</button>
+      </div>
+      <div class="m-setpane" data-user-pane="seq" hidden>
+        <b class="m-userhead">fader step sequencers</b>
+        <label class="m-chk"><input id="m-seqgroove" type="checkbox"><i aria-hidden="true"></i>follow the groove</label>
+        <p class="m-note">On: each step lands as late or early as the groove and its depth put that 16th's hits, for the fader's drum (all the drums' average for a fader that isn't one drum's). Off: steps land on the grid.</p>
       </div>
     </section>
   </div>

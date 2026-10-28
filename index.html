@@ -1290,7 +1290,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v125</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v126</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1375,7 +1375,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · v125, 28 Oct, 07:56</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · v126, 28 Oct, 08:08</footer>
     </section>
   </div>
   </div>
@@ -1404,13 +1404,18 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   <div class="m-rs" id="m-user" hidden>
     <section class="m-card m-rs-card m-set-card" role="dialog" aria-labelledby="m-user-title">
       <div class="m-chead"><b id="m-user-title">user settings</b><button class="m-toggle" id="m-user-close" type="button">done</button></div>
-      <div class="m-rs-tabs m-user-tabs" role="tablist"><button class="m-btn" type="button" role="tab" aria-selected="true">midi</button></div>
-      <div class="m-setpane m-midipane">
+      <div class="m-rs-tabs m-user-tabs" id="m-user-tabs" role="tablist"><button class="m-btn" type="button" role="tab" data-user="midi" aria-selected="true">midi</button><button class="m-btn" type="button" role="tab" data-user="seq" aria-selected="false">seq</button></div>
+      <div class="m-setpane m-midipane" data-user-pane="midi">
         <b class="m-userhead">cc presets</b>
         <div class="m-ccpresets" id="m-ccpresets"></div>
         <b class="m-userhead">perf faders: tap one to set its cc</b>
         <div class="m-ccgrid" id="m-ccgrid"></div>
         <button class="m-btn" id="m-ccsave" type="button">save as midi cc preset</button>
+      </div>
+      <div class="m-setpane" data-user-pane="seq" hidden>
+        <b class="m-userhead">fader step sequencers</b>
+        <label class="m-chk"><input id="m-seqgroove" type="checkbox"><i aria-hidden="true"></i>follow the groove</label>
+        <p class="m-note">On: each step lands as late or early as the groove and its depth put that 16th's hits, for the fader's drum (all the drums' average for a fader that isn't one drum's). Off: steps land on the grid.</p>
       </div>
     </section>
   </div>
@@ -8710,6 +8715,16 @@ new MutationObserver(() => {
   if (mPending) { mPending = null; mDrawPresets(); }
 }).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
 // on each 16th (as the audio thread reaches it, ahead of the output), every running sequencer steps its fader
+// following the groove (user settings, seq tab; on unless switched off, kept in this browser)
+const SEQ_GROOVE_KEY = 'elixir-mobile-seqgroove';
+let mSeqGroove = (() => { try { return localStorage.getItem(SEQ_GROOVE_KEY) !== '0'; } catch (e) { return true; } })();
+let mSeqLast = -2;
+// the drum (groove track) a fader belongs to: a voice page's drum, a perf slot set to a drum's setting; else -1
+function mSeqTrack(f) {
+  const v = /^m-voice-(\d)/.exec(f.key); if (v) return Number(v[1]) - 1;
+  const sl = /^m-faders:slot(\d+)/.exec(f.key); if (sl) { const d = XN.indexOf(mSlots[Number(sl[1])][0]); if (d >= 0) return d; }
+  return -1;
+}
 const mOnEvent = onEvent;
 onEvent = function (ev) {
   // the bar waiting randomises come in on: stop their buttons' flash as that bar is heard
@@ -8722,14 +8737,22 @@ onEvent = function (ev) {
     const p = mPending; setTimeout(() => { if (mPending === p) { mPending = null; mDrawPresets(); } }, ctx && ctx.outputLatency ? ctx.outputLatency * 1000 : 0);
   }
   if (ev.type === 'step' && playing) {
-    const n = ev.bar * 16 + ev.step, stepMs = 60000 / perf.tempo / 4;
-    for (const f of mFaders) {
-      const q = f.seq; if (!q || !q.on) continue;
-      // a step each time the count reaches the step length
-      const len = q.step || 1;
-      if (n % len === 0) mSeqStep(f, n / len, stepMs * len);
+    const n = ev.bar * 16 + ev.step, stepMs = 60000 / perf.tempo / 4, fresh = n !== mSeqLast + 1;
+    mSeqLast = n;
+    // a step each time the count reaches the step length: on the grid; or, following the groove, each 16th as late or
+    // early as the groove puts that 16th's hits on the fader's drum (all the drums' average for a fader that isn't one
+    // drum's), booked a 16th ahead so an early one can still land before its grid time
+    const off = mSeqGroove ? grooveMsg().off : null;
+    const due = (k) => mFaders.filter((f) => f.seq && f.seq.on && k % (f.seq.step || 1) === 0);
+    if (!off || fresh) for (const f of due(n)) mSeqStep(f, n / (f.seq.step || 1), stepMs * (f.seq.step || 1));
+    if (off) {
+      const k = n + 1, s16 = k % 16;
+      for (const f of due(k)) {
+        const t = mSeqTrack(f), o = t >= 0 ? off[t][s16] : off.reduce((a, r) => a + r[s16], 0) / off.length;
+        setTimeout(() => { if (playing && f.seq && f.seq.on) mSeqStep(f, k / (f.seq.step || 1), stepMs * (f.seq.step || 1)); }, Math.max(0, stepMs * (1 + o)));
+      }
     }
-  }
+  } else if (ev.type === 'step') mSeqLast = -2;
   mOnEvent(ev);
 };
 
@@ -9190,11 +9213,20 @@ $('m-rush-reset').addEventListener('click', () => { Object.assign(rushSet, RUSH_
 addEventListener('resize', mRushDraw);
 // the rush-now line follows the rush (a preset, the fader, a randomiser), and a preset's settings redraw it all
 setInterval(() => { if (!$('m-set').hidden && !rgDrag) { rgGlideDraws.forEach((d) => d()); mRushDraw(); } }, 250);
-// ---- user settings (the person by the title; no password): tabs, for now midi. midi: which CC moves each of the twelve
+// ---- user settings (the person by the title; no password): tabs. seq: whether the fader sequencers follow the groove.
+// midi: which CC moves each of the twelve
 // PERF faders (mCc, app/mobile-slots.js), as a 4 by 3 grid like the page (tap a fader to type its CC), the CC presets
 // (cc1 to cc12, cc13 to cc24, and any saved here, which a long press or the ✕ deletes), and save as a preset ----
 $('m-user-open').addEventListener('click', () => { $('m-user').hidden = false; mCcDraw(); });
 $('m-user-close').addEventListener('click', () => { $('m-user').hidden = true; });
+$('m-user-tabs').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-user]'); if (!b) return;
+  for (const t of $('m-user-tabs').children) t.setAttribute('aria-selected', t === b);
+  for (const p of document.querySelectorAll('[data-user-pane]')) p.hidden = p.dataset.userPane !== b.dataset.user;
+});
+// seq: the fader sequencers follow the groove, or not
+$('m-seqgroove').checked = mSeqGroove;
+$('m-seqgroove').addEventListener('change', () => { mSeqGroove = $('m-seqgroove').checked; try { localStorage.setItem(SEQ_GROOVE_KEY, mSeqGroove ? '1' : '0'); } catch (e) {} });
 const ccSame = (a, b) => a.length === b.length && a.every((c, i) => c === b[i]);
 function mCcDraw() {
   const box = $('m-ccpresets'); box.innerHTML = '';
@@ -9268,7 +9300,8 @@ const HELP = [
 <li><b>export presets</b> saves your presets to a file (it never deletes anything); <b>import</b> reads one back.</li></ul>`],
   ['seq', 'step sequencers', `<p>Hold any fader for half a second and it gets a step sequencer: 2 to 16 steps, each moving the fader up or down from where you leave it, so you can still play it.</p>
 <ul><li>Paint the steps with a finger, or press <b>randomise</b>.</li><li><b>speed</b> is each step's length, a 16th up to 8 bars. <b>slew</b> glides between steps. <b>depth</b> is how far they reach.</li>
-<li><b>on</b> turns it on and off. A fader with a sequencer running has its name inverted. Presets keep them.</li></ul>`],
+<li><b>on</b> turns it on and off. A fader with a sequencer running has its name inverted. Presets keep them.</li>
+<li>The steps follow the groove and its depth, landing with the swung hits; switch that off in the person button's <b>seq</b> tab.</li></ul>`],
   ['rec', 'recording', `<ul><li><b>rec</b> starts recording (and playing); press it again to stop, and the WAV downloads.</li>
 <li><b>loop</b> records an exact loop from the next bar and downloads it, ready to loop in any other app. Hold it to choose 1, 2, 4, 8 or 16 bars.</li></ul>`],
   ['more', 'more', `<ul><li>Hold a randomise button to open the randomisers' settings, the ranges and chances each one uses.</li>

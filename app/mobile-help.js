@@ -32,7 +32,8 @@ const HELP = [
 <li><b>export presets</b> saves your presets to a file (it never deletes anything); <b>import</b> reads one back.</li></ul>`],
   ['seq', 'step sequencers', `<p>Hold any fader for half a second and it gets a step sequencer: 2 to 16 steps, each moving the fader up or down from where you leave it, so you can still play it.</p>
 <ul><li>Paint the steps with a finger, or press <b>randomise</b>.</li><li><b>speed</b> is each step's length, a 16th up to 8 bars. <b>slew</b> glides between steps. <b>depth</b> is how far they reach.</li>
-<li><b>on</b> turns it on and off. A fader with a sequencer running has its name inverted. Presets keep them.</li></ul>`],
+<li><b>on</b> turns it on and off. A fader with a sequencer running has its name inverted. Presets keep them.</li>
+<li>The steps follow the groove and its depth, landing with the swung hits; switch that off in the person button's <b>seq</b> tab.</li></ul>`],
   ['rec', 'recording', `<ul><li><b>rec</b> starts recording (and playing); press it again to stop, and the WAV downloads.</li>
 <li><b>loop</b> records an exact loop from the next bar and downloads it, ready to loop in any other app. Hold it to choose 1, 2, 4, 8 or 16 bars.</li></ul>`],
   ['more', 'more', `<ul><li>Hold a randomise button to open the randomisers' settings, the ranges and chances each one uses.</li>
