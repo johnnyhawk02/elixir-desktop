@@ -21,10 +21,39 @@ function mSlot(i) {
     : { min: A.min, max: A.max, get: A.get, set: (v) => { A.set(v); mDrawAll(); setDirty(true); }, show: String, dflt: () => initValues[A.par] });
   const el = mFaders[mFaders.length - 1].el;
   el.dataset.slot = i; mFaders[mFaders.length - 1].key = `m-faders:slot${i}`;
+  el.dataset.full = label; mFitLabel(el);
   box.insertBefore(el, (mSlotEls[i + 1] && mSlotEls[i + 1].el) || null);
   mSlotEls[i] = { el, draw }; draw();
 }
+// a slot's name on one line: as it is if it fits, else its words shortened (a known short form, else the vowels after the
+// first letter dropped), longest word first, the drum or group in front kept; then middle words dropped; past that, an
+// ellipsis (the css)
+const M_SHORT = { decay: 'dcy', filter: 'flt', reso: 'res', slope: 'slp', freq: 'frq', pitch: 'ptch', amount: 'amt', attack: 'atk',
+  release: 'rel', threshold: 'thr', volume: 'vol', level: 'lvl', sample: 'smp', rate: 'rt', drive: 'drv', offset: 'ofs', retrigger: 'rtrg',
+  feedback: 'fbk', width: 'wdth', sidechain: 'sdch', crossfeed: 'xfd', velocity: 'vel', repeat: 'rpt', noise: 'nse', coarse: 'crs',
+  transient: 'trn', makeup: 'mkup', ratio: 'rto', space: 'spc', closed: 'cl', open: 'op', wave: 'wv', mod: 'md', osc1: 'o1', osc2: 'o2', gain: 'gn' };
+const mShorten = (w) => M_SHORT[w] || (w.length > 3 ? w[0] + w.slice(1).replace(/[aeiou]/g, '') : w);
+function mFitLabel(el) {
+  const lab = el.querySelector('.m-flab'), full = el.dataset.full; if (!lab || !full) return;
+  lab.textContent = full;
+  // (measured as the text's own width against the fader's column, with a pixel to spare for rounding)
+  const room = el.clientWidth - 1, wide = () => { const r = document.createRange(); r.selectNodeContents(lab); return r.getBoundingClientRect().width > room; };
+  if (room <= 0 || !wide()) return;
+  const w = full.split(' '), done = new Set([0]); // (the first word, the drum or group, stays)
+  while (wide()) {
+    let k = -1; w.forEach((x, j) => { if (!done.has(j) && (k < 0 || x.length > w[k].length)) k = j; });
+    if (k < 0) break;
+    w[k] = mShorten(w[k]); done.add(k); lab.textContent = w.join(' ');
+  }
+  // (still too long: words after the first dropped, the last kept, so it's the drum and what it is)
+  while (wide() && w.length > 2) { w.splice(1, 1); lab.textContent = w.join(' '); }
+}
 for (let i = 0; i < SLOT0.length; i++) mSlot(i);
+// (refitted whenever the faders change size, which includes the page coming into view)
+const mFitSlots = () => mSlotEls.forEach((s) => s && mFitLabel(s.el));
+new ResizeObserver(mFitSlots).observe($('m-faders'));
+// (and once the pixel font has loaded, since the names' widths change with it)
+if (document.fonts) document.fonts.ready.then(mFitSlots);
 $('m-assign').addEventListener('change', () => { $('m-faders').classList.toggle('assigning', $('m-assign').checked); });
 // MIDI: twelve CCs (13..24 unless changed) set faders 1..12 across their range, and nothing else listens (no other CCs, no notes); MIDI starts
 // at the first touch, since the browser may ask first
