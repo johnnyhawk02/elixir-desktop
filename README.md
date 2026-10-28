@@ -1,8 +1,8 @@
-# Elixir
+# Elixir Mobile
 
-A six-voice drum machine in the browser. **Play it: https://johnnyhawk02.github.io/elixir/**
+A six-voice drum machine for your phone, in the browser. **Play it: https://johnnyhawk02.github.io/elixir-mobile/**
 
-This folder holds the Elixir app and its full source, published as part of johnnyhawk02.github.io.
+This repo holds the app and its full source, published with GitHub Pages.
 
 Elixir's sound engine is a JavaScript port of the drum voices and FX bus in the Erica Synths LXR-02
 firmware ([erica-synths/lxr-desktop-app](https://github.com/erica-synths/lxr-desktop-app),
