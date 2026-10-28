@@ -110,21 +110,21 @@ $('m-pimport').addEventListener('change', async (e) => {
   $('m-pnote').textContent = (n ? `Imported ${n}.` : 'Nothing new to import.') + (old ? ` ${old} skipped: not a preset.` : '') + (bad ? ` ${bad} file${bad > 1 ? 's' : ''} not a presets file.` : '');
   mDrawPresets();
 });
-// export: the favourites, built in and saved alike (each marked fav, so an import stars them again)
+// export: every preset saved here, the built-in ones saved over and every starred one (each marked fav if starred, so an
+// import stars it again), as the settings' export. It never deletes anything
 $('m-pexport').addEventListener('click', async () => {
-  const favs = kitList.filter((k) => (k.saved || k.builtin) && mFavs.has(k.name)).map((k) => ({ ...presetData(k), fav: true }));
-  if (!favs.length) { $('m-pnote').textContent = 'Star some presets first.'; return; }
-  const blob = new Blob([JSON.stringify({ elixir: 1, presets: favs }, null, 1)], { type: 'application/json' });
-  if (!await mOffer({ blob, name: 'elixir-mobile-favourites.json' }, 'application/json')) return; // (cancelled: nothing deleted)
-  $('m-pnote').textContent = `Exported ${favs.length} favourite${favs.length > 1 ? 's' : ''}.`;
-  // (for now, while the factory presets are being made: once they're out, offer a clean slate)
-  const mine = kitList.filter((k) => k.saved);
-  if (!confirm(`Exported ${favs.length}. Delete all ${mine.length} of your saved presets and clear every star?`)) return;
-  const cur = kitList[Number($('kit').value)];
+  const list = mSetPresets(true);
+  if (!list.length) { $('m-pnote').textContent = 'No presets to export yet.'; return; }
+  const blob = new Blob([JSON.stringify({ elixir: 1, presets: list }, null, 1)], { type: 'application/json' });
+  if (await mOffer({ blob, name: 'elixir-mobile-presets.json' }, 'application/json')) $('m-pnote').textContent = `Exported ${list.length} preset${list.length > 1 ? 's' : ''}.`;
+});
+// clear all (in settings): every saved preset deleted and every star cleared (the built-in ones stay)
+function mClearAll() {
+  const mine = kitList.filter((k) => k.saved), cur = kitList[Number($('kit').value)];
   for (const k of mine) kitList.splice(kitList.indexOf(k), 1);
   mFavs.clear(); mFavStore(); storePresets(); fillKits();
   $('kit').value = Math.max(0, kitList.indexOf(cur));
-  $('m-pnote').textContent = `Exported ${favs.length}; your presets deleted.`;
   mDrawPresets();
-});
+  return mine.length;
+}
 

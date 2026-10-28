@@ -2,7 +2,17 @@
 // presets saved here, to be built in. rush: how the rush changes as it rises 0..100%, a lane each for the roll's speed, the other drums, the kick
 // and the high-pass, drawn from the rush settings (rushSet, app/rush-set.js; saved with each preset); dragging a
 // break point changes it, as the desktop's rush settings do ----
-$('m-set-open').addEventListener('click', () => { $('m-set').hidden = false; mRushDraw(); });
+// (for now the settings are behind a password, asked once a visit)
+const SET_PASS = 'Password1!';
+$('m-set-open').addEventListener('click', () => {
+  let ok = false; try { ok = sessionStorage.getItem('elixir-mobile-set') === '1'; } catch (e) {}
+  if (!ok) {
+    const pw = prompt('Settings password');
+    if (pw !== SET_PASS) { if (pw !== null) alert('Wrong password.'); return; }
+    try { sessionStorage.setItem('elixir-mobile-set', '1'); } catch (e) {}
+  }
+  $('m-set').hidden = false; mRushDraw();
+});
 $('m-set-close').addEventListener('click', () => { $('m-set').hidden = true; });
 $('m-set-tabs').addEventListener('click', (e) => {
   const b = e.target.closest('[data-set]'); if (!b) return;
@@ -12,11 +22,24 @@ $('m-set-tabs').addEventListener('click', (e) => {
 });
 // copy presets: every preset saved here, and the built-in ones saved over, in the export file's format
 $('m-set-presets').addEventListener('click', async () => {
-  const b = $('m-set-presets'), list = kitList.filter((k) => k.saved || k.edited).map((k) => ({ ...presetData(k), fav: mFavs.has(k.name) }));
+  const b = $('m-set-presets'), list = mSetPresets(false);
   if (!list.length) { b.textContent = 'none saved yet'; setTimeout(() => { b.textContent = 'copy presets'; }, 1500); return; }
   const text = `Elixir Mobile presets\n${JSON.stringify({ elixir: 1, presets: list })}`;
   try { await navigator.clipboard.writeText(text); b.textContent = `copied ${list.length}`; setTimeout(() => { b.textContent = 'copy presets'; }, 1500); }
   catch (e) { prompt('Copy the presets:', text); }
+});
+// the presets to copy or export: every one saved here and the built-in ones saved over (export adds the starred ones)
+const mSetPresets = (stars) => kitList.filter((k) => k.saved || k.edited || (stars && k.builtin && mFavs.has(k.name))).map((k) => ({ ...presetData(k), fav: mFavs.has(k.name) }));
+$('m-set-export').addEventListener('click', async () => {
+  const b = $('m-set-export'), list = mSetPresets(true), say = (t) => { b.textContent = t; setTimeout(() => { b.textContent = 'export presets'; }, 1500); };
+  if (!list.length) { say('none to export'); return; }
+  const blob = new Blob([JSON.stringify({ elixir: 1, presets: list }, null, 1)], { type: 'application/json' });
+  if (await mOffer({ blob, name: 'elixir-mobile-presets.json' }, 'application/json')) say(`exported ${list.length}`);
+});
+$('m-set-clear').addEventListener('click', () => {
+  const n = kitList.filter((k) => k.saved).length;
+  if (!confirm(`Delete all ${n} of your saved presets and clear every star? This can't be undone.`)) return;
+  const b = $('m-set-clear'); b.textContent = `cleared ${mClearAll()}`; setTimeout(() => { b.textContent = 'clear all'; }, 1500);
 });
 $('m-set-slots').addEventListener('click', async () => {
   const b = $('m-set-slots'), text = `Elixir Mobile perf faders\n${JSON.stringify(mSlots)}`;

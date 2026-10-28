@@ -96,7 +96,7 @@
       <ul class="m-plist" id="m-plist"></ul>
       <div class="m-pio">
         <label class="m-btn m-file" title="Reads a presets file: one exported here, or favourites exported from the full Elixir">import<input id="m-pimport" type="file" accept="application/json,.json" multiple></label>
-        <button class="m-btn" id="m-pexport" type="button" title="Saves every starred preset, built in or yours, to a file">export favourites</button>
+        <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
       <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v@VER@, @BUILT@</footer>
@@ -113,6 +113,10 @@
         <p class="m-note">Copies what the twelve PERF faders do, to paste to Claude as the new defaults.</p>
         <button class="m-btn" id="m-set-presets" type="button">copy presets</button>
         <p class="m-note">Copies your saved presets (and any built-in ones you've saved over), to paste to Claude to build them in.</p>
+        <button class="m-btn" id="m-set-export" type="button">export presets</button>
+        <p class="m-note">Saves the same presets, and every starred one, to a file.</p>
+        <button class="m-btn" id="m-set-clear" type="button">clear all</button>
+        <p class="m-note">Deletes all your saved presets and clears every star (asks first).</p>
       </div>
       <div class="m-setpane m-rushpane" data-set-pane="rush" hidden>
         <svg class="m-rushg" id="m-rushg" role="img" aria-label="how the rush changes as it rises"></svg>

@@ -1221,6 +1221,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-setpane { display: grid; gap: 8px; align-content: start; min-height: 0; }
 .m-setpane[hidden] { display: none; }
 .m .m-setpane > .m-btn { min-height: 50px; font-size: var(--fs-s) !important; }
+.m-setpane .m-note { font-size: var(--fs-xs); line-height: 1.2; margin-bottom: 4px; }
 /* the rush graph: four lanes, then the two glides and reset */
 .m-rushpane { grid-template-rows: minmax(0, 1fr) auto auto; align-content: stretch; }
 .m-rushg { width: 100%; height: 100%; min-height: 0; touch-action: none; font-family: var(--mono); overflow: visible; }
@@ -1260,7 +1261,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v119</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v120</small></b>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
@@ -1340,10 +1341,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
       <ul class="m-plist" id="m-plist"></ul>
       <div class="m-pio">
         <label class="m-btn m-file" title="Reads a presets file: one exported here, or favourites exported from the full Elixir">import<input id="m-pimport" type="file" accept="application/json,.json" multiple></label>
-        <button class="m-btn" id="m-pexport" type="button" title="Saves every starred preset, built in or yours, to a file">export favourites</button>
+        <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v119, 28 Oct, 06:33</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v120, 28 Oct, 06:44</footer>
     </section>
   </div>
   </div>
@@ -1357,6 +1358,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <p class="m-note">Copies what the twelve PERF faders do, to paste to Claude as the new defaults.</p>
         <button class="m-btn" id="m-set-presets" type="button">copy presets</button>
         <p class="m-note">Copies your saved presets (and any built-in ones you've saved over), to paste to Claude to build them in.</p>
+        <button class="m-btn" id="m-set-export" type="button">export presets</button>
+        <p class="m-note">Saves the same presets, and every starred one, to a file.</p>
+        <button class="m-btn" id="m-set-clear" type="button">clear all</button>
+        <p class="m-note">Deletes all your saved presets and clears every star (asks first).</p>
       </div>
       <div class="m-setpane m-rushpane" data-set-pane="rush" hidden>
         <svg class="m-rushg" id="m-rushg" role="img" aria-label="how the rush changes as it rises"></svg>
@@ -8296,23 +8301,23 @@ $('m-pimport').addEventListener('change', async (e) => {
   $('m-pnote').textContent = (n ? `Imported ${n}.` : 'Nothing new to import.') + (old ? ` ${old} skipped: not a preset.` : '') + (bad ? ` ${bad} file${bad > 1 ? 's' : ''} not a presets file.` : '');
   mDrawPresets();
 });
-// export: the favourites, built in and saved alike (each marked fav, so an import stars them again)
+// export: every preset saved here, the built-in ones saved over and every starred one (each marked fav if starred, so an
+// import stars it again), as the settings' export. It never deletes anything
 $('m-pexport').addEventListener('click', async () => {
-  const favs = kitList.filter((k) => (k.saved || k.builtin) && mFavs.has(k.name)).map((k) => ({ ...presetData(k), fav: true }));
-  if (!favs.length) { $('m-pnote').textContent = 'Star some presets first.'; return; }
-  const blob = new Blob([JSON.stringify({ elixir: 1, presets: favs }, null, 1)], { type: 'application/json' });
-  if (!await mOffer({ blob, name: 'elixir-mobile-favourites.json' }, 'application/json')) return; // (cancelled: nothing deleted)
-  $('m-pnote').textContent = `Exported ${favs.length} favourite${favs.length > 1 ? 's' : ''}.`;
-  // (for now, while the factory presets are being made: once they're out, offer a clean slate)
-  const mine = kitList.filter((k) => k.saved);
-  if (!confirm(`Exported ${favs.length}. Delete all ${mine.length} of your saved presets and clear every star?`)) return;
-  const cur = kitList[Number($('kit').value)];
+  const list = mSetPresets(true);
+  if (!list.length) { $('m-pnote').textContent = 'No presets to export yet.'; return; }
+  const blob = new Blob([JSON.stringify({ elixir: 1, presets: list }, null, 1)], { type: 'application/json' });
+  if (await mOffer({ blob, name: 'elixir-mobile-presets.json' }, 'application/json')) $('m-pnote').textContent = `Exported ${list.length} preset${list.length > 1 ? 's' : ''}.`;
+});
+// clear all (in settings): every saved preset deleted and every star cleared (the built-in ones stay)
+function mClearAll() {
+  const mine = kitList.filter((k) => k.saved), cur = kitList[Number($('kit').value)];
   for (const k of mine) kitList.splice(kitList.indexOf(k), 1);
   mFavs.clear(); mFavStore(); storePresets(); fillKits();
   $('kit').value = Math.max(0, kitList.indexOf(cur));
-  $('m-pnote').textContent = `Exported ${favs.length}; your presets deleted.`;
   mDrawPresets();
-});
+  return mine.length;
+}
 
 // ---- record: free length, no count-in; starts now (and starts playback), the second press stops and saves. Rec loop
 // records exactly LOOP_BARS bars (4 unless changed: hold it) from the start of the next bar (from bar 1 if stopped), cut to loop seamlessly, and
@@ -8950,7 +8955,17 @@ $('m-ch-reset').addEventListener('click', () => {
 // presets saved here, to be built in. rush: how the rush changes as it rises 0..100%, a lane each for the roll's speed, the other drums, the kick
 // and the high-pass, drawn from the rush settings (rushSet, app/rush-set.js; saved with each preset); dragging a
 // break point changes it, as the desktop's rush settings do ----
-$('m-set-open').addEventListener('click', () => { $('m-set').hidden = false; mRushDraw(); });
+// (for now the settings are behind a password, asked once a visit)
+const SET_PASS = 'Password1!';
+$('m-set-open').addEventListener('click', () => {
+  let ok = false; try { ok = sessionStorage.getItem('elixir-mobile-set') === '1'; } catch (e) {}
+  if (!ok) {
+    const pw = prompt('Settings password');
+    if (pw !== SET_PASS) { if (pw !== null) alert('Wrong password.'); return; }
+    try { sessionStorage.setItem('elixir-mobile-set', '1'); } catch (e) {}
+  }
+  $('m-set').hidden = false; mRushDraw();
+});
 $('m-set-close').addEventListener('click', () => { $('m-set').hidden = true; });
 $('m-set-tabs').addEventListener('click', (e) => {
   const b = e.target.closest('[data-set]'); if (!b) return;
@@ -8960,11 +8975,24 @@ $('m-set-tabs').addEventListener('click', (e) => {
 });
 // copy presets: every preset saved here, and the built-in ones saved over, in the export file's format
 $('m-set-presets').addEventListener('click', async () => {
-  const b = $('m-set-presets'), list = kitList.filter((k) => k.saved || k.edited).map((k) => ({ ...presetData(k), fav: mFavs.has(k.name) }));
+  const b = $('m-set-presets'), list = mSetPresets(false);
   if (!list.length) { b.textContent = 'none saved yet'; setTimeout(() => { b.textContent = 'copy presets'; }, 1500); return; }
   const text = `Elixir Mobile presets\n${JSON.stringify({ elixir: 1, presets: list })}`;
   try { await navigator.clipboard.writeText(text); b.textContent = `copied ${list.length}`; setTimeout(() => { b.textContent = 'copy presets'; }, 1500); }
   catch (e) { prompt('Copy the presets:', text); }
+});
+// the presets to copy or export: every one saved here and the built-in ones saved over (export adds the starred ones)
+const mSetPresets = (stars) => kitList.filter((k) => k.saved || k.edited || (stars && k.builtin && mFavs.has(k.name))).map((k) => ({ ...presetData(k), fav: mFavs.has(k.name) }));
+$('m-set-export').addEventListener('click', async () => {
+  const b = $('m-set-export'), list = mSetPresets(true), say = (t) => { b.textContent = t; setTimeout(() => { b.textContent = 'export presets'; }, 1500); };
+  if (!list.length) { say('none to export'); return; }
+  const blob = new Blob([JSON.stringify({ elixir: 1, presets: list }, null, 1)], { type: 'application/json' });
+  if (await mOffer({ blob, name: 'elixir-mobile-presets.json' }, 'application/json')) say(`exported ${list.length}`);
+});
+$('m-set-clear').addEventListener('click', () => {
+  const n = kitList.filter((k) => k.saved).length;
+  if (!confirm(`Delete all ${n} of your saved presets and clear every star? This can't be undone.`)) return;
+  const b = $('m-set-clear'); b.textContent = `cleared ${mClearAll()}`; setTimeout(() => { b.textContent = 'clear all'; }, 1500);
 });
 $('m-set-slots').addEventListener('click', async () => {
   const b = $('m-set-slots'), text = `Elixir Mobile perf faders\n${JSON.stringify(mSlots)}`;
