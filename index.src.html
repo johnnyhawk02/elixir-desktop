@@ -19,6 +19,7 @@
     <b class="m-title" id="m-title">elixir<small class="m-ver">v@VER@</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
+    <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
   <section class="m-card m-trans">
@@ -137,6 +138,13 @@
         <div class="m-ccgrid" id="m-ccgrid"></div>
         <button class="m-btn" id="m-ccsave" type="button">save as midi cc preset</button>
       </div>
+    </section>
+  </div>
+  <div class="m-rs" id="m-help" hidden>
+    <section class="m-card m-rs-card m-help-card" role="dialog" aria-labelledby="m-help-title">
+      <div class="m-chead"><b id="m-help-title">help</b><button class="m-toggle" id="m-help-close" type="button">done</button></div>
+      <div class="m-rs-tabs m-help-tabs" id="m-help-tabs" role="tablist"></div>
+      <div class="m-help-text" id="m-help-text"></div>
     </section>
   </div>
   <div class="m-rs m-small" id="m-looplen" hidden>
