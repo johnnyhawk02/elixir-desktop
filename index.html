@@ -1260,7 +1260,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v118</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v119</small></b>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
@@ -1343,7 +1343,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves every starred preset, built in or yours, to a file">export favourites</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v118, 27 Oct, 23:45</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v119, 28 Oct, 06:33</footer>
     </section>
   </div>
   </div>
@@ -1351,10 +1351,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   <div class="m-rs" id="m-set" hidden>
     <section class="m-card m-rs-card m-set-card" role="dialog" aria-labelledby="m-set-title">
       <div class="m-chead"><b id="m-set-title">settings</b><button class="m-toggle" id="m-set-close" type="button">done</button></div>
-      <div class="m-rs-tabs m-set-tabs" id="m-set-tabs" role="tablist"><button class="m-btn" type="button" role="tab" data-set="faders" aria-selected="true">perf faders</button><button class="m-btn" type="button" role="tab" data-set="rush" aria-selected="false">rush</button></div>
+      <div class="m-rs-tabs m-set-tabs" id="m-set-tabs" role="tablist"><button class="m-btn" type="button" role="tab" data-set="faders" aria-selected="true">copy</button><button class="m-btn" type="button" role="tab" data-set="rush" aria-selected="false">rush</button></div>
       <div class="m-setpane" data-set-pane="faders">
         <button class="m-btn" id="m-set-slots" type="button">copy perf faders</button>
         <p class="m-note">Copies what the twelve PERF faders do, to paste to Claude as the new defaults.</p>
+        <button class="m-btn" id="m-set-presets" type="button">copy presets</button>
+        <p class="m-note">Copies your saved presets (and any built-in ones you've saved over), to paste to Claude to build them in.</p>
       </div>
       <div class="m-setpane m-rushpane" data-set-pane="rush" hidden>
         <svg class="m-rushg" id="m-rushg" role="img" aria-label="how the rush changes as it rises"></svg>
@@ -8944,8 +8946,8 @@ $('m-ch-reset').addEventListener('click', () => {
   mSlot(mChSlot); $('m-ch').hidden = true;
 });
 
-// ---- settings (the gear by the title): a tab each. perf faders: copy the perf faders' picks, to be baked in as
-// SLOT0. rush: how the rush changes as it rises 0..100%, a lane each for the roll's speed, the other drums, the kick
+// ---- settings (the gear by the title): a tab each. copy: the perf faders' picks, to be baked in as SLOT0, and the
+// presets saved here, to be built in. rush: how the rush changes as it rises 0..100%, a lane each for the roll's speed, the other drums, the kick
 // and the high-pass, drawn from the rush settings (rushSet, app/rush-set.js; saved with each preset); dragging a
 // break point changes it, as the desktop's rush settings do ----
 $('m-set-open').addEventListener('click', () => { $('m-set').hidden = false; mRushDraw(); });
@@ -8955,6 +8957,14 @@ $('m-set-tabs').addEventListener('click', (e) => {
   for (const t of $('m-set-tabs').children) t.setAttribute('aria-selected', t === b);
   for (const p of document.querySelectorAll('[data-set-pane]')) p.hidden = p.dataset.setPane !== b.dataset.set;
   mRushDraw();
+});
+// copy presets: every preset saved here, and the built-in ones saved over, in the export file's format
+$('m-set-presets').addEventListener('click', async () => {
+  const b = $('m-set-presets'), list = kitList.filter((k) => k.saved || k.edited).map((k) => ({ ...presetData(k), fav: mFavs.has(k.name) }));
+  if (!list.length) { b.textContent = 'none saved yet'; setTimeout(() => { b.textContent = 'copy presets'; }, 1500); return; }
+  const text = `Elixir Mobile presets\n${JSON.stringify({ elixir: 1, presets: list })}`;
+  try { await navigator.clipboard.writeText(text); b.textContent = `copied ${list.length}`; setTimeout(() => { b.textContent = 'copy presets'; }, 1500); }
+  catch (e) { prompt('Copy the presets:', text); }
 });
 $('m-set-slots').addEventListener('click', async () => {
   const b = $('m-set-slots'), text = `Elixir Mobile perf faders\n${JSON.stringify(mSlots)}`;

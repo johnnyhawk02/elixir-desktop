@@ -1,5 +1,5 @@
-// ---- settings (the gear by the title): a tab each. perf faders: copy the perf faders' picks, to be baked in as
-// SLOT0. rush: how the rush changes as it rises 0..100%, a lane each for the roll's speed, the other drums, the kick
+// ---- settings (the gear by the title): a tab each. copy: the perf faders' picks, to be baked in as SLOT0, and the
+// presets saved here, to be built in. rush: how the rush changes as it rises 0..100%, a lane each for the roll's speed, the other drums, the kick
 // and the high-pass, drawn from the rush settings (rushSet, app/rush-set.js; saved with each preset); dragging a
 // break point changes it, as the desktop's rush settings do ----
 $('m-set-open').addEventListener('click', () => { $('m-set').hidden = false; mRushDraw(); });
@@ -9,6 +9,14 @@ $('m-set-tabs').addEventListener('click', (e) => {
   for (const t of $('m-set-tabs').children) t.setAttribute('aria-selected', t === b);
   for (const p of document.querySelectorAll('[data-set-pane]')) p.hidden = p.dataset.setPane !== b.dataset.set;
   mRushDraw();
+});
+// copy presets: every preset saved here, and the built-in ones saved over, in the export file's format
+$('m-set-presets').addEventListener('click', async () => {
+  const b = $('m-set-presets'), list = kitList.filter((k) => k.saved || k.edited).map((k) => ({ ...presetData(k), fav: mFavs.has(k.name) }));
+  if (!list.length) { b.textContent = 'none saved yet'; setTimeout(() => { b.textContent = 'copy presets'; }, 1500); return; }
+  const text = `Elixir Mobile presets\n${JSON.stringify({ elixir: 1, presets: list })}`;
+  try { await navigator.clipboard.writeText(text); b.textContent = `copied ${list.length}`; setTimeout(() => { b.textContent = 'copy presets'; }, 1500); }
+  catch (e) { prompt('Copy the presets:', text); }
 });
 $('m-set-slots').addEventListener('click', async () => {
   const b = $('m-set-slots'), text = `Elixir Mobile perf faders\n${JSON.stringify(mSlots)}`;
