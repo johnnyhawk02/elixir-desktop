@@ -1,5 +1,5 @@
-// ---- the perf page's twelve slots: each fader can do anything on the x/y lists, and MIDI CC 13..24 (any channel) moves
-// faders 1..12. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
+// ---- the perf page's twelve slots: each fader can do anything on the x/y lists, and MIDI CCs (13..24 unless changed in the user
+// settings; any channel) move faders 1..12. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
 // grouped as on that page. The picks are kept in this browser, as [place, group, name], so they survive list changes ----
 const SLOT_KEY = 'elixir-mobile-perfmap';
 const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'], ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
@@ -24,17 +24,23 @@ function mSlot(i) {
 }
 for (let i = 0; i < SLOT0.length; i++) mSlot(i);
 $('m-assign').addEventListener('change', () => { $('m-faders').classList.toggle('assigning', $('m-assign').checked); });
-// MIDI: CC 13..24 set faders 1..12 across their range, and nothing else listens (no other CCs, no notes); MIDI starts
+// MIDI: twelve CCs (13..24 unless changed) set faders 1..12 across their range, and nothing else listens (no other CCs, no notes); MIDI starts
 // at the first touch, since the browser may ask first
 onMidi = (e) => { const [st, cc, val] = e.data; if ((st & 0xf0) === 0xb0) pc4Midi(cc, val); };
 // (a controller sends many CCs a second: only each fader's latest is kept, applied once a frame, and the moving
 // fader skips the LCD fade so it keeps up with the knob)
 const mCcNext = new Map();
 let mCcFrame = 0;
+// (which CC moves which fader: mCc.map, set in the user settings' midi tab, CC 13..24 unless changed; kept in this browser)
+const CC_KEY = 'elixir-mobile-midicc';
+const CC_PRESETS0 = [{ name: 'cc1 to cc12', map: SLOT0.map((_, i) => i + 1) }, { name: 'cc13 to cc24', map: SLOT0.map((_, i) => i + 13) }];
+const mCc = (() => { let v = {}; try { v = JSON.parse(localStorage.getItem(CC_KEY)) || {}; } catch (e) {}
+  return { map: Array.isArray(v.map) && v.map.length === SLOT0.length ? v.map : CC_PRESETS0[1].map.slice(), presets: Array.isArray(v.presets) ? v.presets : [] }; })();
+const mCcStore = () => { try { localStorage.setItem(CC_KEY, JSON.stringify(mCc)); } catch (e) {} };
 pc4Midi = function (cc, val) {
-  if (cc < 13 || cc > 12 + SLOT0.length) return;
-  mCcNext.set(cc - 13, val);
-  if (!mCcFrame) mCcFrame = requestAnimationFrame(mCcApply);
+  let hit = false;
+  mCc.map.forEach((c, i) => { if (c === cc) { mCcNext.set(i, val); hit = true; } });
+  if (hit && !mCcFrame) mCcFrame = requestAnimationFrame(mCcApply);
 };
 function mCcApply() {
   mCcFrame = 0;

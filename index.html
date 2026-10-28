@@ -986,9 +986,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 0 4px 6px; border-bottom: var(--rule); }
 .m-title { font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
 .m-ver { margin-left: .5em; font-size: .7em; letter-spacing: .06em; text-transform: none; opacity: .7; }
-.m-setbtn { align-self: center; margin-right: auto; min-width: 0 !important; min-height: 30px !important; padding: 0 6px; display: grid; place-items: center; }
-.m-setbtn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
-.m-pagename { font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
+.m-userbtn { margin-right: 4px !important; }
+/* (on a narrow phone the title line's spacing tightens, so ELIXIR, the version, both buttons and the page's name fit) */
+@media (max-width: 400px) { .m-title, .m-pagename { letter-spacing: .08em; } .m-top { gap: 6px; } }
+.m-setbtn { align-self: center; margin-right: auto; min-width: 0 !important; min-height: 30px !important; padding: 0 5px; display: grid; place-items: center; }
+.m-setbtn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+.m-pagename { white-space: nowrap; font-family: var(--display); font-size: 1.5rem; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
 
 /* play, rec, rec loop */
 .m-trans { padding: 8px 0; display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; align-items: stretch; }
@@ -1240,6 +1243,19 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-rush-btns { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
 .m-rush-btns output { font-size: var(--fs-xs); text-transform: uppercase; color: var(--muted); }
 .m .m-rush-btns .m-btn { min-height: 46px; min-width: 96px; font-size: var(--fs-xs) !important; }
+/* user settings: the midi tab, its cc presets, the faders' ccs four by three, then save */
+.m-user-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.m-midipane { overflow-y: auto; overscroll-behavior: contain; }
+.m-userhead { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); margin-top: 4px; }
+.m-ccpresets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.m-ccp { display: flex; gap: 4px; min-width: 0; }
+.m .m-ccp .m-btn { flex: 1; min-width: 0; min-height: 46px; padding: 0 4px; font-size: min(var(--fs-xs), 3.7vw, 15.2px) !important; letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m .m-ccp .m-ccdel { flex: none; width: 40px; }
+.m .m-ccp .m-btn[aria-pressed="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
+.m-ccgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.m .m-cccell { min-height: 56px; padding: 0 2px; display: grid; place-content: center; gap: 2px; font-size: var(--fs-s) !important; letter-spacing: 0; }
+.m .m-cccell small { font-size: min(var(--fs-xs), 3.4vw, 14px); opacity: .75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.m .m-midipane > .m-btn { min-height: 50px; font-size: var(--fs-s) !important; }
 /* the loop length */
 .m-small { align-items: flex-start; padding-top: 120px; }
 .m-small .m-rs-card { height: auto; grid-template-rows: auto auto; }
@@ -1261,7 +1277,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v120</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v121</small></b>
+    <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
@@ -1344,7 +1361,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v120, 28 Oct, 06:44</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · <a href="https://johnnyhawk02.github.io/elixir/">Full Elixir</a> · v121, 28 Oct, 06:55</footer>
     </section>
   </div>
   </div>
@@ -1367,6 +1384,19 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <svg class="m-rushg" id="m-rushg" role="img" aria-label="how the rush changes as it rises"></svg>
         <div class="m-rs-rows m-rush-glides" id="m-rush-glides"></div>
         <div class="m-rush-btns"><output id="m-rush-say" aria-live="polite">drag a point</output><button class="m-btn" id="m-rush-reset" type="button">reset</button></div>
+      </div>
+    </section>
+  </div>
+  <div class="m-rs" id="m-user" hidden>
+    <section class="m-card m-rs-card m-set-card" role="dialog" aria-labelledby="m-user-title">
+      <div class="m-chead"><b id="m-user-title">user settings</b><button class="m-toggle" id="m-user-close" type="button">done</button></div>
+      <div class="m-rs-tabs m-user-tabs" role="tablist"><button class="m-btn" type="button" role="tab" aria-selected="true">midi</button></div>
+      <div class="m-setpane m-midipane">
+        <b class="m-userhead">cc presets</b>
+        <div class="m-ccpresets" id="m-ccpresets"></div>
+        <b class="m-userhead">perf faders: tap one to set its cc</b>
+        <div class="m-ccgrid" id="m-ccgrid"></div>
+        <button class="m-btn" id="m-ccsave" type="button">save as midi cc preset</button>
       </div>
     </section>
   </div>
@@ -8857,8 +8887,8 @@ $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][
   for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) rand.addEventListener(ev, () => clearTimeout(hold));
   rand.addEventListener('click', (e) => { if (held) { held = false; e.stopPropagation(); e.preventDefault(); } }, { capture: true });
 }
-// ---- the perf page's twelve slots: each fader can do anything on the x/y lists, and MIDI CC 13..24 (any channel) moves
-// faders 1..12. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
+// ---- the perf page's twelve slots: each fader can do anything on the x/y lists, and MIDI CCs (13..24 unless changed in the user
+// settings; any channel) move faders 1..12. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
 // grouped as on that page. The picks are kept in this browser, as [place, group, name], so they survive list changes ----
 const SLOT_KEY = 'elixir-mobile-perfmap';
 const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'], ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
@@ -8883,17 +8913,23 @@ function mSlot(i) {
 }
 for (let i = 0; i < SLOT0.length; i++) mSlot(i);
 $('m-assign').addEventListener('change', () => { $('m-faders').classList.toggle('assigning', $('m-assign').checked); });
-// MIDI: CC 13..24 set faders 1..12 across their range, and nothing else listens (no other CCs, no notes); MIDI starts
+// MIDI: twelve CCs (13..24 unless changed) set faders 1..12 across their range, and nothing else listens (no other CCs, no notes); MIDI starts
 // at the first touch, since the browser may ask first
 onMidi = (e) => { const [st, cc, val] = e.data; if ((st & 0xf0) === 0xb0) pc4Midi(cc, val); };
 // (a controller sends many CCs a second: only each fader's latest is kept, applied once a frame, and the moving
 // fader skips the LCD fade so it keeps up with the knob)
 const mCcNext = new Map();
 let mCcFrame = 0;
+// (which CC moves which fader: mCc.map, set in the user settings' midi tab, CC 13..24 unless changed; kept in this browser)
+const CC_KEY = 'elixir-mobile-midicc';
+const CC_PRESETS0 = [{ name: 'cc1 to cc12', map: SLOT0.map((_, i) => i + 1) }, { name: 'cc13 to cc24', map: SLOT0.map((_, i) => i + 13) }];
+const mCc = (() => { let v = {}; try { v = JSON.parse(localStorage.getItem(CC_KEY)) || {}; } catch (e) {}
+  return { map: Array.isArray(v.map) && v.map.length === SLOT0.length ? v.map : CC_PRESETS0[1].map.slice(), presets: Array.isArray(v.presets) ? v.presets : [] }; })();
+const mCcStore = () => { try { localStorage.setItem(CC_KEY, JSON.stringify(mCc)); } catch (e) {} };
 pc4Midi = function (cc, val) {
-  if (cc < 13 || cc > 12 + SLOT0.length) return;
-  mCcNext.set(cc - 13, val);
-  if (!mCcFrame) mCcFrame = requestAnimationFrame(mCcApply);
+  let hit = false;
+  mCc.map.forEach((c, i) => { if (c === cc) { mCcNext.set(i, val); hit = true; } });
+  if (hit && !mCcFrame) mCcFrame = requestAnimationFrame(mCcApply);
 };
 function mCcApply() {
   mCcFrame = 0;
@@ -9102,6 +9138,50 @@ $('m-rush-reset').addEventListener('click', () => { Object.assign(rushSet, RUSH_
 addEventListener('resize', mRushDraw);
 // the rush-now line follows the rush (a preset, the fader, a randomiser), and a preset's settings redraw it all
 setInterval(() => { if (!$('m-set').hidden && !rgDrag) { rgGlideDraws.forEach((d) => d()); mRushDraw(); } }, 250);
+// ---- user settings (the person by the title; no password): tabs, for now midi. midi: which CC moves each of the twelve
+// PERF faders (mCc, app/mobile-slots.js), as a 4 by 3 grid like the page (tap a fader to type its CC), the CC presets
+// (cc1 to cc12, cc13 to cc24, and any saved here, which a long press or the ✕ deletes), and save as a preset ----
+$('m-user-open').addEventListener('click', () => { $('m-user').hidden = false; mCcDraw(); });
+$('m-user-close').addEventListener('click', () => { $('m-user').hidden = true; });
+const ccSame = (a, b) => a.length === b.length && a.every((c, i) => c === b[i]);
+function mCcDraw() {
+  const box = $('m-ccpresets'); box.innerHTML = '';
+  [...CC_PRESETS0, ...mCc.presets].forEach((P, i) => {
+    const row = document.createElement('div'); row.className = 'm-ccp';
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'm-btn'; b.textContent = P.name;
+    b.setAttribute('aria-pressed', ccSame(P.map, mCc.map));
+    b.addEventListener('click', () => { mCc.map = P.map.slice(); mCcStore(); mCcDraw(); });
+    row.append(b);
+    if (i >= CC_PRESETS0.length) {
+      const x = document.createElement('button'); x.type = 'button'; x.className = 'm-btn m-ccdel'; x.textContent = '✕'; x.setAttribute('aria-label', `Delete ${P.name}`);
+      x.addEventListener('click', () => { if (!confirm(`Delete the cc preset ${P.name}?`)) return; mCc.presets.splice(i - CC_PRESETS0.length, 1); mCcStore(); mCcDraw(); });
+      row.append(x);
+    }
+    box.append(row);
+  });
+  const grid = $('m-ccgrid'); grid.innerHTML = '';
+  mCc.map.forEach((cc, i) => {
+    const c = document.createElement('button'); c.type = 'button'; c.className = 'm-btn m-cccell';
+    const name = (mSlotEls[i] && mSlotEls[i].el.querySelector('.m-flab').textContent) || `fader ${i + 1}`;
+    c.innerHTML = `<small>${name}</small>cc ${cc}`;
+    c.addEventListener('click', () => {
+      const v = prompt(`CC for fader ${i + 1} (${name}), 0 to 127`, cc);
+      if (v === null) return;
+      const n = Math.round(Number(v));
+      if (!Number.isFinite(n) || n < 0 || n > 127) { alert('A CC is a number from 0 to 127.'); return; }
+      mCc.map[i] = n; mCcStore(); mCcDraw();
+    });
+    grid.append(c);
+  });
+}
+$('m-ccsave').addEventListener('click', () => {
+  const name = (prompt('Name for this midi cc preset') || '').trim();
+  if (!name) return;
+  const at = mCc.presets.findIndex((P) => P.name === name);
+  if (at >= 0) { if (!confirm(`Replace the cc preset ${name}?`)) return; mCc.presets[at].map = mCc.map.slice(); }
+  else mCc.presets.push({ name, map: mCc.map.slice() });
+  mCcStore(); mCcDraw();
+});
 // ---- the glass isn't flat: each control's ink shadow deepens a little toward the top right of the screen (--d, used
 // by the CSS), worked out once from where it sits and again when the screen's size changes ----
 function mDepth() {

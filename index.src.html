@@ -17,6 +17,7 @@
 <main class="m" id="m">
   <header class="m-top">
     <b class="m-title" id="m-title">elixir<small class="m-ver">v@VER@</small></b>
+    <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
@@ -122,6 +123,19 @@
         <svg class="m-rushg" id="m-rushg" role="img" aria-label="how the rush changes as it rises"></svg>
         <div class="m-rs-rows m-rush-glides" id="m-rush-glides"></div>
         <div class="m-rush-btns"><output id="m-rush-say" aria-live="polite">drag a point</output><button class="m-btn" id="m-rush-reset" type="button">reset</button></div>
+      </div>
+    </section>
+  </div>
+  <div class="m-rs" id="m-user" hidden>
+    <section class="m-card m-rs-card m-set-card" role="dialog" aria-labelledby="m-user-title">
+      <div class="m-chead"><b id="m-user-title">user settings</b><button class="m-toggle" id="m-user-close" type="button">done</button></div>
+      <div class="m-rs-tabs m-user-tabs" role="tablist"><button class="m-btn" type="button" role="tab" aria-selected="true">midi</button></div>
+      <div class="m-setpane m-midipane">
+        <b class="m-userhead">cc presets</b>
+        <div class="m-ccpresets" id="m-ccpresets"></div>
+        <b class="m-userhead">perf faders: tap one to set its cc</b>
+        <div class="m-ccgrid" id="m-ccgrid"></div>
+        <button class="m-btn" id="m-ccsave" type="button">save as midi cc preset</button>
       </div>
     </section>
   </div>
