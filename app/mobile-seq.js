@@ -13,7 +13,8 @@ const SEQ_MAX = 64;
 let mSeqPage = 0;
 const mSeqPageBtns = [0, 1, 2, 3].map((p) => {
   const b = document.createElement('button'); b.type = 'button'; b.className = 'm-toggle'; b.textContent = p + 1; b.setAttribute('aria-label', `steps ${p * 16 + 1} to ${p * 16 + 16}`);
-  b.addEventListener('click', () => { mSeqPage = p; mSeqDraw(); }); $('m-seq-pages').append(b); return b;
+  // (on a sequencer with nothing in it yet, a page button also sets the length: 16, 32, 48 or 64 steps)
+  b.addEventListener('click', () => { const q = mSeqQ(); if (q.vals.every((v) => !v)) q.len = (p + 1) * 16; mSeqPage = p; mSeqDraw(); }); $('m-seq-pages').append(b); return b;
 });
 // (sequences kept with sixteen steps get the rest, at rest)
 const mSeqPad = (vals) => { const v = vals.slice(0, SEQ_MAX); while (v.length < SEQ_MAX) v.push(0); return v; };

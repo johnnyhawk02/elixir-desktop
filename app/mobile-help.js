@@ -16,7 +16,7 @@ const HELP = [
 <li>Hold one still for half a second for its settings, the ranges and chances it uses.</li>
 <li><b>options</b> › <b>randomise on next bar</b>: while playing, randomises wait for the start of the next bar (the button flashes until then).</li></ul>`],
   ['seq', 'step sequencer', `<p>Under the knobs. Touch any knob or fader, here or on a page on the right, and its sequencer shows there (greyed out until it runs). It starts once you paint a step or press a shape or a random button, and nothing runs for a control until then.</p>
-<ul><li>2 to 64 steps, each moving the control up or down from where you leave it, so you can still play it. Paint them with the mouse. Past 16 steps they're on pages: the <b>1</b> to <b>4</b> buttons by the name show each sixteen (the one playing is underlined).</li>
+<ul><li>2 to 64 steps, each moving the control up or down from where you leave it, so you can still play it. Paint them with the mouse. Past 16 steps they're on pages: the <b>1</b> to <b>4</b> buttons by the name show each sixteen (the one playing is underlined). On an empty sequencer they also set the length: 16, 32, 48 or 64.</li>
 <li><b>length</b> the number of steps (2 to 64); <b>slew</b> glides between them; <b>speed</b> each step's length, a 16th up to 8 bars; <b>depth</b> how far they reach.</li>
 <li>Shapes, in the row of small buttons under it: <b>ramp ↑</b>, <b>ramp ↓</b>, <b>tri</b>, <b>square</b>, <b>sine</b>.</li>
 <li>Random: <b>rnd</b> (every step anywhere), <b>drunk</b> (a wandering walk), <b>hold</b> (values held for 2 to 4 steps), <b>sparse</b> (mostly still, now and then a jump), <b>smooth</b> (random points glided between).</li>

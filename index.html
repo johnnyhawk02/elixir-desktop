@@ -1485,7 +1485,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>173</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>174</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
@@ -1573,7 +1573,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v173, 29 Oct, 18:06</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v174, 29 Oct, 18:08</footer>
     </section>
   </div>
   </div>
@@ -8918,7 +8918,8 @@ const SEQ_MAX = 64;
 let mSeqPage = 0;
 const mSeqPageBtns = [0, 1, 2, 3].map((p) => {
   const b = document.createElement('button'); b.type = 'button'; b.className = 'm-toggle'; b.textContent = p + 1; b.setAttribute('aria-label', `steps ${p * 16 + 1} to ${p * 16 + 16}`);
-  b.addEventListener('click', () => { mSeqPage = p; mSeqDraw(); }); $('m-seq-pages').append(b); return b;
+  // (on a sequencer with nothing in it yet, a page button also sets the length: 16, 32, 48 or 64 steps)
+  b.addEventListener('click', () => { const q = mSeqQ(); if (q.vals.every((v) => !v)) q.len = (p + 1) * 16; mSeqPage = p; mSeqDraw(); }); $('m-seq-pages').append(b); return b;
 });
 // (sequences kept with sixteen steps get the rest, at rest)
 const mSeqPad = (vals) => { const v = vals.slice(0, SEQ_MAX); while (v.length < SEQ_MAX) v.push(0); return v; };
@@ -9648,7 +9649,7 @@ const HELP = [
 <li>Hold one still for half a second for its settings, the ranges and chances it uses.</li>
 <li><b>options</b> › <b>randomise on next bar</b>: while playing, randomises wait for the start of the next bar (the button flashes until then).</li></ul>`],
   ['seq', 'step sequencer', `<p>Under the knobs. Touch any knob or fader, here or on a page on the right, and its sequencer shows there (greyed out until it runs). It starts once you paint a step or press a shape or a random button, and nothing runs for a control until then.</p>
-<ul><li>2 to 64 steps, each moving the control up or down from where you leave it, so you can still play it. Paint them with the mouse. Past 16 steps they're on pages: the <b>1</b> to <b>4</b> buttons by the name show each sixteen (the one playing is underlined).</li>
+<ul><li>2 to 64 steps, each moving the control up or down from where you leave it, so you can still play it. Paint them with the mouse. Past 16 steps they're on pages: the <b>1</b> to <b>4</b> buttons by the name show each sixteen (the one playing is underlined). On an empty sequencer they also set the length: 16, 32, 48 or 64.</li>
 <li><b>length</b> the number of steps (2 to 64); <b>slew</b> glides between them; <b>speed</b> each step's length, a 16th up to 8 bars; <b>depth</b> how far they reach.</li>
 <li>Shapes, in the row of small buttons under it: <b>ramp ↑</b>, <b>ramp ↓</b>, <b>tri</b>, <b>square</b>, <b>sine</b>.</li>
 <li>Random: <b>rnd</b> (every step anywhere), <b>drunk</b> (a wandering walk), <b>hold</b> (values held for 2 to 4 steps), <b>sparse</b> (mostly still, now and then a jump), <b>smooth</b> (random points glided between).</li>
