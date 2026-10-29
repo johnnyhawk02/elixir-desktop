@@ -15,17 +15,16 @@ addEventListener('keydown', (e) => {
   if (k === 'Escape') {
     if (pop) { const b = pop.querySelector('[id$="-close"]'); if (b) b.click(); else pop.hidden = true; }
     else if (!$('m-seq').hidden) $('m-seq-close').click();
-    else if ($('m').classList.contains('show-xy')) mTab('xy'); else if ($('m').classList.contains('show-presets')) mTab('presets');
     return;
   }
   if (pop) return; // (the other keys wait until the pop-up is closed)
   // (arrows and enter stay with a focused control, so a fader still steps with the arrows)
   if (KEYS[k]) { e.preventDefault(); const b = $(KEYS[k]); if (!b.disabled) b.click(); }
-  else if (/^[1-6]$/.test(k)) { e.preventDefault(); $('m-voice').children[Number(k) - 1].click(); }
-  else if (k === '[' || k === ']') { e.preventDefault(); const n = $('m-vsec').children.length; $('m-vsec').children[(mVSec + (k === ']' ? 1 : n - 1)) % n].click(); }
+  else if (/^[1-6]$/.test(k)) { e.preventDefault(); mTab('dice'); $('m-voice').children[Number(k) - 1].click(); }
+  else if (k === '[' || k === ']') { e.preventDefault(); mTab('dice'); const n = $('m-vsec').children.length; $('m-vsec').children[(mVSec + (k === ']' ? 1 : n - 1)) % n].click(); }
   else if (k === 'n') { e.preventDefault(); $('m-nextbar').click(); }
   else if (k === 'y') { e.preventDefault(); mTab('xy'); }
   else if (k === 'o') { e.preventDefault(); mTab('presets'); }
-  else if (k === '/') { e.preventDefault(); if (mWide.matches && !$('m').classList.contains('show-presets')) mTab('presets'); else if (!mWide.matches) mTab('presets'); $('m-psearch').focus(); }
+  else if (k === '/') { e.preventDefault(); mTab('presets'); $('m-psearch').focus(); }
   else if (k === 'h' || k === '?') { e.preventDefault(); $('m-help-open').click(); }
 }, { capture: true });

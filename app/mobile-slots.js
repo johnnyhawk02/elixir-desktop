@@ -40,9 +40,11 @@ function mFitLabel(el) {
   const lab = el.querySelector('.m-flab'), full = el.dataset.full; if (!lab || !full) return;
   lab.textContent = full;
   // (measured as the text's own width against the fader's column, with a pixel to spare for rounding)
-  const room = el.clientWidth - 1, wide = () => { const r = document.createRange(); r.selectNodeContents(lab); return r.getBoundingClientRect().width > room; };
+  // (on the laptop a knob's name sits beside its ring, in what the ring leaves)
+  const tr = el.querySelector('.m-vtrack'), beside = getComputedStyle(el).display === 'grid' && el.classList.contains('m-knob');
+  const room = el.clientWidth - (beside ? tr.offsetWidth + 10 : 0) - 1, wide = () => { const r = document.createRange(); r.selectNodeContents(lab); return r.getBoundingClientRect().width > room; };
   if (room <= 0 || !wide()) return;
-  const w = full.split(' '), done = new Set([0]); // (the first word, the drum or group, stays)
+  const w = full.split(' '), done = new Set(w.length > 1 ? [0] : []); // (the first word, the drum or group, stays; a name of one word is shortened itself)
   while (wide()) {
     let k = -1; w.forEach((x, j) => { if (!done.has(j) && (k < 0 || x.length > w[k].length)) k = j; });
     if (k < 0) break;

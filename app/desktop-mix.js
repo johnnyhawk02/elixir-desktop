@@ -24,7 +24,7 @@ lvmDraw = function (m) {
     e.preventDefault(); depth = 0; $('m').classList.remove('dropping');
     const files = [...e.dataTransfer.files].filter((f) => /\.json$/i.test(f.name) || f.type === 'application/json');
     if (!files.length) return;
-    if (mWide.matches && !$('m').classList.contains('show-presets')) mTab('presets'); else if (!mWide.matches) mTab('presets');
+    mTab('presets');
     await mImport(files);
   });
 }

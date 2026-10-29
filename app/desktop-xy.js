@@ -1,12 +1,11 @@
-// ---- the x/y pads on the laptop: side by side over the middle and right columns, each leaving a trail of LCD dots
-// where its square has been, fading over a second and a half (whether moved by the mouse, MIDI or a sequencer) ----
+// ---- the x/y pads: each leaves a trail of LCD dots where its square has been, fading over a second and a half (whether moved by the mouse, MIDI or a sequencer) ----
 const XY_TRAIL_MS = 1500;
 const mTrails = [...document.querySelectorAll('.m-xy')].map((pad) => {
   const c = document.createElement('canvas'); c.className = 'm-xy-trail'; c.setAttribute('aria-hidden', 'true');
   pad.prepend(c); return { pad, c, pts: [], last: '' };
 });
 function mTrailFrame(t) {
-  const open = $('m').classList.contains('show-xy') || (!mWide.matches && mCur === 'xy');
+  const open = mWide.matches ? $('m').dataset.page === 'xy' : mCur === 'xy';
   const dpr = devicePixelRatio || 1;
   for (const T of mTrails) {
     const x = Number(T.pad.style.getPropertyValue('--x')) || 0, y = Number(T.pad.style.getPropertyValue('--y')) || 0, k = `${x},${y}`;
