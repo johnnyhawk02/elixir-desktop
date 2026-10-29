@@ -1158,7 +1158,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 /* ---- prst: save at the top, the list between (it scrolls), the file buttons and credits at the foot ---- */
 [data-m-panel="comp"], [data-m-panel="presets"] { grid-template-columns: minmax(0, 1fr); }
-.m-presets-card { display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto auto; gap: 6px; min-height: 0; padding: 8px 2px; }
+.m-presets-card { display: grid; grid-template-rows: auto auto auto auto minmax(0, 1fr) auto auto; gap: 6px; min-height: 0; padding: 8px 2px; }
 /* save new, and save over the loaded preset */
 .m-psaves { display: grid; grid-template-columns: 1fr 1.6fr; gap: 8px; }
 .m-psaves .m-btn { min-height: 56px; font-size: var(--fs-xs) !important; padding: 0 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1421,11 +1421,20 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-seq-btns .m-btn { min-height: 0; }
   .m .m-vf.seq-edit { outline: 2px dashed var(--ink); outline-offset: 2px; }
 }
+
+/* ---- the presets search, and a presets file dropped anywhere on the page ---- */
+.m .m-psearch { min-height: 38px; padding: 0 10px; border: 2px solid var(--ink); border-radius: 3px; background: transparent; color: var(--ink);
+  font: inherit; font-size: var(--fs-s); text-transform: uppercase; letter-spacing: .06em; }
+.m .m-psearch::placeholder { color: var(--muted); }
+.m .m-psearch::-webkit-search-cancel-button { display: none; } /* (esc clears it) */
+.m .m-psearch:focus { outline: 2px solid var(--ink); outline-offset: 2px; }
+.m.dropping::before { content: "drop presets file to import"; position: absolute; inset: 10px; z-index: 40; display: grid; place-items: center; border: 3px dashed var(--ink);
+  border-radius: 6px; background: rgba(167, 181, 140, .85); font-size: var(--fs-l); letter-spacing: .12em; text-transform: uppercase; pointer-events: none; }
 </style>
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v138</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v139</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1503,6 +1512,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     <section class="m-card m-presets-card">
       <div class="m-psaves"><button class="m-btn m-big" id="m-psave" type="button">save new</button><button class="m-btn" id="m-pover" type="button">save over</button></div>
       <label class="m-chk"><input id="m-pbpm" type="checkbox" checked><i aria-hidden="true"></i>loading a preset uses its tempo</label>
+      <input class="m-psearch" id="m-psearch" type="search" placeholder="search presets" aria-label="Search presets" autocomplete="off" spellcheck="false">
       <p class="m-note" id="m-pnote" aria-live="polite"></p>
       <ul class="m-plist" id="m-plist"></ul>
       <div class="m-pio">
@@ -1510,7 +1520,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v138, 29 Oct, 09:41</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v139, 29 Oct, 09:43</footer>
     </section>
   </div>
   </div>
@@ -8477,6 +8487,13 @@ function mDrawPresets() {
     }
     list.append(li);
   };
+  // a search: every preset whose name has it, in one list (enter loads the first)
+  const q = $('m-psearch').value.trim().toLowerCase();
+  if (q) {
+    const found = kitList.filter((k) => (k.saved || k.builtin) && k.name.toLowerCase().includes(q));
+    group(found.length ? `found ${found.length}` : 'none found'); found.forEach(row);
+    return;
+  }
   // favourites first (each shows only there), then mine, then built in
   const favs = kitList.filter((k) => mFavs.has(k.name) && (k.saved || k.builtin));
   if (favs.length) { group('favourites'); favs.forEach(row); }
@@ -8517,9 +8534,9 @@ $('m-pover').addEventListener('click', () => {
 
 // presets files: the full Elixir's format, { elixir: 1, presets: [...] } (PRESETS.md); only the current
 // preset version loads, and a name already saved here is skipped
-$('m-pimport').addEventListener('change', async (e) => {
+async function mImport(files) {
   let n = 0, old = 0, bad = 0;
-  for (const f of e.target.files) {
+  for (const f of files) {
     try {
       for (const p of JSON.parse(await f.text()).presets || []) {
         const q = toCurrent(p); // (any preset with a kit, brought into this format)
@@ -8530,10 +8547,15 @@ $('m-pimport').addEventListener('change', async (e) => {
       }
     } catch (err) { bad++; }
   }
-  e.target.value = '';
   if (n) { const v = $('kit').value; storePresets(); fillKits(); $('kit').value = v; }
   $('m-pnote').textContent = (n ? `Imported ${n}.` : 'Nothing new to import.') + (old ? ` ${old} skipped: not a preset.` : '') + (bad ? ` ${bad} file${bad > 1 ? 's' : ''} not a presets file.` : '');
   mDrawPresets();
+}
+$('m-pimport').addEventListener('change', async (e) => { await mImport([...e.target.files]); e.target.value = ''; });
+$('m-psearch').addEventListener('input', () => { mDrawPresets(); $('m-plist').scrollTop = 0; });
+$('m-psearch').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { const b = $('m-plist').querySelector('.m-pload'); if (b) b.click(); }
+  else if (e.key === 'Escape') { $('m-psearch').value = ''; mDrawPresets(); $('m-psearch').blur(); }
 });
 // export: every preset saved here, the built-in ones saved over and every starred one (each marked fav if starred, so an
 // import stars it again), as the settings' export. It never deletes anything
@@ -9461,7 +9483,8 @@ const HELP = [
   ['prst', 'prst: presets', `<ul><li>Tap a preset to load it: it flashes until the next bar, then takes over. Untick the tempo box to keep your tempo.</li>
 <li>The star makes it a favourite (favourites are listed first).</li>
 <li><b>save new</b> keeps what you hear; <b>save over</b> replaces the one loaded.</li>
-<li><b>export presets</b> saves your presets to a file (it never deletes anything); <b>import</b> reads one back.</li></ul>`],
+<li><b>export presets</b> saves your presets to a file (it never deletes anything); <b>import</b> reads one back, or drop the file anywhere on the page.</li>
+<li>Type in the search box to find a preset by name; enter loads the first one found.</li></ul>`],
   ['seq', 'step sequencers', `<p>Hold any fader for half a second and it gets a step sequencer: 2 to 16 steps, each moving the fader up or down from where you leave it, so you can still play it.</p>
 <ul><li>Paint the steps with a finger, or press <b>randomise</b>.</li><li><b>speed</b> is each step's length, a 16th up to 8 bars. <b>slew</b> glides between steps. <b>depth</b> is how far they reach.</li>
 <li><b>on</b> turns it on and off. A fader with a sequencer running has its name inverted. Presets keep them.</li>
@@ -9471,7 +9494,7 @@ const HELP = [
   ['keys', 'keyboard', `<ul><li><b>space</b> play and stop. <b>r</b> record, <b>l</b> record a loop.</li>
 <li><b>e</b> everything, <b>k</b> kit, <b>a</b> alter, <b>p</b> pattern, <b>c</b> crossfeed, <b>f</b> random fx, <b>g</b> alter fx, <b>z</b> or <b>u</b> undo. <b>n</b> ticks next bar.</li>
 <li><b>1</b> to <b>6</b> pick the drum on the voice page; <b>[</b> and <b>]</b> step through its pages (tone, shape, filter, mod).</li>
-<li><b>y</b> opens and closes the x/y pads, <b>o</b> the presets, <b>h</b> this help. <b>esc</b> closes whatever is open.</li>
+<li><b>y</b> opens and closes the x/y pads, <b>o</b> the presets, <b>/</b> searches the presets (enter loads the first found), <b>h</b> this help. <b>esc</b> closes whatever is open.</li>
 <li>Click a fader or knob, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>
 <li>Right-click a fader or knob for its step sequencer, reset, and (on perf) assign. Double-click one to reset it.</li>
 <li>On a laptop the step sequencer opens as a strip along the bottom, so everything above it still plays; esc or done closes it.</li></ul>`],
@@ -9588,6 +9611,23 @@ lvmDraw = function (m) {
   el.style.setProperty('--m', ((Math.max(LVM_FLOOR, m.db) - LVM_FLOOR) / -LVM_FLOOR).toFixed(3));
   el.style.setProperty('--h', ((Math.max(LVM_FLOOR, m.hold) - LVM_FLOOR) / -LVM_FLOOR).toFixed(3));
 };
+
+// ---- a presets file dragged onto the page imports it (as the import button does), and the presets open to show it ----
+{
+  let depth = 0;
+  const isFiles = (e) => e.dataTransfer && [...e.dataTransfer.types].includes('Files');
+  addEventListener('dragenter', (e) => { if (!isFiles(e)) return; depth++; $('m').classList.add('dropping'); });
+  addEventListener('dragleave', () => { if (--depth <= 0) { depth = 0; $('m').classList.remove('dropping'); } });
+  addEventListener('dragover', (e) => { if (isFiles(e)) e.preventDefault(); });
+  addEventListener('drop', async (e) => {
+    if (!isFiles(e)) return;
+    e.preventDefault(); depth = 0; $('m').classList.remove('dropping');
+    const files = [...e.dataTransfer.files].filter((f) => /\.json$/i.test(f.name) || f.type === 'application/json');
+    if (!files.length) return;
+    if (mWide.matches && !$('m').classList.contains('show-presets')) mTab('presets'); else if (!mWide.matches) mTab('presets');
+    await mImport(files);
+  });
+}
 // ---- the keyboard (laptop): one key for each thing played often. It listens before anything else on the page, so the
 // hidden desktop panels' own keys (space and 1..7 sound a drum, r randomises) never fire; typing in a box, and keys
 // with cmd, ctrl or alt, are left alone ----
@@ -9616,6 +9656,7 @@ addEventListener('keydown', (e) => {
   else if (k === 'n') { e.preventDefault(); $('m-nextbar').click(); }
   else if (k === 'y') { e.preventDefault(); mTab('xy'); }
   else if (k === 'o') { e.preventDefault(); mTab('presets'); }
+  else if (k === '/') { e.preventDefault(); if (mWide.matches && !$('m').classList.contains('show-presets')) mTab('presets'); else if (!mWide.matches) mTab('presets'); $('m-psearch').focus(); }
   else if (k === 'h' || k === '?') { e.preventDefault(); $('m-help-open').click(); }
 }, { capture: true });
 // ---- the glass isn't flat: each control's ink shadow deepens a little toward the top right of the screen (--d, used

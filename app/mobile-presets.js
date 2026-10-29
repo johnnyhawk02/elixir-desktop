@@ -52,6 +52,13 @@ function mDrawPresets() {
     }
     list.append(li);
   };
+  // a search: every preset whose name has it, in one list (enter loads the first)
+  const q = $('m-psearch').value.trim().toLowerCase();
+  if (q) {
+    const found = kitList.filter((k) => (k.saved || k.builtin) && k.name.toLowerCase().includes(q));
+    group(found.length ? `found ${found.length}` : 'none found'); found.forEach(row);
+    return;
+  }
   // favourites first (each shows only there), then mine, then built in
   const favs = kitList.filter((k) => mFavs.has(k.name) && (k.saved || k.builtin));
   if (favs.length) { group('favourites'); favs.forEach(row); }
@@ -92,9 +99,9 @@ $('m-pover').addEventListener('click', () => {
 
 // presets files: the full Elixir's format, { elixir: 1, presets: [...] } (PRESETS.md); only the current
 // preset version loads, and a name already saved here is skipped
-$('m-pimport').addEventListener('change', async (e) => {
+async function mImport(files) {
   let n = 0, old = 0, bad = 0;
-  for (const f of e.target.files) {
+  for (const f of files) {
     try {
       for (const p of JSON.parse(await f.text()).presets || []) {
         const q = toCurrent(p); // (any preset with a kit, brought into this format)
@@ -105,10 +112,15 @@ $('m-pimport').addEventListener('change', async (e) => {
       }
     } catch (err) { bad++; }
   }
-  e.target.value = '';
   if (n) { const v = $('kit').value; storePresets(); fillKits(); $('kit').value = v; }
   $('m-pnote').textContent = (n ? `Imported ${n}.` : 'Nothing new to import.') + (old ? ` ${old} skipped: not a preset.` : '') + (bad ? ` ${bad} file${bad > 1 ? 's' : ''} not a presets file.` : '');
   mDrawPresets();
+}
+$('m-pimport').addEventListener('change', async (e) => { await mImport([...e.target.files]); e.target.value = ''; });
+$('m-psearch').addEventListener('input', () => { mDrawPresets(); $('m-plist').scrollTop = 0; });
+$('m-psearch').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { const b = $('m-plist').querySelector('.m-pload'); if (b) b.click(); }
+  else if (e.key === 'Escape') { $('m-psearch').value = ''; mDrawPresets(); $('m-psearch').blur(); }
 });
 // export: every preset saved here, the built-in ones saved over and every starred one (each marked fav if starred, so an
 // import stars it again), as the settings' export. It never deletes anything

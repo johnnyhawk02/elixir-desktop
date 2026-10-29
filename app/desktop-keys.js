@@ -26,5 +26,6 @@ addEventListener('keydown', (e) => {
   else if (k === 'n') { e.preventDefault(); $('m-nextbar').click(); }
   else if (k === 'y') { e.preventDefault(); mTab('xy'); }
   else if (k === 'o') { e.preventDefault(); mTab('presets'); }
+  else if (k === '/') { e.preventDefault(); if (mWide.matches && !$('m').classList.contains('show-presets')) mTab('presets'); else if (!mWide.matches) mTab('presets'); $('m-psearch').focus(); }
   else if (k === 'h' || k === '?') { e.preventDefault(); $('m-help-open').click(); }
 }, { capture: true });

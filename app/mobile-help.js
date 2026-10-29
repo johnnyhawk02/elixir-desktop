@@ -29,7 +29,8 @@ const HELP = [
   ['prst', 'prst: presets', `<ul><li>Tap a preset to load it: it flashes until the next bar, then takes over. Untick the tempo box to keep your tempo.</li>
 <li>The star makes it a favourite (favourites are listed first).</li>
 <li><b>save new</b> keeps what you hear; <b>save over</b> replaces the one loaded.</li>
-<li><b>export presets</b> saves your presets to a file (it never deletes anything); <b>import</b> reads one back.</li></ul>`],
+<li><b>export presets</b> saves your presets to a file (it never deletes anything); <b>import</b> reads one back, or drop the file anywhere on the page.</li>
+<li>Type in the search box to find a preset by name; enter loads the first one found.</li></ul>`],
   ['seq', 'step sequencers', `<p>Hold any fader for half a second and it gets a step sequencer: 2 to 16 steps, each moving the fader up or down from where you leave it, so you can still play it.</p>
 <ul><li>Paint the steps with a finger, or press <b>randomise</b>.</li><li><b>speed</b> is each step's length, a 16th up to 8 bars. <b>slew</b> glides between steps. <b>depth</b> is how far they reach.</li>
 <li><b>on</b> turns it on and off. A fader with a sequencer running has its name inverted. Presets keep them.</li>
@@ -39,7 +40,7 @@ const HELP = [
   ['keys', 'keyboard', `<ul><li><b>space</b> play and stop. <b>r</b> record, <b>l</b> record a loop.</li>
 <li><b>e</b> everything, <b>k</b> kit, <b>a</b> alter, <b>p</b> pattern, <b>c</b> crossfeed, <b>f</b> random fx, <b>g</b> alter fx, <b>z</b> or <b>u</b> undo. <b>n</b> ticks next bar.</li>
 <li><b>1</b> to <b>6</b> pick the drum on the voice page; <b>[</b> and <b>]</b> step through its pages (tone, shape, filter, mod).</li>
-<li><b>y</b> opens and closes the x/y pads, <b>o</b> the presets, <b>h</b> this help. <b>esc</b> closes whatever is open.</li>
+<li><b>y</b> opens and closes the x/y pads, <b>o</b> the presets, <b>/</b> searches the presets (enter loads the first found), <b>h</b> this help. <b>esc</b> closes whatever is open.</li>
 <li>Click a fader or knob, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>
 <li>Right-click a fader or knob for its step sequencer, reset, and (on perf) assign. Double-click one to reset it.</li>
 <li>On a laptop the step sequencer opens as a strip along the bottom, so everything above it still plays; esc or done closes it.</li></ul>`],

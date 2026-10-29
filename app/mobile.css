@@ -310,7 +310,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 /* ---- prst: save at the top, the list between (it scrolls), the file buttons and credits at the foot ---- */
 [data-m-panel="comp"], [data-m-panel="presets"] { grid-template-columns: minmax(0, 1fr); }
-.m-presets-card { display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto auto; gap: 6px; min-height: 0; padding: 8px 2px; }
+.m-presets-card { display: grid; grid-template-rows: auto auto auto auto minmax(0, 1fr) auto auto; gap: 6px; min-height: 0; padding: 8px 2px; }
 /* save new, and save over the loaded preset */
 .m-psaves { display: grid; grid-template-columns: 1fr 1.6fr; gap: 8px; }
 .m-psaves .m-btn { min-height: 56px; font-size: var(--fs-xs) !important; padding: 0 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -573,3 +573,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-seq-btns .m-btn { min-height: 0; }
   .m .m-vf.seq-edit { outline: 2px dashed var(--ink); outline-offset: 2px; }
 }
+
+/* ---- the presets search, and a presets file dropped anywhere on the page ---- */
+.m .m-psearch { min-height: 38px; padding: 0 10px; border: 2px solid var(--ink); border-radius: 3px; background: transparent; color: var(--ink);
+  font: inherit; font-size: var(--fs-s); text-transform: uppercase; letter-spacing: .06em; }
+.m .m-psearch::placeholder { color: var(--muted); }
+.m .m-psearch::-webkit-search-cancel-button { display: none; } /* (esc clears it) */
+.m .m-psearch:focus { outline: 2px solid var(--ink); outline-offset: 2px; }
+.m.dropping::before { content: "drop presets file to import"; position: absolute; inset: 10px; z-index: 40; display: grid; place-items: center; border: 3px dashed var(--ink);
+  border-radius: 6px; background: rgba(167, 181, 140, .85); font-size: var(--fs-l); letter-spacing: .12em; text-transform: uppercase; pointer-events: none; }
