@@ -602,3 +602,5 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 @media (min-width: 1000px) {
   .m .m-rand .m-btn:not(#m-undo)::before { content: "rnd"; position: absolute; left: 4px; top: 2px; font-size: 11px; line-height: 1; letter-spacing: .06em; opacity: .7; pointer-events: none; }
 }
+/* (the help's numbered lists keep their numbers inside the sheet) */
+#m-help-text ol { padding-left: 1.8em; }

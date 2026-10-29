@@ -1,56 +1,60 @@
-// ---- help me! (the button by the title): getting started first, then a tab each for the pages and the features ----
+// ---- help (options › help, or h; on a phone the HELP ME! button): getting started first, then a tab each for the pages and the features ----
 const HELP = [
   ['start', 'getting started', `<p>Elixir is a six voice drum machine: drum 1, 2 and 3, snare, cymbal and hihat. Three steps to a beat:</p>
-<ol><li>Press <b>play</b>.</li><li>On <b>perf</b>, press <b>everything</b> until you like what you hear: each press is a new beat, kit, effects and mix.</li>
-<li>Play the faders, or press <b>kit</b>, <b>pattern</b> or <b>alter</b> to change one part. <b>undo</b> takes back the last one.</li></ol>
-<p>The buttons along the bottom change page; the page's name is at the top right. Drag a fader up or down; double tap its name to reset it. Hold a fader to give it a step sequencer.</p>
-<p>When you like it, <b>prst</b> › <b>save new</b>. <b>rec</b> records a WAV, <b>loop</b> a loop that repeats seamlessly.</p>`],
-  ['perf', 'perf: play it live', `<p>Twenty-four knobs for playing, four across and six down, and the randomise buttons down the right (on a laptop, along the title line; next bar and assign are in its options button). Drag a knob up or down, or scroll on it with the mouse wheel or trackpad. MIDI CC 1 to 24 turn them.</p>
-<ul><li><b>everything</b>: a new beat (genre, groove, kit, effects, mix). <b>kit</b>: new sounds. <b>pattern</b>: a new beat on the same sounds. <b>alter</b>: the sounds nudged about 10%.</li>
-<li><b>crossfeed</b>: a new crossfeed patch (see fx). <b>random fx</b>: new effects and sends, echo times on musical lengths. <b>alter fx</b>: the effects nudged.</li>
-<li>Tick <b>next bar</b> and every randomise waits for the start of the next bar.</li>
-<li>Tick <b>assign</b>, then click a knob to choose what it does: any fader from any page, or any drum's setting.</li>
-<li>Hold a randomise button for its settings (see more).</li>
-<li>Drag up or down on a randomise button to set how far it goes, 10% to 100% (a bar along its foot shows it below 100%): at 30% a randomise only moves things 30% of the way to the new sound.</li></ul>`],
+<ol><li>Press <b>play</b> (or space).</li><li>Press <b>everything</b> until you like what you hear: each press is a new beat, kit, effects and mix.</li>
+<li>Turn the knobs, or press <b>kit</b>, <b>pattern</b> or <b>alter</b> to change one part. <b>undo</b> takes back the last one.</li></ol>
+<p>The screen: the title line has <b>options</b>, the randomise buttons, then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, x/y, fx, mix, mstr, prst), chosen by the buttons over it.</p>
+<p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>prst</b> › <b>save new</b>. <b>rec</b> records a WAV.</p>
+<p>(On a screen under 1000 px wide it becomes the phone layout: pages along the bottom, and hold a fader for its sequencer.)</p>`],
+  ['perf', 'perform: knobs and randomisers', `<p>Twenty-four knobs, four across and six down: the perform controls (tempo, sidechain, pitch, decay, filter, fm, crossfeed), energy, the best of the beat page, then the drums' most played settings. MIDI CC 1 to 24 turn them (any channel).</p>
+<ul><li>Each knob's ring shows its value. While its step sequencer runs, the pointer stays on your setting and the lit part of the ring shows where the sequencer has moved it.</li>
+<li><b>options</b> › <b>assign knobs</b>, then click a knob to choose what it does: any fader from any page, or any drum's setting. Or right-click a knob › <b>assign</b>.</li></ul>
+<p>The randomise buttons (marked rnd):</p>
+<ul><li><b>everything</b>: a new beat (genre, groove, kit, effects, mix). <b>kit</b>: new sounds. <b>alter</b>: the sounds nudged about 10%. <b>pattern</b>: a new beat on the same sounds.</li>
+<li><b>crossfeed</b>: a new crossfeed patch (see fx). <b>random fx</b>: new effects and sends. <b>alter fx</b>: the effects nudged.</li>
+<li>Click to randomise. Drag up or down on one to set how far it goes, 10% to 100% (a dotted bar along its foot below 100%): at 30% it moves everything only 30% of the way to the new sound, and switches choices like the style 30% of the time.</li>
+<li>Hold one still for half a second for its settings, the ranges and chances it uses.</li>
+<li><b>options</b> › <b>randomise on next bar</b>: while playing, randomises wait for the start of the next bar (the button flashes until then).</li></ul>`],
+  ['seq', 'step sequencer', `<p>Under the knobs. Touch any knob or fader, here or on a page on the right, and its sequencer shows there (greyed out until it runs). It starts once you paint a step or press a shape or a random button, and nothing runs for a control until then.</p>
+<ul><li>2 to 16 steps, each moving the control up or down from where you leave it, so you can still play it. Paint them with the mouse.</li>
+<li><b>length</b> the number of steps; <b>slew</b> glides between them; <b>speed</b> each step's length, a 16th up to 8 bars; <b>depth</b> how far they reach.</li>
+<li>Shapes: <b>ramp up</b>, <b>ramp down</b>, <b>triangle</b>, <b>square</b>, <b>sine</b>.</li>
+<li>Random: <b>rnd</b> (every step anywhere), <b>drunk</b> (a wandering walk), <b>hold</b> (values held for 2 to 4 steps), <b>sparse</b> (mostly still, now and then a jump), <b>smooth</b> (random points glided between).</li>
+<li><b>on</b> switches it on and off. A control with a sequencer running has its name inverted. Presets keep them. esc greys the strip out.</li>
+<li>The steps follow the groove and its depth, landing with the swung hits; switch that off in <b>options</b> › <b>user settings</b> › <b>seq</b>.</li></ul>`],
   ['beat', 'beat: the pattern', `<p>Tempo, genre, beat and energy; fills, rush, rush on and velocity; groove, depth and accent.</p>
 <ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how often it fills.</li>
-<li><b>rush</b> builds a roll: the chosen drum (<b>rush on</b>) rolls faster and faster while the others drop out and a high-pass rises. Push it up for a build, drop it for the drop. Its curve is in settings (the gear).</li>
+<li><b>rush</b> builds a roll: the chosen drum (<b>rush on</b>) rolls faster and faster while the others drop out and a high-pass rises. Push it up for a build, drop it for the drop. Its curve is in <b>options</b> › <b>settings</b> › <b>rush</b>.</li>
 <li><b>groove</b> and <b>depth</b> give it swing or push; <b>accent</b> how loud the accents are.</li></ul>`],
-  ['voice', 'voice: shape a drum', `<p>Every setting of one drum. Pick the drum along the top, then a tab:</p>
+  ['voice', 'voice: shape a drum', `<p>Every setting of one drum. Pick the drum along the top (or keys 1 to 6), then a tab ([ and ] step through them):</p>
 <ul><li><b>tone</b>: tuning, wave and fm. <b>shape</b>: the envelope, the pitch drop and the click (the attack's sample).</li>
 <li><b>filter</b>: cutoff, resonance, type and drive, then the drum's volume, pan, sample rate and drive. <b>mod</b>: its lfo and what velocity does.</li></ul>`],
-  ['x/y', 'x/y: two pads', `<p>Each pad moves two settings at once. Over each pad, pick what left-right (x) and up-down (y) do: first where (a drum, beat, perf, fx, mix or master), then what. Drag a finger around the pad; on a laptop it leaves a fading trail of where it's been.</p>`],
+  ['x/y', 'x/y: two pads', `<p>Each pad moves two settings at once. Over each pad, pick what left-right (x) and up-down (y) do: first where (a drum, beat, perf, fx, mix or master), then what. Drag around the pad; it leaves a fading trail of where it's been.</p>`],
   ['fx', 'fx: echo, ring mod, crossfeed', `<ul><li><b>echo</b>: send, time (musical lengths), tone, feedback and width; tick <b>ping pong</b> to bounce it left and right.</li>
 <li><b>ring mod</b>: send, wave and frequency, for metallic tones.</li>
-<li><b>crossfeed</b>: drums feeding each other. A row is the drum it comes from, a column the drum it goes into; tap a column's name to pick what it changes there (fm, filter or ring). Drag a cell up or down to set it; double tap to clear.</li></ul>`],
-  ['mix', 'mix: levels and sends', `<p>Each drum's level (the big faders), and how much of it goes to the echo and to the ring mod (the short rows above).</p>`],
+<li><b>crossfeed</b>: drums feeding each other. A row is the drum it comes from, a column the drum it goes into; click a column's name to pick what it changes there (fm, filter or ring). Drag a cell up or down to set it; double-click to clear.</li></ul>`],
+  ['mix', 'mix: the channel strips', `<p>A strip for each drum: its echo send (left knob) and ring mod send (right knob) over its level fader, with a level meter beside it.</p>`],
   ['mstr', 'mstr: the master chain', `<p>The whole mix runs top to bottom:</p>
 <ul><li><b>drum 1 sidechain</b>: drum 1 (the kick) ducks the rest; the meter shows how much. <b>space</b> carves the kick's room out of the others.</li>
 <li><b>distortion</b>: mix, type, drive, colour, tone and volume.</li><li><b>compressor</b>: glues it together; the meter shows the gain reduction.</li></ul>`],
-  ['prst', 'prst: presets', `<ul><li>Tap a preset to load it: it flashes until the next bar, then takes over. Untick the tempo box to keep your tempo.</li>
+  ['prst', 'prst: presets', `<ul><li>Click a preset to load it: while playing it flashes until the next bar, then takes over. Untick the tempo box to keep your tempo.</li>
+<li>Type in the search box (or press /) to find one by name; enter loads the first found, esc clears it.</li>
 <li>The star makes it a favourite (favourites are listed first).</li>
 <li><b>save new</b> keeps what you hear; <b>save over</b> replaces the one loaded.</li>
-<li><b>export presets</b> saves your presets to a file (it never deletes anything); <b>import</b> reads one back, or drop the file anywhere on the page.</li>
-<li>Type in the search box to find a preset by name; enter loads the first one found.</li></ul>`],
-  ['seq', 'step sequencers', `<p>Hold any fader for half a second and it gets a step sequencer: 2 to 16 steps, each moving the fader up or down from where you leave it, so you can still play it.</p>
-<ul><li>Paint the steps with a finger, or press <b>randomise</b>.</li><li><b>speed</b> is each step's length, a 16th up to 8 bars. <b>slew</b> glides between steps. <b>depth</b> is how far they reach.</li>
-<li><b>on</b> turns it on and off. A fader with a sequencer running has its name inverted. Presets keep them.</li>
-<li>The steps follow the groove and its depth, landing with the swung hits; switch that off in the person button's <b>seq</b> tab.</li></ul>`],
-  ['rec', 'recording', `<ul><li><b>rec</b> starts recording (and playing); press it again to stop, and the WAV downloads.</li>
-<li><b>loop</b> records an exact loop from the next bar and downloads it, ready to loop in any other app. Hold it to choose 1, 2, 4, 8, 16, 32, 64 or 128 bars.</li>
-<li>On a laptop there's no loop button: hold or right-click <b>rec</b> to choose free recording or a loop length, and rec records that.</li></ul>`],
-  ['keys', 'keyboard', `<ul><li><b>space</b> play and stop. <b>r</b> record, <b>l</b> record a loop.</li>
-<li><b>e</b> everything, <b>k</b> kit, <b>a</b> alter, <b>p</b> pattern, <b>c</b> crossfeed, <b>f</b> random fx, <b>g</b> alter fx, <b>z</b> or <b>u</b> undo. <b>n</b> ticks next bar.</li>
-<li><b>1</b> to <b>6</b> show the voice page with that drum; <b>[</b> and <b>]</b> step through its pages (tone, shape, filter, mod).</li>
-<li><b>y</b> shows the x/y pads, <b>o</b> the presets, <b>/</b> searches the presets (enter loads the first found), <b>h</b> this help. <b>esc</b> closes whatever is open.</li>
-<li>Click a fader or knob, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>
-<li>Right-click a fader or knob for its step sequencer, reset, and (on perf) assign. Double-click one to reset it.</li>
-<li>On a laptop the step sequencer sits under the perform page and shows whichever fader or knob you last touched; it only starts once you paint a step, press randomise or switch it on. Ramp up, ramp down, triangle, square and sine fill its steps with that shape; beside them, five kinds of random: rnd (anywhere), drunk (a wandering walk), hold (values held for 2 to 4 steps), sparse (mostly still, with now and then a jump) and smooth (random points glided between). esc greys it out.</li></ul>`],
-  ['more', 'more', `<ul><li>Hold a randomise button to open the randomisers' settings, the ranges and chances each one uses.</li>
-<li>The person button: your settings. Its <b>midi</b> tab says which MIDI CC moves each perf fader, with presets (cc1 to cc24, cc25 to cc48) and your own.</li>
-<li>The gear: settings, including the <b>rush</b> graph of how the rush builds (drag its squares).</li>
-<li>Install it as an app: <b>install app</b> on the presets page, or your browser's "Add to home screen". It works offline.</li>
-<li>The version number is by the title; the latest arrives when you open the app with a connection.</li></ul>`],
+<li><b>export presets</b> saves your presets to a file (it never deletes anything); <b>import</b> reads one back, or drop the file anywhere on the page.</li></ul>`],
+  ['rec', 'recording', `<ul><li><b>rec</b> records a WAV: press it to start (it starts playing too), again to stop, and the file downloads.</li>
+<li>Hold or right-click <b>rec</b> to choose what it records: <b>free</b>, or an exact loop of 1, 2, 4, 8, 16, 32, 64 or 128 bars. A loop starts at the next bar, shows its progress on the button and downloads by itself, cut to repeat seamlessly in any other app.</li></ul>`],
+  ['keys', 'keyboard and mouse', `<ul><li><b>space</b> play and stop. <b>r</b> record, <b>l</b> record a loop.</li>
+<li><b>e</b> everything, <b>k</b> kit, <b>a</b> alter, <b>p</b> pattern, <b>c</b> crossfeed, <b>f</b> random fx, <b>g</b> alter fx, <b>z</b> or <b>u</b> undo. <b>n</b> randomise on next bar.</li>
+<li><b>1</b> to <b>6</b> show the voice page with that drum; <b>[</b> and <b>]</b> step through its tabs.</li>
+<li><b>y</b> x/y, <b>o</b> presets, <b>/</b> search presets, <b>h</b> help. <b>esc</b> closes whatever is open.</li>
+<li>Click a knob or fader, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>
+<li>Right-click a knob or fader for its step sequencer, reset and (on perform) assign. Double-click one to reset it.</li></ul>`],
+  ['more', 'more', `<ul><li><b>options</b> (by the e) holds randomise on next bar, assign knobs, and:</li>
+<li><b>settings</b>: copy the knob assignments or your presets, export or clear presets, and the <b>rush</b> graph of how the rush builds (drag its squares).</li>
+<li><b>user settings</b>: <b>midi</b>, which CC moves each knob, with presets (cc1 to cc24, cc25 to cc48) and your own; <b>seq</b>, whether sequencers follow the groove.</li>
+<li>Install it as an app from your browser's menu; it works offline.</li>
+<li>The version number is by the e; the latest arrives when you open it with a connection (cmd+shift+R to be sure).</li></ul>`],
 ];
 let mHelpTab = 0;
 function mHelpDraw() {
