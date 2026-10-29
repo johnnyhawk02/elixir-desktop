@@ -119,6 +119,23 @@ $('m-seq-shapes').addEventListener('click', (e) => {
   for (let i = 0; i < 16; i++) q.vals[i] = i < q.len ? mSeqOff(f(ends ? i / (q.len - 1) : i / q.len)) : 0;
   mSeqDraw();
 });
+// random steps (laptop), five ways, each -1..1 over the sequence's length:
+// rnd: each step anywhere; drunk: a random walk, each step a small move from the last; hold: a random value held for 2
+// to 4 steps (sample and hold); sparse: mostly at rest, now and then a big jump; smooth: random points every 4 steps,
+// glided between
+const SEQ_RNDS = {
+  rnd: (n) => Array.from({ length: n }, () => Math.random() * 2 - 1),
+  drunk: (n) => { let v = Math.random() * 2 - 1; return Array.from({ length: n }, () => (v = Math.max(-1, Math.min(1, v + (Math.random() - .5) * .7)))); },
+  hold: (n) => { const out = []; while (out.length < n) { const v = Math.random() * 2 - 1, k = 2 + Math.floor(Math.random() * 3); for (let i = 0; i < k; i++) out.push(v); } return out.slice(0, n); },
+  sparse: (n) => Array.from({ length: n }, () => (Math.random() < .25 ? (Math.random() < .5 ? -1 : 1) * (.5 + Math.random() * .5) : 0)),
+  smooth: (n) => { const pts = Array.from({ length: Math.ceil(n / 4) + 1 }, () => Math.random() * 2 - 1); return Array.from({ length: n }, (_, i) => { const a = pts[i >> 2], b = pts[(i >> 2) + 1]; return a + (b - a) * (i % 4) / 4; }); },
+};
+$('m-seq-rnds').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-rnd]'); if (!b) return;
+  mSeqCommit(); const q = mSeqF.seq, v = SEQ_RNDS[b.dataset.rnd](q.len);
+  for (let i = 0; i < 16; i++) q.vals[i] = i < q.len ? mSeqOff(v[i]) : 0;
+  mSeqDraw();
+});
 $('m-seq-on').addEventListener('click', () => { if (!mSeqF.seq || !mSeqF.seq.on) mSeqCommit(); else { mSeqF.seq.on = false; mSeqRelease(mSeqF); } mSeqDraw(); });
 mCloser('m-seq', () => { mSeqF = null; mSeqDraft = null; });
 // the glides, a frame at a time while any is moving

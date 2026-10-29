@@ -1437,7 +1437,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-helpbtn, .m .m-voice .m-btn, .m .m-rs-tabs .m-btn, .m .m-ch-list .m-btn, .m-big { font-size: var(--fs-xs) !important; }
   .m .m-rand-card .m-rand .m-btn { font-size: clamp(14px, 1.13vw, 18px) !important; }
   .m-rand-card .m-nextbar, .m .m-seq-lenrow, .m .m-seq-lenrow output { font-size: var(--fs-xs); }
-  .m-seq-card { grid-template-columns: minmax(0, 1fr) minmax(250px, 36%) 210px; } .m-seq-btns { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .m #m-seq-rand { letter-spacing: 0; padding: 0 4px; } .m-seq-lenrow { grid-template-columns: 3.6em minmax(0, 1fr) 4.2em; }
+  .m-seq-card { grid-template-columns: minmax(0, 1fr) minmax(250px, 36%) 230px; } .m-seq-btns { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } #m-seq-rand { display: none; } .m-seq-lenrow { grid-template-columns: 3.6em minmax(0, 1fr) 4.2em; }
   .m .m-seq-shapes .m-btn { font-size: var(--fs-xs) !important; }
   .m-foot { font-size: 1.15rem; }
 }
@@ -1445,7 +1445,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v153</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v154</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1531,7 +1531,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v153, 29 Oct, 11:37</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v154, 29 Oct, 11:39</footer>
     </section>
   </div>
   </div>
@@ -1614,7 +1614,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
       <div class="m-seq-lenrow"><span>slew</span><div class="m-seq-len" id="m-seq-slew" role="slider" aria-label="slew"><i></i></div><output id="m-seq-slew-out"></output></div>
       <div class="m-seq-lenrow"><span>speed</span><div class="m-seq-len" id="m-seq-speed" role="slider" aria-label="speed"><i></i></div><output id="m-seq-speed-out"></output></div>
       <div class="m-seq-lenrow"><span>depth</span><div class="m-seq-len" id="m-seq-depth" role="slider" aria-label="depth"><i></i></div><output id="m-seq-depth-out"></output></div>
-      <div class="m-seq-btns"><div class="m-seq-shapes" id="m-seq-shapes"><button class="m-btn" type="button" data-shape="up">ramp up</button><button class="m-btn" type="button" data-shape="down">ramp down</button><button class="m-btn" type="button" data-shape="tri">triangle</button><button class="m-btn" type="button" data-shape="square">square</button><button class="m-btn" type="button" data-shape="sine">sine</button></div><button class="m-btn m-big" id="m-seq-rand" type="button">randomise</button><button class="m-btn" id="m-seq-close" type="button">done</button></div>
+      <div class="m-seq-btns"><div class="m-seq-shapes" id="m-seq-shapes"><button class="m-btn" type="button" data-shape="up">ramp up</button><button class="m-btn" type="button" data-shape="down">ramp down</button><button class="m-btn" type="button" data-shape="tri">triangle</button><button class="m-btn" type="button" data-shape="square">square</button><button class="m-btn" type="button" data-shape="sine">sine</button></div><div class="m-seq-shapes m-seq-rnds" id="m-seq-rnds"><button class="m-btn" type="button" data-rnd="rnd">rnd</button><button class="m-btn" type="button" data-rnd="drunk">drunk</button><button class="m-btn" type="button" data-rnd="hold">hold</button><button class="m-btn" type="button" data-rnd="sparse">sparse</button><button class="m-btn" type="button" data-rnd="smooth">smooth</button></div><button class="m-btn m-big" id="m-seq-rand" type="button">randomise</button><button class="m-btn" id="m-seq-close" type="button">done</button></div>
     </section>
   </div>
 
@@ -8934,6 +8934,23 @@ $('m-seq-shapes').addEventListener('click', (e) => {
   for (let i = 0; i < 16; i++) q.vals[i] = i < q.len ? mSeqOff(f(ends ? i / (q.len - 1) : i / q.len)) : 0;
   mSeqDraw();
 });
+// random steps (laptop), five ways, each -1..1 over the sequence's length:
+// rnd: each step anywhere; drunk: a random walk, each step a small move from the last; hold: a random value held for 2
+// to 4 steps (sample and hold); sparse: mostly at rest, now and then a big jump; smooth: random points every 4 steps,
+// glided between
+const SEQ_RNDS = {
+  rnd: (n) => Array.from({ length: n }, () => Math.random() * 2 - 1),
+  drunk: (n) => { let v = Math.random() * 2 - 1; return Array.from({ length: n }, () => (v = Math.max(-1, Math.min(1, v + (Math.random() - .5) * .7)))); },
+  hold: (n) => { const out = []; while (out.length < n) { const v = Math.random() * 2 - 1, k = 2 + Math.floor(Math.random() * 3); for (let i = 0; i < k; i++) out.push(v); } return out.slice(0, n); },
+  sparse: (n) => Array.from({ length: n }, () => (Math.random() < .25 ? (Math.random() < .5 ? -1 : 1) * (.5 + Math.random() * .5) : 0)),
+  smooth: (n) => { const pts = Array.from({ length: Math.ceil(n / 4) + 1 }, () => Math.random() * 2 - 1); return Array.from({ length: n }, (_, i) => { const a = pts[i >> 2], b = pts[(i >> 2) + 1]; return a + (b - a) * (i % 4) / 4; }); },
+};
+$('m-seq-rnds').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-rnd]'); if (!b) return;
+  mSeqCommit(); const q = mSeqF.seq, v = SEQ_RNDS[b.dataset.rnd](q.len);
+  for (let i = 0; i < 16; i++) q.vals[i] = i < q.len ? mSeqOff(v[i]) : 0;
+  mSeqDraw();
+});
 $('m-seq-on').addEventListener('click', () => { if (!mSeqF.seq || !mSeqF.seq.on) mSeqCommit(); else { mSeqF.seq.on = false; mSeqRelease(mSeqF); } mSeqDraw(); });
 mCloser('m-seq', () => { mSeqF = null; mSeqDraft = null; });
 // the glides, a frame at a time while any is moving
@@ -9558,7 +9575,7 @@ const HELP = [
 <li><b>y</b> shows the x/y pads, <b>o</b> the presets, <b>/</b> searches the presets (enter loads the first found), <b>h</b> this help. <b>esc</b> closes whatever is open.</li>
 <li>Click a fader or knob, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>
 <li>Right-click a fader or knob for its step sequencer, reset, and (on perf) assign. Double-click one to reset it.</li>
-<li>On a laptop the step sequencer sits under the perform page and shows whichever fader or knob you last touched; it only starts once you paint a step, press randomise or switch it on. Beside randomise, ramp up, ramp down, triangle, square and sine fill its steps with that shape. esc greys it out.</li></ul>`],
+<li>On a laptop the step sequencer sits under the perform page and shows whichever fader or knob you last touched; it only starts once you paint a step, press randomise or switch it on. Ramp up, ramp down, triangle, square and sine fill its steps with that shape; beside them, five kinds of random: rnd (anywhere), drunk (a wandering walk), hold (values held for 2 to 4 steps), sparse (mostly still, with now and then a jump) and smooth (random points glided between). esc greys it out.</li></ul>`],
   ['more', 'more', `<ul><li>Hold a randomise button to open the randomisers' settings, the ranges and chances each one uses.</li>
 <li>The person button: your settings. Its <b>midi</b> tab says which MIDI CC moves each perf fader, with presets (cc1 to cc24, cc25 to cc48) and your own.</li>
 <li>The gear: settings, including the <b>rush</b> graph of how the rush builds (drag its squares).</li>

@@ -589,7 +589,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-helpbtn, .m .m-voice .m-btn, .m .m-rs-tabs .m-btn, .m .m-ch-list .m-btn, .m-big { font-size: var(--fs-xs) !important; }
   .m .m-rand-card .m-rand .m-btn { font-size: clamp(14px, 1.13vw, 18px) !important; }
   .m-rand-card .m-nextbar, .m .m-seq-lenrow, .m .m-seq-lenrow output { font-size: var(--fs-xs); }
-  .m-seq-card { grid-template-columns: minmax(0, 1fr) minmax(250px, 36%) 210px; } .m-seq-btns { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .m #m-seq-rand { letter-spacing: 0; padding: 0 4px; } .m-seq-lenrow { grid-template-columns: 3.6em minmax(0, 1fr) 4.2em; }
+  .m-seq-card { grid-template-columns: minmax(0, 1fr) minmax(250px, 36%) 230px; } .m-seq-btns { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } #m-seq-rand { display: none; } .m-seq-lenrow { grid-template-columns: 3.6em minmax(0, 1fr) 4.2em; }
   .m .m-seq-shapes .m-btn { font-size: var(--fs-xs) !important; }
   .m-foot { font-size: 1.15rem; }
 }
