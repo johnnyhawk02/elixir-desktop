@@ -567,18 +567,27 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m[data-page="mix"] [data-m-panel="mix"], .m[data-page="comp"] [data-m-panel="comp"], .m[data-page="presets"] [data-m-panel="presets"] { display: grid; }
   /* (every page's faders: readouts and names in the bigger small print; beat's and voice's readouts on one line, so
      every track starts at the same height) */
-  .m #m-beat-faders .m-flab, .m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab,
+  .m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab,
   .m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output { font-size: var(--fs-xs); }
-  .m #m-beat-faders .m-vf output, .m .m-vset .m-vf output { font-size: var(--fs-xs); white-space: nowrap; height: 1.2em; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; text-align: center; }
-  /* beat: its eleven faders six across, then a row of seven densities, one a track, under a heading */
-  .m-beat-card { grid-template-rows: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; }
-  #m-beat-faders { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .m .m-vset .m-vf output { font-size: var(--fs-xs); white-space: nowrap; height: 1.2em; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; text-align: center; }
+  /* beat: three rows on one seven-column grid, each under a heading and parted by a line: pattern (tempo, genre,
+     beat, energy, fills), feel (velocity, groove, depth, accent) with the rush at the end (rush, rush on), then
+     density (a fader a track). Every fader the same width, every readout two lines tall, so the tracks line up */
+  .m-beat-card { grid-template-rows: minmax(0, 2fr) minmax(0, 1fr); gap: 0; padding: 2px; }
+  #m-beat-faders { grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 4px 6px; padding-bottom: 10px; }
+  #m-beat-faders::before, #m-beat-faders::after, .m-dens > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-s); padding-left: 4px; }
+  #m-beat-faders::before { content: "pattern"; grid-area: 1 / 1 / 2 / -1; }
+  #m-beat-faders::after { content: "feel \b7  rush"; grid-area: 3 / 1 / 4 / -1; padding-top: 8px; border-top: var(--rule); }
+  #m-beat-faders > :nth-child(-n+5) { grid-row: 2; }
+  #m-beat-faders > :nth-child(n+6) { grid-row: 4; }
+  #m-beat-faders > :nth-child(8) { grid-column: 1; } #m-beat-faders > :nth-child(9) { grid-column: 2; } #m-beat-faders > :nth-child(10) { grid-column: 3; }
+  #m-beat-faders > :nth-child(11) { grid-column: 4; } #m-beat-faders > :nth-child(6) { grid-column: 6; } #m-beat-faders > :nth-child(7) { grid-column: 7; }
   .m-dens { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 4px; min-height: 0; padding-top: 8px; border-top: var(--rule); }
-  .m-dens > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-s); padding-left: 4px; }
-  #m-dens-faders { grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
-  #m-dens-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
-  .m #m-dens-faders .m-vf output, .m #m-dens-faders .m-flab { font-size: var(--fs-xs); white-space: nowrap; }
-  .m #m-dens-faders .m-vtrack { width: min(44px, 100%); flex: 1; height: auto; min-height: 12px; }
+  #m-dens-faders { grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px 6px; min-height: 0; }
+  #m-beat-faders .m-vf, #m-dens-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
+  .m #m-beat-faders .m-vf output, .m #m-dens-faders .m-vf output { font-size: var(--fs-xs); white-space: pre-line; height: 2.1em; line-height: 1.05; display: flex; align-items: flex-end; justify-content: center; text-align: center; overflow: visible; max-width: none; letter-spacing: -.02em; }
+  .m #m-beat-faders .m-flab, .m #m-dens-faders .m-flab { font-size: var(--fs-xs); white-space: nowrap; }
+  .m #m-beat-faders .m-vtrack, .m #m-dens-faders .m-vtrack { width: min(44px, 100%); flex: 1; height: auto; min-height: 12px; }
   /* voice: only as many rows as the tab has faders, each as tall as the frame allows */
   .m .m-voice .m-btn { font-size: var(--fs-xs) !important; }
   .m-vset { grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); row-gap: 14px; }
