@@ -21,6 +21,7 @@ const HELP = [
 <li>Shapes, in the row of small buttons under it: <b>ramp ↑</b>, <b>ramp ↓</b>, <b>tri</b>, <b>square</b>, <b>sine</b>.</li>
 <li>Random: <b>rnd</b> (every step anywhere), <b>drunk</b> (a wandering walk), <b>hold</b> (values held for 2 to 4 steps), <b>sparse</b> (mostly still, now and then a jump), <b>smooth</b> (random points glided between).</li>
 <li><b>on</b> switches it on and off. A control with a sequencer running has its name inverted. Presets keep them. esc greys the strip out.</li>
+<li>MIDI CC 21, 22, 23 and 24 set its length, slew, speed and depth (on the sequencer shown).</li>
 <li>The steps follow the groove and its depth, landing with the swung hits; switch that off in <b>options</b> › <b>user settings</b> › <b>seq</b>.</li></ul>`],
   ['beat', 'beat: the pattern', `<p>Tempo, genre, beat and energy; fills, rush, rush on and velocity; groove, depth and accent.</p>
 <ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how often it fills.</li>

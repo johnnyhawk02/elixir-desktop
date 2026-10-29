@@ -63,7 +63,7 @@ new ResizeObserver(mFitSlots).observe($('m-faders'));
 // (and once the pixel font has loaded, since the names' widths change with it)
 if (document.fonts) document.fonts.ready.then(mFitSlots);
 $('m-assign').addEventListener('change', () => { $('m-faders').classList.toggle('assigning', $('m-assign').checked); });
-// MIDI: twelve CCs (1..12 unless changed) set knobs 1..12 across their range, and nothing else listens (no other CCs, no notes); MIDI starts
+// MIDI: twelve CCs (1..12 unless changed) set knobs 1..12 across their range, and on the laptop CC 21..24 the step sequencer's bars; nothing else listens (no other CCs, no notes); MIDI starts
 // at the first touch, since the browser may ask first
 onMidi = (e) => { const [st, cc, val] = e.data; if ((st & 0xf0) === 0xb0) pc4Midi(cc, val); };
 // (a controller sends many CCs a second: only each fader's latest is kept, applied once a frame, and the moving
@@ -77,6 +77,8 @@ const mCc = (() => { let v = {}; try { v = JSON.parse(localStorage.getItem(CC_KE
   return { map: Array.isArray(v.map) && v.map.length === SLOT0.length ? v.map : CC_PRESETS0[0].map.slice(), presets: Array.isArray(v.presets) ? v.presets.filter((P) => P.map && P.map.length === SLOT0.length) : [] }; })();
 const mCcStore = () => { try { localStorage.setItem(CC_KEY, JSON.stringify(mCc)); } catch (e) {} };
 pc4Midi = function (cc, val) {
+  // CC 21 to 24: the length, slew, speed and depth of the step sequencer shown (laptop), whatever the knobs use
+  if (cc >= 21 && cc <= 24 && mWide.matches && mSeqF) { SEQ_BARS[cc - 21](val / 127); mSeqDraw(); return; }
   let hit = false;
   mCc.map.forEach((c, i) => { if (c === cc) { mCcNext.set(i, val); hit = true; } });
   if (hit && !mCcFrame) mCcFrame = requestAnimationFrame(mCcApply);

@@ -118,10 +118,11 @@ function mSeqBar(bar, setFrac) {
   bar.addEventListener('pointermove', (e) => { if (held) at(e); });
   bar.addEventListener('pointerup', () => { held = false; }); bar.addEventListener('pointercancel', () => { held = false; });
 }
-mSeqBar($('m-seq-len'), (x) => { mSeqQ().len = 2 + Math.round(x * (SEQ_MAX - 2)); });
-mSeqBar($('m-seq-slew'), (x) => { mSeqQ().slew = Math.round(x * 20) * 5; });
-mSeqBar($('m-seq-speed'), (x) => { mSeqQ().step = SEQ_STEPS[Math.min(SEQ_STEPS.length - 1, Math.floor(x * SEQ_STEPS.length))]; });
-mSeqBar($('m-seq-depth'), (x) => { mSeqQ().depth = Math.round(x * 20) * 5; if (mSeqF.base !== null) mSeqApply(mSeqF); });
+// (each bar's setting from 0..1 of its width; MIDI CC 21 to 24 set them too, on the sequencer shown: app/mobile-slots.js)
+const SEQ_BARS = [(x) => { mSeqQ().len = 2 + Math.round(x * (SEQ_MAX - 2)); }, (x) => { mSeqQ().slew = Math.round(x * 20) * 5; },
+  (x) => { mSeqQ().step = SEQ_STEPS[Math.min(SEQ_STEPS.length - 1, Math.floor(x * SEQ_STEPS.length))]; },
+  (x) => { mSeqQ().depth = Math.round(x * 20) * 5; if (mSeqF.base !== null) mSeqApply(mSeqF); }];
+['m-seq-len', 'm-seq-slew', 'm-seq-speed', 'm-seq-depth'].forEach((id, i) => mSeqBar($(id), SEQ_BARS[i]));
 $('m-seq-rand').addEventListener('click', () => { mSeqCommit(); const q = mSeqF.seq; for (let i = 0; i < SEQ_MAX; i++) q.vals[i] = mSeqOff(Math.random() * 2 - 1); mSeqDraw(); });
 // shapes (laptop): the steps over the sequence's length set to a ramp, a triangle, a square or a sine, from -1 to 1
 const SEQ_SHAPES = { up: (x) => 2 * x - 1, down: (x) => 1 - 2 * x, tri: (x) => (x < .5 ? 4 * x - 1 : 3 - 4 * x), square: (x) => (x < .5 ? 1 : -1), sine: (x) => Math.sin(2 * Math.PI * x) };
