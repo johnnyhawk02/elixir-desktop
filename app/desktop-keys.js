@@ -1,11 +1,11 @@
 // ---- the keyboard (laptop): one key for each thing played often. It listens before anything else on the page, so the
 // hidden desktop panels' own keys (space and 1..7 sound a drum, r randomises) never fire; typing in a box, and keys
 // with cmd, ctrl or alt, are left alone ----
-const KEYS = { ' ': 'm-play', r: 'm-rec', l: 'm-loop', // (l records a loop even where rec is set to free)
-  e: 'm-everything', k: 'm-kit', a: 'm-alter', p: 'm-pattern', c: 'm-xrand',
+// (l records a loop even where rec is set to free)
+const KEYS = { ' ': 'm-play', r: 'm-rec', l: 'm-loop', e: 'm-everything', k: 'm-kit', a: 'm-alter', p: 'm-pattern', c: 'm-xrand',
   f: 'm-fx-rand', g: 'm-fx-alter', z: 'm-undo', u: 'm-undo' };
-// (the open pop-up, if any: Escape presses its done button)
-// (on the laptop the step sequencer is a strip along the bottom, not a pop-up, so the keys still play while it's open)
+// (the open pop-up, if any: Escape presses its done button; on the laptop the step sequencer is a strip under the knobs,
+// not a pop-up, so the keys still play while it's open)
 const mOpenPop = () => [...document.querySelectorAll(mWide.matches ? '.m-rs' : '.m-rs, .m-seq')].find((el) => !el.hidden);
 addEventListener('keydown', (e) => {
   if (e.target.closest('input:not([type="checkbox"]), select, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;

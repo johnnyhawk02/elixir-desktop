@@ -1,6 +1,7 @@
-// ---- a control's whole name and where it is (laptop): the step sequencer's heading, and touching a control to show
-// its sequencer ----
-function mTipName(el, fd) {
+// ---- the step sequencer on the laptop: touching any fader or knob shows its sequencer in the strip under the knobs,
+// headed with the control's whole name and where it is ----
+// (where a control is and its whole name: the page, its row or drum, and the name its label shortens)
+function mPlaceName(el, fd) {
   const panel = el.closest('[data-m-panel]'), page = panel ? M_PAGE_NAMES[panel.dataset.mPanel] : '';
   const row = el.closest('.m-fx-row'), head = row && row.querySelector(':scope > b, .m-fxhead b');
   const box = { 'm-duck': 'sidechain', 'm-dist': 'distortion', 'm-comp': 'compressor' }[el.parentElement.id];
@@ -13,7 +14,7 @@ function mTipName(el, fd) {
 const mSeqOpenPhone = mSeqOpen;
 mSeqOpen = function (fd) {
   mSeqOpenPhone(fd);
-  if (mWide.matches) { const [where, name] = mTipName(fd.el, fd); $('m-seq-name').textContent = `${where} · ${name}`; }
+  if (mWide.matches) { const [where, name] = mPlaceName(fd.el, fd); $('m-seq-name').textContent = `${where} · ${name}`; }
   mFaders.forEach((f) => f.el.classList.toggle('seq-edit', f === fd));
 };
 $('m-seq-close').addEventListener('click', () => mFaders.forEach((f) => f.el.classList.remove('seq-edit')));
