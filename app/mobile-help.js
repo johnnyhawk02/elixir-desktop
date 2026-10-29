@@ -37,7 +37,8 @@ const HELP = [
 <li><b>on</b> turns it on and off. A fader with a sequencer running has its name inverted. Presets keep them.</li>
 <li>The steps follow the groove and its depth, landing with the swung hits; switch that off in the person button's <b>seq</b> tab.</li></ul>`],
   ['rec', 'recording', `<ul><li><b>rec</b> starts recording (and playing); press it again to stop, and the WAV downloads.</li>
-<li><b>loop</b> records an exact loop from the next bar and downloads it, ready to loop in any other app. Hold it to choose 1, 2, 4, 8, 16, 32, 64 or 128 bars.</li></ul>`],
+<li><b>loop</b> records an exact loop from the next bar and downloads it, ready to loop in any other app. Hold it to choose 1, 2, 4, 8, 16, 32, 64 or 128 bars.</li>
+<li>On a laptop there's no loop button: hold or right-click <b>rec</b> to choose free recording or a loop length, and rec records that.</li></ul>`],
   ['keys', 'keyboard', `<ul><li><b>space</b> play and stop. <b>r</b> record, <b>l</b> record a loop.</li>
 <li><b>e</b> everything, <b>k</b> kit, <b>a</b> alter, <b>p</b> pattern, <b>c</b> crossfeed, <b>f</b> random fx, <b>g</b> alter fx, <b>z</b> or <b>u</b> undo. <b>n</b> ticks next bar.</li>
 <li><b>1</b> to <b>6</b> show the voice page with that drum; <b>[</b> and <b>]</b> step through its pages (tone, shape, filter, mod).</li>
