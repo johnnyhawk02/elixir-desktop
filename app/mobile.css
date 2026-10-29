@@ -486,7 +486,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   [data-m-panel="comp"] { grid-area: 7 / 3 / 13 / 4; border-left: var(--rule); border-top: var(--rule); } [data-m-panel="comp"]::before { content: "master"; }
   /* x/y and presets: sheets of the same glass over a column, shown while their button is lit */
   [data-m-panel="xy"], [data-m-panel="presets"] { display: none; z-index: 6; background-color: var(--panel); border-left: var(--rule); box-shadow: -6px 0 14px rgba(23, 32, 14, .18); }
-  [data-m-panel="xy"] { grid-area: 1 / 2 / 13 / 3; } [data-m-panel="xy"]::before { content: "x/y"; }
+  [data-m-panel="xy"] { grid-area: 1 / 2 / 13 / 4; } [data-m-panel="xy"]::before { content: "x/y"; }
   [data-m-panel="presets"] { grid-area: 1 / 3 / 13 / 4; } [data-m-panel="presets"]::before { content: "presets"; }
   .m.show-xy [data-m-panel="xy"], .m.show-presets [data-m-panel="presets"] { display: grid; }
 
@@ -588,4 +588,11 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 @media (min-width: 1000px) {
   .m > .m-card.m-trans { max-width: none; grid-template-columns: 220px 150px 150px minmax(120px, 1fr); }
   .m-scope { display: block; width: 100%; height: 40px; align-self: center; border: 2px solid var(--ink); border-radius: 3px; padding: 2px; box-sizing: border-box; }
+}
+
+/* ---- x/y: the trail canvas under the square; on the laptop the two pads side by side over two columns ---- */
+.m-xy-trail { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+@media (min-width: 1000px) {
+  .m-xy-card { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 0; padding: 2px; }
+  .m-xybox + .m-xybox { border-top: 0; padding-top: 0; border-left: var(--rule); padding-left: 12px; margin-left: 12px; }
 }

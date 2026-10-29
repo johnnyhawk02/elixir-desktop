@@ -18,7 +18,7 @@ const HELP = [
   ['voice', 'voice: shape a drum', `<p>Every setting of one drum. Pick the drum along the top, then a tab:</p>
 <ul><li><b>tone</b>: tuning, wave and fm. <b>shape</b>: the envelope, the pitch drop and the click (the attack's sample).</li>
 <li><b>filter</b>: cutoff, resonance, type and drive, then the drum's volume, pan, sample rate and drive. <b>mod</b>: its lfo and what velocity does.</li></ul>`],
-  ['x/y', 'x/y: two pads', `<p>Each pad moves two settings at once. Over each pad, pick what left-right (x) and up-down (y) do: first where (a drum, beat, perf, fx, mix or master), then what. Drag a finger around the pad.</p>`],
+  ['x/y', 'x/y: two pads', `<p>Each pad moves two settings at once. Over each pad, pick what left-right (x) and up-down (y) do: first where (a drum, beat, perf, fx, mix or master), then what. Drag a finger around the pad; on a laptop it leaves a fading trail of where it's been.</p>`],
   ['fx', 'fx: echo, ring mod, crossfeed', `<ul><li><b>echo</b>: send, time (musical lengths), tone, feedback and width; tick <b>ping pong</b> to bounce it left and right.</li>
 <li><b>ring mod</b>: send, wave and frequency, for metallic tones.</li>
 <li><b>crossfeed</b>: drums feeding each other. A row is the drum it comes from, a column the drum it goes into; tap a column's name to pick what it changes there (fm, filter or ring). Drag a cell up or down to set it; double tap to clear.</li></ul>`],

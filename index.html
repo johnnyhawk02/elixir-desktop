@@ -1334,7 +1334,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   [data-m-panel="comp"] { grid-area: 7 / 3 / 13 / 4; border-left: var(--rule); border-top: var(--rule); } [data-m-panel="comp"]::before { content: "master"; }
   /* x/y and presets: sheets of the same glass over a column, shown while their button is lit */
   [data-m-panel="xy"], [data-m-panel="presets"] { display: none; z-index: 6; background-color: var(--panel); border-left: var(--rule); box-shadow: -6px 0 14px rgba(23, 32, 14, .18); }
-  [data-m-panel="xy"] { grid-area: 1 / 2 / 13 / 3; } [data-m-panel="xy"]::before { content: "x/y"; }
+  [data-m-panel="xy"] { grid-area: 1 / 2 / 13 / 4; } [data-m-panel="xy"]::before { content: "x/y"; }
   [data-m-panel="presets"] { grid-area: 1 / 3 / 13 / 4; } [data-m-panel="presets"]::before { content: "presets"; }
   .m.show-xy [data-m-panel="xy"], .m.show-presets [data-m-panel="presets"] { display: grid; }
 
@@ -1437,11 +1437,18 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m > .m-card.m-trans { max-width: none; grid-template-columns: 220px 150px 150px minmax(120px, 1fr); }
   .m-scope { display: block; width: 100%; height: 40px; align-self: center; border: 2px solid var(--ink); border-radius: 3px; padding: 2px; box-sizing: border-box; }
 }
+
+/* ---- x/y: the trail canvas under the square; on the laptop the two pads side by side over two columns ---- */
+.m-xy-trail { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+@media (min-width: 1000px) {
+  .m-xy-card { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 0; padding: 2px; }
+  .m-xybox + .m-xybox { border-top: 0; padding-top: 0; border-left: var(--rule); padding-left: 12px; margin-left: 12px; }
+}
 </style>
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v140</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v141</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1527,7 +1534,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v140, 29 Oct, 09:46</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v141, 29 Oct, 09:49</footer>
     </section>
   </div>
   </div>
@@ -9479,7 +9486,7 @@ const HELP = [
   ['voice', 'voice: shape a drum', `<p>Every setting of one drum. Pick the drum along the top, then a tab:</p>
 <ul><li><b>tone</b>: tuning, wave and fm. <b>shape</b>: the envelope, the pitch drop and the click (the attack's sample).</li>
 <li><b>filter</b>: cutoff, resonance, type and drive, then the drum's volume, pan, sample rate and drive. <b>mod</b>: its lfo and what velocity does.</li></ul>`],
-  ['x/y', 'x/y: two pads', `<p>Each pad moves two settings at once. Over each pad, pick what left-right (x) and up-down (y) do: first where (a drum, beat, perf, fx, mix or master), then what. Drag a finger around the pad.</p>`],
+  ['x/y', 'x/y: two pads', `<p>Each pad moves two settings at once. Over each pad, pick what left-right (x) and up-down (y) do: first where (a drum, beat, perf, fx, mix or master), then what. Drag a finger around the pad; on a laptop it leaves a fading trail of where it's been.</p>`],
   ['fx', 'fx: echo, ring mod, crossfeed', `<ul><li><b>echo</b>: send, time (musical lengths), tone, feedback and width; tick <b>ping pong</b> to bounce it left and right.</li>
 <li><b>ring mod</b>: send, wave and frequency, for metallic tones.</li>
 <li><b>crossfeed</b>: drums feeding each other. A row is the drum it comes from, a column the drum it goes into; tap a column's name to pick what it changes there (fm, filter or ring). Drag a cell up or down to set it; double tap to clear.</li></ul>`],
@@ -9686,6 +9693,38 @@ function mScopeDraw() {
 // (it runs while playing, and draws its flat line when stopped or resized)
 new MutationObserver(() => { if (!mScopeRaf) mScopeDraw(); }).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
 new ResizeObserver(() => { if (!mScopeRaf) mScopeDraw(); }).observe(mScope);
+// ---- the x/y pads on the laptop: side by side over the middle and right columns, each leaving a trail of LCD dots
+// where its square has been, fading over a second and a half (whether moved by the mouse, MIDI or a sequencer) ----
+const XY_TRAIL_MS = 1500;
+const mTrails = [...document.querySelectorAll('.m-xy')].map((pad) => {
+  const c = document.createElement('canvas'); c.className = 'm-xy-trail'; c.setAttribute('aria-hidden', 'true');
+  pad.prepend(c); return { pad, c, pts: [], last: '' };
+});
+function mTrailFrame(t) {
+  const open = $('m').classList.contains('show-xy') || (!mWide.matches && mCur === 'xy');
+  const dpr = devicePixelRatio || 1;
+  for (const T of mTrails) {
+    const x = Number(T.pad.style.getPropertyValue('--x')) || 0, y = Number(T.pad.style.getPropertyValue('--y')) || 0, k = `${x},${y}`;
+    if (k !== T.last) { T.last = k; T.pts.push({ x, y, t }); }
+    while (T.pts.length && t - T.pts[0].t > XY_TRAIL_MS) T.pts.shift();
+    if (!open) continue;
+    const w = T.pad.clientWidth, h = T.pad.clientHeight;
+    if (T.c.width !== Math.round(w * dpr) || T.c.height !== Math.round(h * dpr)) { T.c.width = Math.round(w * dpr); T.c.height = Math.round(h * dpr); }
+    const g = T.c.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+    g.fillStyle = getComputedStyle($('m')).getPropertyValue('--ink').trim() || '#17200e';
+    // (on the pad's 12 px dot grid, as lit dots, between each point and the next so a fast move stays a line)
+    const P = 12, lit = new Map();
+    const at = (p) => [Math.round((XY_IN + (w - 2 * XY_IN) * p.x) / P), Math.round((h - XY_IN - (h - 2 * XY_IN) * p.y) / P)];
+    T.pts.forEach((p, i) => {
+      const a = 1 - (t - p.t) / XY_TRAIL_MS, [x1, y1] = at(p), [x0, y0] = i ? at(T.pts[i - 1]) : [x1, y1];
+      const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1);
+      for (let s = 1; s <= n; s++) { const key = `${Math.round(x0 + (x1 - x0) * s / n)},${Math.round(y0 + (y1 - y0) * s / n)}`; lit.set(key, Math.max(lit.get(key) || 0, a)); }
+    });
+    for (const [key, a] of lit) { const [gx, gy] = key.split(',').map(Number); g.globalAlpha = a * .7; g.fillRect(gx * P - 3, gy * P - 3, 6, 6); }
+  }
+  requestAnimationFrame(mTrailFrame);
+}
+requestAnimationFrame(mTrailFrame);
 // ---- the keyboard (laptop): one key for each thing played often. It listens before anything else on the page, so the
 // hidden desktop panels' own keys (space and 1..7 sound a drum, r randomises) never fire; typing in a box, and keys
 // with cmd, ctrl or alt, are left alone ----
