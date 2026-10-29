@@ -32,7 +32,7 @@ const XS = ['d1', 'd2', 'd3', 'sn', 'cy', 'hh'];
 XS.forEach((short, n) => {
   // an echo send above 0 routes the drum to the echo bus (fxButtons does that, as the mixer's dial does)
   for (const [k, box] of [['fx', 'm-mix-echo'], ['ring', 'm-mix-ring']]) {
-    mFader($(box), short, { min: 0, max: 100, get: () => mix[k][n], show: (v) => (v ? String(v) : 'off'), dflt: 0,
+    mFader($(box), short, { min: 0, max: 100, get: () => mix[k][n], show: (v) => (v ? String(v) : 'off'), dflt: 0, knob: true,
       set: (v) => { mix[k][n] = v; if (k === 'fx') fxButtons[n](); sendMix(); setDirty(true); } });
   }
   const vol = PAR.VOL1 + n;

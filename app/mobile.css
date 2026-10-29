@@ -190,7 +190,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
    while a sequencer runs, a tick on the rim marks the knob's own setting */
 #m-faders .m-knob { gap: 1px; }
 #m-faders .m-knob output { display: block; height: 1.1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.m #m-faders .m-knob .m-vtrack { container-type: size; width: 100%; min-height: 28px; background: none; overflow: visible; border-radius: 0; }
+.m #m-faders .m-knob .m-vtrack, .m .m-mix-card .m-knob .m-vtrack { container-type: size; width: 100%; min-height: 28px; background: none; overflow: visible; border-radius: 0; }
 .m .m-knob .m-vtrack i, .m .m-knob .m-vtrack::before, .m .m-knob .m-vtrack::after, .m .m-knob .m-vtrack.mod b {
   --k: min(100cqw, 100cqh); position: absolute; left: 50%; top: 50%; width: var(--k); height: var(--k); margin: calc(var(--k) / -2) 0 0 calc(var(--k) / -2); bottom: auto; right: auto; }
 .m .m-knob .m-vtrack::before { content: ''; border-radius: 50%;
@@ -479,10 +479,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-panel { position: relative; padding: 24px 10px 4px; }
   .m-panel::before { position: absolute; top: 4px; left: 10px; font-size: var(--fs-s); letter-spacing: .12em; text-transform: uppercase; }
   [data-m-panel="play"] { grid-area: 1 / 1 / 13 / 2; } [data-m-panel="play"]::before { content: "perform"; }
-  [data-m-panel="beat"] { grid-area: 1 / 2 / 6 / 3; border-left: var(--rule); } [data-m-panel="beat"]::before { content: "beat"; }
-  [data-m-panel="dice"] { grid-area: 6 / 2 / 10 / 3; border-left: var(--rule); border-top: var(--rule); } [data-m-panel="dice"]::before { content: "voice"; }
+  [data-m-panel="beat"] { grid-area: 1 / 2 / 5 / 3; border-left: var(--rule); } [data-m-panel="beat"]::before { content: "beat"; }
+  [data-m-panel="dice"] { grid-area: 5 / 2 / 9 / 3; border-left: var(--rule); border-top: var(--rule); } [data-m-panel="dice"]::before { content: "voice"; }
   [data-m-panel="fx"] { grid-area: 1 / 3 / 7 / 4; border-left: var(--rule); } [data-m-panel="fx"]::before { content: "effects"; }
-  [data-m-panel="mix"] { grid-area: 10 / 2 / 13 / 3; border-left: var(--rule); border-top: var(--rule); } [data-m-panel="mix"]::before { content: "mixer"; }
+  [data-m-panel="mix"] { grid-area: 9 / 2 / 13 / 3; border-left: var(--rule); border-top: var(--rule); } [data-m-panel="mix"]::before { content: "mixer"; }
   [data-m-panel="comp"] { grid-area: 7 / 3 / 13 / 4; border-left: var(--rule); border-top: var(--rule); } [data-m-panel="comp"]::before { content: "master"; }
   /* x/y and presets: sheets of the same glass over a column, shown while their button is lit */
   [data-m-panel="xy"], [data-m-panel="presets"] { display: none; z-index: 6; background-color: var(--panel); border-left: var(--rule); box-shadow: -6px 0 14px rgba(23, 32, 14, .18); }
@@ -501,20 +501,39 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   /* effects: echo and ring mod over the crossfeed matrix, its cells shorter */
   .m-fx-card { padding: 2px; }
   /* (the matrix shares the height with the faders, so the page shrinks when the step sequencer strip opens) */
-  [data-m-panel="fx"] .m-fx-card { grid-template-rows: minmax(0, 1fr) minmax(0, 1.4fr); overflow: hidden; }
+  [data-m-panel="fx"] .m-fx-card { grid-template-rows: minmax(0, 1fr) minmax(0, 1.9fr); overflow: hidden; }
   .m-xrow { overflow: hidden; }
   .m-xrow { grid-template-rows: auto minmax(0, 1fr); }
   .m-xgrid { grid-template-rows: auto repeat(6, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); max-height: 210px; min-height: 0; }
   .m-xcell { min-height: 0; }
   .m-fx-row > b, .m-fxhead b { font-size: var(--fs-s); }
   .m-fxhead .m-chk { min-height: 24px; }
-  /* mixer: echo sends, ring mod sends and levels side by side, six faders each, all full height */
-  .m-fx-card.m-mix-card { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); column-gap: 0; padding: 2px; }
-  .m-mix-card .m-fx-row + .m-fx-row { border-top: 0; padding-top: 0; border-left: var(--rule); padding-left: 4px; margin-left: 4px; }
-  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { flex: 1; height: auto; min-height: 12px; }
-  .m .m-mix-card .m-fx-row .m-vtrack { width: min(30px, 100%); }
-  .m-mix-card .m-fx-row .m-faders { gap: 2px; }
-  .m-mix-card .m-fx-row > b { white-space: nowrap; overflow: hidden; font-size: var(--fs-xs); }
+  /* mixer: a channel strip a drum, its echo and ring mod send knobs side by side over its level fader (the meter beside
+     it). The rows and their fader boxes step aside (display: contents) so every control sits on one grid, two columns
+     a drum */
+  .m-fx-card.m-mix-card { grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: auto minmax(0, 1fr) minmax(0, 2fr); gap: 2px 2px; padding: 2px; }
+  .m-mix-card .m-fx-row:nth-child(1) > b { grid-row: 1; grid-column: 1 / -1; }
+  .m-mix-card .m-fx-row:nth-child(n+2) > b { display: none; }
+  #m-mix-echo > .m-vf:nth-child(1) { grid-column: 1; } #m-mix-echo > .m-vf:nth-child(2) { grid-column: 3; } #m-mix-echo > .m-vf:nth-child(3) { grid-column: 5; }
+  #m-mix-echo > .m-vf:nth-child(4) { grid-column: 7; } #m-mix-echo > .m-vf:nth-child(5) { grid-column: 9; } #m-mix-echo > .m-vf:nth-child(6) { grid-column: 11; }
+  #m-mix-ring > .m-vf:nth-child(1) { grid-column: 2; } #m-mix-ring > .m-vf:nth-child(2) { grid-column: 4; } #m-mix-ring > .m-vf:nth-child(3) { grid-column: 6; }
+  #m-mix-ring > .m-vf:nth-child(4) { grid-column: 8; } #m-mix-ring > .m-vf:nth-child(5) { grid-column: 10; } #m-mix-ring > .m-vf:nth-child(6) { grid-column: 12; }
+  #m-mix-vol > .m-vf { grid-column: span 2; }
+  .m-mix-card .m-fx-row, .m-mix-card .m-fx-row .m-faders { display: contents; }
+  .m-mix-card .m-fx-row > b { padding: 0; white-space: nowrap; font-size: var(--fs-xs); letter-spacing: .04em; opacity: .75; }
+  #m-mix-echo > .m-vf, #m-mix-ring > .m-vf { grid-row: 2; } #m-mix-vol > .m-vf { grid-row: 3; }
+  .m-mix-card .m-fx-row:nth-child(1) > b { font-size: 0; } .m-mix-card .m-fx-row:nth-child(1) > b::before { content: "sends: echo (left) and ring mod (right) for each drum"; font-size: var(--fs-xs); }
+  /* (the sends' names would repeat the strip's; the level fader's name, under it, names the strip) */
+  #m-mix-echo .m-flab, #m-mix-ring .m-flab { display: none; }
+  .m-mix-card .m-knob { gap: 0; }
+  .m-mix-card .m-knob output { display: block; height: 1.05em; white-space: nowrap; }
+  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { flex: 1; height: auto; min-height: 16px; width: 100%; }
+  .m .m-mix-card #m-mix-vol .m-vtrack { width: min(30px, 70%); overflow: visible; margin-right: 10px; }
+  /* the meter: segments up beside the fader, the peak held a moment as one segment */
+  .m-lvm { --m: 0; --h: 0; position: absolute; left: calc(100% + 4px); top: 0; bottom: 0; width: 6px; pointer-events: none;
+    background: repeating-linear-gradient(to top, var(--ghost) 0 3px, transparent 3px 5px); }
+  .m-lvm .m-lvm-on { position: absolute; left: 0; right: 0; bottom: 0; height: round(down, calc(var(--m) * 100%), 5px); background: repeating-linear-gradient(to top, var(--ink) 0 3px, transparent 3px 5px); }
+  .m-lvm .m-lvm-pk { position: absolute; left: 0; right: 0; height: 3px; bottom: round(down, calc(var(--h) * (100% - 3px)), 5px); background: var(--ink); opacity: calc(var(--h) * 4); }
   /* master, still in signal order: the sidechain and distortion side by side, the compressor under them */
   .m-comp-card { padding: 2px; gap: 4px 0; grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr); }
   .m-comp-card > :nth-child(1) { grid-area: 1 / 1; } .m-comp-card > :nth-child(2) { grid-area: 2 / 1; }
