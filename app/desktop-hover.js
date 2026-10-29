@@ -44,3 +44,10 @@ mSeqOpen = function (fd) {
   mFaders.forEach((f) => f.el.classList.toggle('seq-edit', f === fd));
 };
 $('m-seq-close').addEventListener('click', () => mFaders.forEach((f) => f.el.classList.remove('seq-edit')));
+// on the laptop, touching a fader or knob shows its step sequencer in the strip (a draft until a step is painted, so
+// nothing runs for it)
+$('m').addEventListener('pointerdown', (e) => {
+  if (!mWide.matches || e.button !== 0) return;
+  const tr = e.target.closest('.m-vtrack'), fd = tr && mFdOf(tr.closest('.m-vf'));
+  if (fd && fd !== mSeqF && !$('m-faders').classList.contains('assigning')) mSeqOpen(fd);
+});

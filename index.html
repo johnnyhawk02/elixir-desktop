@@ -1424,7 +1424,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v145</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v146</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1510,7 +1510,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v145, 29 Oct, 10:24</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v146, 29 Oct, 10:31</footer>
     </section>
   </div>
   </div>
@@ -1596,7 +1596,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
       <div class="m-seq-btns"><button class="m-btn m-big" id="m-seq-rand" type="button">randomise</button><button class="m-btn" id="m-seq-close" type="button">done</button></div>
     </section>
   </div>
-  <div class="m-seq-hint" aria-hidden="true"><span>right-click or hold a knob for its step sequencer</span></div>
+  <div class="m-seq-hint" aria-hidden="true"><span>touch a knob or fader to see its step sequencer</span></div>
 
   <nav class="m-tabs" role="tablist" aria-label="pages">
     <button type="button" role="tab" data-m-tab="play" aria-selected="true">perf</button>
@@ -8796,13 +8796,19 @@ function mSeqRelease(f) {
   if (f.base === null) return;
   const b = f.base; f.glide = null; f.off = 0; f.base = null; f.put(b);
 }
+// a control without a sequencer shows a draft, switched off and kept apart from it, so opening one (or, on the laptop,
+// just touching the control) costs nothing; it becomes the control's own, switched on, once a step is painted or it's
+// randomised or switched on
+let mSeqDraft = null;
+const mSeqQ = () => mSeqF.seq || mSeqDraft;
+function mSeqCommit() { if (!mSeqF.seq) { mSeqF.seq = mSeqDraft; mSeqDraft = null; } mSeqF.seq.on = true; }
 function mSeqOpen(fd) {
-  if (!fd.seq) fd.seq = newSeq();
+  mSeqDraft = fd.seq ? null : { ...newSeq(), on: false };
   mSeqF = fd; $('m-seq-name').textContent = fd.label;
   $('m-seq').hidden = false; mSeqDraw();
 }
 function mSeqDraw() {
-  const fd = mSeqF, q = fd.seq;
+  const fd = mSeqF, q = mSeqQ();
   mSeqSteps.forEach((c, i) => {
     c.style.setProperty('--up', Math.max(0, q.vals[i])); c.style.setProperty('--dn', Math.max(0, -q.vals[i]));
     c.classList.toggle('off', i >= q.len);
@@ -8837,7 +8843,7 @@ useSong = function (g, keepTempo) {
     const hi = f.hiOf(), vals = q ? (q.rel ? q.vals.slice() : q.vals.map((v) => mSeqOff(((v - f.min) / (hi - f.min || 1)) * 2 - 1))) : null;
     f.seq = q ? { on: !!q.on, len: q.len, slew: q.slew || 0, step: SEQ_STEPS.includes(q.step) ? q.step : 1, depth: typeof q.depth === 'number' ? q.depth : 50, vals } : null;
   }
-  if (mSeqF) { if (mSeqF.seq) mSeqDraw(); else $('m-seq-close').click(); }
+  if (mSeqF) { if (!mSeqF.seq) mSeqDraft = { ...newSeq(), on: false }; mSeqDraw(); }
   mSeqMarks();
 };
 // painting: a step takes the offset at the finger's height (the middle is none); dragging across paints the steps it passes
@@ -8851,6 +8857,7 @@ useSong = function (g, keepTempo) {
     const row = Math.max(0, Math.min(rows - 1, Math.floor((e.clientY - r.top) / r.height * rows)));
     const c = mSeqSteps[row * cols + col], cr = c.getBoundingClientRect();
     if (c.classList.contains('off')) return;
+    if (!mSeqF.seq || !mSeqF.seq.on) mSeqCommit();
     const o = mSeqF.seq.vals[row * cols + col] = mSeqOff(1 - 2 * (e.clientY - cr.top) / cr.height);
     $('m-seq-val').textContent = `${o > 0 ? '+' : o < 0 ? '−' : ''}${Math.round(Math.abs(o) * mSeqF.seq.depth)}%`;
     mSeqDraw();
@@ -8868,13 +8875,13 @@ function mSeqBar(bar, setFrac) {
   bar.addEventListener('pointermove', (e) => { if (held) at(e); });
   bar.addEventListener('pointerup', () => { held = false; }); bar.addEventListener('pointercancel', () => { held = false; });
 }
-mSeqBar($('m-seq-len'), (x) => { mSeqF.seq.len = 2 + Math.round(x * 14); });
-mSeqBar($('m-seq-slew'), (x) => { mSeqF.seq.slew = Math.round(x * 20) * 5; });
-mSeqBar($('m-seq-speed'), (x) => { mSeqF.seq.step = SEQ_STEPS[Math.min(SEQ_STEPS.length - 1, Math.floor(x * SEQ_STEPS.length))]; });
-mSeqBar($('m-seq-depth'), (x) => { mSeqF.seq.depth = Math.round(x * 20) * 5; if (mSeqF.base !== null) mSeqApply(mSeqF); });
-$('m-seq-rand').addEventListener('click', () => { const q = mSeqF.seq; for (let i = 0; i < 16; i++) q.vals[i] = mSeqOff(Math.random() * 2 - 1); q.on = true; mSeqDraw(); });
-$('m-seq-on').addEventListener('click', () => { mSeqF.seq.on = !mSeqF.seq.on; if (!mSeqF.seq.on) mSeqRelease(mSeqF); mSeqDraw(); });
-mCloser('m-seq', () => { mSeqF = null; });
+mSeqBar($('m-seq-len'), (x) => { mSeqQ().len = 2 + Math.round(x * 14); });
+mSeqBar($('m-seq-slew'), (x) => { mSeqQ().slew = Math.round(x * 20) * 5; });
+mSeqBar($('m-seq-speed'), (x) => { mSeqQ().step = SEQ_STEPS[Math.min(SEQ_STEPS.length - 1, Math.floor(x * SEQ_STEPS.length))]; });
+mSeqBar($('m-seq-depth'), (x) => { mSeqQ().depth = Math.round(x * 20) * 5; if (mSeqF.base !== null) mSeqApply(mSeqF); });
+$('m-seq-rand').addEventListener('click', () => { mSeqCommit(); const q = mSeqF.seq; for (let i = 0; i < 16; i++) q.vals[i] = mSeqOff(Math.random() * 2 - 1); mSeqDraw(); });
+$('m-seq-on').addEventListener('click', () => { if (!mSeqF.seq || !mSeqF.seq.on) mSeqCommit(); else { mSeqF.seq.on = false; mSeqRelease(mSeqF); } mSeqDraw(); });
+mCloser('m-seq', () => { mSeqF = null; mSeqDraft = null; });
 // the glides, a frame at a time while any is moving
 let mGlideOn = false;
 function mGlideRun() {
@@ -9495,7 +9502,7 @@ const HELP = [
 <li><b>y</b> shows the x/y pads, <b>o</b> the presets, <b>/</b> searches the presets (enter loads the first found), <b>h</b> this help. <b>esc</b> closes whatever is open.</li>
 <li>Click a fader or knob, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>
 <li>Right-click a fader or knob for its step sequencer, reset, and (on perf) assign. Double-click one to reset it.</li>
-<li>On a laptop the step sequencer opens under the perform page, so everything still plays; esc or done closes it.</li></ul>`],
+<li>On a laptop the step sequencer sits under the perform page and shows whichever fader or knob you last touched; it only starts once you paint a step, press randomise or switch it on. esc or done greys it out.</li></ul>`],
   ['more', 'more', `<ul><li>Hold a randomise button to open the randomisers' settings, the ranges and chances each one uses.</li>
 <li>The person button: your settings. Its <b>midi</b> tab says which MIDI CC moves each perf fader, with presets (cc1 to cc24, cc25 to cc48) and your own.</li>
 <li>The gear: settings, including the <b>rush</b> graph of how the rush builds (drag its squares).</li>
@@ -9596,6 +9603,13 @@ mSeqOpen = function (fd) {
   mFaders.forEach((f) => f.el.classList.toggle('seq-edit', f === fd));
 };
 $('m-seq-close').addEventListener('click', () => mFaders.forEach((f) => f.el.classList.remove('seq-edit')));
+// on the laptop, touching a fader or knob shows its step sequencer in the strip (a draft until a step is painted, so
+// nothing runs for it)
+$('m').addEventListener('pointerdown', (e) => {
+  if (!mWide.matches || e.button !== 0) return;
+  const tr = e.target.closest('.m-vtrack'), fd = tr && mFdOf(tr.closest('.m-vf'));
+  if (fd && fd !== mSeqF && !$('m-faders').classList.contains('assigning')) mSeqOpen(fd);
+});
 // ---- the mixer on the laptop: a channel strip a drum (its echo and ring mod send knobs over its level fader), with a
 // level meter beside each fader, fed by the same peaks as the full desktop mixer's meters (lvms in app/mixer.js) ----
 const mLvm = [...$('m-mix-vol').children].map((vf) => {

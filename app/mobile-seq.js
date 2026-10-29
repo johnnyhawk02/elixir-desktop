@@ -25,13 +25,19 @@ function mSeqRelease(f) {
   if (f.base === null) return;
   const b = f.base; f.glide = null; f.off = 0; f.base = null; f.put(b);
 }
+// a control without a sequencer shows a draft, switched off and kept apart from it, so opening one (or, on the laptop,
+// just touching the control) costs nothing; it becomes the control's own, switched on, once a step is painted or it's
+// randomised or switched on
+let mSeqDraft = null;
+const mSeqQ = () => mSeqF.seq || mSeqDraft;
+function mSeqCommit() { if (!mSeqF.seq) { mSeqF.seq = mSeqDraft; mSeqDraft = null; } mSeqF.seq.on = true; }
 function mSeqOpen(fd) {
-  if (!fd.seq) fd.seq = newSeq();
+  mSeqDraft = fd.seq ? null : { ...newSeq(), on: false };
   mSeqF = fd; $('m-seq-name').textContent = fd.label;
   $('m-seq').hidden = false; mSeqDraw();
 }
 function mSeqDraw() {
-  const fd = mSeqF, q = fd.seq;
+  const fd = mSeqF, q = mSeqQ();
   mSeqSteps.forEach((c, i) => {
     c.style.setProperty('--up', Math.max(0, q.vals[i])); c.style.setProperty('--dn', Math.max(0, -q.vals[i]));
     c.classList.toggle('off', i >= q.len);
@@ -66,7 +72,7 @@ useSong = function (g, keepTempo) {
     const hi = f.hiOf(), vals = q ? (q.rel ? q.vals.slice() : q.vals.map((v) => mSeqOff(((v - f.min) / (hi - f.min || 1)) * 2 - 1))) : null;
     f.seq = q ? { on: !!q.on, len: q.len, slew: q.slew || 0, step: SEQ_STEPS.includes(q.step) ? q.step : 1, depth: typeof q.depth === 'number' ? q.depth : 50, vals } : null;
   }
-  if (mSeqF) { if (mSeqF.seq) mSeqDraw(); else $('m-seq-close').click(); }
+  if (mSeqF) { if (!mSeqF.seq) mSeqDraft = { ...newSeq(), on: false }; mSeqDraw(); }
   mSeqMarks();
 };
 // painting: a step takes the offset at the finger's height (the middle is none); dragging across paints the steps it passes
@@ -80,6 +86,7 @@ useSong = function (g, keepTempo) {
     const row = Math.max(0, Math.min(rows - 1, Math.floor((e.clientY - r.top) / r.height * rows)));
     const c = mSeqSteps[row * cols + col], cr = c.getBoundingClientRect();
     if (c.classList.contains('off')) return;
+    if (!mSeqF.seq || !mSeqF.seq.on) mSeqCommit();
     const o = mSeqF.seq.vals[row * cols + col] = mSeqOff(1 - 2 * (e.clientY - cr.top) / cr.height);
     $('m-seq-val').textContent = `${o > 0 ? '+' : o < 0 ? '−' : ''}${Math.round(Math.abs(o) * mSeqF.seq.depth)}%`;
     mSeqDraw();
@@ -97,13 +104,13 @@ function mSeqBar(bar, setFrac) {
   bar.addEventListener('pointermove', (e) => { if (held) at(e); });
   bar.addEventListener('pointerup', () => { held = false; }); bar.addEventListener('pointercancel', () => { held = false; });
 }
-mSeqBar($('m-seq-len'), (x) => { mSeqF.seq.len = 2 + Math.round(x * 14); });
-mSeqBar($('m-seq-slew'), (x) => { mSeqF.seq.slew = Math.round(x * 20) * 5; });
-mSeqBar($('m-seq-speed'), (x) => { mSeqF.seq.step = SEQ_STEPS[Math.min(SEQ_STEPS.length - 1, Math.floor(x * SEQ_STEPS.length))]; });
-mSeqBar($('m-seq-depth'), (x) => { mSeqF.seq.depth = Math.round(x * 20) * 5; if (mSeqF.base !== null) mSeqApply(mSeqF); });
-$('m-seq-rand').addEventListener('click', () => { const q = mSeqF.seq; for (let i = 0; i < 16; i++) q.vals[i] = mSeqOff(Math.random() * 2 - 1); q.on = true; mSeqDraw(); });
-$('m-seq-on').addEventListener('click', () => { mSeqF.seq.on = !mSeqF.seq.on; if (!mSeqF.seq.on) mSeqRelease(mSeqF); mSeqDraw(); });
-mCloser('m-seq', () => { mSeqF = null; });
+mSeqBar($('m-seq-len'), (x) => { mSeqQ().len = 2 + Math.round(x * 14); });
+mSeqBar($('m-seq-slew'), (x) => { mSeqQ().slew = Math.round(x * 20) * 5; });
+mSeqBar($('m-seq-speed'), (x) => { mSeqQ().step = SEQ_STEPS[Math.min(SEQ_STEPS.length - 1, Math.floor(x * SEQ_STEPS.length))]; });
+mSeqBar($('m-seq-depth'), (x) => { mSeqQ().depth = Math.round(x * 20) * 5; if (mSeqF.base !== null) mSeqApply(mSeqF); });
+$('m-seq-rand').addEventListener('click', () => { mSeqCommit(); const q = mSeqF.seq; for (let i = 0; i < 16; i++) q.vals[i] = mSeqOff(Math.random() * 2 - 1); mSeqDraw(); });
+$('m-seq-on').addEventListener('click', () => { if (!mSeqF.seq || !mSeqF.seq.on) mSeqCommit(); else { mSeqF.seq.on = false; mSeqRelease(mSeqF); } mSeqDraw(); });
+mCloser('m-seq', () => { mSeqF = null; mSeqDraft = null; });
 // the glides, a frame at a time while any is moving
 let mGlideOn = false;
 function mGlideRun() {

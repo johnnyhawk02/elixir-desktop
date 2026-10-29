@@ -43,7 +43,7 @@ const HELP = [
 <li><b>y</b> shows the x/y pads, <b>o</b> the presets, <b>/</b> searches the presets (enter loads the first found), <b>h</b> this help. <b>esc</b> closes whatever is open.</li>
 <li>Click a fader or knob, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>
 <li>Right-click a fader or knob for its step sequencer, reset, and (on perf) assign. Double-click one to reset it.</li>
-<li>On a laptop the step sequencer opens under the perform page, so everything still plays; esc or done closes it.</li></ul>`],
+<li>On a laptop the step sequencer sits under the perform page and shows whichever fader or knob you last touched; it only starts once you paint a step, press randomise or switch it on. esc or done greys it out.</li></ul>`],
   ['more', 'more', `<ul><li>Hold a randomise button to open the randomisers' settings, the ranges and chances each one uses.</li>
 <li>The person button: your settings. Its <b>midi</b> tab says which MIDI CC moves each perf fader, with presets (cc1 to cc24, cc25 to cc48) and your own.</li>
 <li>The gear: settings, including the <b>rush</b> graph of how the rush builds (drag its squares).</li>
