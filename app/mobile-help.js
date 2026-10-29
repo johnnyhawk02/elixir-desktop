@@ -17,7 +17,7 @@ const HELP = [
 <li><b>options</b> › <b>randomise on next bar</b>: while playing, randomises wait for the start of the next bar (the button flashes until then).</li></ul>`],
   ['mute', 'mutes and sends', `<p>Beside the knobs, a column for each drum (drum 1, 2, 3, snare, cymbal, hihat): its level meter, its mute, then its echo send and ring mod send as number boxes, each with its own mute.</p>
 <ul><li>Keys: <b>z x c v b n</b> mute the drums; <b>a s d f g h</b> mute their echo sends; <b>q w e r t y</b> their ring mod sends. <b>clear</b> lifts every mute.</li>
-<li>Drag a number box up or down, or scroll on it, to set the send; double-click to reset. A muted send sends nothing but keeps its amount (struck through).</li>
+<li>Drag a number box up or down, or scroll on it, to set the send; double-click to reset. A muted send sends nothing but keeps its amount (its box goes black).</li>
 <li>Mutes work on the notes, not the sound: a muted drum's last hit, its decay and its echo ring on. The hihat's mute covers both its closed and open hits. Presets keep them all.</li></ul>`],
   ['seq', 'step sequencer', `<p>Under the knobs. Touch any knob or fader, here or on a page on the right, and its sequencer shows there (greyed out until it runs). It starts once you paint a step or press a shape or a random button, and nothing runs for a control until then.</p>
 <ul><li>2 to 64 steps, each moving the control up or down from where you leave it, so you can still play it. Paint them with the mouse. Past 16 steps they're on pages: the <b>1</b> to <b>4</b> buttons by the name show each sixteen (the one playing is underlined). On an empty sequencer they also set the length: 16, 32, 48 or 64.</li>

@@ -580,14 +580,15 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-mutes-head .m-toggle { min-height: 28px; padding: 0 8px; font-size: var(--fs-xs) !important; }
   .m-mute-rows { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; min-height: 0; }
   .m-mute-col { display: grid; grid-template-rows: minmax(0, 1fr) auto auto auto auto auto auto; justify-items: center; gap: 4px; min-height: 0; min-width: 0; }
-  /* (the sends' number boxes: the amount in a box, dragged or scrolled; a muted one's struck through and faint) */
+  /* (the sends' number boxes: the amount in a box, dragged or scrolled; a muted one black; under each its key, plain) */
   .m-mute-col .m-num { width: 100%; display: block; }
   .m-mute-col .m-num output, .m-mute-col .m-num .m-flab { display: none; }
   .m .m-mute-col .m-num .m-vtrack { width: 100%; height: 26px; border: 1.5px solid var(--ink); border-radius: 3px; background: none; display: grid; place-items: center; overflow: hidden; }
   .m .m-mute-col .m-num .m-vtrack i { display: none; }
   .m .m-mute-col .m-num .m-vtrack::after { content: attr(aria-valuetext); font-size: var(--fs-xs); line-height: 1; }
-  .m .m-mute-col .m-num.muted .m-vtrack { opacity: .35; text-decoration: line-through; }
-  .m .m-mute-col .m-send-mute { width: 100%; min-width: 0 !important; min-height: 20px; padding: 0; font-size: var(--fs-xs) !important; text-transform: uppercase; line-height: 1; }
+  .m .m-mute-col .m-num.muted .m-vtrack { background: var(--ink); color: var(--panel); text-shadow: none; }
+  .m .m-mute-col .m-send-mute { width: 100%; min-width: 0 !important; min-height: 0; padding: 0; border: 0; background: none !important; color: var(--ink) !important; box-shadow: none !important;
+    font-size: var(--fs-xs) !important; text-transform: uppercase; line-height: 1; opacity: .55; }
   .m-mute-meter { --m: 0; --h: 0; position: relative; width: 14px; height: 100%; min-height: 24px; max-height: 70px; text-decoration: none;
     background: repeating-linear-gradient(to top, var(--ghost) 0 3px, transparent 3px 5px); }
   .m-mute-meter .m-lvm-on { position: absolute; left: 0; right: 0; bottom: 0; height: round(down, calc(var(--m) * 100%), 5px); background: repeating-linear-gradient(to top, var(--ink) 0 3px, transparent 3px 5px); }
