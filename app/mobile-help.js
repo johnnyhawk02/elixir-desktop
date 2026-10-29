@@ -5,7 +5,7 @@ const HELP = [
 <li>Play the faders, or press <b>kit</b>, <b>pattern</b> or <b>alter</b> to change one part. <b>undo</b> takes back the last one.</li></ol>
 <p>The buttons along the bottom change page; the page's name is at the top right. Drag a fader up or down; double tap its name to reset it. Hold a fader to give it a step sequencer.</p>
 <p>When you like it, <b>prst</b> › <b>save new</b>. <b>rec</b> records a WAV, <b>loop</b> a loop that repeats seamlessly.</p>`],
-  ['perf', 'perf: play it live', `<p>Twenty-four knobs for playing, four across and six down, and the randomise buttons down the right (on a laptop, in a bar along the top). Drag a knob up or down, or scroll on it with the mouse wheel or trackpad. MIDI CC 1 to 24 turn them.</p>
+  ['perf', 'perf: play it live', `<p>Twenty-four knobs for playing, four across and six down, and the randomise buttons down the right (on a laptop, along the title line; next bar and assign are in its options button). Drag a knob up or down, or scroll on it with the mouse wheel or trackpad. MIDI CC 1 to 24 turn them.</p>
 <ul><li><b>everything</b>: a new beat (genre, groove, kit, effects, mix). <b>kit</b>: new sounds. <b>pattern</b>: a new beat on the same sounds. <b>alter</b>: the sounds nudged about 10%.</li>
 <li><b>crossfeed</b>: a new crossfeed patch (see fx). <b>random fx</b>: new effects and sends, echo times on musical lengths. <b>alter fx</b>: the effects nudged.</li>
 <li>Tick <b>next bar</b> and every randomise waits for the start of the next bar.</li>

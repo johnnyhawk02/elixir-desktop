@@ -34,3 +34,14 @@ addEventListener('pointerdown', (e) => { if (!e.target.closest('#m-menu')) mMenu
 $('m').addEventListener('dblclick', (e) => {
   const tr = e.target.closest('.m-vtrack'), fd = tr && mFdOf(tr.closest('.m-vf')); if (fd) mReset(fd);
 });
+
+// ---- the laptop's one options button: next bar and assign (ticked when on), then the settings, user settings and help
+// (whose own buttons the laptop hides) ----
+$('m-opts').addEventListener('click', (e) => {
+  const tick = (id) => ($(id).checked ? '■ ' : '□ ');
+  const r = $('m-opts').getBoundingClientRect();
+  mMenu({ clientX: r.left, clientY: r.bottom + 6 }, [
+    [tick('m-nextbar') + 'randomise on next bar', () => $('m-nextbar').click()],
+    [tick('m-assign') + 'assign knobs', () => $('m-assign').click()],
+    ['settings', () => $('m-set-open').click()], ['user settings', () => $('m-user-open').click()], ['help', () => $('m-help-open').click()]]);
+});

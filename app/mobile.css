@@ -142,6 +142,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-userbtn, .m-top .m-setbtn:not(.m-helpbtn) { margin-right: 4px !important; }
 .m-helpbtn { margin-right: auto; font-size: min(var(--fs-xs), 3.6vw, 15px) !important; letter-spacing: .02em; white-space: nowrap; }
 .m-help-short { display: none; }
+.m .m-optsbtn, .m-title-short { display: none; }
 @media (max-width: 380px) { .m-help-long { display: none; } .m-help-short { display: inline; font-size: 1.2em; } }
 /* (on a narrow phone the title line's spacing tightens, so ELIXIR, the version, both buttons and the page's name fit) */
 @media (max-width: 430px) { .m-title, .m-pagename { letter-spacing: .08em; } .m-top { gap: 6px; } }
@@ -475,20 +476,24 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-trans .m-loop { display: none; }
   /* (the pages' box steps aside, so each page sits on this grid itself) */
   .m-pages { display: contents; }
-  /* the perform page steps aside too: its randomise buttons are a bar along the top of the left half, level with the
-     page buttons over the right (randomisers, then the effects ones, then undo and the two boxes), and its knobs take
-     the whole width under them */
+  /* the title line's left half: "e", one options button (next bar, assign, settings, user settings, help), then the
+     perform page's randomise buttons, every one the same size (undo too), in groups: the sound ones, the effects ones,
+     then undo. The perform page steps aside so its parts sit on this grid, its knobs taking the whole left half under */
+  .m-top { justify-self: start; gap: 10px; }
+  .m-title-long, .m-userbtn, #m-set-open, #m-help-open { display: none; }
+  .m-title-short { display: inline; }
+  .m-top { width: 180px; }
+  .m .m-optsbtn { display: grid; padding: 0 10px !important; font-size: var(--fs-xs) !important; letter-spacing: .04em; }
   [data-m-panel="play"] { display: contents; }
-  .m-play-card { grid-area: 3 / 1; min-height: 0; padding: 14px 24px 10px 4px; }
-  .m-pages .m-rand-card { grid-area: 2 / 1; padding: 10px 24px 8px 4px; border-left: 0; border-top: var(--rule); }
-  /* every randomise box the same size (undo too), in groups: the sound ones, the effects ones, then undo; next bar and
-     assign stacked after them */
-  .m-rand-card .m-rand { grid-template-columns: repeat(4, minmax(0, 1fr)) 6px repeat(3, minmax(0, 1fr)) 6px minmax(0, 1fr) auto; grid-template-rows: 20px 20px; height: auto; gap: 0 6px; }
-  .m .m-rand-card .m-rand .m-btn { grid-row: 1 / 3; padding: 0 2px; letter-spacing: 0; font-size: clamp(12px, 1.05vw, 15.2px) !important; }
-  .m-rand > :nth-child(1) { grid-area: 1 / 11; } .m-rand > :nth-child(2) { grid-area: 2 / 11; }
+  .m-play-card { grid-area: 2 / 1 / 4 / 2; min-height: 0; padding: 14px 24px 10px 4px; border-top: var(--rule); }
+  /* (the bar runs on to the transport, over the start of the right half too) */
+  .m-pages .m-rand-card { grid-area: 1 / 1 / 2 / 3; align-self: center; margin: 0 310px 0 196px; padding: 6px 0 10px; border: 0; }
+  .m-title-short { font-size: 2rem; line-height: 1; }
+  .m-rand-card .m-rand { grid-template-columns: repeat(4, minmax(0, 1fr)) 6px repeat(3, minmax(0, 1fr)) 6px minmax(0, 1fr); grid-template-rows: 40px; height: auto; gap: 0 6px; }
+  .m .m-rand-card .m-rand .m-btn { grid-row: 1; padding: 0 2px; letter-spacing: 0; }
+  .m-rand > :nth-child(1), .m-rand > :nth-child(2) { display: none; }
   .m-rand > :nth-child(3) { grid-column: 1; } .m-rand > :nth-child(4) { grid-column: 2; } .m-rand > :nth-child(5) { grid-column: 3; } .m-rand > :nth-child(6) { grid-column: 4; }
   .m-rand > :nth-child(7) { grid-column: 6; } .m-rand > :nth-child(8) { grid-column: 7; } .m-rand > :nth-child(9) { grid-column: 8; } .m-rand > :nth-child(10) { grid-column: 10; }
-  .m-rand-card .m-nextbar { padding-left: 4px; min-height: 0; font-size: var(--fs-xs); } .m-rand-card .m-nextbar i { width: 14px; height: 14px; }
   /* each knob: its ring on the left of its cell, value over name beside it, so the rings can be big */
   #m-faders { gap: 10px 14px; }
   #m-faders .m-knob { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr 1fr; column-gap: 10px; align-items: center; justify-items: start; }
@@ -588,7 +593,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab { font-size: var(--fs-xs); }
   .m-helpbtn, .m .m-voice .m-btn, .m .m-rs-tabs .m-btn, .m .m-ch-list .m-btn, .m-big { font-size: var(--fs-xs) !important; }
   .m .m-rand-card .m-rand .m-btn { font-size: clamp(14px, 1.13vw, 18px) !important; }
-  .m-rand-card .m-nextbar, .m .m-seq-lenrow, .m .m-seq-lenrow output { font-size: var(--fs-xs); }
+  .m .m-seq-lenrow, .m .m-seq-lenrow output { font-size: var(--fs-xs); }
   .m-seq-card { grid-template-columns: minmax(0, 1fr) minmax(250px, 36%) 230px; } .m-seq-btns { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } #m-seq-rand { display: none; } .m-seq-lenrow { grid-template-columns: 3.6em minmax(0, 1fr) 4.2em; }
   .m .m-seq-shapes .m-btn { font-size: var(--fs-xs) !important; }
   .m-foot { font-size: 1.15rem; }
