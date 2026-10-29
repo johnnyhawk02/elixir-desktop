@@ -1312,117 +1312,11 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-vf.cc .m-vtrack i { transition: none; }
 @media (prefers-reduced-motion: reduce) { .m .m-vtrack i, .m .m-gr i b, .m .m-seq-steps i::after, .m .m-seq-steps i::before, .m .m-btn, .m .m-toggle, .m .m-pload, .m .m-tabs button, .m .m-trans button, .m .m-xy i { transition: none; } }
 
-/* ==== the laptop screen (1000 px and wider) ====
-   Calm: the perform page always open, wide, on the left, with room under it for a step sequencer; every other page one
-   at a time on the right, chosen by the page buttons above it. The title and the transport share the top line. */
-@media (min-width: 1000px) {
-  .m { max-width: 1600px; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto; column-gap: 0; padding: 8px 18px 14px; }
-  .m-top { grid-area: 1 / 1; align-self: center; border-bottom: 0; padding: 0 24px 0 4px; }
-  .m-pagename { display: none; }
-  /* play and rec, small, at the right (no loop button: rec's hold or right-click chooses free or a loop) */
-  .m > .m-card.m-trans { grid-area: 1 / 2; border-bottom: 0; padding: 6px 0 10px 24px; grid-template-columns: 130px 130px; justify-content: end; }
-  .m .m-play, .m .m-rec { min-height: 38px; }
-  .m .m-trans .m-loop { display: none; }
-  /* (the pages' box steps aside, so each page sits on this grid itself) */
-  .m-pages { display: contents; }
-  /* the title line's left half: "e", one options button (next bar, assign, settings, user settings, help), then the
-     perform page's randomise buttons, every one the same size (undo too), in groups: the sound ones, the effects ones,
-     then undo. The perform page steps aside so its parts sit on this grid, its knobs taking the whole left half under */
-  .m-top { justify-self: start; gap: 10px; }
-  .m-title-long, .m-userbtn, #m-set-open, #m-help-open { display: none; }
-  .m-title-short { display: inline; }
-  .m-top { width: 180px; }
-  .m .m-optsbtn { display: grid; padding: 0 10px !important; font-size: var(--fs-xs) !important; letter-spacing: .04em; }
-  [data-m-panel="play"] { display: contents; }
-  .m-play-card { grid-area: 2 / 1 / 4 / 2; min-height: 0; padding: 14px 24px 10px 4px; border-top: var(--rule); }
-  /* (the bar runs on to the transport, over the start of the right half too) */
-  .m-pages .m-rand-card { grid-area: 1 / 1 / 2 / 3; align-self: center; margin: 0 310px 0 196px; padding: 6px 0 10px; border: 0; }
-  /* (the title's mark: a small cauldron in the LCD's ink, cast like the type) */
-  .m-title-short { display: inline-block; width: 34px; height: 34px; vertical-align: middle; font-size: 0; color: transparent; background: var(--ink);
-    -webkit-mask: url("data:image/png;base64,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") center / contain no-repeat; mask: url("data:image/png;base64,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") center / contain no-repeat;
-    filter: drop-shadow(2px 2.2px 0 rgba(23, 32, 14, .17)); }
-  .m-rand-card .m-rand { grid-template-columns: repeat(4, minmax(0, 1fr)) 6px repeat(3, minmax(0, 1fr)) 6px minmax(0, 1fr); grid-template-rows: 40px; height: auto; gap: 0 6px; }
-  .m .m-rand-card .m-rand .m-btn { grid-row: 1; padding: 0 2px; letter-spacing: 0; }
-  .m-rand > :nth-child(1), .m-rand > :nth-child(2) { display: none; }
-  .m-rand > :nth-child(3) { grid-column: 1; } .m-rand > :nth-child(4) { grid-column: 2; } .m-rand > :nth-child(5) { grid-column: 3; } .m-rand > :nth-child(6) { grid-column: 4; }
-  .m-rand > :nth-child(7) { grid-column: 6; } .m-rand > :nth-child(8) { grid-column: 7; } .m-rand > :nth-child(9) { grid-column: 8; } .m-rand > :nth-child(10) { grid-column: 10; }
-  /* each knob: its ring on the left of its cell, value over name beside it, so the rings can be big */
-  #m-faders { gap: 10px 14px; }
-  #m-faders .m-knob { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr 1fr; column-gap: 10px; align-items: center; justify-items: start; }
-  .m #m-faders .m-knob .m-vtrack { grid-area: 1 / 1 / 3 / 2; height: 100%; width: auto; aspect-ratio: 1; max-height: 60px; min-height: 0; }
-  #m-faders .m-knob output { grid-area: 1 / 2; align-self: end; height: auto; max-width: 100%; text-align: left; font-size: var(--fs-s); }
-  #m-faders .m-knob .m-flab { grid-area: 2 / 2; align-self: start; max-width: 100%; text-align: left; }
-  @media (max-width: 1360px) { .m #m-faders .m-knob .m-vtrack { max-height: 48px; } }
-  /* (a little smaller, the whole set in one rounded box) */
-  .m #m-faders .m-knob .m-vtrack { max-height: 52px; }
-  @media (max-width: 1360px) { .m #m-faders .m-knob .m-vtrack { max-height: 42px; } }
-  #m-faders { padding: 12px 16px; border: 1.5px solid var(--ink); border-radius: 14px; }
-  /* the right: the page buttons, then the page chosen (beat until another is) */
-  .m > .m-tabs { grid-area: 2 / 2; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0; padding: 10px 0 8px 24px; border-top: var(--rule); border-left: var(--rule); }
-  .m > .m-tabs button[data-m-tab="play"] { display: none; }
-  .m > .m-tabs button { min-height: 40px; }
-  .m .m-tabs button { font-size: var(--fs-m) !important; }
-  .m-panel:not([data-m-panel="play"]) { grid-area: 3 / 2 / 5 / 3; display: none; padding: 8px 0 0 24px; border-left: var(--rule); }
-  .m[data-page="beat"] [data-m-panel="beat"], .m[data-page="dice"] [data-m-panel="dice"], .m[data-page="xy"] [data-m-panel="xy"], .m[data-page="fx"] [data-m-panel="fx"],
-  .m[data-page="mix"] [data-m-panel="mix"], .m[data-page="comp"] [data-m-panel="comp"], .m[data-page="presets"] [data-m-panel="presets"] { display: grid; }
-
-  /* mixer: a channel strip a drum, its echo and ring mod send knobs side by side over its level fader (the meter beside
-     it). The rows and their fader boxes step aside (display: contents) so every control sits on one grid, two columns
-     a drum */
-  .m-fx-card.m-mix-card { grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: auto minmax(0, .7fr) minmax(0, 2fr); gap: 2px 2px; padding: 2px; }
-  .m-mix-card .m-fx-row:nth-child(1) > b { grid-row: 1; grid-column: 1 / -1; }
-  .m-mix-card .m-fx-row:nth-child(n+2) > b { display: none; }
-  #m-mix-echo > .m-vf:nth-child(1) { grid-column: 1; } #m-mix-echo > .m-vf:nth-child(2) { grid-column: 3; } #m-mix-echo > .m-vf:nth-child(3) { grid-column: 5; }
-  #m-mix-echo > .m-vf:nth-child(4) { grid-column: 7; } #m-mix-echo > .m-vf:nth-child(5) { grid-column: 9; } #m-mix-echo > .m-vf:nth-child(6) { grid-column: 11; }
-  #m-mix-ring > .m-vf:nth-child(1) { grid-column: 2; } #m-mix-ring > .m-vf:nth-child(2) { grid-column: 4; } #m-mix-ring > .m-vf:nth-child(3) { grid-column: 6; }
-  #m-mix-ring > .m-vf:nth-child(4) { grid-column: 8; } #m-mix-ring > .m-vf:nth-child(5) { grid-column: 10; } #m-mix-ring > .m-vf:nth-child(6) { grid-column: 12; }
-  #m-mix-vol > .m-vf { grid-column: span 2; }
-  .m-mix-card .m-fx-row, .m-mix-card .m-fx-row .m-faders { display: contents; }
-  .m-mix-card .m-fx-row > b { padding: 0; white-space: nowrap; font-size: var(--fs-xs); letter-spacing: .04em; opacity: .75; }
-  #m-mix-echo > .m-vf, #m-mix-ring > .m-vf { grid-row: 2; } #m-mix-vol > .m-vf { grid-row: 3; }
-  .m-mix-card .m-fx-row:nth-child(1) > b { font-size: 0; } .m-mix-card .m-fx-row:nth-child(1) > b::before { content: "sends: echo (left) and ring mod (right) for each drum"; font-size: var(--fs-xs); }
-  /* (the sends' names would repeat the strip's; the level fader's name, under it, names the strip) */
-  #m-mix-echo .m-flab, #m-mix-ring .m-flab { display: none; }
-  .m-mix-card .m-knob { gap: 0; }
-  .m-mix-card .m-knob output { display: block; height: 1.05em; white-space: nowrap; }
-  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { flex: 1; height: auto; min-height: 16px; width: 100%; }
-  .m .m-mix-card #m-mix-vol .m-vtrack { width: min(30px, 70%); overflow: visible; margin-right: 10px; }
-  /* the meter: segments up beside the fader, the peak held a moment as one segment */
-  .m-lvm { --m: 0; --h: 0; position: absolute; left: calc(100% + 4px); top: 0; bottom: 0; width: 6px; pointer-events: none;
-    background: repeating-linear-gradient(to top, var(--ghost) 0 3px, transparent 3px 5px); }
-  .m-lvm .m-lvm-on { position: absolute; left: 0; right: 0; bottom: 0; height: round(down, calc(var(--m) * 100%), 5px); background: repeating-linear-gradient(to top, var(--ink) 0 3px, transparent 3px 5px); }
-  .m-lvm .m-lvm-pk { position: absolute; left: 0; right: 0; height: 3px; bottom: round(down, calc(var(--h) * (100% - 3px)), 5px); background: var(--ink); opacity: calc(var(--h) * 4); }
-}
-
-/* ---- the right-click menu (laptop): a small sheet of glass by the pointer ---- */
+/* ---- the right-click and options menus (laptop): a small sheet of glass by the pointer ---- */
 .m-menu { position: fixed; z-index: 30; display: grid; gap: 4px; min-width: 190px; padding: 6px; background-color: var(--panel); border: 2px solid var(--ink); border-radius: 4px;
   box-shadow: 4px 5px 0 rgba(23, 32, 14, .25); }
 .m .m-menu .m-btn { min-height: 34px; justify-content: flex-start; text-align: left; padding: 0 10px; font-size: var(--fs-s) !important; }
 .m .m-menu .m-btn:hover, .m .m-menu .m-btn:focus-visible { background: var(--ink); color: var(--panel); text-shadow: none; outline: 0; }
-/* ---- the step sequencer on the laptop: under the perform page, in a space of its own (greyed out until one is
-   open), so everything stays playable while it's open. Sixteen steps in a row, the four bars, then the buttons ---- */
-@media (min-width: 1000px) {
-  .m-seq { position: static; grid-area: 4 / 1; z-index: auto; display: block; padding: 0; pointer-events: auto; }
-  /* (closed, it stays in view greyed out, nothing on it taking a click) */
-  .m-seq[hidden] { display: block !important; } /* (over the page-wide [hidden] rule) */
-  .m-seq[hidden] .m-seq-card { opacity: .28; pointer-events: none; }
-  .m-seq-card { max-width: none; height: clamp(130px, 22vh, 190px); padding: 8px 24px 0 4px; border: 0; border-top: var(--rule); border-radius: 0;
-    background: none; box-shadow: none; grid-template-columns: minmax(0, 1fr) minmax(220px, 32%) 220px; grid-template-rows: auto repeat(4, minmax(0, 1fr)); gap: 4px 16px; }
-  .m-seq-card > .m-chead { grid-area: 1 / 1 / 2 / 2; min-width: 0; } .m-seq-card > .m-chead b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-  .m-seq-steps { grid-area: 2 / 1 / 6 / 2; grid-template-columns: repeat(16, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
-  .m-seq-lenrow { grid-column: 2; grid-template-columns: 4em 1fr 5em; gap: 8px; }
-  .m-seq-lenrow output { min-width: 0; }
-  .m-seq-card > .m-seq-lenrow:nth-child(3) { grid-row: 2; } .m-seq-card > .m-seq-lenrow:nth-child(4) { grid-row: 3; }
-  .m-seq-card > .m-seq-lenrow:nth-child(5) { grid-row: 4; } .m-seq-card > .m-seq-lenrow:nth-child(6) { grid-row: 5; }
-  .m-seq-len { height: 100%; max-height: 28px; }
-  .m-seq-btns .m-btn { min-height: 0; }
-  /* (no done: it's always there, showing the control last touched); the shapes in two columns beside randomise */
-  .m-seq-btns { grid-area: 1 / 3 / 6 / 4; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); } #m-seq-close { display: none; }
-  .m-seq-shapes { display: grid; grid-template-rows: repeat(5, minmax(0, 1fr)); gap: 4px; min-height: 0; }
-  .m .m-seq-shapes .m-btn { min-height: 0; padding: 0 4px; font-size: var(--fs-xs) !important; letter-spacing: .02em; white-space: nowrap; }
-  .m .m-vf.seq-edit { outline: 2px dashed var(--ink); outline-offset: 2px; }
-}
-
 /* ---- the presets search, and a presets file dropped anywhere on the page ---- */
 .m .m-psearch { min-height: 38px; padding: 0 10px; border: 2px solid var(--ink); border-radius: 3px; background: transparent; color: var(--ink);
   font: inherit; font-size: var(--fs-s); text-transform: uppercase; letter-spacing: .06em; }
@@ -1431,74 +1325,136 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-psearch:focus { outline: 2px solid var(--ink); outline-offset: 2px; }
 .m.dropping::before { content: "drop presets file to import"; position: absolute; inset: 10px; z-index: 40; display: grid; place-items: center; border: 3px dashed var(--ink);
   border-radius: 6px; background: rgba(167, 181, 140, .85); font-size: var(--fs-l); letter-spacing: .12em; text-transform: uppercase; pointer-events: none; }
-
 /* ---- x/y: the trail canvas under the square ---- */
 .m-xy-trail { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-
 /* ---- randomise depth: a bar along the foot of a randomise button, as far across as its depth (shown below 100%) ---- */
 .m .m-rand .m-btn { position: relative; touch-action: none; }
 .m .m-rand .m-btn.rd::after { content: ""; position: absolute; left: 3px; bottom: 3px; height: 3px; width: calc((100% - 6px) * var(--rd, 1));
   background: repeating-linear-gradient(to right, currentColor 0 4px, transparent 4px 6px); pointer-events: none; }
-
-/* ---- bigger small print on the laptop (Johnny): the phone's sizes are capped for a narrow screen; here the small
-   sizes go up and the caps come off ---- */
-@media (min-width: 1000px) {
-  .m { --fs-xs: 1.3rem; --fs-s: 1.42rem; --fs-m: 1.5rem; }
-  .m #m-faders .m-flab, .m #m-beat-faders .m-flab, .m #m-beat-faders .m-vf output, .m-nextbar, .m .m-xhead, .m-xcell, .m .m-cccell small,
-  .m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output, .m .m-vset .m-vf output,
-  .m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab { font-size: var(--fs-xs); }
-  .m-helpbtn, .m .m-voice .m-btn, .m .m-rs-tabs .m-btn, .m .m-ch-list .m-btn, .m-big { font-size: var(--fs-xs) !important; }
-  .m .m-rand-card .m-rand .m-btn { font-size: clamp(14px, 1.13vw, 18px) !important; }
-  .m .m-seq-lenrow, .m .m-seq-lenrow output { font-size: var(--fs-xs); }
-  .m-seq-card { grid-template-columns: minmax(0, 1fr) minmax(250px, 36%) 230px; } .m-seq-btns { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } #m-seq-rand { display: none; } .m-seq-lenrow { grid-template-columns: 3.6em minmax(0, 1fr) 4.2em; }
-  .m .m-seq-shapes .m-btn { font-size: var(--fs-xs) !important; }
-  .m-foot { font-size: 1.15rem; }
-}
-/* ---- a small RND in the top left of each randomise button (laptop) ---- */
-@media (min-width: 1000px) {
-  .m .m-rand .m-btn:not(#m-undo)::before { content: "rnd"; position: absolute; left: 4px; top: 2px; font-size: 11px; line-height: 1; letter-spacing: .06em; opacity: .7; pointer-events: none; }
-}
 /* (the help's numbered lists keep their numbers inside the sheet) */
 #m-help-text ol { padding-left: 1.8em; }
 
-/* ---- laptop tidy (Johnny: every page neat and balanced) ---- */
+/* ==== the laptop screen (1000 px and wider) ====
+   Calm: the perform knobs always open, wide, on the left, the step sequencer under them; every other page one at a time
+   on the right, chosen by the page buttons above it. The title line runs across both: the cauldron, options, the
+   randomise buttons, then play and rec. The pages' box and the perform page step aside (display: contents) so their
+   parts sit on this one grid. The phone's small print is capped for a narrow screen; here it's bigger. */
 @media (min-width: 1000px) {
-  /* readouts on one line, so every fader's track starts at the same height */
-  .m #m-beat-faders .m-vf output, .m .m-vset .m-vf output { white-space: nowrap; height: 1.2em; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; text-align: center; }
-  /* voice: only as many rows as the tab has faders, each as tall as the frame allows */
-  .m-vset { grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); row-gap: 14px; }
-  /* mixer: the send knobs a fixed size, their readouts just over them; the heading level with the knobs' columns */
-  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { flex: none; height: 46px; min-height: 0; }
-  .m-fx-card.m-mix-card { grid-template-rows: auto auto minmax(0, 1fr); row-gap: 10px; }
-  .m-mix-card .m-knob { justify-content: end; }
-  /* x/y: the pads' axis names clear of the square's corner */
-  .m-xy-x, .m-xy-y { z-index: 1; background: var(--panel); padding: 0 4px; }
-}
-@media (min-width: 1000px) {
-  /* mixer strips: echo send knob, ring mod send knob under it, then the level fader, a column a drum */
-  .m-fx-card.m-mix-card { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: auto auto auto minmax(0, 1fr); gap: 8px 10px; }
-  #m-mix-echo > .m-vf:nth-child(n), #m-mix-ring > .m-vf:nth-child(n), #m-mix-vol > .m-vf { grid-column: auto; }
-  #m-mix-echo > .m-vf { grid-row: 2; } #m-mix-ring > .m-vf { grid-row: 3; } #m-mix-vol > .m-vf { grid-row: 4; grid-column: auto; }
-  .m-mix-card .m-fx-row:nth-child(1) > b::before { content: "sends: echo (top) and ring mod (under), then level" !important; }
-  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { height: 52px; }
-  .m-mix-card .m-knob { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .m-mix-card .m-knob output { height: auto; text-align: center; }
-  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { width: 52px; height: 44px; }
-}
-/* ---- the version number, just the number, in the glass colour on the cauldron's body (laptop) ---- */
-@media (min-width: 1000px) {
+  .m { --fs-xs: 1.3rem; --fs-s: 1.42rem; --fs-m: 1.5rem; --cauldron: url("data:image/png;base64,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");
+    max-width: 1600px; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto; column-gap: 0; padding: 8px 18px 14px; }
+  .m-pages, [data-m-panel="play"] { display: contents; }
+
+  /* -- the title line: the cauldron with the version on it, one options button (next bar, assign, settings, user
+     settings, help, install), the randomise buttons, then play and rec (no loop button: rec's hold or right-click
+     chooses free or a loop) -- */
+  .m-top { grid-area: 1 / 1; align-self: center; justify-self: start; width: 180px; gap: 10px; border-bottom: 0; padding: 0 24px 0 4px; }
+  .m-pagename, .m-title-long, .m-userbtn, #m-set-open, #m-help-open, .m-ver-v { display: none; }
   .m-title { position: relative; display: inline-flex; align-items: center; }
-  .m-title-short { width: 46px; height: 46px; }
-  .m-ver-v { display: none; }
+  /* (a small cauldron in the LCD's ink, cast like the type; the version number on its body in the glass colour) */
+  .m-title-short { display: inline-block; width: 46px; height: 46px; vertical-align: middle; font-size: 0; color: transparent; background: var(--ink);
+    -webkit-mask: var(--cauldron) center / contain no-repeat; mask: var(--cauldron) center / contain no-repeat; filter: drop-shadow(2px 2.2px 0 rgba(23, 32, 14, .17)); }
   .m .m-title .m-ver { position: absolute; left: 0; width: 46px; top: 58%; transform: translateY(-50%); margin: 0; text-align: center;
     color: var(--panel); opacity: 1; font-size: 15px; letter-spacing: 0; text-shadow: none; pointer-events: none; }
+  .m .m-optsbtn { display: grid; padding: 0 10px !important; font-size: var(--fs-xs) !important; letter-spacing: .04em; }
+  .m > .m-card.m-trans { grid-area: 1 / 2; border-bottom: 0; padding: 6px 0 10px 24px; grid-template-columns: 130px 130px; justify-content: end; }
+  .m .m-play, .m .m-rec { min-height: 38px; }
+  .m .m-trans .m-loop { display: none; }
+  /* (the randomise bar runs on to the transport, over the start of the right half; every box the same size, undo too,
+     in groups: the sound ones, the effects ones, then undo; next bar and assign are in options) */
+  .m-pages .m-rand-card { grid-area: 1 / 1 / 2 / 3; align-self: center; margin: 0 310px 0 196px; padding: 6px 0 10px; border: 0; }
+  .m-rand-card .m-rand { grid-template-columns: repeat(4, minmax(0, 1fr)) 6px repeat(3, minmax(0, 1fr)) 6px minmax(0, 1fr); grid-template-rows: 40px; height: auto; gap: 0 6px; }
+  .m .m-rand-card .m-rand .m-btn { grid-row: 1; padding: 0 2px; letter-spacing: 0; font-size: clamp(14px, 1.13vw, 18px) !important; }
+  .m-rand > :nth-child(1), .m-rand > :nth-child(2) { display: none; }
+  .m-rand > :nth-child(3) { grid-column: 1; } .m-rand > :nth-child(4) { grid-column: 2; } .m-rand > :nth-child(5) { grid-column: 3; } .m-rand > :nth-child(6) { grid-column: 4; }
+  .m-rand > :nth-child(7) { grid-column: 6; } .m-rand > :nth-child(8) { grid-column: 7; } .m-rand > :nth-child(9) { grid-column: 8; } .m-rand > :nth-child(10) { grid-column: 10; }
+  /* (a small RND in the top left of each randomise button) */
+  .m .m-rand .m-btn:not(#m-undo)::before { content: "rnd"; position: absolute; left: 4px; top: 2px; font-size: 11px; line-height: 1; letter-spacing: .06em; opacity: .7; pointer-events: none; }
+
+  /* -- the perform knobs: one rounded box round them all; each knob's ring on the left of its cell, value over name
+     beside it -- */
+  .m-play-card { grid-area: 2 / 1 / 4 / 2; min-height: 0; padding: 14px 24px 10px 4px; border-top: var(--rule); }
+  #m-faders { gap: 10px 14px; padding: 12px 16px; border: 1.5px solid var(--ink); border-radius: 14px; }
+  #m-faders .m-knob { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr 1fr; column-gap: 10px; align-items: center; justify-items: start; }
+  .m #m-faders .m-knob .m-vtrack { grid-area: 1 / 1 / 3 / 2; height: 100%; width: auto; aspect-ratio: 1; max-height: 52px; min-height: 0; }
+  @media (max-width: 1360px) { .m #m-faders .m-knob .m-vtrack { max-height: 42px; } }
+  #m-faders .m-knob output { grid-area: 1 / 2; align-self: end; height: auto; max-width: 100%; text-align: left; font-size: var(--fs-s); }
+  #m-faders .m-knob .m-flab { grid-area: 2 / 2; align-self: start; max-width: 100%; text-align: left; }
+  .m #m-faders .m-flab { font-size: var(--fs-xs); }
+
+  /* -- the step sequencer, under the knobs (greyed out until a control's is shown, nothing on it taking a click then):
+     sixteen steps in a row, the four bars, then the shapes and the five kinds of random (no done: it's always there) -- */
+  .m-seq { position: static; grid-area: 4 / 1; z-index: auto; display: block; padding: 0; pointer-events: auto; }
+  .m-seq[hidden] { display: block !important; } /* (over the page-wide [hidden] rule) */
+  .m-seq[hidden] .m-seq-card { opacity: .28; pointer-events: none; }
+  .m-seq-card { max-width: none; height: clamp(130px, 22vh, 190px); padding: 8px 24px 0 4px; border: 0; border-top: var(--rule); border-radius: 0;
+    background: none; box-shadow: none; grid-template-columns: minmax(0, 1fr) minmax(250px, 36%) 230px; grid-template-rows: auto repeat(4, minmax(0, 1fr)); gap: 4px 16px; }
+  .m-seq-card > .m-chead { grid-area: 1 / 1 / 2 / 2; min-width: 0; } .m-seq-card > .m-chead b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .m-seq-steps { grid-area: 2 / 1 / 6 / 2; grid-template-columns: repeat(16, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+  .m-seq-lenrow { grid-column: 2; grid-template-columns: 3.6em minmax(0, 1fr) 4.2em; gap: 8px; }
+  .m-seq-lenrow output { min-width: 0; }
+  .m .m-seq-lenrow, .m .m-seq-lenrow output { font-size: var(--fs-xs); }
+  .m-seq-card > .m-seq-lenrow:nth-child(3) { grid-row: 2; } .m-seq-card > .m-seq-lenrow:nth-child(4) { grid-row: 3; }
+  .m-seq-card > .m-seq-lenrow:nth-child(5) { grid-row: 4; } .m-seq-card > .m-seq-lenrow:nth-child(6) { grid-row: 5; }
+  .m-seq-len { height: 100%; max-height: 28px; }
+  .m-seq-btns { grid-area: 1 / 3 / 6 / 4; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+  .m-seq-btns .m-btn { min-height: 0; }
+  #m-seq-close, #m-seq-rand { display: none; }
+  .m-seq-shapes { display: grid; grid-template-rows: repeat(5, minmax(0, 1fr)); gap: 4px; min-height: 0; }
+  .m .m-seq-shapes .m-btn { min-height: 0; padding: 0 4px; font-size: var(--fs-xs) !important; letter-spacing: .02em; white-space: nowrap; }
+  .m .m-vf.seq-edit { outline: 2px dashed var(--ink); outline-offset: 2px; }
+
+  /* -- the right: the page buttons, then the page chosen (beat until another is) -- */
+  .m > .m-tabs { grid-area: 2 / 2; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0; padding: 10px 0 8px 24px; border-top: var(--rule); border-left: var(--rule); }
+  .m > .m-tabs button[data-m-tab="play"] { display: none; }
+  .m > .m-tabs button { min-height: 40px; }
+  .m .m-tabs button { font-size: var(--fs-m) !important; }
+  .m-panel:not([data-m-panel="play"]) { grid-area: 3 / 2 / 5 / 3; display: none; padding: 8px 0 0 24px; border-left: var(--rule); }
+  .m[data-page="beat"] [data-m-panel="beat"], .m[data-page="dice"] [data-m-panel="dice"], .m[data-page="xy"] [data-m-panel="xy"], .m[data-page="fx"] [data-m-panel="fx"],
+  .m[data-page="mix"] [data-m-panel="mix"], .m[data-page="comp"] [data-m-panel="comp"], .m[data-page="presets"] [data-m-panel="presets"] { display: grid; }
+  /* (every page's faders: readouts and names in the bigger small print; beat's and voice's readouts on one line, so
+     every track starts at the same height) */
+  .m #m-beat-faders .m-flab, .m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab,
+  .m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output { font-size: var(--fs-xs); }
+  .m #m-beat-faders .m-vf output, .m .m-vset .m-vf output { font-size: var(--fs-xs); white-space: nowrap; height: 1.2em; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; text-align: center; }
+  /* voice: only as many rows as the tab has faders, each as tall as the frame allows */
+  .m .m-voice .m-btn { font-size: var(--fs-xs) !important; }
+  .m-vset { grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); row-gap: 14px; }
+  /* x/y: the pads' axis names clear of the square's corner */
+  .m-xy-x, .m-xy-y { z-index: 1; background: var(--panel); padding: 0 4px; }
+  /* fx: the crossfeed matrix's names and numbers */
+  .m .m-xhead, .m-xcell { font-size: var(--fs-xs); }
+  /* mixer: a channel strip a drum: its echo send knob, its ring mod send knob, then its level fader with a meter
+     beside it. The rows and their fader boxes step aside so every control sits on one grid, a column a drum */
+  .m-fx-card.m-mix-card { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: auto auto auto minmax(0, 1fr); gap: 8px 10px; padding: 2px; }
+  .m-mix-card .m-fx-row, .m-mix-card .m-fx-row .m-faders { display: contents; }
+  .m-mix-card .m-fx-row > b { padding: 0; white-space: nowrap; font-size: var(--fs-xs); letter-spacing: .04em; opacity: .75; }
+  .m-mix-card .m-fx-row:nth-child(1) > b { grid-row: 1; grid-column: 1 / -1; font-size: 0; }
+  .m-mix-card .m-fx-row:nth-child(1) > b::before { content: "sends: echo (top) and ring mod (under), then level"; font-size: var(--fs-xs); }
+  .m-mix-card .m-fx-row:nth-child(n+2) > b { display: none; }
+  #m-mix-echo > .m-vf { grid-row: 2; } #m-mix-ring > .m-vf { grid-row: 3; } #m-mix-vol > .m-vf { grid-row: 4; }
+  /* (the sends' names would repeat the strip's; the level fader's name, under it, names the strip) */
+  #m-mix-echo .m-flab, #m-mix-ring .m-flab { display: none; }
+  .m-mix-card .m-knob { display: flex; flex-direction: column; align-items: center; justify-content: end; gap: 2px; }
+  .m-mix-card .m-knob output { display: block; height: auto; white-space: nowrap; text-align: center; }
+  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { flex: none; width: 52px; height: 44px; min-height: 0; }
+  .m .m-mix-card #m-mix-vol .m-vtrack { width: min(30px, 70%); overflow: visible; margin-right: 10px; }
+  /* (the meter: segments up beside the fader, the peak held a moment as one segment) */
+  .m-lvm { --m: 0; --h: 0; position: absolute; left: calc(100% + 4px); top: 0; bottom: 0; width: 6px; pointer-events: none;
+    background: repeating-linear-gradient(to top, var(--ghost) 0 3px, transparent 3px 5px); }
+  .m-lvm .m-lvm-on { position: absolute; left: 0; right: 0; bottom: 0; height: round(down, calc(var(--m) * 100%), 5px); background: repeating-linear-gradient(to top, var(--ink) 0 3px, transparent 3px 5px); }
+  .m-lvm .m-lvm-pk { position: absolute; left: 0; right: 0; height: 3px; bottom: round(down, calc(var(--h) * (100% - 3px)), 5px); background: var(--ink); opacity: calc(var(--h) * 4); }
+  /* presets: install app is in options instead */
+  .m .m-pio .m-install { display: none !important; }
+  .m-foot { font-size: 1.15rem; }
+  /* the pop-ups' tabs and the slot chooser's buttons, and the midi grid */
+  .m .m-rs-tabs .m-btn, .m .m-ch-list .m-btn, .m-big { font-size: var(--fs-xs) !important; }
+  .m .m-cccell small { font-size: var(--fs-xs); }
 }
-@media (min-width: 1000px) { .m .m-pio .m-install { display: none !important; } }
 </style>
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>164</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>165</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
@@ -1585,7 +1541,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v164, 29 Oct, 13:41</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v165, 29 Oct, 14:19</footer>
     </section>
   </div>
   </div>
