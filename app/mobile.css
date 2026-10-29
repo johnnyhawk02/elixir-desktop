@@ -636,3 +636,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-mix-card .m-knob output { height: auto; text-align: center; }
   .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { width: 52px; height: 44px; }
 }
+/* ---- the version number in white on the cauldron's body (laptop) ---- */
+@media (min-width: 1000px) {
+  .m-title { position: relative; display: inline-flex; align-items: center; }
+  .m-title-short { width: 46px; height: 46px; }
+  .m .m-title .m-ver { position: absolute; left: 0; width: 46px; top: 58%; transform: translateY(-50%); margin: 0; text-align: center;
+    color: #fff; opacity: 1; font-size: 13px; letter-spacing: 0; text-shadow: none; pointer-events: none; }
+}
