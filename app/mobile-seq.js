@@ -124,7 +124,7 @@ function mGlideRun() {
 $('m').addEventListener('contextmenu', (e) => e.preventDefault());
 // one step of a fader's sequencer: its offset, jumped to or, with slew, glided to over that share of the step
 function mSeqStep(f, i, ms) {
-  const q = f.seq, k = i % q.len, to = q.vals[k];
+  const q = f.seq, k = Math.floor(i) % q.len, to = q.vals[k] || 0;
   if (q.slew) { f.glide = { from: f.off, to, t0: performance.now(), ms: q.slew / 100 * ms }; mGlideRun(); } else { f.glide = null; f.off = to; mSeqApply(f); }
   if (f === mSeqF) mSeqSteps.forEach((c, j) => c.classList.toggle('now', j === k));
 }
@@ -169,8 +169,9 @@ onEvent = function (ev) {
     if (off) {
       const k = n + 1, s16 = k % 16;
       for (const f of due(k)) {
-        const t = mSeqTrack(f), o = t >= 0 ? off[t][s16] : off.reduce((a, r) => a + r[s16], 0) / off.length;
-        setTimeout(() => { if (playing && f.seq && f.seq.on) mSeqStep(f, k / (f.seq.step || 1), stepMs * (f.seq.step || 1)); }, Math.max(0, stepMs * (1 + o)));
+        const t = mSeqTrack(f), o = t >= 0 ? off[t][s16] : off.reduce((a, r) => a + r[s16], 0) / off.length, len = f.seq.step || 1;
+        // (its step and length as booked: the speed may change before it lands)
+        setTimeout(() => { if (playing && f.seq && f.seq.on) mSeqStep(f, k / len, stepMs * len); }, Math.max(0, stepMs * (1 + o)));
       }
     }
   } else if (ev.type === 'step') mSeqLast = -2;
