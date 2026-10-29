@@ -15,7 +15,7 @@ const HELP = [
 <li>Click to randomise. Drag up or down on one to set how far it goes, 10% to 100% (a dotted bar along its foot below 100%): at 30% it moves everything only 30% of the way to the new sound, and switches choices like the style 30% of the time.</li>
 <li>Hold one still for half a second for its settings, the ranges and chances it uses.</li>
 <li><b>options</b> › <b>randomise on next bar</b>: while playing, randomises wait for the start of the next bar (the button flashes until then).</li></ul>`],
-  ['mute', 'mutes and sends', `<p>Beside the knobs, a column for each drum (drum 1, 2, 3, snare, cymbal, hihat): its level meter, its mute, then its echo send and ring mod send as number boxes, each with its own mute.</p>
+  ['mute', 'mutes and sends', `<p>Beside the knobs, a column for each drum (drum 1, 2, 3, snare, cymbal, hihat): its level meter, its ring mod send and echo send as number boxes (each with its own mute), and its mute at the foot.</p>
 <ul><li>Keys: <b>z x c v b n</b> mute the drums; <b>a s d f g h</b> mute their echo sends; <b>q w e r t y</b> their ring mod sends. <b>clear</b> lifts every mute.</li>
 <li>Drag a number box up or down, or scroll on it, to set the send; double-click to reset. A muted send sends nothing but keeps its amount (its box goes black).</li>
 <li>Mutes work on the notes, not the sound: a muted drum's last hit, its decay and its echo ring on. The hihat's mute covers both its closed and open hits. Presets keep them all.</li></ul>`],
