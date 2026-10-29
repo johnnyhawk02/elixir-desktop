@@ -53,4 +53,4 @@ function mHelpDraw() {
   $('m-help-text').innerHTML = `<h3>${title}</h3>${body}`; $('m-help-text').scrollTop = 0;
 }
 $('m-help-open').addEventListener('click', () => { mHelpTab = 0; mHelpDraw(); $('m-help').hidden = false; });
-$('m-help-close').addEventListener('click', () => { $('m-help').hidden = true; });
+mCloser('m-help');

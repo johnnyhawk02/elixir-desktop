@@ -964,21 +964,20 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 #m-faders .m-vf, #m-beat-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 3px; }
 #m-faders .m-vf output, #m-beat-faders .m-vf output { font-size: var(--fs-xs); line-height: 1; color: var(--ink); height: 2.5em; display: flex; align-items: flex-end; justify-content: center; flex: none; align-self: stretch; }
 #m-faders .m-flab, #m-beat-faders .m-flab { line-height: 1.2; }
-.m #m-faders .m-flab { font-size: min(var(--fs-xs), min(3.75vw, 15.5px)); letter-spacing: -.02em; }
 /* (a slot's name is shortened to fit one line, mobile-slots.js; an ellipsis if even that won't) */
-.m #m-faders .m-flab { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-.m #m-beat-faders .m-flab { font-size: min(var(--fs-xs), min(4vw, 16.5px)); letter-spacing: -.02em; white-space: nowrap; }
-.m #m-beat-faders .m-vf output { font-size: min(var(--fs-xs), min(3.8vw, 15.7px)); }
+.m #m-faders .m-flab { font-size: min(var(--fs-xs), 3.75vw, 15.5px); letter-spacing: -.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.m #m-beat-faders .m-flab { font-size: min(var(--fs-xs), 4vw, 16.5px); letter-spacing: -.02em; white-space: nowrap; }
+.m #m-beat-faders .m-vf output { font-size: min(var(--fs-xs), 3.8vw, 15.7px); }
 #m-faders .m-vtrack, #m-beat-faders .m-vtrack { width: min(56px, 100%); flex: 1; height: auto; min-height: 48px; }
 #m-beat-faders .m-vtrack { min-height: 16px; }
 
 /* the small faders (voice, fx, mix, master): a one-line readout, a narrow label */
 .m-fx-row .m-vf, #m-comp .m-vf, #m-duck .m-vf, #m-dist .m-vf, .m-vset .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
 .m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output, .m .m-vset .m-vf output {
-  font-size: min(var(--fs-xs), min(3.9vw, 16.1px)); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; }
+  font-size: min(var(--fs-xs), 3.9vw, 16.1px); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; }
 .m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output { white-space: nowrap; }
 .m .m-fx-row .m-vf output { display: flex; align-items: flex-end; justify-content: center; }
-.m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab { font-size: min(1.05rem, min(3.7vw, 15.2px)); letter-spacing: 0; white-space: nowrap; }
+.m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab { font-size: min(1.05rem, 3.7vw, 15.2px); letter-spacing: 0; white-space: nowrap; }
 .m .m-vset .m-flab, .m .m-vset .m-vf output { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 .m .m-fx-row .m-vtrack, .m #m-comp .m-vtrack, .m #m-duck .m-vtrack, .m #m-dist .m-vtrack, .m .m-vset .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 12px; }
 .m .m-fx-row .m-vtrack { width: min(44px, 100%); }
@@ -1007,7 +1006,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-play svg { width: 20px; height: 20px; fill: currentColor; }
 .m-play .i-stop, .m-play[aria-pressed="true"] .i-play { display: none; }
 .m-play[aria-pressed="true"] .i-stop { display: inline; }
-.m .m-rec { display: grid; grid-auto-flow: column; justify-content: center; place-items: center; align-content: center; gap: min(10px, min(2vw, 8.2px)) !important; min-height: 46px; }
+.m .m-rec { display: grid; grid-auto-flow: column; justify-content: center; place-items: center; align-content: center; gap: min(10px, 2vw, 8.2px) !important; min-height: 46px; }
 .m-rec i { width: 16px; height: 16px; border-radius: 2px; background: var(--ink); }
 .m-rec span { font-family: var(--mono); font-size: var(--fs-s); font-variant-numeric: tabular-nums; }
 .m-rec.on i { width: 16px; height: 16px; border-radius: 4px; background: var(--panel); animation: m-blink 1s steps(1) infinite; }
@@ -1028,7 +1027,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m > .m-tabs { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 2px; margin-top: 6px; padding: 8px 0 0; border-top: var(--rule); }
 .m-tabs button { border-color: transparent; min-width: 0; }
 .m-tabs button[aria-selected="true"] { border-color: var(--ink); }
-.m .m-tabs button { min-height: 56px; padding: 0; font-size: min(1.4rem, min(4.9vw, 20.2px)) !important; letter-spacing: 0; }
+.m .m-tabs button { min-height: 56px; padding: 0; font-size: min(1.4rem, 4.9vw, 20.2px) !important; letter-spacing: 0; }
 
 /* ---- perf: twelve faders, four by three (as beat and voice), and the randomise column beside them ---- */
 [data-m-panel="play"] { grid-template-columns: minmax(0, 1fr) 92px; gap: 8px; }
@@ -1039,8 +1038,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-rand { display: grid; }
 .m-rand-card .m-rand { grid-template-columns: 1fr; grid-template-rows: auto auto repeat(8, minmax(0, 1fr)); grid-auto-rows: auto; gap: 6px; align-content: stretch; min-width: 0; height: 100%; }
 .m-rand-card .m-rand .m-btn { min-height: 0; min-width: 0; padding: 0 2px; letter-spacing: .02em; overflow: hidden; }
-.m .m-rand-card .m-rand .m-btn { font-size: min(var(--fs-xs), min(3.7vw, 15.2px)) !important; white-space: nowrap; }
-.m-nextbar { gap: 6px; font-size: min(var(--fs-xs), min(3.6vw, 14.8px)); white-space: nowrap; }
+.m .m-rand-card .m-rand .m-btn { font-size: min(var(--fs-xs), 3.7vw, 15.2px) !important; white-space: nowrap; }
+.m-nextbar { gap: 6px; font-size: min(var(--fs-xs), 3.6vw, 14.8px); white-space: nowrap; }
 .m-rand-card .m-nextbar { justify-content: flex-start; padding-left: 6px; min-height: 30px; }
 .m-nextbar i { width: 18px; height: 18px; }
 /* next bar: a button waiting for the bar flashes */
@@ -1059,7 +1058,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-dice-card { display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 10px; min-height: 0; padding: 10px 2px; }
 .m-voice { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
 .m-vsec { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; align-items: end; border-bottom: 2px solid var(--ink); }
-.m .m-voice .m-btn { min-height: 44px; min-width: 0; padding: 0 1px; font-size: min(1.05rem, min(3.6vw, 14.8px)) !important; letter-spacing: 0; overflow: hidden; }
+.m .m-voice .m-btn { min-height: 44px; min-width: 0; padding: 0 1px; font-size: min(1.05rem, 3.6vw, 14.8px) !important; letter-spacing: 0; overflow: hidden; }
 /* the pages are tabs: the chosen one opens into a frame round its faders, the others sit on the line */
 .m .m-vsec .m-btn { min-height: 40px; margin-bottom: -2px; border-color: transparent; border-bottom: 0; border-radius: 4px 4px 0 0; box-shadow: none; opacity: .8; }
 .m .m-vsec .m-btn[aria-selected="true"] { position: relative; z-index: 1; background: var(--panel) !important; color: var(--ink) !important; border-color: var(--ink); opacity: 1; text-shadow: inherit; }
@@ -1118,11 +1117,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-fx-row { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 2px; min-height: 0; }
 .m-fx-row + .m-fx-row { border-top: var(--rule); padding-top: 6px; }
 .m-fx-row b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); padding-left: 4px; }
-/* (the row headings the same size as the master page's) */
-.m-fx-row > b, .m-fxhead b { font-size: var(--fs-m); }
 /* the echo row's heading, with its ping pong box */
 .m-fxhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.m-fxhead b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); }
+/* (the row headings the same size as the master page's) */
+.m-fx-row > b, .m-fxhead b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-m); }
 .m-fxhead .m-chk { min-height: 30px; gap: 8px; }
 .m-fxhead .m-chk i { width: 20px; height: 20px; }
 /* six to a row everywhere small faders sit in rows, so the columns line up (the master page's rows too) */
@@ -1201,8 +1199,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-seq-btns { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; }
 .m-seq-btns .m-btn { min-height: 52px; }
 
-/* ---- pop-ups over the whole screen: the randomisers' settings (tap the title), the perf slot chooser, and the loop
-   length (a small card near the top). Each: a heading, a strip of tabs, a list, then buttons ---- */
+/* ---- pop-ups over the whole screen: the randomisers' settings (hold a randomise button), the perf slot chooser, the
+   loop length (a small card near the top), settings, user settings and help. Each: a heading, a strip of tabs, a list, then buttons ---- */
 .m-rs { position: fixed; inset: 0; z-index: 11; display: flex; justify-content: center;
   padding: max(8px, env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px)) max(8px, env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
 .m-rs[hidden] { display: none; }
@@ -1211,7 +1209,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-rs-card .m-chead { gap: 8px; }
 .m-rs-card .m-chead b { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .m-rs-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
-.m .m-rs-tabs .m-btn { min-height: 40px; font-size: min(var(--fs-xs), min(3.8vw, 15.7px)) !important; padding: 0 2px; letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m .m-rs-tabs .m-btn { min-height: 40px; font-size: min(var(--fs-xs), 3.8vw, 15.7px) !important; padding: 0 2px; letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .m-rs-rows { display: grid; align-content: start; gap: 10px; overflow-y: auto; overscroll-behavior: contain; min-height: 0; padding: 4px 2px; border-top: var(--rule); }
 .m-rs-rows .m-seq-lenrow { grid-template-columns: 7.2em minmax(0, 1fr) 3.6em; gap: 8px; font-size: var(--fs-xs); }
 .m-rs-rows .m-seq-lenrow output { min-width: 0; text-align: right; white-space: nowrap; }
@@ -1223,7 +1221,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-ch-list { overflow-y: auto; overscroll-behavior: contain; min-height: 0; display: grid; align-content: start; gap: 6px; border-top: var(--rule); padding-top: 6px; }
 .m-ch-list > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-xs); margin-top: 4px; }
 .m-ch-list > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-.m .m-ch-list .m-btn { min-height: 44px; font-size: min(var(--fs-xs), min(3.6vw, 14.8px)) !important; padding: 0 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.m .m-ch-list .m-btn { min-height: 44px; font-size: min(var(--fs-xs), 3.6vw, 14.8px) !important; padding: 0 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .m-set-card { grid-template-rows: auto auto minmax(0, 1fr); }
 .m-set-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .m-setpane { display: grid; gap: 8px; align-content: start; min-height: 0; }
@@ -1273,7 +1271,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-small { align-items: flex-start; padding-top: 120px; }
 .m-small .m-rs-card { height: auto; grid-template-rows: auto auto; }
 .m-looplens { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
-.m .m-looplens .m-btn { min-height: 56px; font-size: min(var(--fs-xs), min(3.8vw, 15.7px)) !important; padding: 0 2px; }
+.m .m-looplens .m-btn { min-height: 56px; font-size: min(var(--fs-xs), 3.8vw, 15.7px) !important; padding: 0 2px; }
 
 /* ---- LCD fade: liquid crystal is slow, so segments come on quickly and linger a moment going off. The faders' and
    meters' lit segments, the step bars and the inverted buttons and tabs ease rather than jump (off slower than on);
@@ -1290,7 +1288,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v127</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v128</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1375,7 +1373,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · v127, 28 Oct, 09:25</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · v128, 29 Oct, 06:03</footer>
     </section>
   </div>
   </div>
@@ -7927,10 +7925,33 @@ drawScope();
 // the buttons here press theirs and the sliders write the same state. This file: pages, transport and the faders
 // every page uses. Then, in build order: mobile-pages (beat, perf, master, randomisers, voice), mobile-presets,
 // mobile-record, mobile-mix (fx, distortion, mix), mobile-seq (step sequencers), mobile-extras (install, next bar),
-// mobile-xy, mobile-settings (the randomisers' settings), mobile-slots (perf slots and MIDI CC), mobile-glass.
+// mobile-xy, mobile-settings (the randomisers' settings), mobile-slots (perf slots and MIDI CC), mobile-setup
+// (settings, behind the gear), mobile-rush (its rush graph), mobile-user (user settings), mobile-help, mobile-glass.
 // iOS: play Web Audio through the ringer switch like a music app
 try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
 const mRnd = (n) => Math.floor(Math.random() * n);
+
+// ---- small helpers for the pop-ups and their buttons ----
+// a button says something for a moment (copied, none saved yet), then its own name again
+function mSay(btn, text) {
+  const idle = btn.dataset.idle ??= btn.textContent;
+  btn.textContent = text; clearTimeout(btn.mSayT); btn.mSayT = setTimeout(() => { btn.textContent = idle; }, 1500);
+}
+// text to the clipboard, the button saying so; where the clipboard is refused, a box with the text to copy by hand
+async function mCopy(btn, text, said = 'copied', ask = 'Copy this:') {
+  try { await navigator.clipboard.writeText(text); mSay(btn, said); } catch (e) { prompt(ask, text); }
+}
+// a strip of tabs over panes: data-<k> on each tab, data-<k>-pane on the pane it shows (then: after a change)
+function mPaneTabs(strip, k, then) {
+  strip.addEventListener('click', (e) => {
+    const b = e.target.closest(`[data-${k}]`); if (!b) return;
+    for (const t of strip.children) t.setAttribute('aria-selected', t === b);
+    for (const p of document.querySelectorAll(`[data-${k}-pane]`)) p.hidden = p.dataset[`${k}Pane`] !== b.dataset[k];
+    if (then) then();
+  });
+}
+// a pop-up's done button (its id + '-close') hides it
+const mCloser = (id, then) => $(id + '-close').addEventListener('click', () => { $(id).hidden = true; if (then) then(); });
 
 // ---- pages: tap a tab to scroll to one (the pages don't swipe). The tab changes once, at once, not for each page passed ----
 const mPages = $('m-pages');
@@ -8419,7 +8440,7 @@ function mLoopPick() {
   }
   $('m-looplen').hidden = false;
 }
-$('m-looplen-close').addEventListener('click', () => { $('m-looplen').hidden = true; });
+mCloser('m-looplen');
 mRecUi();
 $('m-loop').addEventListener('click', async () => {
   if (recState === 'off') {
@@ -8681,7 +8702,7 @@ mSeqBar($('m-seq-speed'), (x) => { mSeqF.seq.step = SEQ_STEPS[Math.min(SEQ_STEPS
 mSeqBar($('m-seq-depth'), (x) => { mSeqF.seq.depth = Math.round(x * 20) * 5; if (mSeqF.base !== null) mSeqApply(mSeqF); });
 $('m-seq-rand').addEventListener('click', () => { const q = mSeqF.seq; for (let i = 0; i < 16; i++) q.vals[i] = mSeqOff(Math.random() * 2 - 1); q.on = true; mSeqDraw(); });
 $('m-seq-on').addEventListener('click', () => { mSeqF.seq.on = !mSeqF.seq.on; if (!mSeqF.seq.on) mSeqRelease(mSeqF); mSeqDraw(); });
-$('m-seq-close').addEventListener('click', () => { $('m-seq').hidden = true; mSeqF = null; });
+mCloser('m-seq', () => { mSeqF = null; });
 // the glides, a frame at a time while any is moving
 let mGlideOn = false;
 function mGlideRun() {
@@ -8907,14 +8928,10 @@ function mRsDraw() {
 }
 const mRsPlay = () => { $('m-rs-play').textContent = $('play').getAttribute('aria-pressed') === 'true' ? 'stop' : 'play'; };
 new MutationObserver(mRsPlay).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
-$('m-rs-close').addEventListener('click', () => { $('m-rs').hidden = true; });
+mCloser('m-rs');
 // copy: every page's settings as text, to paste back as the new defaults (RAND0); where the clipboard is refused, a
 // box with the text selected instead
-$('m-rs-copy').addEventListener('click', async () => {
-  const text = `Elixir Mobile randomise settings\n${JSON.stringify(RAND)}`;
-  try { await navigator.clipboard.writeText(text); $('m-rs-copy').textContent = 'copied'; setTimeout(() => { $('m-rs-copy').textContent = 'copy'; }, 1500); }
-  catch (e) { prompt('Copy these settings:', text); }
-});
+$('m-rs-copy').addEventListener('click', () => mCopy($('m-rs-copy'), `Elixir Mobile randomise settings\n${JSON.stringify(RAND)}`, 'copied', 'Copy these settings:'));
 $('m-rs-go').addEventListener('click', () => $(RS_PAGES[mRsPage][2]).click());
 $('m-rs-play').addEventListener('click', () => $('play').click());
 $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][0]; Object.assign(RAND[key], RAND0[key]); saveRand(); mRsDraw(); });
@@ -9055,17 +9072,15 @@ function mChDraw() {
     list.append(grid);
   }
 }
-$('m-ch-close').addEventListener('click', () => { $('m-ch').hidden = true; });
+mCloser('m-ch');
 $('m-ch-reset').addEventListener('click', () => {
   mSlots[mChSlot] = SLOT0[mChSlot].slice();
   try { localStorage.setItem(SLOT_KEY, JSON.stringify(mSlots)); } catch (e) {}
   mSlot(mChSlot); $('m-ch').hidden = true;
 });
 
-// ---- settings (the gear by the title): a tab each. copy: the perf faders' picks, to be baked in as SLOT0, and the
-// presets saved here, to be built in. rush: how the rush changes as it rises 0..100%, a lane each for the roll's speed, the other drums, the kick
-// and the high-pass, drawn from the rush settings (rushSet, app/rush-set.js; saved with each preset); dragging a
-// break point changes it, as the desktop's rush settings do ----
+// ---- settings (the gear by the title): a tab each. copy: the perf faders' picks (to be baked in as SLOT0), the presets
+// saved here (to be built in), export presets and clear all. rush: the rush graph (mobile-rush.js) ----
 // (for now the settings are behind a password, asked once a visit)
 const SET_PASS = 'Password1!';
 $('m-set-open').addEventListener('click', () => {
@@ -9077,40 +9092,31 @@ $('m-set-open').addEventListener('click', () => {
   }
   $('m-set').hidden = false; mRushDraw();
 });
-$('m-set-close').addEventListener('click', () => { $('m-set').hidden = true; });
-$('m-set-tabs').addEventListener('click', (e) => {
-  const b = e.target.closest('[data-set]'); if (!b) return;
-  for (const t of $('m-set-tabs').children) t.setAttribute('aria-selected', t === b);
-  for (const p of document.querySelectorAll('[data-set-pane]')) p.hidden = p.dataset.setPane !== b.dataset.set;
-  mRushDraw();
-});
+mCloser('m-set');
+mPaneTabs($('m-set-tabs'), 'set', () => mRushDraw());
 // copy presets: every preset saved here, and the built-in ones saved over, in the export file's format
 $('m-set-presets').addEventListener('click', async () => {
   const b = $('m-set-presets'), list = mSetPresets(false);
-  if (!list.length) { b.textContent = 'none saved yet'; setTimeout(() => { b.textContent = 'copy presets'; }, 1500); return; }
-  const text = `Elixir Mobile presets\n${JSON.stringify({ elixir: 1, presets: list })}`;
-  try { await navigator.clipboard.writeText(text); b.textContent = `copied ${list.length}`; setTimeout(() => { b.textContent = 'copy presets'; }, 1500); }
-  catch (e) { prompt('Copy the presets:', text); }
+  if (!list.length) { mSay(b, 'none saved yet'); return; }
+  mCopy(b, `Elixir Mobile presets\n${JSON.stringify({ elixir: 1, presets: list })}`, `copied ${list.length}`, 'Copy the presets:');
 });
 // the presets to copy or export: every one saved here and the built-in ones saved over (export adds the starred ones)
 const mSetPresets = (stars) => kitList.filter((k) => k.saved || k.edited || (stars && k.builtin && mFavs.has(k.name))).map((k) => ({ ...presetData(k), fav: mFavs.has(k.name) }));
 $('m-set-export').addEventListener('click', async () => {
-  const b = $('m-set-export'), list = mSetPresets(true), say = (t) => { b.textContent = t; setTimeout(() => { b.textContent = 'export presets'; }, 1500); };
-  if (!list.length) { say('none to export'); return; }
+  const b = $('m-set-export'), list = mSetPresets(true);
+  if (!list.length) { mSay(b, 'none to export'); return; }
   const blob = new Blob([JSON.stringify({ elixir: 1, presets: list }, null, 1)], { type: 'application/json' });
-  if (await mOffer({ blob, name: 'elixir-mobile-presets.json' }, 'application/json')) say(`exported ${list.length}`);
+  if (await mOffer({ blob, name: 'elixir-mobile-presets.json' }, 'application/json')) mSay(b, `exported ${list.length}`);
 });
 $('m-set-clear').addEventListener('click', () => {
   const n = kitList.filter((k) => k.saved).length;
   if (!confirm(`Delete all ${n} of your saved presets and clear every star? This can't be undone.`)) return;
-  const b = $('m-set-clear'); b.textContent = `cleared ${mClearAll()}`; setTimeout(() => { b.textContent = 'clear all'; }, 1500);
+  mSay($('m-set-clear'), `cleared ${mClearAll()}`);
 });
-$('m-set-slots').addEventListener('click', async () => {
-  const b = $('m-set-slots'), text = `Elixir Mobile perf faders\n${JSON.stringify(mSlots)}`;
-  try { await navigator.clipboard.writeText(text); b.textContent = 'copied'; setTimeout(() => { b.textContent = 'copy perf faders'; }, 1500); }
-  catch (e) { prompt('Copy the perf faders:', text); }
-});
-
+$('m-set-slots').addEventListener('click', () => mCopy($('m-set-slots'), `Elixir Mobile perf faders\n${JSON.stringify(mSlots)}`, 'copied', 'Copy the perf faders:'));
+// ---- the rush graph (settings › rush): how the rush changes as it rises 0..100%, a lane each for the roll's speed, the
+// other drums, the kick and the high-pass, drawn from the rush settings (rushSet, app/rush-set.js; saved with each
+// preset); dragging a break point changes it, as the desktop's rush settings do ----
 // the lanes: each a curve over rush 0..100 (its y 0..1, bottom to top) and its break points, each moving one setting
 // along x (a rush %) or, at 100%, up and down
 const RG_ROLL = ['1/16', '1/32', '1/64', '1/128', '1/256'];
@@ -9214,16 +9220,12 @@ addEventListener('resize', mRushDraw);
 // the rush-now line follows the rush (a preset, the fader, a randomiser), and a preset's settings redraw it all
 setInterval(() => { if (!$('m-set').hidden && !rgDrag) { rgGlideDraws.forEach((d) => d()); mRushDraw(); } }, 250);
 // ---- user settings (the person by the title; no password): tabs. seq: whether the fader sequencers follow the groove.
-// midi: which CC moves each of the twelve
-// PERF faders (mCc, app/mobile-slots.js), as a 4 by 3 grid like the page (tap a fader to type its CC), the CC presets
-// (cc1 to cc12, cc13 to cc24, and any saved here, which a long press or the ✕ deletes), and save as a preset ----
+// midi: which CC moves each of the twelve PERF faders (mCc, app/mobile-slots.js), as a 4 by 3 grid like the page (tap
+// a fader to type its CC), the CC presets (cc1 to cc12, cc13 to cc24, and any saved here, which the ✕ deletes), and
+// save as a preset ----
 $('m-user-open').addEventListener('click', () => { $('m-user').hidden = false; mCcDraw(); });
-$('m-user-close').addEventListener('click', () => { $('m-user').hidden = true; });
-$('m-user-tabs').addEventListener('click', (e) => {
-  const b = e.target.closest('[data-user]'); if (!b) return;
-  for (const t of $('m-user-tabs').children) t.setAttribute('aria-selected', t === b);
-  for (const p of document.querySelectorAll('[data-user-pane]')) p.hidden = p.dataset.userPane !== b.dataset.user;
-});
+mCloser('m-user');
+mPaneTabs($('m-user-tabs'), 'user');
 // seq: the fader sequencers follow the groove, or not
 $('m-seqgroove').checked = mSeqGroove;
 $('m-seqgroove').addEventListener('change', () => { mSeqGroove = $('m-seqgroove').checked; try { localStorage.setItem(SEQ_GROOVE_KEY, mSeqGroove ? '1' : '0'); } catch (e) {} });
@@ -9321,7 +9323,7 @@ function mHelpDraw() {
   $('m-help-text').innerHTML = `<h3>${title}</h3>${body}`; $('m-help-text').scrollTop = 0;
 }
 $('m-help-open').addEventListener('click', () => { mHelpTab = 0; mHelpDraw(); $('m-help').hidden = false; });
-$('m-help-close').addEventListener('click', () => { $('m-help').hidden = true; });
+mCloser('m-help');
 // ---- the glass isn't flat: each control's ink shadow deepens a little toward the top right of the screen (--d, used
 // by the CSS), worked out once from where it sits and again when the screen's size changes ----
 function mDepth() {

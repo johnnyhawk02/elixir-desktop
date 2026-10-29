@@ -102,7 +102,7 @@ mSeqBar($('m-seq-speed'), (x) => { mSeqF.seq.step = SEQ_STEPS[Math.min(SEQ_STEPS
 mSeqBar($('m-seq-depth'), (x) => { mSeqF.seq.depth = Math.round(x * 20) * 5; if (mSeqF.base !== null) mSeqApply(mSeqF); });
 $('m-seq-rand').addEventListener('click', () => { const q = mSeqF.seq; for (let i = 0; i < 16; i++) q.vals[i] = mSeqOff(Math.random() * 2 - 1); q.on = true; mSeqDraw(); });
 $('m-seq-on').addEventListener('click', () => { mSeqF.seq.on = !mSeqF.seq.on; if (!mSeqF.seq.on) mSeqRelease(mSeqF); mSeqDraw(); });
-$('m-seq-close').addEventListener('click', () => { $('m-seq').hidden = true; mSeqF = null; });
+mCloser('m-seq', () => { mSeqF = null; });
 // the glides, a frame at a time while any is moving
 let mGlideOn = false;
 function mGlideRun() {

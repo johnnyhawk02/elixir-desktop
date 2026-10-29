@@ -26,68 +26,72 @@
 <main>
 <div class="lcd">
   <h1>elixir mobile</h1>
-  <p class="lead">A six voice drum machine for your phone, built on the LXR-02 engine. Press play, then start pressing the randomise buttons. Everything below is optional.</p>
+  <p class="lead">A six voice drum machine for your phone, built on the LXR-02 engine. The same help is in the app: press HELP ME! at the top.</p>
 
-  <h2>The basics</h2>
-  <ul>
-    <li><b>play</b> starts and stops the beat. <b>help me!</b> at the top has a getting started guide and a tab for every page.</li>
-    <li>The buttons along the bottom switch pages. The page you're on is named next to the ELIXIR title.</li>
-    <li>Drag any fader up or down to change it.</li>
-    <li><b>undo</b> on the PERF page takes back the last randomise.</li>
-  </ul>
+  <h2>getting started</h2>
+  <p>Elixir is a six voice drum machine: drum 1, 2 and 3, snare, cymbal and hihat. Three steps to a beat:</p>
+<ol><li>Press <b>play</b>.</li><li>On <b>perf</b>, press <b>everything</b> until you like what you hear: each press is a new beat, kit, effects and mix.</li>
+<li>Play the faders, or press <b>kit</b>, <b>pattern</b> or <b>alter</b> to change one part. <b>undo</b> takes back the last one.</li></ol>
+<p>The buttons along the bottom change page; the page's name is at the top right. Drag a fader up or down; double tap its name to reset it. Hold a fader to give it a step sequencer.</p>
+<p>When you like it, <b>prst</b> › <b>save new</b>. <b>rec</b> records a WAV, <b>loop</b> a loop that repeats seamlessly.</p>
 
-  <h2>perf</h2>
-  <p>Twelve faders for playing live, plus the randomise buttons.</p>
-  <ul>
-    <li><b>everything</b> makes a whole new beat: a new genre, groove, kit, effects and mix.</li>
-    <li><b>kit</b> changes the sounds and <b>pattern</b> changes the beat. <b>alter</b> nudges the current sounds by about 10%.</li>
-    <li><b>crossfeed</b> randomises how the voices modulate each other.</li>
-    <li><b>random fx</b> sets new effects and sends. <b>alter fx</b> nudges them. Echo times stay musical.</li>
-    <li>Tick <b>next bar</b> to make every randomise land on the start of the next bar.</li>
-    <li>Tick <b>assign</b>, then tap a fader to choose what it controls.</li>
-  </ul>
+  <h2>perf: play it live</h2>
+  <p>Twelve faders for playing, four by three, and the randomise buttons down the right.</p>
+<ul><li><b>everything</b>: a new beat (genre, groove, kit, effects, mix). <b>kit</b>: new sounds. <b>pattern</b>: a new beat on the same sounds. <b>alter</b>: the sounds nudged about 10%.</li>
+<li><b>crossfeed</b>: a new crossfeed patch (see fx). <b>random fx</b>: new effects and sends, echo times on musical lengths. <b>alter fx</b>: the effects nudged.</li>
+<li>Tick <b>next bar</b> and every randomise waits for the start of the next bar.</li>
+<li>Tick <b>assign</b>, then tap a fader to choose what it does: any fader from any page, or any drum's setting.</li>
+<li>Hold a randomise button for its settings (see more).</li></ul>
 
-  <h2>beat</h2>
-  <p>Tempo, genre, beat and energy, plus fills, the rush (a roll that builds on one drum while the others fall away), velocity, groove, depth and accent.</p>
+  <h2>beat: the pattern</h2>
+  <p>Tempo, genre, beat and energy; fills, rush, rush on and velocity; groove, depth and accent.</p>
+<ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how often it fills.</li>
+<li><b>rush</b> builds a roll: the chosen drum (<b>rush on</b>) rolls faster and faster while the others drop out and a high-pass rises. Push it up for a build, drop it for the drop. Its curve is in settings (the gear).</li>
+<li><b>groove</b> and <b>depth</b> give it swing or push; <b>accent</b> how loud the accents are.</li></ul>
 
-  <h2>voice</h2>
-  <p>Every setting for one drum. Choose the drum along the top, then a tab: tone (tuning, wave, fm), shape (envelope, pitch drop, click), filter (filter, then volume, pan, sample rate, drive) or mod (lfo, velocity). The click fader picks the attack sample: the 14 built in ones, then the extra clicks.</p>
+  <h2>voice: shape a drum</h2>
+  <p>Every setting of one drum. Pick the drum along the top, then a tab:</p>
+<ul><li><b>tone</b>: tuning, wave and fm. <b>shape</b>: the envelope, the pitch drop and the click (the attack's sample).</li>
+<li><b>filter</b>: cutoff, resonance, type and drive, then the drum's volume, pan, sample rate and drive. <b>mod</b>: its lfo and what velocity does.</li></ul>
 
-  <h2>x/y</h2>
-  <p>Two pads. Use the menus above each pad to choose what left-right and up-down control, then drag your finger around.</p>
+  <h2>x/y: two pads</h2>
+  <p>Each pad moves two settings at once. Over each pad, pick what left-right (x) and up-down (y) do: first where (a drum, beat, perf, fx, mix or master), then what. Drag a finger around the pad.</p>
 
-  <h2>fx, mix and mstr</h2>
-  <ul>
-    <li><b>fx</b> sets up the echo (tick ping pong to bounce it left and right) and the ring mod.</li>
-    <li><b>mix</b> has each drum's level and how much it sends to the two effects.</li>
-    <li><b>mstr</b> is the master chain: the drum 1 sidechain duck, then distortion, then the compressor.</li>
-  </ul>
+  <h2>fx: echo, ring mod, crossfeed</h2>
+  <ul><li><b>echo</b>: send, time (musical lengths), tone, feedback and width; tick <b>ping pong</b> to bounce it left and right.</li>
+<li><b>ring mod</b>: send, wave and frequency, for metallic tones.</li>
+<li><b>crossfeed</b>: drums feeding each other. A row is the drum it comes from, a column the drum it goes into; tap a column's name to pick what it changes there (fm, filter or ring). Drag a cell up or down to set it; double tap to clear.</li></ul>
 
-  <h2>prst (presets)</h2>
-  <ul>
-    <li>Tap a preset to load it. It flashes until the next bar, then takes over.</li>
-    <li>Tap the star to make it a favourite.</li>
-    <li><b>save new</b> stores what you hear. <b>save over</b> replaces the loaded preset.</li>
-    <li>Untick the tempo box to keep your tempo when loading.</li>
-    <li><b>export presets</b> saves your presets, the built-in ones you've saved over and every starred one to a file (it never deletes anything). <b>import</b> reads one back.</li>
-  </ul>
+  <h2>mix: levels and sends</h2>
+  <p>Each drum's level (the big faders), and how much of it goes to the echo and to the ring mod (the short rows above).</p>
 
-  <h2>Step sequencers</h2>
-  <p>Hold any fader for half a second to open a step sequencer for it. Set the number of steps (2 to 16), the note length, depth and slew, or randomise the steps. The steps move the fader up and down from wherever you leave it, so you can still play it. They follow the groove and its depth (switch that off in the person button's SEQ tab).</p>
+  <h2>mstr: the master chain</h2>
+  <p>The whole mix runs top to bottom:</p>
+<ul><li><b>drum 1 sidechain</b>: drum 1 (the kick) ducks the rest; the meter shows how much. <b>space</b> carves the kick's room out of the others.</li>
+<li><b>distortion</b>: mix, type, drive, colour, tone and volume.</li><li><b>compressor</b>: glues it together; the meter shows the gain reduction.</li></ul>
 
-  <h2>Recording</h2>
-  <ul>
-    <li><b>rec</b> starts recording. Press it again to stop, and the WAV downloads.</li>
-    <li><b>loop</b> records an exact, loopable WAV of a set number of bars and downloads it. Hold it to choose 1, 2, 4, 8 or 16 bars.</li>
-  </ul>
+  <h2>prst: presets</h2>
+  <ul><li>Tap a preset to load it: it flashes until the next bar, then takes over. Untick the tempo box to keep your tempo.</li>
+<li>The star makes it a favourite (favourites are listed first).</li>
+<li><b>save new</b> keeps what you hear; <b>save over</b> replaces the one loaded.</li>
+<li><b>export presets</b> saves your presets to a file (it never deletes anything); <b>import</b> reads one back.</li></ul>
 
-  <h2>Hidden extras</h2>
-  <ul>
-    <li>Hold a randomise button to open its settings: the ranges and chances it uses, with a tab for each randomise button.</li>
-    <li>The gear beside the title opens settings. Its RUSH tab is a graph of how the rush changes as it rises: the roll's speed, the other drums dropping out, the kick and the high-pass. Drag a square to move that break point.</li>
-    <li>MIDI CCs move the twelve PERF faders (13 to 24 unless you change them: the person button by the title, MIDI tab, has CC presets, a grid to set each fader's CC, and save as preset; nothing else answers MIDI), in Chrome with a MIDI controller plugged in.</li>
-    <li>To install it as an app, use <b>install app</b> on the presets page, or your browser's "Add to home screen".</li>
-  </ul>
+  <h2>step sequencers</h2>
+  <p>Hold any fader for half a second and it gets a step sequencer: 2 to 16 steps, each moving the fader up or down from where you leave it, so you can still play it.</p>
+<ul><li>Paint the steps with a finger, or press <b>randomise</b>.</li><li><b>speed</b> is each step's length, a 16th up to 8 bars. <b>slew</b> glides between steps. <b>depth</b> is how far they reach.</li>
+<li><b>on</b> turns it on and off. A fader with a sequencer running has its name inverted. Presets keep them.</li>
+<li>The steps follow the groove and its depth, landing with the swung hits; switch that off in the person button's <b>seq</b> tab.</li></ul>
+
+  <h2>recording</h2>
+  <ul><li><b>rec</b> starts recording (and playing); press it again to stop, and the WAV downloads.</li>
+<li><b>loop</b> records an exact loop from the next bar and downloads it, ready to loop in any other app. Hold it to choose 1, 2, 4, 8 or 16 bars.</li></ul>
+
+  <h2>more</h2>
+  <ul><li>Hold a randomise button to open the randomisers' settings, the ranges and chances each one uses.</li>
+<li>The person button: your settings. Its <b>midi</b> tab says which MIDI CC moves each perf fader, with presets (cc1 to cc12, cc13 to cc24) and your own.</li>
+<li>The gear: settings, including the <b>rush</b> graph of how the rush builds (drag its squares).</li>
+<li>Install it as an app: <b>install app</b> on the presets page, or your browser's "Add to home screen". It works offline.</li>
+<li>The version number is by the title; the latest arrives when you open the app with a connection.</li></ul>
 
   <a class="back" href="./">&larr; back to elixir</a>
 </div>

@@ -3,10 +3,33 @@
 // the buttons here press theirs and the sliders write the same state. This file: pages, transport and the faders
 // every page uses. Then, in build order: mobile-pages (beat, perf, master, randomisers, voice), mobile-presets,
 // mobile-record, mobile-mix (fx, distortion, mix), mobile-seq (step sequencers), mobile-extras (install, next bar),
-// mobile-xy, mobile-settings (the randomisers' settings), mobile-slots (perf slots and MIDI CC), mobile-glass.
+// mobile-xy, mobile-settings (the randomisers' settings), mobile-slots (perf slots and MIDI CC), mobile-setup
+// (settings, behind the gear), mobile-rush (its rush graph), mobile-user (user settings), mobile-help, mobile-glass.
 // iOS: play Web Audio through the ringer switch like a music app
 try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
 const mRnd = (n) => Math.floor(Math.random() * n);
+
+// ---- small helpers for the pop-ups and their buttons ----
+// a button says something for a moment (copied, none saved yet), then its own name again
+function mSay(btn, text) {
+  const idle = btn.dataset.idle ??= btn.textContent;
+  btn.textContent = text; clearTimeout(btn.mSayT); btn.mSayT = setTimeout(() => { btn.textContent = idle; }, 1500);
+}
+// text to the clipboard, the button saying so; where the clipboard is refused, a box with the text to copy by hand
+async function mCopy(btn, text, said = 'copied', ask = 'Copy this:') {
+  try { await navigator.clipboard.writeText(text); mSay(btn, said); } catch (e) { prompt(ask, text); }
+}
+// a strip of tabs over panes: data-<k> on each tab, data-<k>-pane on the pane it shows (then: after a change)
+function mPaneTabs(strip, k, then) {
+  strip.addEventListener('click', (e) => {
+    const b = e.target.closest(`[data-${k}]`); if (!b) return;
+    for (const t of strip.children) t.setAttribute('aria-selected', t === b);
+    for (const p of document.querySelectorAll(`[data-${k}-pane]`)) p.hidden = p.dataset[`${k}Pane`] !== b.dataset[k];
+    if (then) then();
+  });
+}
+// a pop-up's done button (its id + '-close') hides it
+const mCloser = (id, then) => $(id + '-close').addEventListener('click', () => { $(id).hidden = true; if (then) then(); });
 
 // ---- pages: tap a tab to scroll to one (the pages don't swipe). The tab changes once, at once, not for each page passed ----
 const mPages = $('m-pages');

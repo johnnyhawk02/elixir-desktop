@@ -122,7 +122,7 @@ function mChDraw() {
     list.append(grid);
   }
 }
-$('m-ch-close').addEventListener('click', () => { $('m-ch').hidden = true; });
+mCloser('m-ch');
 $('m-ch-reset').addEventListener('click', () => {
   mSlots[mChSlot] = SLOT0[mChSlot].slice();
   try { localStorage.setItem(SLOT_KEY, JSON.stringify(mSlots)); } catch (e) {}

@@ -42,7 +42,7 @@ for (const p of presets) if (p.v !== PRESET_V) throw new Error(`presets/: ${p.na
 // order as one classic script (each file sees the ones before it)
 const APP = ['kit', 'audio', 'groove-types', 'perform-state', 'sound', 'randomise', 'scope', 'steps', 'presets', 'midi', 'preset-manager', 'recorder',
   'grooves', 'styles', 'mixer', 'fx', 'master', 'perform-knobs', 'rush-set', 'pc4', 'crossfeed', 'main',
-  'mobile', 'mobile-pages', 'mobile-presets', 'mobile-record', 'mobile-mix', 'mobile-seq', 'mobile-extras', 'mobile-xy', 'mobile-settings', 'mobile-slots', 'mobile-setup', 'mobile-user', 'mobile-help', 'mobile-glass'];
+  'mobile', 'mobile-pages', 'mobile-presets', 'mobile-record', 'mobile-mix', 'mobile-seq', 'mobile-extras', 'mobile-xy', 'mobile-settings', 'mobile-slots', 'mobile-setup', 'mobile-rush', 'mobile-user', 'mobile-help', 'mobile-glass'];
 const app = APP.map((f) => read(`app/${f}.js`)).join('');
 
 const sources = { lxr: read('lxr.js'), verify: read('verify.mjs') };
@@ -60,3 +60,6 @@ const ver = Number(execSync('git rev-list --count HEAD', { cwd: new URL('.', her
 const built = new Date().toLocaleString('en-GB', { timeZone: 'Europe/London', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 writeFileSync(outFile || new URL('index.html', here), page.replaceAll('@VER@', () => ver).replace('@BUILT@', () => built));
 console.log(`${outFile || 'index.html'}: ${(page.length / 1024).toFixed(1)} KB`);
+// help.html: the same help as the app's HELP ME! pop-up (HELP in app/mobile-help.js), a section a tab, so the two agree
+const HELP = new Function(`return ${/const HELP = (\[[\s\S]*?\n\]);/.exec(read('app/mobile-help.js'))[1]}`)();
+if (!outFile) writeFileSync(new URL('help.html', here), read('help.src.html').replace('<!--@HELP@-->', () => HELP.map(([, title, body]) => `<h2>${title}</h2>\n  ${body}`).join('\n\n  ')));

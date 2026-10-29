@@ -45,14 +45,10 @@ function mRsDraw() {
 }
 const mRsPlay = () => { $('m-rs-play').textContent = $('play').getAttribute('aria-pressed') === 'true' ? 'stop' : 'play'; };
 new MutationObserver(mRsPlay).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
-$('m-rs-close').addEventListener('click', () => { $('m-rs').hidden = true; });
+mCloser('m-rs');
 // copy: every page's settings as text, to paste back as the new defaults (RAND0); where the clipboard is refused, a
 // box with the text selected instead
-$('m-rs-copy').addEventListener('click', async () => {
-  const text = `Elixir Mobile randomise settings\n${JSON.stringify(RAND)}`;
-  try { await navigator.clipboard.writeText(text); $('m-rs-copy').textContent = 'copied'; setTimeout(() => { $('m-rs-copy').textContent = 'copy'; }, 1500); }
-  catch (e) { prompt('Copy these settings:', text); }
-});
+$('m-rs-copy').addEventListener('click', () => mCopy($('m-rs-copy'), `Elixir Mobile randomise settings\n${JSON.stringify(RAND)}`, 'copied', 'Copy these settings:'));
 $('m-rs-go').addEventListener('click', () => $(RS_PAGES[mRsPage][2]).click());
 $('m-rs-play').addEventListener('click', () => $('play').click());
 $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][0]; Object.assign(RAND[key], RAND0[key]); saveRand(); mRsDraw(); });

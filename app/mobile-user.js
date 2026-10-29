@@ -1,14 +1,10 @@
 // ---- user settings (the person by the title; no password): tabs. seq: whether the fader sequencers follow the groove.
-// midi: which CC moves each of the twelve
-// PERF faders (mCc, app/mobile-slots.js), as a 4 by 3 grid like the page (tap a fader to type its CC), the CC presets
-// (cc1 to cc12, cc13 to cc24, and any saved here, which a long press or the ✕ deletes), and save as a preset ----
+// midi: which CC moves each of the twelve PERF faders (mCc, app/mobile-slots.js), as a 4 by 3 grid like the page (tap
+// a fader to type its CC), the CC presets (cc1 to cc12, cc13 to cc24, and any saved here, which the ✕ deletes), and
+// save as a preset ----
 $('m-user-open').addEventListener('click', () => { $('m-user').hidden = false; mCcDraw(); });
-$('m-user-close').addEventListener('click', () => { $('m-user').hidden = true; });
-$('m-user-tabs').addEventListener('click', (e) => {
-  const b = e.target.closest('[data-user]'); if (!b) return;
-  for (const t of $('m-user-tabs').children) t.setAttribute('aria-selected', t === b);
-  for (const p of document.querySelectorAll('[data-user-pane]')) p.hidden = p.dataset.userPane !== b.dataset.user;
-});
+mCloser('m-user');
+mPaneTabs($('m-user-tabs'), 'user');
 // seq: the fader sequencers follow the groove, or not
 $('m-seqgroove').checked = mSeqGroove;
 $('m-seqgroove').addEventListener('change', () => { mSeqGroove = $('m-seqgroove').checked; try { localStorage.setItem(SEQ_GROOVE_KEY, mSeqGroove ? '1' : '0'); } catch (e) {} });

@@ -42,7 +42,7 @@ function mLoopPick() {
   }
   $('m-looplen').hidden = false;
 }
-$('m-looplen-close').addEventListener('click', () => { $('m-looplen').hidden = true; });
+mCloser('m-looplen');
 mRecUi();
 $('m-loop').addEventListener('click', async () => {
   if (recState === 'off') {
