@@ -611,3 +611,28 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 }
 /* (the help's numbered lists keep their numbers inside the sheet) */
 #m-help-text ol { padding-left: 1.8em; }
+
+/* ---- laptop tidy (Johnny: every page neat and balanced) ---- */
+@media (min-width: 1000px) {
+  /* readouts on one line, so every fader's track starts at the same height */
+  .m #m-beat-faders .m-vf output, .m .m-vset .m-vf output { white-space: nowrap; height: 1.2em; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; text-align: center; }
+  /* voice: only as many rows as the tab has faders, each as tall as the frame allows */
+  .m-vset { grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); row-gap: 14px; }
+  /* mixer: the send knobs a fixed size, their readouts just over them; the heading level with the knobs' columns */
+  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { flex: none; height: 46px; min-height: 0; }
+  .m-fx-card.m-mix-card { grid-template-rows: auto auto minmax(0, 1fr); row-gap: 10px; }
+  .m-mix-card .m-knob { justify-content: end; }
+  /* x/y: the pads' axis names clear of the square's corner */
+  .m-xy-x, .m-xy-y { z-index: 1; background: var(--panel); padding: 0 4px; }
+}
+@media (min-width: 1000px) {
+  /* mixer strips: echo send knob, ring mod send knob under it, then the level fader, a column a drum */
+  .m-fx-card.m-mix-card { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: auto auto auto minmax(0, 1fr); gap: 8px 10px; }
+  #m-mix-echo > .m-vf:nth-child(n), #m-mix-ring > .m-vf:nth-child(n), #m-mix-vol > .m-vf { grid-column: auto; }
+  #m-mix-echo > .m-vf { grid-row: 2; } #m-mix-ring > .m-vf { grid-row: 3; } #m-mix-vol > .m-vf { grid-row: 4; grid-column: auto; }
+  .m-mix-card .m-fx-row:nth-child(1) > b::before { content: "sends: echo (top) and ring mod (under), then level" !important; }
+  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { height: 52px; }
+  .m-mix-card .m-knob { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .m-mix-card .m-knob output { height: auto; text-align: center; }
+  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { width: 52px; height: 44px; }
+}
