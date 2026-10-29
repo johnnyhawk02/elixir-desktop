@@ -15,11 +15,9 @@ const HELP = [
 <li>Click to randomise. Drag up or down on one to set how far it goes, 10% to 100% (a dotted bar along its foot below 100%): at 30% it moves everything only 30% of the way to the new sound, and switches choices like the style 30% of the time.</li>
 <li>Hold one still for half a second for its settings, the ranges and chances it uses.</li>
 <li><b>options</b> › <b>randomise on next bar</b>: while playing, randomises wait for the start of the next bar (the button flashes until then).</li></ul>`],
-  ['scenes', 'scenes', `<p>Beside the knobs: eight snapshots of the twelve knobs.</p>
-<ul><li>Click an empty scene to keep the knobs as they are now; click a kept one to bring them back. Kept ones are solid, empty ones dashed.</li>
-<li>The scene you last brought back is <b>a</b> (inverted); <b>b</b> is underlined. Click <b>a</b> or <b>b</b> under them to step through the kept scenes.</li>
-<li><b>morph</b> moves every knob from scene a's settings (0%) to scene b's (100%). It's a knob like the others: give it a step sequencer, put it on a perf knob (perf › scenes › morph) or MIDI.</li>
-<li>Right-click a scene to keep over it, make it a or b, or clear it. Presets keep the scenes.</li></ul>`],
+  ['mute', 'mute and solo', `<p>Beside the knobs, a row for each track (drum 1, 2, 3, snare, cymbal, closed and open hat).</p>
+<ul><li><b>mute</b> stops that track being hit; <b>solo</b> leaves only the soloed tracks hit. <b>clear</b> lifts them all.</li>
+<li>They work on the notes, not the sound: a muted drum's last hit, its decay and its echo ring on; it just isn't played again until you unmute it. Presets keep them.</li></ul>`],
   ['seq', 'step sequencer', `<p>Under the knobs. Touch any knob or fader, here or on a page on the right, and its sequencer shows there (greyed out until it runs). It starts once you paint a step or press a shape or a random button, and nothing runs for a control until then.</p>
 <ul><li>2 to 64 steps, each moving the control up or down from where you leave it, so you can still play it. Paint them with the mouse. Past 16 steps they're on pages: the <b>1</b> to <b>4</b> buttons by the name show each sixteen (the one playing is underlined). On an empty sequencer they also set the length: 16, 32, 48 or 64.</li>
 <li><b>length</b> the number of steps (2 to 64); <b>slew</b> glides between them; <b>speed</b> each step's length, a 16th up to 8 bars; <b>depth</b> how far they reach.</li>

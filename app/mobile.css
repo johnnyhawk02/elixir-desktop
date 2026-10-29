@@ -193,7 +193,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
    value the sequencer has moved it to */
 #m-faders .m-knob { gap: 1px; }
 #m-faders .m-knob output { display: block; height: 1.1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.m #m-faders .m-knob .m-vtrack, .m .m-mix-card .m-knob .m-vtrack, .m #m-scene-morph .m-knob .m-vtrack { container-type: size; width: 100%; min-height: 28px; background: none; overflow: visible; border-radius: 0; }
+.m #m-faders .m-knob .m-vtrack, .m .m-mix-card .m-knob .m-vtrack { container-type: size; width: 100%; min-height: 28px; background: none; overflow: visible; border-radius: 0; }
 .m .m-knob .m-vtrack i, .m .m-knob .m-vtrack::before, .m .m-knob .m-vtrack::after {
   --k: min(100cqw, 100cqh); position: absolute; left: 50%; top: 50%; width: var(--k); height: var(--k); margin: calc(var(--k) / -2) 0 0 calc(var(--k) / -2); bottom: auto; right: auto; }
 .m .m-knob .m-vtrack::before { content: ''; border-radius: 50%;
@@ -477,8 +477,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   box-shadow: 4px 5px 0 rgba(23, 32, 14, .25); }
 .m .m-menu .m-btn { min-height: 34px; justify-content: flex-start; text-align: left; padding: 0 10px; font-size: var(--fs-s) !important; }
 .m .m-menu .m-btn:hover, .m .m-menu .m-btn:focus-visible { background: var(--ink); color: var(--panel); text-shadow: none; outline: 0; }
-/* ---- scenes (laptop only) ---- */
-.m-scenes { display: none; }
+/* ---- mute and solo (laptop only) ---- */
+.m-mutes { display: none; }
 /* ---- the presets search, and a presets file dropped anywhere on the page ---- */
 .m .m-psearch { min-height: 38px; padding: 0 10px; border: 2px solid var(--ink); border-radius: 3px; background: transparent; color: var(--ink);
   font: inherit; font-size: var(--fs-s); text-transform: uppercase; letter-spacing: .06em; }
@@ -573,20 +573,16 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   /* (no perform button: it's always open; no x/y page on the laptop) */
   .m > .m-tabs button[data-m-tab="play"], .m > .m-tabs button[data-m-tab="xy"] { display: none; }
   .m > .m-tabs button { min-height: 40px; }
-  /* -- scenes, beside the knobs: eight buttons (kept ones solid; A inverted, B underlined), then a, the morph knob and b -- */
-  .m-scenes { grid-column: 2; min-width: 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 8px; min-height: 0; align-content: start; }
-  .m-scenes > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-s); }
-  .m-scene-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
-  .m .m-scene-grid .m-btn { min-height: 40px; padding: 0; font-size: var(--fs-s) !important; border-style: dashed; opacity: .55; }
-  .m .m-scene-grid .m-btn.full { border-style: solid; opacity: 1; }
-  .m .m-scene-grid .m-btn.is-a { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
-  .m .m-scene-grid .m-btn.is-b { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px; }
-  .m-scene-ab { display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; align-items: center; gap: 8px; min-height: 0; min-width: 0; }
-  .m .m-scene-ab .m-toggle { min-width: 0 !important; min-height: 36px; padding: 0; font-size: var(--fs-xs) !important; text-transform: uppercase; }
-  #m-scene-morph { display: block; min-height: 0; height: 100%; }
-  #m-scene-morph .m-knob { height: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 0; }
-  .m #m-scene-morph .m-vtrack { container-type: size; flex: 1; width: 100%; min-height: 40px; max-height: 80px; background: none; overflow: visible; }
-  .m #m-scene-morph output, .m #m-scene-morph .m-flab { font-size: var(--fs-xs); }
+  /* -- mute and solo, beside the knobs: a row a track (its name, mute, solo), a quiet track's name faint -- */
+  .m-mutes { grid-column: 2; min-width: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 6px; min-height: 0; }
+  .m-mutes-head { display: flex; align-items: center; justify-content: space-between; }
+  .m-mutes-head b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-s); }
+  .m .m-mutes-head .m-toggle { min-height: 28px; padding: 0 8px; font-size: var(--fs-xs) !important; }
+  .m-mute-rows { display: grid; grid-template-rows: repeat(7, minmax(0, 1fr)); gap: 4px; min-height: 0; }
+  .m-mute-row { display: grid; grid-template-columns: 3em minmax(0, 1fr) minmax(0, 1fr); gap: 6px; align-items: stretch; min-height: 0; }
+  .m-mute-row > span { align-self: center; text-transform: uppercase; font-size: var(--fs-xs); letter-spacing: .04em; }
+  .m-mute-row.quiet > span { opacity: .35; }
+  .m .m-mute-row .m-toggle { min-height: 0; padding: 0; font-size: var(--fs-xs) !important; text-transform: uppercase; }
   .m .m-tabs button { font-size: var(--fs-m) !important; }
   .m-panel:not([data-m-panel="play"]) { grid-area: 3 / 2 / 5 / 3; display: none; padding: 8px 0 0 24px; border-left: var(--rule); }
   .m[data-page="beat"] [data-m-panel="beat"], .m[data-page="dice"] [data-m-panel="dice"], .m[data-page="fx"] [data-m-panel="fx"],

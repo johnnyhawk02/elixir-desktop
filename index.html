@@ -1041,7 +1041,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
    value the sequencer has moved it to */
 #m-faders .m-knob { gap: 1px; }
 #m-faders .m-knob output { display: block; height: 1.1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.m #m-faders .m-knob .m-vtrack, .m .m-mix-card .m-knob .m-vtrack, .m #m-scene-morph .m-knob .m-vtrack { container-type: size; width: 100%; min-height: 28px; background: none; overflow: visible; border-radius: 0; }
+.m #m-faders .m-knob .m-vtrack, .m .m-mix-card .m-knob .m-vtrack { container-type: size; width: 100%; min-height: 28px; background: none; overflow: visible; border-radius: 0; }
 .m .m-knob .m-vtrack i, .m .m-knob .m-vtrack::before, .m .m-knob .m-vtrack::after {
   --k: min(100cqw, 100cqh); position: absolute; left: 50%; top: 50%; width: var(--k); height: var(--k); margin: calc(var(--k) / -2) 0 0 calc(var(--k) / -2); bottom: auto; right: auto; }
 .m .m-knob .m-vtrack::before { content: ''; border-radius: 50%;
@@ -1325,8 +1325,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   box-shadow: 4px 5px 0 rgba(23, 32, 14, .25); }
 .m .m-menu .m-btn { min-height: 34px; justify-content: flex-start; text-align: left; padding: 0 10px; font-size: var(--fs-s) !important; }
 .m .m-menu .m-btn:hover, .m .m-menu .m-btn:focus-visible { background: var(--ink); color: var(--panel); text-shadow: none; outline: 0; }
-/* ---- scenes (laptop only) ---- */
-.m-scenes { display: none; }
+/* ---- mute and solo (laptop only) ---- */
+.m-mutes { display: none; }
 /* ---- the presets search, and a presets file dropped anywhere on the page ---- */
 .m .m-psearch { min-height: 38px; padding: 0 10px; border: 2px solid var(--ink); border-radius: 3px; background: transparent; color: var(--ink);
   font: inherit; font-size: var(--fs-s); text-transform: uppercase; letter-spacing: .06em; }
@@ -1421,20 +1421,16 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   /* (no perform button: it's always open; no x/y page on the laptop) */
   .m > .m-tabs button[data-m-tab="play"], .m > .m-tabs button[data-m-tab="xy"] { display: none; }
   .m > .m-tabs button { min-height: 40px; }
-  /* -- scenes, beside the knobs: eight buttons (kept ones solid; A inverted, B underlined), then a, the morph knob and b -- */
-  .m-scenes { grid-column: 2; min-width: 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 8px; min-height: 0; align-content: start; }
-  .m-scenes > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-s); }
-  .m-scene-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
-  .m .m-scene-grid .m-btn { min-height: 40px; padding: 0; font-size: var(--fs-s) !important; border-style: dashed; opacity: .55; }
-  .m .m-scene-grid .m-btn.full { border-style: solid; opacity: 1; }
-  .m .m-scene-grid .m-btn.is-a { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
-  .m .m-scene-grid .m-btn.is-b { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px; }
-  .m-scene-ab { display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; align-items: center; gap: 8px; min-height: 0; min-width: 0; }
-  .m .m-scene-ab .m-toggle { min-width: 0 !important; min-height: 36px; padding: 0; font-size: var(--fs-xs) !important; text-transform: uppercase; }
-  #m-scene-morph { display: block; min-height: 0; height: 100%; }
-  #m-scene-morph .m-knob { height: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 0; }
-  .m #m-scene-morph .m-vtrack { container-type: size; flex: 1; width: 100%; min-height: 40px; max-height: 80px; background: none; overflow: visible; }
-  .m #m-scene-morph output, .m #m-scene-morph .m-flab { font-size: var(--fs-xs); }
+  /* -- mute and solo, beside the knobs: a row a track (its name, mute, solo), a quiet track's name faint -- */
+  .m-mutes { grid-column: 2; min-width: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 6px; min-height: 0; }
+  .m-mutes-head { display: flex; align-items: center; justify-content: space-between; }
+  .m-mutes-head b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-s); }
+  .m .m-mutes-head .m-toggle { min-height: 28px; padding: 0 8px; font-size: var(--fs-xs) !important; }
+  .m-mute-rows { display: grid; grid-template-rows: repeat(7, minmax(0, 1fr)); gap: 4px; min-height: 0; }
+  .m-mute-row { display: grid; grid-template-columns: 3em minmax(0, 1fr) minmax(0, 1fr); gap: 6px; align-items: stretch; min-height: 0; }
+  .m-mute-row > span { align-self: center; text-transform: uppercase; font-size: var(--fs-xs); letter-spacing: .04em; }
+  .m-mute-row.quiet > span { opacity: .35; }
+  .m .m-mute-row .m-toggle { min-height: 0; padding: 0; font-size: var(--fs-xs) !important; text-transform: uppercase; }
   .m .m-tabs button { font-size: var(--fs-m) !important; }
   .m-panel:not([data-m-panel="play"]) { grid-area: 3 / 2 / 5 / 3; display: none; padding: 8px 0 0 24px; border-left: var(--rule); }
   .m[data-page="beat"] [data-m-panel="beat"], .m[data-page="dice"] [data-m-panel="dice"], .m[data-page="fx"] [data-m-panel="fx"],
@@ -1501,7 +1497,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>178</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>179</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
@@ -1517,8 +1513,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   <div class="m-pages" id="m-pages">
   <div class="m-panel" data-m-panel="play">
     <section class="m-card m-play-card"><div class="m-faders" id="m-faders"></div><div id="m-perf-src" hidden></div>
-      <div class="m-scenes" id="m-scenes"><b>scenes</b><div class="m-scene-grid" id="m-scene-grid"></div>
-        <div class="m-scene-ab"><button class="m-toggle" id="m-scene-a" type="button">a -</button><div class="m-faders" id="m-scene-morph"></div><button class="m-toggle" id="m-scene-b" type="button">b -</button></div></div></section>
+      <div class="m-mutes" id="m-mutes"><div class="m-mutes-head"><b>mute · solo</b><button class="m-toggle" id="m-mute-clear" type="button">clear</button></div><div class="m-mute-rows" id="m-mute-rows"></div></div></section>
     <section class="m-card m-rand-card" aria-label="randomise">
       <div class="m-rand">
         <label class="m-chk m-nextbar"><input id="m-nextbar" type="checkbox"><i aria-hidden="true"></i>next bar</label>
@@ -1591,7 +1586,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v178, 29 Oct, 18:26</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v179, 29 Oct, 18:40</footer>
     </section>
   </div>
   </div>
@@ -9670,11 +9665,9 @@ const HELP = [
 <li>Click to randomise. Drag up or down on one to set how far it goes, 10% to 100% (a dotted bar along its foot below 100%): at 30% it moves everything only 30% of the way to the new sound, and switches choices like the style 30% of the time.</li>
 <li>Hold one still for half a second for its settings, the ranges and chances it uses.</li>
 <li><b>options</b> › <b>randomise on next bar</b>: while playing, randomises wait for the start of the next bar (the button flashes until then).</li></ul>`],
-  ['scenes', 'scenes', `<p>Beside the knobs: eight snapshots of the twelve knobs.</p>
-<ul><li>Click an empty scene to keep the knobs as they are now; click a kept one to bring them back. Kept ones are solid, empty ones dashed.</li>
-<li>The scene you last brought back is <b>a</b> (inverted); <b>b</b> is underlined. Click <b>a</b> or <b>b</b> under them to step through the kept scenes.</li>
-<li><b>morph</b> moves every knob from scene a's settings (0%) to scene b's (100%). It's a knob like the others: give it a step sequencer, put it on a perf knob (perf › scenes › morph) or MIDI.</li>
-<li>Right-click a scene to keep over it, make it a or b, or clear it. Presets keep the scenes.</li></ul>`],
+  ['mute', 'mute and solo', `<p>Beside the knobs, a row for each track (drum 1, 2, 3, snare, cymbal, closed and open hat).</p>
+<ul><li><b>mute</b> stops that track being hit; <b>solo</b> leaves only the soloed tracks hit. <b>clear</b> lifts them all.</li>
+<li>They work on the notes, not the sound: a muted drum's last hit, its decay and its echo ring on; it just isn't played again until you unmute it. Presets keep them.</li></ul>`],
   ['seq', 'step sequencer', `<p>Under the knobs. Touch any knob or fader, here or on a page on the right, and its sequencer shows there (greyed out until it runs). It starts once you paint a step or press a shape or a random button, and nothing runs for a control until then.</p>
 <ul><li>2 to 64 steps, each moving the control up or down from where you leave it, so you can still play it. Paint them with the mouse. Past 16 steps they're on pages: the <b>1</b> to <b>4</b> buttons by the name show each sixteen (the one playing is underlined). On an empty sequencer they also set the length: 16, 32, 48 or 64.</li>
 <li><b>length</b> the number of steps (2 to 64); <b>slew</b> glides between them; <b>speed</b> each step's length, a 16th up to 8 bars; <b>depth</b> how far they reach.</li>
@@ -9835,77 +9828,45 @@ lvmDraw = function (m) {
     await mImport(files);
   });
 }
-// ---- scenes (laptop): eight snapshots of the twelve perf knobs, beside them. Click an empty one to keep the knobs as
-// they are; click a kept one to bring them back (it becomes A). The morph knob between A and B moves every knob from
-// scene A's setting (at 0) to scene B's (at 100), part way between in between; it's a knob like any other, so a perf
-// slot, MIDI or a step sequencer can move it. Right-click a scene to keep over it, make it A or B, or clear it; A and
-// B cycle through the kept scenes when clicked. Presets keep the scenes (song.scenes) ----
-let mScenes = new Array(8).fill(null), mSceneA = -1, mSceneB = -1, mMorph = 0;
-const mSlotFd = (i) => mFaders.find((f) => f.el === mSlotEls[i].el);
-const mFdNow = (fd) => (fd.base !== null ? fd.base : fd.get());
-function mFdSet(fd, v) { v = fd.snap(v); if (fd.base !== null) { fd.base = v; mSeqApply(fd); } else fd.put(v); }
-// a scene: each knob's control and its setting
-const mSceneTake = () => mSlots.map((ctl, i) => ({ ctl: ctl.slice(), v: mFdNow(mSlotFd(i)) }));
-// a setting back on its control: the knob it's on now, else the control itself wherever it is
-function mSceneSet(ctl, v) {
-  const i = mSlots.findIndex((c) => c.join('|') === ctl.join('|'));
-  if (i >= 0) return mFdSet(mSlotFd(i), v);
-  const A = slotAxis(ctl); if (!A) return;
-  if (A.fd) mFdSet(A.fd, v); else A.set(Math.round(v));
-}
-function mSceneMorph() {
-  const a = mScenes[mSceneA], b = mScenes[mSceneB]; if (!a) return;
-  const k = b ? mMorph / 100 : 0;
-  for (const e of a) {
-    const f = b && b.find((x) => x.ctl.join('|') === e.ctl.join('|'));
-    mSceneSet(e.ctl, f ? e.v + (f.v - e.v) * k : e.v);
+// ---- mute and solo (laptop), beside the knobs: a pair a track (drum 1, 2, 3, snare, cymbal, closed and open hat).
+// They work on the notes, not the sound: a muted track's steps aren't sent to the player, so it stops being hit while
+// anything already sounding (a decay, an echo) rings on; with any solo on, only the soloed tracks are hit. Like density,
+// they change what's sent, not the pattern; presets keep them (song.mute, song.solo) ----
+let mMute = new Array(7).fill(false), mSolo = new Array(7).fill(false);
+const mMuteSend = send;
+send = function (m) {
+  if (m && m.type === 'seq' && m.pattern && (mMute.some(Boolean) || mSolo.some(Boolean))) {
+    const any = mSolo.some(Boolean), quiet = (t) => mMute[t] || (any && !mSolo[t]);
+    const P = m.pattern, cut = (pg) => { for (let t = 0; t < 7; t++) if (quiet(t)) pg.on[t] = pg.on[t].map(() => 0); return pg; };
+    if (P.pages) P.pages = P.pages.map(cut); else cut(P);
   }
-  mDrawAll(); setDirty(true);
-}
-// the scene buttons
-const mSceneBtns = mScenes.map((_, n) => {
-  const b = document.createElement('button'); b.type = 'button'; b.className = 'm-btn'; b.textContent = n + 1;
-  b.addEventListener('click', () => {
-    if (!mScenes[n]) { mScenes[n] = mSceneTake(); if (mSceneA < 0) mSceneA = n; else if (mSceneB < 0 && n !== mSceneA) mSceneB = n; }
-    else { mSceneA = n; mMorph = 0; mSceneMorph(); }
-    mSceneDraw();
-  });
-  b.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
-    mMenu(e, [[mScenes[n] ? 'keep knobs here' : 'keep knobs', () => { mScenes[n] = mSceneTake(); mSceneDraw(); }],
-      ...(mScenes[n] ? [['make it A', () => { mSceneA = n; mSceneMorph(); mSceneDraw(); }], ['make it B', () => { mSceneB = n; mSceneMorph(); mSceneDraw(); }],
-        ['clear', () => { mScenes[n] = null; if (mSceneA === n) mSceneA = -1; if (mSceneB === n) mSceneB = -1; mSceneDraw(); }]] : [])]);
-  });
-  $('m-scene-grid').append(b); return b;
-});
-// A and B: each click the next kept scene
-const mSceneNext = (from) => { for (let d = 1; d <= 8; d++) { const n = (from + d + 8) % 8; if (mScenes[n]) return n; } return -1; };
-$('m-scene-a').addEventListener('click', () => { mSceneA = mSceneNext(mSceneA); mSceneMorph(); mSceneDraw(); });
-$('m-scene-b').addEventListener('click', () => { mSceneB = mSceneNext(mSceneB); mSceneMorph(); mSceneDraw(); });
-function mSceneDraw() {
-  mSceneBtns.forEach((b, n) => { b.classList.toggle('full', !!mScenes[n]); b.classList.toggle('is-a', n === mSceneA); b.classList.toggle('is-b', n === mSceneB);
-    b.setAttribute('aria-label', `scene ${n + 1}${mScenes[n] ? '' : ', empty'}${n === mSceneA ? ', A' : ''}${n === mSceneB ? ', B' : ''}`); });
-  $('m-scene-a').textContent = `a ${mSceneA >= 0 ? mSceneA + 1 : '-'}`; $('m-scene-b').textContent = `b ${mSceneB >= 0 ? mSceneB + 1 : '-'}`;
-}
-// the morph knob, and a place for it on the knobs' chooser (perf › scenes)
-mFader($('m-scene-morph'), 'morph', { min: 0, max: 100, knob: true, dflt: 0, get: () => mMorph, show: (v) => `${v}%`,
-  set: (v) => { mMorph = v; mSceneMorph(); } });
-{
-  const fd = mFaders[mFaders.length - 1];
-  XY_PLACES.find((P) => P.name === 'perf').groups.push(['scenes', [{ label: 'morph', min: 0, max: 100, get: fd.get, set: (x) => fd.put(x), fd }]]);
-}
-// presets keep the scenes; one without them has none
-const mSceneSnap = songSnapshot, mSceneUse = useSong;
-songSnapshot = function () { return { ...mSceneSnap(), scenes: { s: mScenes.map((x) => x && x.map((e) => ({ ctl: e.ctl, v: e.v }))), a: mSceneA, b: mSceneB, morph: mMorph } }; };
-useSong = function (g, keepTempo) {
-  mSceneUse(g, keepTempo);
-  const S = g.scenes && Array.isArray(g.scenes.s) ? g.scenes : null;
-  mScenes = S ? S.s.slice(0, 8).map((x) => (Array.isArray(x) ? x.filter((e) => e && Array.isArray(e.ctl) && typeof e.v === 'number') : null)) : new Array(8).fill(null);
-  while (mScenes.length < 8) mScenes.push(null);
-  mSceneA = S && mScenes[S.a] ? S.a : -1; mSceneB = S && mScenes[S.b] ? S.b : -1; mMorph = S && typeof S.morph === 'number' ? S.morph : 0;
-  mSceneDraw(); mDrawAll();
+  mMuteSend(m);
 };
-mSceneDraw();
+const MUTE_N = ['dr1', 'dr2', 'dr3', 'sn', 'cy', 'cl', 'op'];
+const mMuteBtns = MUTE_N.map((n, t) => {
+  const row = document.createElement('div'); row.className = 'm-mute-row';
+  row.innerHTML = `<span>${n}</span><button class="m-toggle" type="button">mute</button><button class="m-toggle" type="button">solo</button>`;
+  const [mb, sb] = row.querySelectorAll('button');
+  mb.addEventListener('click', () => { mMute[t] = !mMute[t]; mMuteDraw(); sendSeq(); setDirty(true); });
+  sb.addEventListener('click', () => { mSolo[t] = !mSolo[t]; mMuteDraw(); sendSeq(); setDirty(true); });
+  $('m-mute-rows').append(row); return [mb, sb, row];
+});
+function mMuteDraw() {
+  const any = mSolo.some(Boolean);
+  mMuteBtns.forEach(([mb, sb, row], t) => {
+    mb.setAttribute('aria-pressed', mMute[t]); sb.setAttribute('aria-pressed', mSolo[t]);
+    mb.setAttribute('aria-label', `mute ${XN[t] || 'open hat'}`); sb.setAttribute('aria-label', `solo ${XN[t] || 'open hat'}`);
+    row.classList.toggle('quiet', mMute[t] || (any && !mSolo[t]));
+  });
+}
+$('m-mute-clear').addEventListener('click', () => { mMute.fill(false); mSolo.fill(false); mMuteDraw(); sendSeq(); setDirty(true); });
+const mMuteSnap = songSnapshot, mMuteUse = useSong;
+songSnapshot = function () { return { ...mMuteSnap(), mute: mMute.slice(), solo: mSolo.slice() }; };
+useSong = function (g, keepTempo) {
+  mMute = Array.from({ length: 7 }, (_, t) => !!(g.mute && g.mute[t])); mSolo = Array.from({ length: 7 }, (_, t) => !!(g.solo && g.solo[t]));
+  mMuteUse(g, keepTempo); mMuteDraw(); sendSeq();
+};
+mMuteDraw();
 // ---- randomise depth: each randomise button has its own depth, 10% to 100% (kept in this browser). Clicking randomises;
 // dragging up or down on the button sets the depth, shown as a bar along its foot. Below 100%, the randomise runs as
 // usual and then everything it changed is taken only that far from where it was: numbers part way, a choice (a style,
