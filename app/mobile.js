@@ -85,11 +85,12 @@ mPlay.addEventListener('click', () => $('play').click());
 // holding one still opens its step sequencer (below). While a sequencer runs, the fader sets its base (fd.base) and the
 // sequencer moves the value around it: the fill is the value heard, the bar the base ----
 const mDraws = [], mFaders = [];
-// (a knob, knob: true, is the same control drawn as a segmented ring; it drags up and down over a fixed distance, as
+// (a number box, num: true, is the same control drawn as its readout in a box, dragged like a knob; a knob, knob: true,
+// is the same control drawn as a segmented ring; it drags up and down over a fixed distance, as
 // the ring is too small to be the range. Any of them also turns with the mouse wheel or a two-finger trackpad scroll)
-function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel = 1, knob = false }) {
+function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel = 1, knob = false, num = false }) {
   const el = document.createElement('div');
-  el.className = knob ? 'm-vf m-knob' : 'm-vf';
+  el.className = knob ? 'm-vf m-knob' : num ? 'm-vf m-num' : 'm-vf';
   el.innerHTML = '<output></output><div class="m-vtrack" role="slider" tabindex="0"><i></i><b></b></div><span class="m-flab"></span>';
   el.querySelector('.m-flab').textContent = label;
   const tr = el.querySelector('.m-vtrack'), out = el.querySelector('output');
@@ -114,7 +115,7 @@ function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel =
   let drag = null, hold = 0;
   tr.addEventListener('pointerdown', (e) => {
     tr.setPointerCapture(e.pointerId); el.classList.add('held');
-    drag = { y: e.clientY, v: fd.base !== null ? fd.base : get(), h: knob ? 160 : tr.getBoundingClientRect().height };
+    drag = { y: e.clientY, v: fd.base !== null ? fd.base : get(), h: knob || num ? 160 : tr.getBoundingClientRect().height };
     clearTimeout(hold);
     hold = setTimeout(() => { if (!drag) return; const v = drag.v; end(); move(v); mSeqOpen(fd); }, 500);
   });
