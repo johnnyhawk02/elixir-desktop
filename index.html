@@ -1321,7 +1321,19 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-play, .m .m-rec { min-height: 42px; }
   /* (the pages' box steps aside, so each page sits on this grid itself) */
   .m-pages { display: contents; }
-  [data-m-panel="play"] { grid-area: 2 / 1 / 4 / 2; grid-template-columns: minmax(0, 1fr) 150px; gap: 20px; padding: 14px 24px 10px 4px; border-top: var(--rule); }
+  /* the perform page steps aside too: its randomise buttons are a bar along the top of the left half, level with the
+     page buttons over the right (randomisers, then the effects ones, then undo and the two boxes), and its knobs take
+     the whole width under them */
+  [data-m-panel="play"] { display: contents; }
+  .m-play-card { grid-area: 3 / 1; min-height: 0; padding: 14px 24px 10px 4px; }
+  .m-pages .m-rand-card { grid-area: 2 / 1; padding: 10px 24px 8px 4px; border-left: 0; border-top: var(--rule); }
+  .m-rand-card .m-rand { grid-template-columns: minmax(0, 1.25fr) repeat(3, minmax(0, 1fr)) 8px minmax(0, 1.1fr) repeat(2, minmax(0, 1fr)) 8px minmax(0, .8fr) auto auto; grid-template-rows: 40px; height: auto; gap: 6px; }
+  .m .m-rand-card .m-rand .m-btn { padding: 0 2px; letter-spacing: 0; font-size: clamp(12px, 1.05vw, 15.2px) !important; }
+  .m-rand > * { grid-row: 1; }
+  .m-rand > :nth-child(1) { grid-column: 11; } .m-rand > :nth-child(2) { grid-column: 12; }
+  .m-rand > :nth-child(3) { grid-column: 1; } .m-rand > :nth-child(4) { grid-column: 2; } .m-rand > :nth-child(5) { grid-column: 3; } .m-rand > :nth-child(6) { grid-column: 4; }
+  .m-rand > :nth-child(7) { grid-column: 6; } .m-rand > :nth-child(8) { grid-column: 7; } .m-rand > :nth-child(9) { grid-column: 8; } .m-rand > :nth-child(10) { grid-column: 10; }
+  .m-rand-card .m-nextbar { padding-left: 6px; min-height: 0; }
   /* each knob: its ring on the left of its cell, value over name beside it, so the rings can be big */
   #m-faders { gap: 10px 14px; }
   #m-faders .m-knob { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr 1fr; column-gap: 10px; align-items: center; justify-items: start; }
@@ -1423,7 +1435,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v149</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v150</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1509,7 +1521,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v149, 29 Oct, 10:39</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v150, 29 Oct, 11:06</footer>
     </section>
   </div>
   </div>
@@ -9472,7 +9484,7 @@ const HELP = [
 <li>Play the faders, or press <b>kit</b>, <b>pattern</b> or <b>alter</b> to change one part. <b>undo</b> takes back the last one.</li></ol>
 <p>The buttons along the bottom change page; the page's name is at the top right. Drag a fader up or down; double tap its name to reset it. Hold a fader to give it a step sequencer.</p>
 <p>When you like it, <b>prst</b> › <b>save new</b>. <b>rec</b> records a WAV, <b>loop</b> a loop that repeats seamlessly.</p>`],
-  ['perf', 'perf: play it live', `<p>Twenty-four knobs for playing, four across and six down, and the randomise buttons down the right. Drag a knob up or down, or scroll on it with the mouse wheel or trackpad. MIDI CC 1 to 24 turn them.</p>
+  ['perf', 'perf: play it live', `<p>Twenty-four knobs for playing, four across and six down, and the randomise buttons down the right (on a laptop, in a bar along the top). Drag a knob up or down, or scroll on it with the mouse wheel or trackpad. MIDI CC 1 to 24 turn them.</p>
 <ul><li><b>everything</b>: a new beat (genre, groove, kit, effects, mix). <b>kit</b>: new sounds. <b>pattern</b>: a new beat on the same sounds. <b>alter</b>: the sounds nudged about 10%.</li>
 <li><b>crossfeed</b>: a new crossfeed patch (see fx). <b>random fx</b>: new effects and sends, echo times on musical lengths. <b>alter fx</b>: the effects nudged.</li>
 <li>Tick <b>next bar</b> and every randomise waits for the start of the next bar.</li>
