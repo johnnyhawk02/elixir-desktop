@@ -24,7 +24,6 @@ addEventListener('keydown', (e) => {
   else if (/^[1-6]$/.test(k)) { e.preventDefault(); mTab('dice'); $('m-voice').children[Number(k) - 1].click(); }
   else if (k === '[' || k === ']') { e.preventDefault(); mTab('dice'); const n = $('m-vsec').children.length; $('m-vsec').children[(mVSec + (k === ']' ? 1 : n - 1)) % n].click(); }
   else if (k === 'n') { e.preventDefault(); $('m-nextbar').click(); }
-  else if (k === 'y') { e.preventDefault(); mTab('xy'); }
   else if (k === 'o') { e.preventDefault(); mTab('presets'); }
   else if (k === '/') { e.preventDefault(); mTab('presets'); $('m-psearch').focus(); }
   else if (k === 'h' || k === '?') { e.preventDefault(); $('m-help-open').click(); }

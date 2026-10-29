@@ -32,7 +32,7 @@
   <p>Elixir is a six voice drum machine: drum 1, 2 and 3, snare, cymbal and hihat. Three steps to a beat:</p>
 <ol><li>Press <b>play</b> (or space).</li><li>Press <b>everything</b> until you like what you hear: each press is a new beat, kit, effects and mix.</li>
 <li>Turn the knobs, or press <b>kit</b>, <b>pattern</b> or <b>alter</b> to change one part. <b>undo</b> takes back the last one.</li></ol>
-<p>The screen: the title line has <b>options</b>, the randomise buttons, then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, x/y, fx, mix, mstr, prst), chosen by the buttons over it.</p>
+<p>The screen: the title line has <b>options</b>, the randomise buttons, then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, fx, mix, mstr, prst), chosen by the buttons over it.</p>
 <p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>prst</b> › <b>save new</b>. <b>rec</b> records a WAV.</p>
 <p>(On a screen under 1000 px wide it becomes the phone layout: pages along the bottom, and hold a fader for its sequencer.)</p>
 
@@ -46,6 +46,13 @@
 <li>Click to randomise. Drag up or down on one to set how far it goes, 10% to 100% (a dotted bar along its foot below 100%): at 30% it moves everything only 30% of the way to the new sound, and switches choices like the style 30% of the time.</li>
 <li>Hold one still for half a second for its settings, the ranges and chances it uses.</li>
 <li><b>options</b> › <b>randomise on next bar</b>: while playing, randomises wait for the start of the next bar (the button flashes until then).</li></ul>
+
+  <h2>scenes</h2>
+  <p>Beside the knobs: eight snapshots of the twelve knobs.</p>
+<ul><li>Click an empty scene to keep the knobs as they are now; click a kept one to bring them back. Kept ones are solid, empty ones dashed.</li>
+<li>The scene you last brought back is <b>a</b> (inverted); <b>b</b> is underlined. Click <b>a</b> or <b>b</b> under them to step through the kept scenes.</li>
+<li><b>morph</b> moves every knob from scene a's settings (0%) to scene b's (100%). It's a knob like the others: give it a step sequencer, put it on a perf knob (perf › scenes › morph) or MIDI.</li>
+<li>Right-click a scene to keep over it, make it a or b, or clear it. Presets keep the scenes.</li></ul>
 
   <h2>step sequencer</h2>
   <p>Under the knobs. Touch any knob or fader, here or on a page on the right, and its sequencer shows there (greyed out until it runs). It starts once you paint a step or press a shape or a random button, and nothing runs for a control until then.</p>
@@ -68,9 +75,6 @@
   <p>Every setting of one drum. Pick the drum along the top (or keys 1 to 6), then a tab ([ and ] step through them):</p>
 <ul><li><b>tone</b>: tuning, wave and fm. <b>shape</b>: the envelope, the pitch drop and the click (the attack's sample).</li>
 <li><b>filter</b>: cutoff, resonance, type and drive, then the drum's volume, pan, sample rate and drive. <b>mod</b>: its lfo and what velocity does.</li></ul>
-
-  <h2>x/y: two pads</h2>
-  <p>Each pad moves two settings at once. Over each pad, pick what left-right (x) and up-down (y) do: first where (a drum, beat, perf, fx, mix or master), then what. Drag around the pad; it leaves a fading trail of where it's been.</p>
 
   <h2>fx: echo, ring mod, crossfeed</h2>
   <ul><li><b>echo</b>: send, time (musical lengths), tone, feedback and width; tick <b>ping pong</b> to bounce it left and right.</li>
@@ -100,7 +104,7 @@
   <ul><li><b>space</b> play and stop. <b>r</b> record, <b>l</b> record a loop.</li>
 <li><b>e</b> everything, <b>k</b> kit, <b>a</b> alter, <b>p</b> pattern, <b>c</b> crossfeed, <b>f</b> random fx, <b>g</b> alter fx, <b>z</b> or <b>u</b> undo. <b>n</b> randomise on next bar.</li>
 <li><b>1</b> to <b>6</b> show the voice page with that drum; <b>[</b> and <b>]</b> step through its tabs.</li>
-<li><b>y</b> x/y, <b>o</b> presets, <b>/</b> search presets, <b>h</b> help. <b>esc</b> closes whatever is open.</li>
+<li><b>o</b> presets, <b>/</b> search presets, <b>h</b> help. <b>esc</b> closes whatever is open.</li>
 <li>Click a knob or fader, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>
 <li>Right-click a knob or fader for its step sequencer, reset and (on perform) assign. Double-click one to reset it.</li></ul>
 
