@@ -1424,7 +1424,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v144</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v145</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1510,7 +1510,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v144, 29 Oct, 10:13</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v145, 29 Oct, 10:24</footer>
     </section>
   </div>
   </div>
@@ -9124,12 +9124,16 @@ $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][
 // ---- the perf page's twenty-four slots, knobs four across and six down: each can do anything on the x/y lists, and MIDI CCs
 // (1..24 unless changed in the user settings; any channel) move knobs 1..24. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
 // grouped as on that page. The picks are kept in this browser, as [place, group, name], so they survive list changes ----
-const SLOT_KEY = 'elixir-desktop-perfmap';
-const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'], ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
-  ['beat', 'beat', 'rush'], ['beat', 'beat', 'fills'], ['fx', 'echo', 'send'], ['master', 'distortion', 'mix'],
-  ['beat', 'beat', 'genre'], ['beat', 'beat', 'beat'], ['beat', 'beat', 'groove'], ['beat', 'beat', 'velocity'],
-  ['fx', 'echo', 'time'], ['fx', 'echo', 'feedback'], ['fx', 'ring mod', 'send'], ['fx', 'ring mod', 'freq'],
-  ['master', 'distortion', 'drive'], ['master', 'distortion', 'tone'], ['master', 'sidechain', 'space'], ['master', 'compressor', 'threshold']];
+// (the picks are kept under a new key when the defaults are remade, so everyone gets the new ones; the old key is cleared)
+const SLOT_KEY = 'elixir-desktop-perfmap2';
+try { localStorage.removeItem('elixir-desktop-perfmap'); } catch (e) {}
+// the defaults, four a row: the perform controls, then the best of the beat page, then the drums' most played settings
+const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'],
+  ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
+  ['beat', 'beat', 'genre'], ['beat', 'beat', 'beat'], ['beat', 'beat', 'fills'], ['beat', 'beat', 'rush'],
+  ['beat', 'beat', 'groove'], ['beat', 'beat', 'depth'], ['beat', 'beat', 'accent'], ['beat', 'beat', 'velocity'],
+  ['drum 1', 'amp eg', 'decay'], ['drum 1', 'modulation', 'pitch decay'], ['drum 1', 'fm', 'fm amount'], ['snare', 'oscillator', 'noise'],
+  ['snare', 'amp eg', 'decay'], ['hihat', 'amp eg', 'decay closed'], ['hihat', 'amp eg', 'decay open'], ['cymbal', 'amp eg', 'decay']];
 let mSlots = (() => { try { const v = JSON.parse(localStorage.getItem(SLOT_KEY)); return Array.isArray(v) && v.length >= 7 ? v : null; } catch (e) { return null; } })() || SLOT0.map((x) => x.slice());
 while (mSlots.length < SLOT0.length) mSlots.push(SLOT0[mSlots.length].slice());
 const slotAxis = ([pl, g, n]) => { const P = XY_PLACES.find((x) => x.name === pl), G = P && P.groups.find((x) => x[0] === g); return G && G[1].find((a) => a.label === n); };

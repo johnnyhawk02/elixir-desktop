@@ -1,12 +1,16 @@
 // ---- the perf page's twenty-four slots, knobs four across and six down: each can do anything on the x/y lists, and MIDI CCs
 // (1..24 unless changed in the user settings; any channel) move knobs 1..24. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
 // grouped as on that page. The picks are kept in this browser, as [place, group, name], so they survive list changes ----
-const SLOT_KEY = 'elixir-desktop-perfmap';
-const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'], ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
-  ['beat', 'beat', 'rush'], ['beat', 'beat', 'fills'], ['fx', 'echo', 'send'], ['master', 'distortion', 'mix'],
-  ['beat', 'beat', 'genre'], ['beat', 'beat', 'beat'], ['beat', 'beat', 'groove'], ['beat', 'beat', 'velocity'],
-  ['fx', 'echo', 'time'], ['fx', 'echo', 'feedback'], ['fx', 'ring mod', 'send'], ['fx', 'ring mod', 'freq'],
-  ['master', 'distortion', 'drive'], ['master', 'distortion', 'tone'], ['master', 'sidechain', 'space'], ['master', 'compressor', 'threshold']];
+// (the picks are kept under a new key when the defaults are remade, so everyone gets the new ones; the old key is cleared)
+const SLOT_KEY = 'elixir-desktop-perfmap2';
+try { localStorage.removeItem('elixir-desktop-perfmap'); } catch (e) {}
+// the defaults, four a row: the perform controls, then the best of the beat page, then the drums' most played settings
+const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'],
+  ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
+  ['beat', 'beat', 'genre'], ['beat', 'beat', 'beat'], ['beat', 'beat', 'fills'], ['beat', 'beat', 'rush'],
+  ['beat', 'beat', 'groove'], ['beat', 'beat', 'depth'], ['beat', 'beat', 'accent'], ['beat', 'beat', 'velocity'],
+  ['drum 1', 'amp eg', 'decay'], ['drum 1', 'modulation', 'pitch decay'], ['drum 1', 'fm', 'fm amount'], ['snare', 'oscillator', 'noise'],
+  ['snare', 'amp eg', 'decay'], ['hihat', 'amp eg', 'decay closed'], ['hihat', 'amp eg', 'decay open'], ['cymbal', 'amp eg', 'decay']];
 let mSlots = (() => { try { const v = JSON.parse(localStorage.getItem(SLOT_KEY)); return Array.isArray(v) && v.length >= 7 ? v : null; } catch (e) { return null; } })() || SLOT0.map((x) => x.slice());
 while (mSlots.length < SLOT0.length) mSlots.push(SLOT0[mSlots.length].slice());
 const slotAxis = ([pl, g, n]) => { const P = XY_PLACES.find((x) => x.name === pl), G = P && P.groups.find((x) => x[0] === g); return G && G[1].find((a) => a.label === n); };
