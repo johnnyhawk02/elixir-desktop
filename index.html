@@ -1348,7 +1348,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-vset { grid-template-columns: none; grid-template-rows: minmax(0, 1fr); grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 2px; }
   /* effects: echo and ring mod over the crossfeed matrix, its cells shorter */
   .m-fx-card { padding: 2px; }
-  .m-xgrid { grid-auto-rows: clamp(16px, 2.6vh, 26px); }
+  /* (the matrix shares the height with the faders, so the page shrinks when the step sequencer strip opens) */
+  [data-m-panel="fx"] .m-fx-card { grid-template-rows: minmax(0, 1fr) minmax(0, 1.4fr); overflow: hidden; }
+  .m-xrow { overflow: hidden; }
+  .m-xrow { grid-template-rows: auto minmax(0, 1fr); }
+  .m-xgrid { grid-template-rows: auto repeat(6, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); max-height: 210px; min-height: 0; }
+  .m-xcell { min-height: 0; }
   .m-fx-row > b, .m-fxhead b { font-size: var(--fs-s); }
   .m-fxhead .m-chk { min-height: 24px; }
   /* mixer: echo sends, ring mod sends and levels side by side, six faders each, all full height */
@@ -1379,11 +1384,29 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-tip[hidden] { display: none; }
 .m-tip small { font-size: .78em; opacity: .7; }
 .m-tip b { font-weight: 400; }
+/* ---- the step sequencer on the laptop: a strip across the bottom of the screen, the pages shrinking to make room, so
+   everything stays playable while it's open. Sixteen steps in one row on the left, the four bars, then the buttons ---- */
+@media (min-width: 1000px) {
+  .m { grid-template-rows: auto minmax(0, 1fr) auto; }
+  .m-seq { position: static; grid-column: 1 / -1; grid-row: 3; z-index: auto; display: block; padding: 0; pointer-events: auto; }
+  .m-seq[hidden] { display: none; }
+  .m-seq-card { max-width: none; height: clamp(120px, 20vh, 180px); padding: 8px 4px 0; border: 0; border-top: 2px solid var(--ink); border-radius: 0;
+    background: none; box-shadow: none; grid-template-columns: minmax(0, 1fr) minmax(280px, 26%) 170px; grid-template-rows: auto repeat(4, minmax(0, 1fr)); gap: 4px 18px; }
+  .m-seq-card > .m-chead { grid-area: 1 / 1 / 2 / 2; }
+  .m-seq-steps { grid-area: 2 / 1 / 6 / 2; grid-template-columns: repeat(16, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+  .m-seq-lenrow { grid-column: 2; grid-template-columns: 4.5em 1fr 5em; gap: 8px; }
+  .m-seq-card > .m-seq-lenrow:nth-child(3) { grid-row: 2; } .m-seq-card > .m-seq-lenrow:nth-child(4) { grid-row: 3; }
+  .m-seq-card > .m-seq-lenrow:nth-child(5) { grid-row: 4; } .m-seq-card > .m-seq-lenrow:nth-child(6) { grid-row: 5; }
+  .m-seq-len { height: 100%; max-height: 30px; }
+  .m-seq-btns { grid-area: 1 / 3 / 6 / 4; grid-template-columns: 1fr; grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .m-seq-btns .m-btn { min-height: 0; }
+  .m .m-vf.seq-edit { outline: 2px dashed var(--ink); outline-offset: 2px; }
+}
 </style>
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v136</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v137</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1468,7 +1491,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v136, 29 Oct, 09:34</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v137, 29 Oct, 09:36</footer>
     </section>
   </div>
   </div>
@@ -8789,7 +8812,8 @@ useSong = function (g, keepTempo) {
   const box = $('m-seq-steps');
   let painting = false;
   const paint = (e) => {
-    const r = box.getBoundingClientRect(), cols = 8, rows = 2;
+    // (eight across in two rows on the phone, sixteen in one on the laptop)
+    const r = box.getBoundingClientRect(), cols = getComputedStyle(box).gridTemplateColumns.split(' ').length, rows = 16 / cols;
     const col = Math.max(0, Math.min(cols - 1, Math.floor((e.clientX - r.left) / r.width * cols)));
     const row = Math.max(0, Math.min(rows - 1, Math.floor((e.clientY - r.top) / r.height * rows)));
     const c = mSeqSteps[row * cols + col], cr = c.getBoundingClientRect();
@@ -9430,7 +9454,8 @@ const HELP = [
 <li><b>1</b> to <b>6</b> pick the drum on the voice page; <b>[</b> and <b>]</b> step through its pages (tone, shape, filter, mod).</li>
 <li><b>y</b> opens and closes the x/y pads, <b>o</b> the presets, <b>h</b> this help. <b>esc</b> closes whatever is open.</li>
 <li>Click a fader or knob, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>
-<li>Right-click a fader or knob for its step sequencer, reset, and (on perf) assign. Double-click one to reset it.</li></ul>`],
+<li>Right-click a fader or knob for its step sequencer, reset, and (on perf) assign. Double-click one to reset it.</li>
+<li>On a laptop the step sequencer opens as a strip along the bottom, so everything above it still plays; esc or done closes it.</li></ul>`],
   ['more', 'more', `<ul><li>Hold a randomise button to open the randomisers' settings, the ranges and chances each one uses.</li>
 <li>The person button: your settings. Its <b>midi</b> tab says which MIDI CC moves each perf fader, with presets (cc1 to cc24, cc25 to cc48) and your own.</li>
 <li>The gear: settings, including the <b>rush</b> graph of how the rush builds (drag its squares).</li>
@@ -9523,13 +9548,22 @@ $('m').addEventListener('pointerout', (e) => {
 });
 // (a drag that ends off the control hides it then)
 addEventListener('pointerup', () => { if (mTipFd && !mTipFd.el.matches(':hover')) { mTipFd = null; mTip.hidden = true; } });
+// the step sequencer's heading gets the same whole name, and the control it's editing is marked while it's open
+const mSeqOpenPhone = mSeqOpen;
+mSeqOpen = function (fd) {
+  mSeqOpenPhone(fd);
+  if (mWide.matches) { const [where, name] = mTipName(fd.el, fd); $('m-seq-name').textContent = `${where} · ${name}`; }
+  mFaders.forEach((f) => f.el.classList.toggle('seq-edit', f === fd));
+};
+$('m-seq-close').addEventListener('click', () => mFaders.forEach((f) => f.el.classList.remove('seq-edit')));
 // ---- the keyboard (laptop): one key for each thing played often. It listens before anything else on the page, so the
 // hidden desktop panels' own keys (space and 1..7 sound a drum, r randomises) never fire; typing in a box, and keys
 // with cmd, ctrl or alt, are left alone ----
 const KEYS = { ' ': 'm-play', r: 'm-rec', l: 'm-loop', e: 'm-everything', k: 'm-kit', a: 'm-alter', p: 'm-pattern', c: 'm-xrand',
   f: 'm-fx-rand', g: 'm-fx-alter', z: 'm-undo', u: 'm-undo' };
 // (the open pop-up, if any: Escape presses its done button)
-const mOpenPop = () => [...document.querySelectorAll('.m-rs, .m-seq')].find((el) => !el.hidden);
+// (on the laptop the step sequencer is a strip along the bottom, not a pop-up, so the keys still play while it's open)
+const mOpenPop = () => [...document.querySelectorAll(mWide.matches ? '.m-rs' : '.m-rs, .m-seq')].find((el) => !el.hidden);
 addEventListener('keydown', (e) => {
   if (e.target.closest('input:not([type="checkbox"]), select, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
   e.stopImmediatePropagation();
@@ -9538,6 +9572,7 @@ addEventListener('keydown', (e) => {
   if (k === 'Escape' && $('m-menu')) { mMenuClose(); return; }
   if (k === 'Escape') {
     if (pop) { const b = pop.querySelector('[id$="-close"]'); if (b) b.click(); else pop.hidden = true; }
+    else if (!$('m-seq').hidden) $('m-seq-close').click();
     else if ($('m').classList.contains('show-xy')) mTab('xy'); else if ($('m').classList.contains('show-presets')) mTab('presets');
     return;
   }

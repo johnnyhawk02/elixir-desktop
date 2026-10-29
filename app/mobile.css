@@ -500,7 +500,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-vset { grid-template-columns: none; grid-template-rows: minmax(0, 1fr); grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 2px; }
   /* effects: echo and ring mod over the crossfeed matrix, its cells shorter */
   .m-fx-card { padding: 2px; }
-  .m-xgrid { grid-auto-rows: clamp(16px, 2.6vh, 26px); }
+  /* (the matrix shares the height with the faders, so the page shrinks when the step sequencer strip opens) */
+  [data-m-panel="fx"] .m-fx-card { grid-template-rows: minmax(0, 1fr) minmax(0, 1.4fr); overflow: hidden; }
+  .m-xrow { overflow: hidden; }
+  .m-xrow { grid-template-rows: auto minmax(0, 1fr); }
+  .m-xgrid { grid-template-rows: auto repeat(6, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); max-height: 210px; min-height: 0; }
+  .m-xcell { min-height: 0; }
   .m-fx-row > b, .m-fxhead b { font-size: var(--fs-s); }
   .m-fxhead .m-chk { min-height: 24px; }
   /* mixer: echo sends, ring mod sends and levels side by side, six faders each, all full height */
@@ -531,3 +536,21 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-tip[hidden] { display: none; }
 .m-tip small { font-size: .78em; opacity: .7; }
 .m-tip b { font-weight: 400; }
+/* ---- the step sequencer on the laptop: a strip across the bottom of the screen, the pages shrinking to make room, so
+   everything stays playable while it's open. Sixteen steps in one row on the left, the four bars, then the buttons ---- */
+@media (min-width: 1000px) {
+  .m { grid-template-rows: auto minmax(0, 1fr) auto; }
+  .m-seq { position: static; grid-column: 1 / -1; grid-row: 3; z-index: auto; display: block; padding: 0; pointer-events: auto; }
+  .m-seq[hidden] { display: none; }
+  .m-seq-card { max-width: none; height: clamp(120px, 20vh, 180px); padding: 8px 4px 0; border: 0; border-top: 2px solid var(--ink); border-radius: 0;
+    background: none; box-shadow: none; grid-template-columns: minmax(0, 1fr) minmax(280px, 26%) 170px; grid-template-rows: auto repeat(4, minmax(0, 1fr)); gap: 4px 18px; }
+  .m-seq-card > .m-chead { grid-area: 1 / 1 / 2 / 2; }
+  .m-seq-steps { grid-area: 2 / 1 / 6 / 2; grid-template-columns: repeat(16, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+  .m-seq-lenrow { grid-column: 2; grid-template-columns: 4.5em 1fr 5em; gap: 8px; }
+  .m-seq-card > .m-seq-lenrow:nth-child(3) { grid-row: 2; } .m-seq-card > .m-seq-lenrow:nth-child(4) { grid-row: 3; }
+  .m-seq-card > .m-seq-lenrow:nth-child(5) { grid-row: 4; } .m-seq-card > .m-seq-lenrow:nth-child(6) { grid-row: 5; }
+  .m-seq-len { height: 100%; max-height: 30px; }
+  .m-seq-btns { grid-area: 1 / 3 / 6 / 4; grid-template-columns: 1fr; grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .m-seq-btns .m-btn { min-height: 0; }
+  .m .m-vf.seq-edit { outline: 2px dashed var(--ink); outline-offset: 2px; }
+}

@@ -4,7 +4,8 @@
 const KEYS = { ' ': 'm-play', r: 'm-rec', l: 'm-loop', e: 'm-everything', k: 'm-kit', a: 'm-alter', p: 'm-pattern', c: 'm-xrand',
   f: 'm-fx-rand', g: 'm-fx-alter', z: 'm-undo', u: 'm-undo' };
 // (the open pop-up, if any: Escape presses its done button)
-const mOpenPop = () => [...document.querySelectorAll('.m-rs, .m-seq')].find((el) => !el.hidden);
+// (on the laptop the step sequencer is a strip along the bottom, not a pop-up, so the keys still play while it's open)
+const mOpenPop = () => [...document.querySelectorAll(mWide.matches ? '.m-rs' : '.m-rs, .m-seq')].find((el) => !el.hidden);
 addEventListener('keydown', (e) => {
   if (e.target.closest('input:not([type="checkbox"]), select, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
   e.stopImmediatePropagation();
@@ -13,6 +14,7 @@ addEventListener('keydown', (e) => {
   if (k === 'Escape' && $('m-menu')) { mMenuClose(); return; }
   if (k === 'Escape') {
     if (pop) { const b = pop.querySelector('[id$="-close"]'); if (b) b.click(); else pop.hidden = true; }
+    else if (!$('m-seq').hidden) $('m-seq-close').click();
     else if ($('m').classList.contains('show-xy')) mTab('xy'); else if ($('m').classList.contains('show-presets')) mTab('presets');
     return;
   }

@@ -74,7 +74,8 @@ useSong = function (g, keepTempo) {
   const box = $('m-seq-steps');
   let painting = false;
   const paint = (e) => {
-    const r = box.getBoundingClientRect(), cols = 8, rows = 2;
+    // (eight across in two rows on the phone, sixteen in one on the laptop)
+    const r = box.getBoundingClientRect(), cols = getComputedStyle(box).gridTemplateColumns.split(' ').length, rows = 16 / cols;
     const col = Math.max(0, Math.min(cols - 1, Math.floor((e.clientX - r.left) / r.width * cols)));
     const row = Math.max(0, Math.min(rows - 1, Math.floor((e.clientY - r.top) / r.height * rows)));
     const c = mSeqSteps[row * cols + col], cr = c.getBoundingClientRect();

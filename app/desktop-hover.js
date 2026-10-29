@@ -36,3 +36,11 @@ $('m').addEventListener('pointerout', (e) => {
 });
 // (a drag that ends off the control hides it then)
 addEventListener('pointerup', () => { if (mTipFd && !mTipFd.el.matches(':hover')) { mTipFd = null; mTip.hidden = true; } });
+// the step sequencer's heading gets the same whole name, and the control it's editing is marked while it's open
+const mSeqOpenPhone = mSeqOpen;
+mSeqOpen = function (fd) {
+  mSeqOpenPhone(fd);
+  if (mWide.matches) { const [where, name] = mTipName(fd.el, fd); $('m-seq-name').textContent = `${where} · ${name}`; }
+  mFaders.forEach((f) => f.el.classList.toggle('seq-edit', f === fd));
+};
+$('m-seq-close').addEventListener('click', () => mFaders.forEach((f) => f.el.classList.remove('seq-edit')));
