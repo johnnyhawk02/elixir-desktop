@@ -1,6 +1,6 @@
 // ---- user settings (the person by the title; no password): tabs. seq: whether the fader sequencers follow the groove.
-// midi: which CC moves each of the twenty-four PERF knobs (mCc, app/mobile-slots.js), as a 4 by 6 grid like the page (tap
-// a fader to type its CC), the CC presets (cc1 to cc24, cc25 to cc48, and any saved here, which the ✕ deletes), and
+// midi: which CC moves each of the twelve PERF knobs (mCc, app/mobile-slots.js), as a 4 by 3 grid like the page (tap
+// a fader to type its CC), the CC presets (cc1 to cc12, cc13 to cc24, and any saved here, which the ✕ deletes), and
 // save as a preset ----
 $('m-user-open').addEventListener('click', () => { $('m-user').hidden = false; mCcDraw(); });
 mCloser('m-user');

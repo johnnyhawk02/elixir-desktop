@@ -6,7 +6,7 @@ const HELP = [
 <p>The screen: the title line has <b>options</b>, the randomise buttons, then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, x/y, fx, mix, mstr, prst), chosen by the buttons over it.</p>
 <p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>prst</b> › <b>save new</b>. <b>rec</b> records a WAV.</p>
 <p>(On a screen under 1000 px wide it becomes the phone layout: pages along the bottom, and hold a fader for its sequencer.)</p>`],
-  ['perf', 'perform: knobs and randomisers', `<p>Twenty-four knobs, four across and six down: the perform controls (tempo, sidechain, pitch, decay, filter, fm, crossfeed), energy, the best of the beat page, then the drums' most played settings. MIDI CC 1 to 24 turn them (any channel).</p>
+  ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: the perform controls (tempo, sidechain, pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and rush. MIDI CC 1 to 12 turn them (any channel).</p>
 <ul><li>Each knob's ring shows its value. While its step sequencer runs, the pointer stays on your setting and the lit part of the ring shows where the sequencer has moved it.</li>
 <li><b>options</b> › <b>assign knobs</b>, then click a knob to choose what it does: any fader from any page, or any drum's setting. Or right-click a knob › <b>assign</b>.</li></ul>
 <p>The randomise buttons (marked rnd):</p>
@@ -53,7 +53,7 @@ const HELP = [
 <li>Right-click a knob or fader for its step sequencer, reset and (on perform) assign. Double-click one to reset it.</li></ul>`],
   ['more', 'more', `<ul><li><b>options</b> (by the e) holds randomise on next bar, assign knobs, and:</li>
 <li><b>settings</b>: copy the knob assignments or your presets, export or clear presets, and the <b>rush</b> graph of how the rush builds (drag its squares).</li>
-<li><b>user settings</b>: <b>midi</b>, which CC moves each knob, with presets (cc1 to cc24, cc25 to cc48) and your own; <b>seq</b>, whether sequencers follow the groove.</li>
+<li><b>user settings</b>: <b>midi</b>, which CC moves each knob, with presets (cc1 to cc12, cc13 to cc24) and your own; <b>seq</b>, whether sequencers follow the groove.</li>
 <li>Install it as an app from your browser's menu; it works offline.</li>
 <li>The version number is by the e; the latest arrives when you open it with a connection (cmd+shift+R to be sure).</li></ul>`],
 ];
