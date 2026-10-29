@@ -545,8 +545,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-seq { position: static; grid-area: 4 / 1; z-index: auto; display: block; padding: 0; pointer-events: auto; }
   .m-seq[hidden] { display: block !important; } /* (over the page-wide [hidden] rule) */
   .m-seq[hidden] .m-seq-card { opacity: .28; pointer-events: none; }
+  /* (the steps take the width, the four bars in a narrow column beside them, and the shapes and kinds of random in one
+     slim row of small buttons under both) */
   .m-seq-card { max-width: none; height: clamp(220px, 40vh, 340px); padding: 8px 24px 0 4px; border: 0; border-top: var(--rule); border-radius: 0;
-    background: none; box-shadow: none; grid-template-columns: minmax(0, 1.25fr) minmax(250px, 1fr) 210px; grid-template-rows: auto repeat(4, minmax(0, 1fr)); gap: 4px 14px; }
+    background: none; box-shadow: none; grid-template-columns: minmax(0, 1fr) 270px; grid-template-rows: auto repeat(4, minmax(0, 1fr)) 30px; gap: 6px 18px; }
   .m-seq-card > .m-chead { grid-area: 1 / 1 / 2 / 3; min-width: 0; } .m-seq-card > .m-chead b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .m-seq-steps { grid-area: 2 / 1 / 6 / 2; grid-template-columns: repeat(16, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
   .m-seq-lenrow { grid-column: 2; grid-template-columns: 3.4em minmax(0, 1fr) 4em; gap: 8px; }
@@ -554,12 +556,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-seq-lenrow, .m .m-seq-lenrow output { font-size: var(--fs-xs); }
   .m-seq-card > .m-seq-lenrow:nth-child(3) { grid-row: 2; } .m-seq-card > .m-seq-lenrow:nth-child(4) { grid-row: 3; }
   .m-seq-card > .m-seq-lenrow:nth-child(5) { grid-row: 4; } .m-seq-card > .m-seq-lenrow:nth-child(6) { grid-row: 5; }
-  .m-seq-len { height: 100%; max-height: 28px; }
-  .m-seq-btns { grid-area: 1 / 3 / 6 / 4; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
-  .m-seq-btns .m-btn { min-height: 0; }
+  .m-seq-len { height: 100%; max-height: 26px; }
+  .m-seq-btns { grid-area: 6 / 1 / 7 / 3; grid-template-columns: repeat(5, minmax(0, 1fr)) 10px repeat(5, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 0 4px; }
+  .m-seq-shapes { display: contents; }
+  .m-seq-rnds > :first-child { grid-column: 7; }
   #m-seq-close, #m-seq-rand { display: none; }
-  .m-seq-shapes { display: grid; grid-template-rows: repeat(5, minmax(0, 1fr)); gap: 4px; min-height: 0; }
-  .m .m-seq-shapes .m-btn { min-height: 0; padding: 0 4px; font-size: var(--fs-xs) !important; letter-spacing: .02em; white-space: nowrap; }
+  .m .m-seq-shapes .m-btn { min-height: 0; padding: 0 2px; font-size: 14px !important; letter-spacing: 0; white-space: nowrap; overflow: hidden; }
   .m .m-vf.seq-edit { outline: 2px dashed var(--ink); outline-offset: 2px; }
 
   /* -- the right: the page buttons, then the page chosen (beat until another is) -- */
