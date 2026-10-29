@@ -46,7 +46,8 @@ function mFitLabel(el) {
   // (measured as the text's own width against the fader's column, with a pixel to spare for rounding)
   // (on the laptop a knob's name sits beside its ring, in what the ring leaves)
   const tr = el.querySelector('.m-vtrack'), beside = getComputedStyle(el).display === 'grid' && el.classList.contains('m-knob');
-  const room = el.clientWidth - (beside ? tr.offsetWidth + 10 : 0) - 1, wide = () => { const r = document.createRange(); r.selectNodeContents(lab); return r.getBoundingClientRect().width > room; };
+  const cs = getComputedStyle(el), pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+  const room = el.clientWidth - pad - (beside ? tr.offsetWidth + 10 : 0) - 1, wide = () => { const r = document.createRange(); r.selectNodeContents(lab); return r.getBoundingClientRect().width > room; };
   if (room <= 0 || !wide()) return;
   const w = full.split(' '), done = new Set(w.length > 1 ? [0] : []); // (the first word, the drum or group, stays; a name of one word is shortened itself)
   while (wide()) {

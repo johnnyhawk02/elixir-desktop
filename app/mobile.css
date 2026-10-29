@@ -501,6 +501,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   #m-faders .m-knob output { grid-area: 1 / 2; align-self: end; height: auto; max-width: 100%; text-align: left; font-size: var(--fs-s); }
   #m-faders .m-knob .m-flab { grid-area: 2 / 2; align-self: start; max-width: 100%; text-align: left; }
   @media (max-width: 1360px) { .m #m-faders .m-knob .m-vtrack { max-height: 48px; } }
+  /* (a little smaller, each in a rounded box of its own) */
+  .m #m-faders .m-knob .m-vtrack { max-height: 52px; }
+  @media (max-width: 1360px) { .m #m-faders .m-knob .m-vtrack { max-height: 42px; } }
+  #m-faders .m-knob { padding: 4px 8px; border: 1.5px solid var(--ink); border-radius: 10px; }
   /* the right: the page buttons, then the page chosen (beat until another is) */
   .m > .m-tabs { grid-area: 2 / 2; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0; padding: 10px 0 8px 24px; border-top: var(--rule); border-left: var(--rule); }
   .m > .m-tabs button[data-m-tab="play"] { display: none; }

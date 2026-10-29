@@ -1349,6 +1349,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   #m-faders .m-knob output { grid-area: 1 / 2; align-self: end; height: auto; max-width: 100%; text-align: left; font-size: var(--fs-s); }
   #m-faders .m-knob .m-flab { grid-area: 2 / 2; align-self: start; max-width: 100%; text-align: left; }
   @media (max-width: 1360px) { .m #m-faders .m-knob .m-vtrack { max-height: 48px; } }
+  /* (a little smaller, each in a rounded box of its own) */
+  .m #m-faders .m-knob .m-vtrack { max-height: 52px; }
+  @media (max-width: 1360px) { .m #m-faders .m-knob .m-vtrack { max-height: 42px; } }
+  #m-faders .m-knob { padding: 4px 8px; border: 1.5px solid var(--ink); border-radius: 10px; }
   /* the right: the page buttons, then the page chosen (beat until another is) */
   .m > .m-tabs { grid-area: 2 / 2; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0; padding: 10px 0 8px 24px; border-top: var(--rule); border-left: var(--rule); }
   .m > .m-tabs button[data-m-tab="play"] { display: none; }
@@ -1456,7 +1460,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true">e</span><small class="m-ver">v157</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true">e</span><small class="m-ver">v158</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
@@ -1543,7 +1547,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v157, 29 Oct, 11:55</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v158, 29 Oct, 12:04</footer>
     </section>
   </div>
   </div>
@@ -9259,7 +9263,8 @@ function mFitLabel(el) {
   // (measured as the text's own width against the fader's column, with a pixel to spare for rounding)
   // (on the laptop a knob's name sits beside its ring, in what the ring leaves)
   const tr = el.querySelector('.m-vtrack'), beside = getComputedStyle(el).display === 'grid' && el.classList.contains('m-knob');
-  const room = el.clientWidth - (beside ? tr.offsetWidth + 10 : 0) - 1, wide = () => { const r = document.createRange(); r.selectNodeContents(lab); return r.getBoundingClientRect().width > room; };
+  const cs = getComputedStyle(el), pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+  const room = el.clientWidth - pad - (beside ? tr.offsetWidth + 10 : 0) - 1, wide = () => { const r = document.createRange(); r.selectNodeContents(lab); return r.getBoundingClientRect().width > room; };
   if (room <= 0 || !wide()) return;
   const w = full.split(' '), done = new Set(w.length > 1 ? [0] : []); // (the first word, the drum or group, stays; a name of one word is shortened itself)
   while (wide()) {
