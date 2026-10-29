@@ -109,6 +109,16 @@ mSeqBar($('m-seq-slew'), (x) => { mSeqQ().slew = Math.round(x * 20) * 5; });
 mSeqBar($('m-seq-speed'), (x) => { mSeqQ().step = SEQ_STEPS[Math.min(SEQ_STEPS.length - 1, Math.floor(x * SEQ_STEPS.length))]; });
 mSeqBar($('m-seq-depth'), (x) => { mSeqQ().depth = Math.round(x * 20) * 5; if (mSeqF.base !== null) mSeqApply(mSeqF); });
 $('m-seq-rand').addEventListener('click', () => { mSeqCommit(); const q = mSeqF.seq; for (let i = 0; i < 16; i++) q.vals[i] = mSeqOff(Math.random() * 2 - 1); mSeqDraw(); });
+// shapes (laptop): the steps over the sequence's length set to a ramp, a triangle, a square or a sine, from -1 to 1
+const SEQ_SHAPES = { up: (x) => 2 * x - 1, down: (x) => 1 - 2 * x, tri: (x) => (x < .5 ? 4 * x - 1 : 3 - 4 * x), square: (x) => (x < .5 ? 1 : -1), sine: (x) => Math.sin(2 * Math.PI * x) };
+$('m-seq-shapes').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-shape]'); if (!b) return;
+  mSeqCommit(); const q = mSeqF.seq, f = SEQ_SHAPES[b.dataset.shape];
+  // (ramps and the triangle reach both ends; the square and sine repeat at the length)
+  const ends = b.dataset.shape === 'up' || b.dataset.shape === 'down';
+  for (let i = 0; i < 16; i++) q.vals[i] = i < q.len ? mSeqOff(f(ends ? i / (q.len - 1) : i / q.len)) : 0;
+  mSeqDraw();
+});
 $('m-seq-on').addEventListener('click', () => { if (!mSeqF.seq || !mSeqF.seq.on) mSeqCommit(); else { mSeqF.seq.on = false; mSeqRelease(mSeqF); } mSeqDraw(); });
 mCloser('m-seq', () => { mSeqF = null; mSeqDraft = null; });
 // the glides, a frame at a time while any is moving
