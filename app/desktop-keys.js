@@ -8,7 +8,9 @@ const mOpenPop = () => [...document.querySelectorAll('.m-rs, .m-seq')].find((el)
 addEventListener('keydown', (e) => {
   if (e.target.closest('input:not([type="checkbox"]), select, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
   e.stopImmediatePropagation();
+  if ($('m-menu') && e.key !== 'Escape') return; // (the menu's own buttons take tab, enter and space)
   const k = e.key.length === 1 ? e.key.toLowerCase() : e.key, pop = mOpenPop();
+  if (k === 'Escape' && $('m-menu')) { mMenuClose(); return; }
   if (k === 'Escape') {
     if (pop) { const b = pop.querySelector('[id$="-close"]'); if (b) b.click(); else pop.hidden = true; }
     else if ($('m').classList.contains('show-xy')) mTab('xy'); else if ($('m').classList.contains('show-presets')) mTab('presets');

@@ -1367,11 +1367,17 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   #m-duck { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .m-comp-card > .m-chead:first-child { flex-wrap: wrap; row-gap: 2px; } .m-comp-card > .m-chead:first-child .m-gr { flex-basis: 100%; }
 }
+
+/* ---- the right-click menu (laptop): a small sheet of glass by the pointer ---- */
+.m-menu { position: fixed; z-index: 30; display: grid; gap: 4px; min-width: 190px; padding: 6px; background-color: var(--panel); border: 2px solid var(--ink); border-radius: 4px;
+  box-shadow: 4px 5px 0 rgba(23, 32, 14, .25); }
+.m .m-menu .m-btn { min-height: 34px; justify-content: flex-start; text-align: left; padding: 0 10px; font-size: var(--fs-s) !important; }
+.m .m-menu .m-btn:hover, .m .m-menu .m-btn:focus-visible { background: var(--ink); color: var(--panel); text-shadow: none; outline: 0; }
 </style>
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v134</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v135</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1456,7 +1462,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v134, 29 Oct, 09:29</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v135, 29 Oct, 09:31</footer>
     </section>
   </div>
   </div>
@@ -9417,7 +9423,8 @@ const HELP = [
 <li><b>e</b> everything, <b>k</b> kit, <b>a</b> alter, <b>p</b> pattern, <b>c</b> crossfeed, <b>f</b> random fx, <b>g</b> alter fx, <b>z</b> or <b>u</b> undo. <b>n</b> ticks next bar.</li>
 <li><b>1</b> to <b>6</b> pick the drum on the voice page; <b>[</b> and <b>]</b> step through its pages (tone, shape, filter, mod).</li>
 <li><b>y</b> opens and closes the x/y pads, <b>o</b> the presets, <b>h</b> this help. <b>esc</b> closes whatever is open.</li>
-<li>Click a fader or knob, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li></ul>`],
+<li>Click a fader or knob, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>
+<li>Right-click a fader or knob for its step sequencer, reset, and (on perf) assign. Double-click one to reset it.</li></ul>`],
   ['more', 'more', `<ul><li>Hold a randomise button to open the randomisers' settings, the ranges and chances each one uses.</li>
 <li>The person button: your settings. Its <b>midi</b> tab says which MIDI CC moves each perf fader, with presets (cc1 to cc24, cc25 to cc48) and your own.</li>
 <li>The gear: settings, including the <b>rush</b> graph of how the rush builds (drag its squares).</li>
@@ -9436,6 +9443,42 @@ function mHelpDraw() {
 }
 $('m-help-open').addEventListener('click', () => { mHelpTab = 0; mHelpDraw(); $('m-help').hidden = false; });
 mCloser('m-help');
+// ---- the mouse (laptop): right-click a fader or knob for a small menu (its step sequencer, back to its default, and on
+// the perf page what it does), and double-click one to put it back to its default. The phone's long hold and double
+// tap on the name still work ----
+const mFdOf = (el) => mFaders.find((f) => f.el === el);
+function mReset(fd) {
+  if (fd.dflt === undefined) return;
+  const v = fd.snap(typeof fd.dflt === 'function' ? fd.dflt() : fd.dflt);
+  if (fd.base !== null) { fd.base = v; mSeqApply(fd); } else fd.put(v);
+  setDirty(true);
+}
+const mMenuClose = () => { const m = $('m-menu'); if (m) m.remove(); };
+function mMenu(e, items) {
+  mMenuClose();
+  const m = document.createElement('div'); m.className = 'm-menu'; m.id = 'm-menu'; m.setAttribute('role', 'menu');
+  for (const [label, act] of items) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'm-btn'; b.setAttribute('role', 'menuitem'); b.textContent = label;
+    b.addEventListener('click', () => { mMenuClose(); act(); }); m.append(b);
+  }
+  $('m').append(m);
+  // (by the pointer, kept on the screen)
+  const r = m.getBoundingClientRect();
+  m.style.left = Math.min(e.clientX, innerWidth - r.width - 8) + 'px'; m.style.top = Math.min(e.clientY, innerHeight - r.height - 8) + 'px';
+  m.querySelector('button').focus();
+}
+$('m').addEventListener('contextmenu', (e) => {
+  const el = e.target.closest('.m-vf'), fd = el && mFdOf(el); if (!fd) return;
+  e.preventDefault();
+  const items = [[fd.seq && fd.seq.on ? 'edit step sequencer' : 'step sequencer', () => mSeqOpen(fd)]];
+  if (fd.dflt !== undefined) items.push(['reset to default', () => mReset(fd)]);
+  if (el.dataset.slot) items.push(['assign…', () => mChooser(Number(el.dataset.slot))]);
+  mMenu(e, items);
+});
+addEventListener('pointerdown', (e) => { if (!e.target.closest('#m-menu')) mMenuClose(); }, { capture: true });
+$('m').addEventListener('dblclick', (e) => {
+  const tr = e.target.closest('.m-vtrack'), fd = tr && mFdOf(tr.closest('.m-vf')); if (fd) mReset(fd);
+});
 // ---- the keyboard (laptop): one key for each thing played often. It listens before anything else on the page, so the
 // hidden desktop panels' own keys (space and 1..7 sound a drum, r randomises) never fire; typing in a box, and keys
 // with cmd, ctrl or alt, are left alone ----
@@ -9446,7 +9489,9 @@ const mOpenPop = () => [...document.querySelectorAll('.m-rs, .m-seq')].find((el)
 addEventListener('keydown', (e) => {
   if (e.target.closest('input:not([type="checkbox"]), select, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
   e.stopImmediatePropagation();
+  if ($('m-menu') && e.key !== 'Escape') return; // (the menu's own buttons take tab, enter and space)
   const k = e.key.length === 1 ? e.key.toLowerCase() : e.key, pop = mOpenPop();
+  if (k === 'Escape' && $('m-menu')) { mMenuClose(); return; }
   if (k === 'Escape') {
     if (pop) { const b = pop.querySelector('[id$="-close"]'); if (b) b.click(); else pop.hidden = true; }
     else if ($('m').classList.contains('show-xy')) mTab('xy'); else if ($('m').classList.contains('show-presets')) mTab('presets');

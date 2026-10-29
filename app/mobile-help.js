@@ -40,7 +40,8 @@ const HELP = [
 <li><b>e</b> everything, <b>k</b> kit, <b>a</b> alter, <b>p</b> pattern, <b>c</b> crossfeed, <b>f</b> random fx, <b>g</b> alter fx, <b>z</b> or <b>u</b> undo. <b>n</b> ticks next bar.</li>
 <li><b>1</b> to <b>6</b> pick the drum on the voice page; <b>[</b> and <b>]</b> step through its pages (tone, shape, filter, mod).</li>
 <li><b>y</b> opens and closes the x/y pads, <b>o</b> the presets, <b>h</b> this help. <b>esc</b> closes whatever is open.</li>
-<li>Click a fader or knob, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li></ul>`],
+<li>Click a fader or knob, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>
+<li>Right-click a fader or knob for its step sequencer, reset, and (on perf) assign. Double-click one to reset it.</li></ul>`],
   ['more', 'more', `<ul><li>Hold a randomise button to open the randomisers' settings, the ranges and chances each one uses.</li>
 <li>The person button: your settings. Its <b>midi</b> tab says which MIDI CC moves each perf fader, with presets (cc1 to cc24, cc25 to cc48) and your own.</li>
 <li>The gear: settings, including the <b>rush</b> graph of how the rush builds (drag its squares).</li>
