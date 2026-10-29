@@ -645,3 +645,4 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-title .m-ver { position: absolute; left: 0; width: 46px; top: 58%; transform: translateY(-50%); margin: 0; text-align: center;
     color: var(--panel); opacity: 1; font-size: 15px; letter-spacing: 0; text-shadow: none; pointer-events: none; }
 }
+@media (min-width: 1000px) { .m .m-pio .m-install { display: none !important; } }
