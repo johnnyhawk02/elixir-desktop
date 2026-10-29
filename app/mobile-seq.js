@@ -137,7 +137,7 @@ new MutationObserver(() => {
 }).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
 // on each 16th (as the audio thread reaches it, ahead of the output), every running sequencer steps its fader
 // following the groove (user settings, seq tab; on unless switched off, kept in this browser)
-const SEQ_GROOVE_KEY = 'elixir-mobile-seqgroove';
+const SEQ_GROOVE_KEY = 'elixir-desktop-seqgroove';
 let mSeqGroove = (() => { try { return localStorage.getItem(SEQ_GROOVE_KEY) !== '0'; } catch (e) { return true; } })();
 let mSeqLast = -2;
 // the drum (groove track) a fader belongs to: a voice page's drum, a perf slot set to a drum's setting; else -1

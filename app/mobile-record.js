@@ -2,7 +2,7 @@
 // records exactly LOOP_BARS bars (4 unless changed: hold it) from the start of the next bar (from bar 1 if stopped), cut to loop seamlessly, and
 // downloads it by itself; pressing it again while it runs stops it early ----
 // (the loop's length: hold the loop button to change it; kept in this browser)
-const LOOP_KEY = 'elixir-mobile-loopbars';
+const LOOP_KEY = 'elixir-desktop-loopbars';
 let LOOP_BARS = (() => { try { const v = Number(localStorage.getItem(LOOP_KEY)); return LENS.includes(v) && v ? v : 4; } catch (e) { return 4; } })();
 let mTimer = 0, mRecKind = null;
 function mRecUi() {

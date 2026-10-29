@@ -1,6 +1,6 @@
-# Elixir Mobile
+# Elixir Desktop
 
-A six-voice drum machine for your phone, in the browser. **Play it: https://johnnyhawk02.github.io/elixir-mobile/**
+A six-voice drum machine in the browser, a desktop layout grown from [Elixir Mobile](https://github.com/johnnyhawk02/elixir-mobile). **Play it: https://johnnyhawk02.github.io/elixir-desktop/**
 
 This repo holds the app and its full source, published with GitHub Pages.
 

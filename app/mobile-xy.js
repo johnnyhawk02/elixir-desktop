@@ -17,7 +17,7 @@ const XY_PLACES = (() => {
     { name: 'master', groups: faders([['sidechain', 'm-duck'], ['distortion', 'm-dist'], ['compressor', 'm-comp']]) }];
 })();
 // two pads, one above the other, each with its own x and y picks: [pad][axis] = [place, group, item]
-const XY_KEY = 'elixir-mobile-xy';
+const XY_KEY = 'elixir-desktop-xy';
 let mXY = (() => { try { return JSON.parse(localStorage.getItem(XY_KEY)); } catch (e) { return null; } })();
 if (!Array.isArray(mXY) || !Array.isArray(mXY[0]) || !Array.isArray(mXY[0][0])) mXY = [mXY && Array.isArray(mXY[0]) ? mXY : [[0, 0, 0], [0, 1, 1]], [[0, 5, 0], [0, 5, 1]]];
 if (!mXY[1]) mXY[1] = [[0, 5, 0], [0, 5, 1]];

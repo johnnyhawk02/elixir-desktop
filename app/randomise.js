@@ -37,7 +37,7 @@ const RAND0 = {
   fx: { pingpong: 60, echoOn: 50, echoLo: 10, echoHi: 60, ringOn: 20, ringLo: 10, ringHi: 60, fbLo: 15, fbHi: 70, fbWild: 20, toneLo: 40, toneHi: 110, widthLo: 60, widthHi: 160 },
   alterfx: { amount: 10 },
 };
-const RAND_KEY = 'elixir-mobile-rand';
+const RAND_KEY = 'elixir-desktop-rand';
 const RAND = (() => { let s = {}; try { s = JSON.parse(localStorage.getItem(RAND_KEY)) || {}; } catch (e) {} return Object.fromEntries(Object.entries(RAND0).map(([k, d]) => [k, { ...d, ...(s[k] || {}) }])); })();
 const saveRand = () => { try { localStorage.setItem(RAND_KEY, JSON.stringify(RAND)); } catch (e) {} };
 // a whole number from a Lo..Hi pair (either way round), and a yes for a percentage chance

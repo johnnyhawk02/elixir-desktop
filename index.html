@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>Elixir Mobile</title>
+<title>Elixir Desktop</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1b1d1a">
@@ -1288,7 +1288,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v130</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v131</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1373,7 +1373,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · v130, 29 Oct, 08:48</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v131, 29 Oct, 09:08</footer>
     </section>
   </div>
   </div>
@@ -6144,7 +6144,7 @@ const RAND0 = {
   fx: { pingpong: 60, echoOn: 50, echoLo: 10, echoHi: 60, ringOn: 20, ringLo: 10, ringHi: 60, fbLo: 15, fbHi: 70, fbWild: 20, toneLo: 40, toneHi: 110, widthLo: 60, widthHi: 160 },
   alterfx: { amount: 10 },
 };
-const RAND_KEY = 'elixir-mobile-rand';
+const RAND_KEY = 'elixir-desktop-rand';
 const RAND = (() => { let s = {}; try { s = JSON.parse(localStorage.getItem(RAND_KEY)) || {}; } catch (e) {} return Object.fromEntries(Object.entries(RAND0).map(([k, d]) => [k, { ...d, ...(s[k] || {}) }])); })();
 const saveRand = () => { try { localStorage.setItem(RAND_KEY, JSON.stringify(RAND)); } catch (e) {} };
 // a whole number from a Lo..Hi pair (either way round), and a yes for a percentage chance
@@ -6473,10 +6473,10 @@ const kitList = [{ name: 'Init kit', kit: factoryInit, userSamples: 0, builtin: 
 const kitSel = $('kit');
 // saved presets: the kit values, crossfeed, FX and mixer sends, plus the song (pattern, perform dials,
 // tempo, velocity, accent, master, snare rush and its settings), kept in this browser
-// Elixir Mobile keeps its presets under its own key, apart from the full Elixir's (elexir-presets-v2, on the same
+// Elixir Desktop keeps its presets under its own key, apart from Elixir Mobile's (elixir-mobile-presets, on the same
 // site), so neither app reads presets the other wrote in a shape it doesn't know; on first run here the ones saved
-// under the shared key are copied over
-const SAVE_KEY = 'elixir-mobile-presets', OLD_KEY = 'elexir-presets-v2';
+// under Elixir Mobile's key are copied over (read once, never written)
+const SAVE_KEY = 'elixir-desktop-presets', OLD_KEY = 'elixir-mobile-presets';
 try { if (localStorage.getItem(SAVE_KEY) === null && localStorage.getItem(OLD_KEY) !== null) localStorage.setItem(SAVE_KEY, localStorage.getItem(OLD_KEY)); } catch (e) {}
 function storedPresets() { try { return JSON.parse(localStorage.getItem(SAVE_KEY)) || []; } catch (e) { return []; } }
 function storePresets() {
@@ -8280,7 +8280,7 @@ $('m-pbpm').checked = presetBpm.checked;
 $('m-pbpm').addEventListener('change', () => { presetBpm.checked = $('m-pbpm').checked; presetBpm.dispatchEvent(new Event('change')); });
 // favourites: a star on any preset, mine or built in, keeps it in a group at the top of the list. Kept in this browser
 // by name (a saved one also carries fav, so an export keeps it)
-const FAV_KEY = 'elixir-mobile-favs';
+const FAV_KEY = 'elixir-desktop-favs';
 const mFavs = new Set((() => { try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch (e) { return []; } })());
 for (const k of kitList) if (k.saved && k.fav) mFavs.add(k.name);
 const mFavStore = () => { try { localStorage.setItem(FAV_KEY, JSON.stringify([...mFavs])); } catch (e) {} };
@@ -8339,7 +8339,7 @@ $('m-psave').addEventListener('click', () => {
 // save over: the current sound and song replace the loaded preset's, name and star kept (to match levels across
 // presets). A built-in one's new version is kept in this browser over the factory one (and goes out with an export
 // of favourites); Init kit can't be overwritten
-const EDIT_KEY = 'elixir-mobile-factory-edits';
+const EDIT_KEY = 'elixir-desktop-factory-edits';
 const mEdits = (() => { try { return JSON.parse(localStorage.getItem(EDIT_KEY)) || {}; } catch (e) { return {}; } })();
 kitList.forEach((k, i) => { if (k.builtin && mEdits[k.name]) { const q = toCurrent(mEdits[k.name]); if (q) kitList[i] = { ...fromStored(q, { builtin: true }), edited: true }; } });
 const mOverTarget = () => { const k = mPending ? null : kitList[Number($('kit').value)]; return k && (k.saved || k.builtin) && k.kit !== factoryInit ? k : null; };
@@ -8384,7 +8384,7 @@ $('m-pexport').addEventListener('click', async () => {
   const list = mSetPresets(true);
   if (!list.length) { $('m-pnote').textContent = 'No presets to export yet.'; return; }
   const blob = new Blob([JSON.stringify({ elixir: 1, presets: list }, null, 1)], { type: 'application/json' });
-  if (await mOffer({ blob, name: 'elixir-mobile-presets.json' }, 'application/json')) $('m-pnote').textContent = `Exported ${list.length} preset${list.length > 1 ? 's' : ''}.`;
+  if (await mOffer({ blob, name: 'elixir-desktop-presets.json' }, 'application/json')) $('m-pnote').textContent = `Exported ${list.length} preset${list.length > 1 ? 's' : ''}.`;
 });
 // clear all (in settings): every saved preset deleted and every star cleared (the built-in ones stay)
 function mClearAll() {
@@ -8400,7 +8400,7 @@ function mClearAll() {
 // records exactly LOOP_BARS bars (4 unless changed: hold it) from the start of the next bar (from bar 1 if stopped), cut to loop seamlessly, and
 // downloads it by itself; pressing it again while it runs stops it early ----
 // (the loop's length: hold the loop button to change it; kept in this browser)
-const LOOP_KEY = 'elixir-mobile-loopbars';
+const LOOP_KEY = 'elixir-desktop-loopbars';
 let LOOP_BARS = (() => { try { const v = Number(localStorage.getItem(LOOP_KEY)); return LENS.includes(v) && v ? v : 4; } catch (e) { return 4; } })();
 let mTimer = 0, mRecKind = null;
 function mRecUi() {
@@ -8737,7 +8737,7 @@ new MutationObserver(() => {
 }).observe($('play'), { attributes: true, attributeFilter: ['aria-pressed'] });
 // on each 16th (as the audio thread reaches it, ahead of the output), every running sequencer steps its fader
 // following the groove (user settings, seq tab; on unless switched off, kept in this browser)
-const SEQ_GROOVE_KEY = 'elixir-mobile-seqgroove';
+const SEQ_GROOVE_KEY = 'elixir-desktop-seqgroove';
 let mSeqGroove = (() => { try { return localStorage.getItem(SEQ_GROOVE_KEY) !== '0'; } catch (e) { return true; } })();
 let mSeqLast = -2;
 // the drum (groove track) a fader belongs to: a voice page's drum, a perf slot set to a drum's setting; else -1
@@ -8793,7 +8793,7 @@ $('m-install').addEventListener('click', async () => {
 
 // ---- next bar: with the box on the perf page ticked, while playing, a randomise button's changes wait for the start
 // of the next bar (the player holds them, as it does a preset's), the button flashing until then. Kept in this browser ----
-const NB_KEY = 'elixir-mobile-nextbar';
+const NB_KEY = 'elixir-desktop-nextbar';
 try { $('m-nextbar').checked = localStorage.getItem(NB_KEY) === '1'; } catch (e) {}
 $('m-nextbar').addEventListener('change', () => { try { localStorage.setItem(NB_KEY, $('m-nextbar').checked ? '1' : '0'); } catch (e) {} });
 const mBarBtns = new Set();
@@ -8825,7 +8825,7 @@ const XY_PLACES = (() => {
     { name: 'master', groups: faders([['sidechain', 'm-duck'], ['distortion', 'm-dist'], ['compressor', 'm-comp']]) }];
 })();
 // two pads, one above the other, each with its own x and y picks: [pad][axis] = [place, group, item]
-const XY_KEY = 'elixir-mobile-xy';
+const XY_KEY = 'elixir-desktop-xy';
 let mXY = (() => { try { return JSON.parse(localStorage.getItem(XY_KEY)); } catch (e) { return null; } })();
 if (!Array.isArray(mXY) || !Array.isArray(mXY[0]) || !Array.isArray(mXY[0][0])) mXY = [mXY && Array.isArray(mXY[0]) ? mXY : [[0, 0, 0], [0, 1, 1]], [[0, 5, 0], [0, 5, 1]]];
 if (!mXY[1]) mXY[1] = [[0, 5, 0], [0, 5, 1]];
@@ -8952,7 +8952,7 @@ $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][
 // ---- the perf page's twelve slots: each fader can do anything on the x/y lists, and MIDI CCs (13..24 unless changed in the user
 // settings; any channel) move faders 1..12. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
 // grouped as on that page. The picks are kept in this browser, as [place, group, name], so they survive list changes ----
-const SLOT_KEY = 'elixir-mobile-perfmap';
+const SLOT_KEY = 'elixir-desktop-perfmap';
 const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'], ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
   ['beat', 'beat', 'rush'], ['beat', 'beat', 'fills'], ['fx', 'echo', 'send'], ['master', 'distortion', 'mix']];
 let mSlots = (() => { try { const v = JSON.parse(localStorage.getItem(SLOT_KEY)); return Array.isArray(v) && v.length >= 7 ? v : null; } catch (e) { return null; } })() || SLOT0.map((x) => x.slice());
@@ -9014,7 +9014,7 @@ onMidi = (e) => { const [st, cc, val] = e.data; if ((st & 0xf0) === 0xb0) pc4Mid
 const mCcNext = new Map();
 let mCcFrame = 0;
 // (which CC moves which fader: mCc.map, set in the user settings' midi tab, CC 13..24 unless changed; kept in this browser)
-const CC_KEY = 'elixir-mobile-midicc';
+const CC_KEY = 'elixir-desktop-midicc';
 const CC_PRESETS0 = [{ name: 'cc1 to cc12', map: SLOT0.map((_, i) => i + 1) }, { name: 'cc13 to cc24', map: SLOT0.map((_, i) => i + 13) }];
 const mCc = (() => { let v = {}; try { v = JSON.parse(localStorage.getItem(CC_KEY)) || {}; } catch (e) {}
   return { map: Array.isArray(v.map) && v.map.length === SLOT0.length ? v.map : CC_PRESETS0[1].map.slice(), presets: Array.isArray(v.presets) ? v.presets : [] }; })();
@@ -9085,11 +9085,11 @@ $('m-ch-reset').addEventListener('click', () => {
 // (for now the settings are behind a password, asked once a visit)
 const SET_PASS = 'Password1!';
 $('m-set-open').addEventListener('click', () => {
-  let ok = false; try { ok = sessionStorage.getItem('elixir-mobile-set') === '1'; } catch (e) {}
+  let ok = false; try { ok = sessionStorage.getItem('elixir-desktop-set') === '1'; } catch (e) {}
   if (!ok) {
     const pw = prompt('Settings password');
     if (pw !== SET_PASS) { if (pw !== null) alert('Wrong password.'); return; }
-    try { sessionStorage.setItem('elixir-mobile-set', '1'); } catch (e) {}
+    try { sessionStorage.setItem('elixir-desktop-set', '1'); } catch (e) {}
   }
   $('m-set').hidden = false; mRushDraw();
 });
@@ -9107,7 +9107,7 @@ $('m-set-export').addEventListener('click', async () => {
   const b = $('m-set-export'), list = mSetPresets(true);
   if (!list.length) { mSay(b, 'none to export'); return; }
   const blob = new Blob([JSON.stringify({ elixir: 1, presets: list }, null, 1)], { type: 'application/json' });
-  if (await mOffer({ blob, name: 'elixir-mobile-presets.json' }, 'application/json')) mSay(b, `exported ${list.length}`);
+  if (await mOffer({ blob, name: 'elixir-desktop-presets.json' }, 'application/json')) mSay(b, `exported ${list.length}`);
 });
 $('m-set-clear').addEventListener('click', () => {
   const n = kitList.filter((k) => k.saved).length;

@@ -12,7 +12,7 @@ $('m-pbpm').checked = presetBpm.checked;
 $('m-pbpm').addEventListener('change', () => { presetBpm.checked = $('m-pbpm').checked; presetBpm.dispatchEvent(new Event('change')); });
 // favourites: a star on any preset, mine or built in, keeps it in a group at the top of the list. Kept in this browser
 // by name (a saved one also carries fav, so an export keeps it)
-const FAV_KEY = 'elixir-mobile-favs';
+const FAV_KEY = 'elixir-desktop-favs';
 const mFavs = new Set((() => { try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch (e) { return []; } })());
 for (const k of kitList) if (k.saved && k.fav) mFavs.add(k.name);
 const mFavStore = () => { try { localStorage.setItem(FAV_KEY, JSON.stringify([...mFavs])); } catch (e) {} };
@@ -71,7 +71,7 @@ $('m-psave').addEventListener('click', () => {
 // save over: the current sound and song replace the loaded preset's, name and star kept (to match levels across
 // presets). A built-in one's new version is kept in this browser over the factory one (and goes out with an export
 // of favourites); Init kit can't be overwritten
-const EDIT_KEY = 'elixir-mobile-factory-edits';
+const EDIT_KEY = 'elixir-desktop-factory-edits';
 const mEdits = (() => { try { return JSON.parse(localStorage.getItem(EDIT_KEY)) || {}; } catch (e) { return {}; } })();
 kitList.forEach((k, i) => { if (k.builtin && mEdits[k.name]) { const q = toCurrent(mEdits[k.name]); if (q) kitList[i] = { ...fromStored(q, { builtin: true }), edited: true }; } });
 const mOverTarget = () => { const k = mPending ? null : kitList[Number($('kit').value)]; return k && (k.saved || k.builtin) && k.kit !== factoryInit ? k : null; };
@@ -116,7 +116,7 @@ $('m-pexport').addEventListener('click', async () => {
   const list = mSetPresets(true);
   if (!list.length) { $('m-pnote').textContent = 'No presets to export yet.'; return; }
   const blob = new Blob([JSON.stringify({ elixir: 1, presets: list }, null, 1)], { type: 'application/json' });
-  if (await mOffer({ blob, name: 'elixir-mobile-presets.json' }, 'application/json')) $('m-pnote').textContent = `Exported ${list.length} preset${list.length > 1 ? 's' : ''}.`;
+  if (await mOffer({ blob, name: 'elixir-desktop-presets.json' }, 'application/json')) $('m-pnote').textContent = `Exported ${list.length} preset${list.length > 1 ? 's' : ''}.`;
 });
 // clear all (in settings): every saved preset deleted and every star cleared (the built-in ones stay)
 function mClearAll() {

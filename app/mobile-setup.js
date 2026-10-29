@@ -3,11 +3,11 @@
 // (for now the settings are behind a password, asked once a visit)
 const SET_PASS = 'Password1!';
 $('m-set-open').addEventListener('click', () => {
-  let ok = false; try { ok = sessionStorage.getItem('elixir-mobile-set') === '1'; } catch (e) {}
+  let ok = false; try { ok = sessionStorage.getItem('elixir-desktop-set') === '1'; } catch (e) {}
   if (!ok) {
     const pw = prompt('Settings password');
     if (pw !== SET_PASS) { if (pw !== null) alert('Wrong password.'); return; }
-    try { sessionStorage.setItem('elixir-mobile-set', '1'); } catch (e) {}
+    try { sessionStorage.setItem('elixir-desktop-set', '1'); } catch (e) {}
   }
   $('m-set').hidden = false; mRushDraw();
 });
@@ -25,7 +25,7 @@ $('m-set-export').addEventListener('click', async () => {
   const b = $('m-set-export'), list = mSetPresets(true);
   if (!list.length) { mSay(b, 'none to export'); return; }
   const blob = new Blob([JSON.stringify({ elixir: 1, presets: list }, null, 1)], { type: 'application/json' });
-  if (await mOffer({ blob, name: 'elixir-mobile-presets.json' }, 'application/json')) mSay(b, `exported ${list.length}`);
+  if (await mOffer({ blob, name: 'elixir-desktop-presets.json' }, 'application/json')) mSay(b, `exported ${list.length}`);
 });
 $('m-set-clear').addEventListener('click', () => {
   const n = kitList.filter((k) => k.saved).length;

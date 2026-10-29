@@ -53,10 +53,10 @@ const kitList = [{ name: 'Init kit', kit: factoryInit, userSamples: 0, builtin: 
 const kitSel = $('kit');
 // saved presets: the kit values, crossfeed, FX and mixer sends, plus the song (pattern, perform dials,
 // tempo, velocity, accent, master, snare rush and its settings), kept in this browser
-// Elixir Mobile keeps its presets under its own key, apart from the full Elixir's (elexir-presets-v2, on the same
+// Elixir Desktop keeps its presets under its own key, apart from Elixir Mobile's (elixir-mobile-presets, on the same
 // site), so neither app reads presets the other wrote in a shape it doesn't know; on first run here the ones saved
-// under the shared key are copied over
-const SAVE_KEY = 'elixir-mobile-presets', OLD_KEY = 'elexir-presets-v2';
+// under Elixir Mobile's key are copied over (read once, never written)
+const SAVE_KEY = 'elixir-desktop-presets', OLD_KEY = 'elixir-mobile-presets';
 try { if (localStorage.getItem(SAVE_KEY) === null && localStorage.getItem(OLD_KEY) !== null) localStorage.setItem(SAVE_KEY, localStorage.getItem(OLD_KEY)); } catch (e) {}
 function storedPresets() { try { return JSON.parse(localStorage.getItem(SAVE_KEY)) || []; } catch (e) { return []; } }
 function storePresets() {

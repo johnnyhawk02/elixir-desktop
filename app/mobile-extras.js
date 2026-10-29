@@ -13,7 +13,7 @@ $('m-install').addEventListener('click', async () => {
 
 // ---- next bar: with the box on the perf page ticked, while playing, a randomise button's changes wait for the start
 // of the next bar (the player holds them, as it does a preset's), the button flashing until then. Kept in this browser ----
-const NB_KEY = 'elixir-mobile-nextbar';
+const NB_KEY = 'elixir-desktop-nextbar';
 try { $('m-nextbar').checked = localStorage.getItem(NB_KEY) === '1'; } catch (e) {}
 $('m-nextbar').addEventListener('change', () => { try { localStorage.setItem(NB_KEY, $('m-nextbar').checked ? '1' : '0'); } catch (e) {} });
 const mBarBtns = new Set();
