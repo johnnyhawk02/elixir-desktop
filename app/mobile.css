@@ -536,12 +536,6 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   box-shadow: 4px 5px 0 rgba(23, 32, 14, .25); }
 .m .m-menu .m-btn { min-height: 34px; justify-content: flex-start; text-align: left; padding: 0 10px; font-size: var(--fs-s) !important; }
 .m .m-menu .m-btn:hover, .m .m-menu .m-btn:focus-visible { background: var(--ink); color: var(--panel); text-shadow: none; outline: 0; }
-/* ---- the hover tag (laptop): where, the whole name and the whole value, over the control ---- */
-.m-tip { position: fixed; z-index: 25; pointer-events: none; display: grid; padding: 4px 10px 5px; background: var(--ink); color: var(--panel); border-radius: 3px;
-  font-size: var(--fs-s); line-height: 1.05; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; text-shadow: none; }
-.m-tip[hidden] { display: none; }
-.m-tip small { font-size: .78em; opacity: .7; }
-.m-tip b { font-weight: 400; }
 /* ---- the step sequencer on the laptop: under the perform page, in a space of its own (greyed out until one is
    open), so everything stays playable while it's open. Sixteen steps in a row, the four bars, then the buttons ---- */
 @media (min-width: 1000px) {
@@ -589,3 +583,18 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-rand .m-btn { position: relative; touch-action: none; }
 .m .m-rand .m-btn.rd::after { content: ""; position: absolute; left: 3px; bottom: 3px; height: 3px; width: calc((100% - 6px) * var(--rd, 1));
   background: repeating-linear-gradient(to right, currentColor 0 4px, transparent 4px 6px); pointer-events: none; }
+
+/* ---- bigger small print on the laptop (Johnny): the phone's sizes are capped for a narrow screen; here the small
+   sizes go up and the caps come off ---- */
+@media (min-width: 1000px) {
+  .m { --fs-xs: 1.3rem; --fs-s: 1.42rem; --fs-m: 1.5rem; }
+  .m #m-faders .m-flab, .m #m-beat-faders .m-flab, .m #m-beat-faders .m-vf output, .m-nextbar, .m .m-xhead, .m-xcell, .m .m-cccell small,
+  .m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output, .m .m-vset .m-vf output,
+  .m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab { font-size: var(--fs-xs); }
+  .m-helpbtn, .m .m-voice .m-btn, .m .m-rs-tabs .m-btn, .m .m-ch-list .m-btn, .m-big { font-size: var(--fs-xs) !important; }
+  .m .m-rand-card .m-rand .m-btn { font-size: clamp(14px, 1.13vw, 18px) !important; }
+  .m-rand-card .m-nextbar, .m .m-seq-lenrow, .m .m-seq-lenrow output { font-size: var(--fs-xs); }
+  .m-seq-card { grid-template-columns: minmax(0, 1fr) minmax(250px, 36%) 210px; } .m-seq-btns { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .m #m-seq-rand { letter-spacing: 0; padding: 0 4px; } .m-seq-lenrow { grid-template-columns: 3.6em minmax(0, 1fr) 4.2em; }
+  .m .m-seq-shapes .m-btn { font-size: var(--fs-xs) !important; }
+  .m-foot { font-size: 1.15rem; }
+}
