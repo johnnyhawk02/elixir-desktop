@@ -528,18 +528,13 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-tip[hidden] { display: none; }
 .m-tip small { font-size: .78em; opacity: .7; }
 .m-tip b { font-weight: 400; }
-/* ---- the step sequencer on the laptop: under the perform page, in a space of its own (a hint there until one is
+/* ---- the step sequencer on the laptop: under the perform page, in a space of its own (greyed out until one is
    open), so everything stays playable while it's open. Sixteen steps in a row, the four bars, then the buttons ---- */
-.m-seq-hint { display: none; }
 @media (min-width: 1000px) {
   .m-seq { position: static; grid-area: 4 / 1; z-index: auto; display: block; padding: 0; pointer-events: auto; }
-  /* (closed, it stays in view greyed out, nothing on it taking a click, with how to open one over it) */
+  /* (closed, it stays in view greyed out, nothing on it taking a click) */
   .m-seq[hidden] { display: block !important; } /* (over the page-wide [hidden] rule) */
   .m-seq[hidden] .m-seq-card { opacity: .28; pointer-events: none; }
-  .m-seq-hint { grid-area: 4 / 1; z-index: 1; display: grid; place-items: center; height: clamp(130px, 22vh, 190px); margin: 0 24px 0 4px; pointer-events: none;
-    color: var(--ink); font-size: var(--fs-m); letter-spacing: .1em; text-transform: uppercase; }
-  .m-seq-hint span { padding: 4px 14px; background-color: var(--panel); border: 2px solid var(--ink); border-radius: 3px; }
-  .m-seq:not([hidden]) + .m-seq-hint { display: none; }
   .m-seq-card { max-width: none; height: clamp(130px, 22vh, 190px); padding: 8px 24px 0 4px; border: 0; border-top: var(--rule); border-radius: 0;
     background: none; box-shadow: none; grid-template-columns: minmax(0, 1fr) minmax(220px, 34%) 110px; grid-template-rows: auto repeat(4, minmax(0, 1fr)); gap: 4px 16px; }
   .m-seq-card > .m-chead { grid-area: 1 / 1 / 2 / 2; min-width: 0; } .m-seq-card > .m-chead b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }

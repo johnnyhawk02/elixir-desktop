@@ -1376,18 +1376,13 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-tip[hidden] { display: none; }
 .m-tip small { font-size: .78em; opacity: .7; }
 .m-tip b { font-weight: 400; }
-/* ---- the step sequencer on the laptop: under the perform page, in a space of its own (a hint there until one is
+/* ---- the step sequencer on the laptop: under the perform page, in a space of its own (greyed out until one is
    open), so everything stays playable while it's open. Sixteen steps in a row, the four bars, then the buttons ---- */
-.m-seq-hint { display: none; }
 @media (min-width: 1000px) {
   .m-seq { position: static; grid-area: 4 / 1; z-index: auto; display: block; padding: 0; pointer-events: auto; }
-  /* (closed, it stays in view greyed out, nothing on it taking a click, with how to open one over it) */
+  /* (closed, it stays in view greyed out, nothing on it taking a click) */
   .m-seq[hidden] { display: block !important; } /* (over the page-wide [hidden] rule) */
   .m-seq[hidden] .m-seq-card { opacity: .28; pointer-events: none; }
-  .m-seq-hint { grid-area: 4 / 1; z-index: 1; display: grid; place-items: center; height: clamp(130px, 22vh, 190px); margin: 0 24px 0 4px; pointer-events: none;
-    color: var(--ink); font-size: var(--fs-m); letter-spacing: .1em; text-transform: uppercase; }
-  .m-seq-hint span { padding: 4px 14px; background-color: var(--panel); border: 2px solid var(--ink); border-radius: 3px; }
-  .m-seq:not([hidden]) + .m-seq-hint { display: none; }
   .m-seq-card { max-width: none; height: clamp(130px, 22vh, 190px); padding: 8px 24px 0 4px; border: 0; border-top: var(--rule); border-radius: 0;
     background: none; box-shadow: none; grid-template-columns: minmax(0, 1fr) minmax(220px, 34%) 110px; grid-template-rows: auto repeat(4, minmax(0, 1fr)); gap: 4px 16px; }
   .m-seq-card > .m-chead { grid-area: 1 / 1 / 2 / 2; min-width: 0; } .m-seq-card > .m-chead b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -1424,7 +1419,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v146</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v147</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1510,7 +1505,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v146, 29 Oct, 10:31</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v147, 29 Oct, 10:36</footer>
     </section>
   </div>
   </div>
@@ -1596,7 +1591,6 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
       <div class="m-seq-btns"><button class="m-btn m-big" id="m-seq-rand" type="button">randomise</button><button class="m-btn" id="m-seq-close" type="button">done</button></div>
     </section>
   </div>
-  <div class="m-seq-hint" aria-hidden="true"><span>touch a knob or fader to see its step sequencer</span></div>
 
   <nav class="m-tabs" role="tablist" aria-label="pages">
     <button type="button" role="tab" data-m-tab="play" aria-selected="true">perf</button>
