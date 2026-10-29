@@ -530,15 +530,16 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   /* (a small RND in the top left of each randomise button) */
   .m .m-rand .m-btn:not(#m-undo)::before { content: "rnd"; position: absolute; left: 4px; top: 2px; font-size: 11px; line-height: 1; letter-spacing: .06em; opacity: .7; pointer-events: none; }
 
-  /* -- the perform knobs: one rounded box round them all; each knob's ring on the left of its cell, value over name
-     beside it -- */
+  /* -- the perform knobs: one rounded box round them all -- */
   .m-play-card { grid-area: 2 / 1 / 4 / 2; min-height: 0; padding: 14px 24px 10px 4px; border-top: var(--rule); }
-  #m-faders { gap: 10px 14px; padding: 12px 16px; border: 1.5px solid var(--ink); border-radius: 14px; }
-  #m-faders .m-knob { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr 1fr; column-gap: 10px; align-items: center; justify-items: start; }
-  .m #m-faders .m-knob .m-vtrack { grid-area: 1 / 1 / 3 / 2; height: 100%; width: auto; aspect-ratio: 1; max-height: 52px; min-height: 0; }
-  @media (max-width: 1360px) { .m #m-faders .m-knob .m-vtrack { max-height: 42px; } }
-  #m-faders .m-knob output { grid-area: 1 / 2; align-self: end; height: auto; max-width: 100%; text-align: left; font-size: var(--fs-s); }
-  #m-faders .m-knob .m-flab { grid-area: 2 / 2; align-self: start; max-width: 100%; text-align: left; }
+  /* (the box as wide as the step sequencer's steps under it, its right edge over theirs; each knob's readout over its
+     ring and its name under it) */
+  .m-play-card { grid-template-columns: minmax(0, 1fr) 270px; column-gap: 18px; }
+  #m-faders { grid-column: 1; gap: 8px 10px; padding: 10px 12px; border: 1.5px solid var(--ink); border-radius: 14px; }
+  #m-faders .m-knob { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 0; }
+  .m #m-faders .m-knob .m-vtrack { flex: 1; width: 100%; height: auto; min-height: 28px; max-height: 64px; }
+  #m-faders .m-knob output { height: auto; max-width: 100%; text-align: center; font-size: var(--fs-xs); letter-spacing: -.03em; }
+  #m-faders .m-knob .m-flab { max-width: 100%; text-align: center; }
   .m #m-faders .m-flab { font-size: var(--fs-xs); }
 
   /* -- the step sequencer, under the knobs (greyed out until a control's is shown, nothing on it taking a click then):
