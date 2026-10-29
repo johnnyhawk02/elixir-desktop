@@ -34,7 +34,16 @@ const mCloser = (id, then) => $(id + '-close').addEventListener('click', () => {
 // ---- pages: tap a tab to scroll to one (the pages don't swipe). The tab changes once, at once, not for each page passed ----
 const mPages = $('m-pages');
 let mCur = 'play', mSettle = 0;
+// (on a laptop screen every page is in view, so only x/y and presets have buttons, and those open and close their sheets)
+const mWide = matchMedia('(min-width: 1000px)');
 function mTab(t) {
+  if (mWide.matches) {
+    const on = !$('m').classList.contains('show-' + t);
+    $('m').classList.remove('show-xy', 'show-presets'); $('m').classList.toggle('show-' + t, on);
+    document.querySelectorAll('[data-m-tab]').forEach((b) => b.setAttribute('aria-selected', on && b.dataset.mTab === t));
+    if (on && t === 'presets') mDrawPresets();
+    return;
+  }
   const el = document.querySelector(`[data-m-panel="${t}"]`);
   mShown(t);
   mPages.scrollTo({ left: el.offsetLeft - mPages.offsetLeft, behavior: 'instant' }); // (straight there, no slide)

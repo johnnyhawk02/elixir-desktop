@@ -457,3 +457,65 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 /* a fader moved by MIDI follows the knob straight away */
 .m .m-vf.cc .m-vtrack i { transition: none; }
 @media (prefers-reduced-motion: reduce) { .m .m-vtrack i, .m .m-gr i b, .m .m-seq-steps i::after, .m .m-seq-steps i::before, .m .m-btn, .m .m-toggle, .m .m-pload, .m .m-tabs button, .m .m-trans button, .m .m-xy i { transition: none; } }
+
+/* ==== the laptop screen (1000 px and wider) ====
+   One wide LCD. The title, transport and the x/y and presets buttons share the top line; under it three columns of
+   pages all at once: perf on the left, beat over voice in the middle, fx, mix and master down the right. X/Y opens
+   over the middle column and presets over the right one (their buttons toggle them). Each page has its name in its
+   top left corner, and thin ink lines part them. */
+@media (min-width: 1000px) {
+  .m { max-width: 1600px; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr); column-gap: 20px; padding: 6px 12px 10px; }
+  .m-top { grid-column: 1; align-self: center; border-bottom: 0; padding-bottom: 0; }
+  .m-pagename { display: none; }
+  .m > .m-card.m-trans { grid-column: 2; border-bottom: 0; padding: 6px 0; max-width: 560px; }
+  .m > .m-tabs { grid-column: 3; grid-row: 1; align-self: center; grid-template-columns: repeat(2, auto); gap: 8px; margin: 0; padding: 0; border-top: 0; }
+  .m > .m-tabs button:not([data-m-tab="xy"]):not([data-m-tab="presets"]) { display: none; }
+  .m > .m-tabs button { min-height: 46px; min-width: 96px; padding: 0 14px; border-color: var(--ink); }
+  .m > .m-tabs button[aria-selected="true"] { background: var(--ink); color: var(--panel); text-shadow: none; }
+  .m .m-tabs button { font-size: var(--fs-m) !important; }
+
+  .m-pages { grid-column: 1 / -1; grid-auto-flow: row; grid-auto-columns: auto; position: relative; overflow: visible; padding-top: 0; border-top: var(--rule);
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) minmax(0, 1.1fr); grid-template-rows: repeat(12, minmax(0, 1fr)); column-gap: 0; }
+  .m-panel { position: relative; padding: 24px 10px 4px; }
+  .m-panel::before { position: absolute; top: 4px; left: 10px; font-size: var(--fs-s); letter-spacing: .12em; text-transform: uppercase; }
+  [data-m-panel="play"] { grid-area: 1 / 1 / 13 / 2; } [data-m-panel="play"]::before { content: "perform"; }
+  [data-m-panel="beat"] { grid-area: 1 / 2 / 6 / 3; border-left: var(--rule); } [data-m-panel="beat"]::before { content: "beat"; }
+  [data-m-panel="dice"] { grid-area: 6 / 2 / 10 / 3; border-left: var(--rule); border-top: var(--rule); } [data-m-panel="dice"]::before { content: "voice"; }
+  [data-m-panel="fx"] { grid-area: 1 / 3 / 7 / 4; border-left: var(--rule); } [data-m-panel="fx"]::before { content: "effects"; }
+  [data-m-panel="mix"] { grid-area: 10 / 2 / 13 / 3; border-left: var(--rule); border-top: var(--rule); } [data-m-panel="mix"]::before { content: "mixer"; }
+  [data-m-panel="comp"] { grid-area: 7 / 3 / 13 / 4; border-left: var(--rule); border-top: var(--rule); } [data-m-panel="comp"]::before { content: "master"; }
+  /* x/y and presets: sheets of the same glass over a column, shown while their button is lit */
+  [data-m-panel="xy"], [data-m-panel="presets"] { display: none; z-index: 6; background-color: var(--panel); border-left: var(--rule); box-shadow: -6px 0 14px rgba(23, 32, 14, .18); }
+  [data-m-panel="xy"] { grid-area: 1 / 2 / 13 / 3; } [data-m-panel="xy"]::before { content: "x/y"; }
+  [data-m-panel="presets"] { grid-area: 1 / 3 / 13 / 4; } [data-m-panel="presets"]::before { content: "presets"; }
+  .m.show-xy [data-m-panel="xy"], .m.show-presets [data-m-panel="presets"] { display: grid; }
+
+  /* beat: six across, two down; voice: its faders six across, two down, under the drum and page strips */
+  #m-beat-faders { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .m-dice-card { gap: 6px; padding: 2px; }
+  .m > .m-card.m-trans { padding: 4px 0; } .m .m-play, .m .m-rec, .m > .m-tabs button { min-height: 40px; }
+  .m .m-voice .m-btn { min-height: 32px; }
+  .m .m-vsec .m-btn { min-height: 30px; }
+  .m-vsets { margin-top: -6px; padding: 8px 4px 4px; }
+  .m-vset { grid-template-columns: none; grid-template-rows: minmax(0, 1fr); grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 2px; }
+  /* effects: echo and ring mod over the crossfeed matrix, its cells shorter */
+  .m-fx-card { padding: 2px; }
+  .m-xgrid { grid-auto-rows: clamp(16px, 2.6vh, 26px); }
+  .m-fx-row > b, .m-fxhead b { font-size: var(--fs-s); }
+  .m-fxhead .m-chk { min-height: 24px; }
+  /* mixer: echo sends, ring mod sends and levels side by side, six faders each, all full height */
+  .m-fx-card.m-mix-card { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); column-gap: 0; padding: 2px; }
+  .m-mix-card .m-fx-row + .m-fx-row { border-top: 0; padding-top: 0; border-left: var(--rule); padding-left: 4px; margin-left: 4px; }
+  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { flex: 1; height: auto; min-height: 12px; }
+  .m .m-mix-card .m-fx-row .m-vtrack { width: min(30px, 100%); }
+  .m-mix-card .m-fx-row .m-faders { gap: 2px; }
+  .m-mix-card .m-fx-row > b { white-space: nowrap; overflow: hidden; font-size: var(--fs-xs); }
+  /* master, still in signal order: the sidechain and distortion side by side, the compressor under them */
+  .m-comp-card { padding: 2px; gap: 4px 0; grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr); }
+  .m-comp-card > :nth-child(1) { grid-area: 1 / 1; } .m-comp-card > :nth-child(2) { grid-area: 2 / 1; }
+  .m-comp-card > :nth-child(3) { grid-area: 1 / 2; border-top: 0 !important; padding-top: 0 !important; } .m-comp-card > :nth-child(4) { grid-area: 2 / 2; }
+  .m-comp-card > :nth-child(3), .m-comp-card > :nth-child(4) { border-left: var(--rule); padding-left: 6px; margin-left: 4px; }
+  .m-comp-card > :nth-child(5) { grid-area: 3 / 1 / 4 / 3; } .m-comp-card > :nth-child(6) { grid-area: 4 / 1 / 5 / 3; }
+  #m-duck { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .m-comp-card > .m-chead:first-child { flex-wrap: wrap; row-gap: 2px; } .m-comp-card > .m-chead:first-child .m-gr { flex-basis: 100%; }
+}
