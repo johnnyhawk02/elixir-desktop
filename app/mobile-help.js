@@ -35,7 +35,7 @@ const HELP = [
 <li><b>on</b> turns it on and off. A fader with a sequencer running has its name inverted. Presets keep them.</li>
 <li>The steps follow the groove and its depth, landing with the swung hits; switch that off in the person button's <b>seq</b> tab.</li></ul>`],
   ['rec', 'recording', `<ul><li><b>rec</b> starts recording (and playing); press it again to stop, and the WAV downloads.</li>
-<li><b>loop</b> records an exact loop from the next bar and downloads it, ready to loop in any other app. Hold it to choose 1, 2, 4, 8 or 16 bars.</li></ul>`],
+<li><b>loop</b> records an exact loop from the next bar and downloads it, ready to loop in any other app. Hold it to choose 1, 2, 4, 8, 16, 32, 64 or 128 bars.</li></ul>`],
   ['more', 'more', `<ul><li>Hold a randomise button to open the randomisers' settings, the ranges and chances each one uses.</li>
 <li>The person button: your settings. Its <b>midi</b> tab says which MIDI CC moves each perf fader, with presets (cc1 to cc12, cc13 to cc24) and your own.</li>
 <li>The gear: settings, including the <b>rush</b> graph of how the rush builds (drag its squares).</li>

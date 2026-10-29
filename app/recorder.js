@@ -1,7 +1,7 @@
 // ---- recorder: the finished mix, taken at the engine's own rate, written out as a WAV ----
 // A loop starts on the first step of a bar (starting playback if it is stopped) and stops after its bars,
 // so the take is exactly that many bars and the echo carried over from before the loop keeps it seamless.
-const recDlg = $('rec'), LENS = [0, 1, 2, 4, 8, 16], RATES = [44100, 48000], BITS = [16, 24];
+const recDlg = $('rec'), LENS = [0, 1, 2, 4, 8, 16, 32, 64, 128], RATES = [44100, 48000], BITS = [16, 24];
 const recSet = { len: 3, rate: 0, bits: 0, norm: false, count: false };
 try { Object.assign(recSet, JSON.parse(localStorage.getItem('elexir-rec') || '{}')); } catch (e) { /* defaults */ }
 const saveRecSet = () => { try { localStorage.setItem('elexir-rec', JSON.stringify(recSet)); } catch (e) { /* not kept */ } };

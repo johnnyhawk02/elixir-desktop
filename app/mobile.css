@@ -422,7 +422,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 /* the loop length */
 .m-small { align-items: flex-start; padding-top: 120px; }
 .m-small .m-rs-card { height: auto; grid-template-rows: auto auto; }
-.m-looplens { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.m-looplens { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .m .m-looplens .m-btn { min-height: 56px; font-size: min(var(--fs-xs), 3.8vw, 15.7px) !important; padding: 0 2px; }
 
 /* ---- LCD fade: liquid crystal is slow, so segments come on quickly and linger a moment going off. The faders' and

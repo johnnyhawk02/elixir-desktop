@@ -1270,7 +1270,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 /* the loop length */
 .m-small { align-items: flex-start; padding-top: 120px; }
 .m-small .m-rs-card { height: auto; grid-template-rows: auto auto; }
-.m-looplens { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.m-looplens { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .m .m-looplens .m-btn { min-height: 56px; font-size: min(var(--fs-xs), 3.8vw, 15.7px) !important; padding: 0 2px; }
 
 /* ---- LCD fade: liquid crystal is slow, so segments come on quickly and linger a moment going off. The faders' and
@@ -1288,7 +1288,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v128</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v129</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1373,7 +1373,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · v128, 29 Oct, 06:03</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-mobile">Source</a> · v129, 29 Oct, 06:33</footer>
     </section>
   </div>
   </div>
@@ -6815,7 +6815,7 @@ $('kit-file').addEventListener('change', async (e) => {
 // ---- recorder: the finished mix, taken at the engine's own rate, written out as a WAV ----
 // A loop starts on the first step of a bar (starting playback if it is stopped) and stops after its bars,
 // so the take is exactly that many bars and the echo carried over from before the loop keeps it seamless.
-const recDlg = $('rec'), LENS = [0, 1, 2, 4, 8, 16], RATES = [44100, 48000], BITS = [16, 24];
+const recDlg = $('rec'), LENS = [0, 1, 2, 4, 8, 16, 32, 64, 128], RATES = [44100, 48000], BITS = [16, 24];
 const recSet = { len: 3, rate: 0, bits: 0, norm: false, count: false };
 try { Object.assign(recSet, JSON.parse(localStorage.getItem('elexir-rec') || '{}')); } catch (e) { /* defaults */ }
 const saveRecSet = () => { try { localStorage.setItem('elexir-rec', JSON.stringify(recSet)); } catch (e) { /* not kept */ } };
@@ -8401,7 +8401,7 @@ function mClearAll() {
 // downloads it by itself; pressing it again while it runs stops it early ----
 // (the loop's length: hold the loop button to change it; kept in this browser)
 const LOOP_KEY = 'elixir-mobile-loopbars';
-let LOOP_BARS = (() => { try { const v = Number(localStorage.getItem(LOOP_KEY)); return [1, 2, 4, 8, 16].includes(v) ? v : 4; } catch (e) { return 4; } })();
+let LOOP_BARS = (() => { try { const v = Number(localStorage.getItem(LOOP_KEY)); return LENS.includes(v) && v ? v : 4; } catch (e) { return 4; } })();
 let mTimer = 0, mRecKind = null;
 function mRecUi() {
   const on = recState !== 'off';
@@ -8432,7 +8432,7 @@ mRec.addEventListener('click', async () => {
 }
 function mLoopPick() {
   const box = $('m-loop-lens'); box.innerHTML = '';
-  for (const n of [1, 2, 4, 8, 16]) {
+  for (const n of LENS.filter((b) => b)) {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'm-btn'; b.textContent = `${n} bar${n > 1 ? 's' : ''}`;
     b.setAttribute('aria-pressed', n === LOOP_BARS);
     b.addEventListener('click', () => { LOOP_BARS = n; try { localStorage.setItem(LOOP_KEY, String(n)); } catch (e) {} $('m-looplen').hidden = true; mRecUi(); });
@@ -9305,7 +9305,7 @@ const HELP = [
 <li><b>on</b> turns it on and off. A fader with a sequencer running has its name inverted. Presets keep them.</li>
 <li>The steps follow the groove and its depth, landing with the swung hits; switch that off in the person button's <b>seq</b> tab.</li></ul>`],
   ['rec', 'recording', `<ul><li><b>rec</b> starts recording (and playing); press it again to stop, and the WAV downloads.</li>
-<li><b>loop</b> records an exact loop from the next bar and downloads it, ready to loop in any other app. Hold it to choose 1, 2, 4, 8 or 16 bars.</li></ul>`],
+<li><b>loop</b> records an exact loop from the next bar and downloads it, ready to loop in any other app. Hold it to choose 1, 2, 4, 8, 16, 32, 64 or 128 bars.</li></ul>`],
   ['more', 'more', `<ul><li>Hold a randomise button to open the randomisers' settings, the ranges and chances each one uses.</li>
 <li>The person button: your settings. Its <b>midi</b> tab says which MIDI CC moves each perf fader, with presets (cc1 to cc12, cc13 to cc24) and your own.</li>
 <li>The gear: settings, including the <b>rush</b> graph of how the rush builds (drag its squares).</li>

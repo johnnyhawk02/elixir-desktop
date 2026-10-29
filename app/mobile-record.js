@@ -3,7 +3,7 @@
 // downloads it by itself; pressing it again while it runs stops it early ----
 // (the loop's length: hold the loop button to change it; kept in this browser)
 const LOOP_KEY = 'elixir-mobile-loopbars';
-let LOOP_BARS = (() => { try { const v = Number(localStorage.getItem(LOOP_KEY)); return [1, 2, 4, 8, 16].includes(v) ? v : 4; } catch (e) { return 4; } })();
+let LOOP_BARS = (() => { try { const v = Number(localStorage.getItem(LOOP_KEY)); return LENS.includes(v) && v ? v : 4; } catch (e) { return 4; } })();
 let mTimer = 0, mRecKind = null;
 function mRecUi() {
   const on = recState !== 'off';
@@ -34,7 +34,7 @@ mRec.addEventListener('click', async () => {
 }
 function mLoopPick() {
   const box = $('m-loop-lens'); box.innerHTML = '';
-  for (const n of [1, 2, 4, 8, 16]) {
+  for (const n of LENS.filter((b) => b)) {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'm-btn'; b.textContent = `${n} bar${n > 1 ? 's' : ''}`;
     b.setAttribute('aria-pressed', n === LOOP_BARS);
     b.addEventListener('click', () => { LOOP_BARS = n; try { localStorage.setItem(LOOP_KEY, String(n)); } catch (e) {} $('m-looplen').hidden = true; mRecUi(); });
