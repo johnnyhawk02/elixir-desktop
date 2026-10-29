@@ -525,3 +525,9 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   box-shadow: 4px 5px 0 rgba(23, 32, 14, .25); }
 .m .m-menu .m-btn { min-height: 34px; justify-content: flex-start; text-align: left; padding: 0 10px; font-size: var(--fs-s) !important; }
 .m .m-menu .m-btn:hover, .m .m-menu .m-btn:focus-visible { background: var(--ink); color: var(--panel); text-shadow: none; outline: 0; }
+/* ---- the hover tag (laptop): where, the whole name and the whole value, over the control ---- */
+.m-tip { position: fixed; z-index: 25; pointer-events: none; display: grid; padding: 4px 10px 5px; background: var(--ink); color: var(--panel); border-radius: 3px;
+  font-size: var(--fs-s); line-height: 1.05; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; text-shadow: none; }
+.m-tip[hidden] { display: none; }
+.m-tip small { font-size: .78em; opacity: .7; }
+.m-tip b { font-weight: 400; }
