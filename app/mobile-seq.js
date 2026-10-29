@@ -1,4 +1,4 @@
-// ---- step sequencers: holding a fader opens one for it: 2 to 16 steps, each an offset from the fader's setting (up or
+// ---- step sequencers: holding a fader opens one for it: 2 to 64 steps (shown sixteen at a time, a page each), each an offset from the fader's setting (up or
 // down, up to depth of its range) that it takes while playing (the step is the bar's 16th counted from the start,
 // wrapped at the length, so short ones run against the bar), jumping to it or, with slew, gliding to it over up to a
 // whole step; each step lasts a 16th note up to 8 bars. The fader still moves its setting meanwhile, and stopping
@@ -7,13 +7,23 @@
 // marked. Presets keep them ----
 const mSeqSteps = Array.from({ length: 16 }, (_, i) => { const c = document.createElement('i'); c.dataset.i = i; $('m-seq-steps').append(c); return c; });
 let mSeqF = null;
+// up to four pages of sixteen; the page shown (the sixteen cells are its steps), and its buttons in the heading (the
+// pages past the length faint; the one playing marked)
+const SEQ_MAX = 64;
+let mSeqPage = 0;
+const mSeqPageBtns = [0, 1, 2, 3].map((p) => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'm-toggle'; b.textContent = p + 1; b.setAttribute('aria-label', `steps ${p * 16 + 1} to ${p * 16 + 16}`);
+  b.addEventListener('click', () => { mSeqPage = p; mSeqDraw(); }); $('m-seq-pages').append(b); return b;
+});
+// (sequences kept with sixteen steps get the rest, at rest)
+const mSeqPad = (vals) => { const v = vals.slice(0, SEQ_MAX); while (v.length < SEQ_MAX) v.push(0); return v; };
 // speed: how long each step lasts, in 16ths: a 16th note (1) up to 8 bars (128); counted from the bar's 16ths, so every
 // speed stays in time with the beat
 const SEQ_STEPS = [1, 2, 4, 8, 16, 32, 64, 128];
 const stepName = (v) => (v < 16 ? `1/${16 / v}` : v === 16 ? '1 bar' : `${v / 16} bars`);
 // a step's offset, -1..1 of depth, in twentieths
 const mSeqOff = (x) => Math.round(Math.max(-1, Math.min(1, x)) * 20) / 20;
-const newSeq = () => ({ on: true, len: 16, slew: 0, step: 1, depth: 50, vals: new Array(16).fill(0) });
+const newSeq = () => ({ on: true, len: 16, slew: 0, step: 1, depth: 50, vals: new Array(SEQ_MAX).fill(0) });
 // the value heard: the setting moved by the current offset
 function mSeqApply(f) {
   const q = f.seq;
@@ -33,17 +43,20 @@ const mSeqQ = () => mSeqF.seq || mSeqDraft;
 function mSeqCommit() { if (!mSeqF.seq) { mSeqF.seq = mSeqDraft; mSeqDraft = null; } mSeqF.seq.on = true; }
 function mSeqOpen(fd) {
   mSeqDraft = fd.seq ? null : { ...newSeq(), on: false };
-  mSeqF = fd; $('m-seq-name').textContent = fd.label;
+  mSeqF = fd; mSeqPage = 0; $('m-seq-name').textContent = fd.label;
   $('m-seq').hidden = false; mSeqDraw();
 }
 function mSeqDraw() {
   const fd = mSeqF, q = mSeqQ();
-  mSeqSteps.forEach((c, i) => {
+  if (mSeqPage * 16 >= q.len) mSeqPage = Math.ceil(q.len / 16) - 1;
+  mSeqSteps.forEach((c, j) => {
+    const i = mSeqPage * 16 + j;
     c.style.setProperty('--up', Math.max(0, q.vals[i])); c.style.setProperty('--dn', Math.max(0, -q.vals[i]));
     c.classList.toggle('off', i >= q.len);
   });
+  mSeqPageBtns.forEach((b, p) => { b.setAttribute('aria-pressed', p === mSeqPage); b.classList.toggle('off', p * 16 >= q.len); });
   $('m-seq-depth').style.setProperty('--w', q.depth / 100); $('m-seq-depth-out').textContent = `±${q.depth}%`;
-  $('m-seq-len').style.setProperty('--w', q.len / 16); $('m-seq-len-out').textContent = `${q.len} steps`;
+  $('m-seq-len').style.setProperty('--w', q.len / SEQ_MAX); $('m-seq-len-out').textContent = `${q.len} steps`;
   $('m-seq-slew').style.setProperty('--w', q.slew / 100); $('m-seq-slew-out').textContent = q.slew ? `${q.slew}%` : 'off';
   $('m-seq-speed').style.setProperty('--w', (SEQ_STEPS.indexOf(q.step) + 1) / SEQ_STEPS.length); $('m-seq-speed-out').textContent = stepName(q.step);
   $('m-seq-on').setAttribute('aria-pressed', q.on); $('m-seq-on').textContent = q.on ? 'on' : 'off';
@@ -70,7 +83,7 @@ useSong = function (g, keepTempo) {
     f.base = null; f.off = 0; f.glide = null;
     // (sequences saved before they were offsets held values: they become offsets from the middle of the range)
     const hi = f.hiOf(), vals = q ? (q.rel ? q.vals.slice() : q.vals.map((v) => mSeqOff(((v - f.min) / (hi - f.min || 1)) * 2 - 1))) : null;
-    f.seq = q ? { on: !!q.on, len: q.len, slew: q.slew || 0, step: SEQ_STEPS.includes(q.step) ? q.step : 1, depth: typeof q.depth === 'number' ? q.depth : 50, vals } : null;
+    f.seq = q ? { on: !!q.on, len: Math.max(2, Math.min(SEQ_MAX, q.len)), slew: q.slew || 0, step: SEQ_STEPS.includes(q.step) ? q.step : 1, depth: typeof q.depth === 'number' ? q.depth : 50, vals: mSeqPad(vals) } : null;
   }
   if (mSeqF) { if (!mSeqF.seq) mSeqDraft = { ...newSeq(), on: false }; mSeqDraw(); }
   mSeqMarks();
@@ -87,7 +100,7 @@ useSong = function (g, keepTempo) {
     const c = mSeqSteps[row * cols + col], cr = c.getBoundingClientRect();
     if (c.classList.contains('off')) return;
     if (!mSeqF.seq || !mSeqF.seq.on) mSeqCommit();
-    const o = mSeqF.seq.vals[row * cols + col] = mSeqOff(1 - 2 * (e.clientY - cr.top) / cr.height);
+    const o = mSeqF.seq.vals[mSeqPage * 16 + row * cols + col] = mSeqOff(1 - 2 * (e.clientY - cr.top) / cr.height);
     $('m-seq-val').textContent = `${o > 0 ? '+' : o < 0 ? '−' : ''}${Math.round(Math.abs(o) * mSeqF.seq.depth)}%`;
     mSeqDraw();
   };
@@ -96,7 +109,7 @@ useSong = function (g, keepTempo) {
   const stop = () => { painting = false; };
   box.addEventListener('pointerup', stop); box.addEventListener('pointercancel', stop);
 }
-// the length (2 at the left to 16 at the right) and the slew (off to a whole step): horizontal bars
+// the length (2 at the left to 64 at the right) and the slew (off to a whole step): horizontal bars
 function mSeqBar(bar, setFrac) {
   const at = (e) => { const r = bar.getBoundingClientRect(); setFrac(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width))); mSeqDraw(); };
   let held = false;
@@ -104,11 +117,11 @@ function mSeqBar(bar, setFrac) {
   bar.addEventListener('pointermove', (e) => { if (held) at(e); });
   bar.addEventListener('pointerup', () => { held = false; }); bar.addEventListener('pointercancel', () => { held = false; });
 }
-mSeqBar($('m-seq-len'), (x) => { mSeqQ().len = 2 + Math.round(x * 14); });
+mSeqBar($('m-seq-len'), (x) => { mSeqQ().len = 2 + Math.round(x * (SEQ_MAX - 2)); });
 mSeqBar($('m-seq-slew'), (x) => { mSeqQ().slew = Math.round(x * 20) * 5; });
 mSeqBar($('m-seq-speed'), (x) => { mSeqQ().step = SEQ_STEPS[Math.min(SEQ_STEPS.length - 1, Math.floor(x * SEQ_STEPS.length))]; });
 mSeqBar($('m-seq-depth'), (x) => { mSeqQ().depth = Math.round(x * 20) * 5; if (mSeqF.base !== null) mSeqApply(mSeqF); });
-$('m-seq-rand').addEventListener('click', () => { mSeqCommit(); const q = mSeqF.seq; for (let i = 0; i < 16; i++) q.vals[i] = mSeqOff(Math.random() * 2 - 1); mSeqDraw(); });
+$('m-seq-rand').addEventListener('click', () => { mSeqCommit(); const q = mSeqF.seq; for (let i = 0; i < SEQ_MAX; i++) q.vals[i] = mSeqOff(Math.random() * 2 - 1); mSeqDraw(); });
 // shapes (laptop): the steps over the sequence's length set to a ramp, a triangle, a square or a sine, from -1 to 1
 const SEQ_SHAPES = { up: (x) => 2 * x - 1, down: (x) => 1 - 2 * x, tri: (x) => (x < .5 ? 4 * x - 1 : 3 - 4 * x), square: (x) => (x < .5 ? 1 : -1), sine: (x) => Math.sin(2 * Math.PI * x) };
 $('m-seq-shapes').addEventListener('click', (e) => {
@@ -116,7 +129,7 @@ $('m-seq-shapes').addEventListener('click', (e) => {
   mSeqCommit(); const q = mSeqF.seq, f = SEQ_SHAPES[b.dataset.shape];
   // (ramps and the triangle reach both ends; the square and sine repeat at the length)
   const ends = b.dataset.shape === 'up' || b.dataset.shape === 'down';
-  for (let i = 0; i < 16; i++) q.vals[i] = i < q.len ? mSeqOff(f(ends ? i / (q.len - 1) : i / q.len)) : 0;
+  for (let i = 0; i < SEQ_MAX; i++) q.vals[i] = i < q.len ? mSeqOff(f(ends ? i / (q.len - 1) : i / q.len)) : 0;
   mSeqDraw();
 });
 // random steps (laptop), five ways, each -1..1 over the sequence's length:
@@ -133,7 +146,7 @@ const SEQ_RNDS = {
 $('m-seq-rnds').addEventListener('click', (e) => {
   const b = e.target.closest('[data-rnd]'); if (!b) return;
   mSeqCommit(); const q = mSeqF.seq, v = SEQ_RNDS[b.dataset.rnd](q.len);
-  for (let i = 0; i < 16; i++) q.vals[i] = i < q.len ? mSeqOff(v[i]) : 0;
+  for (let i = 0; i < SEQ_MAX; i++) q.vals[i] = i < q.len ? mSeqOff(v[i]) : 0;
   mSeqDraw();
 });
 $('m-seq-on').addEventListener('click', () => { if (!mSeqF.seq || !mSeqF.seq.on) mSeqCommit(); else { mSeqF.seq.on = false; mSeqRelease(mSeqF); } mSeqDraw(); });
@@ -161,7 +174,7 @@ $('m').addEventListener('contextmenu', (e) => e.preventDefault());
 function mSeqStep(f, i, ms) {
   const q = f.seq, k = Math.floor(i) % q.len, to = q.vals[k] || 0;
   if (q.slew) { f.glide = { from: f.off, to, t0: performance.now(), ms: q.slew / 100 * ms }; mGlideRun(); } else { f.glide = null; f.off = to; mSeqApply(f); }
-  if (f === mSeqF) mSeqSteps.forEach((c, j) => c.classList.toggle('now', j === k));
+  if (f === mSeqF) { mSeqSteps.forEach((c, j) => c.classList.toggle('now', mSeqPage * 16 + j === k)); mSeqPageBtns.forEach((b, p) => b.classList.toggle('now', p === k >> 4)); }
 }
 // stopping puts every fader back to its setting
 new MutationObserver(() => {

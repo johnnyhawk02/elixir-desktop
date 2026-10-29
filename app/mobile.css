@@ -360,6 +360,11 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   pointer-events: auto; box-shadow: 0 -8px 30px rgba(0, 0, 0, .5), inset 0 3px 10px rgba(0, 0, 0, .28); }
 .m-seq .m-chead { gap: 10px; }
 .m-seq .m-chead output { flex: 1; text-align: right; color: var(--muted); font-size: var(--fs-s); }
+/* the step pages, 1 to 4 (the ones past the length faint, the one playing underlined) */
+.m-seq-pages { display: flex; gap: 4px; flex: none; }
+.m .m-seq-pages .m-toggle { min-width: 30px !important; min-height: 28px; padding: 0 6px; }
+.m .m-seq-pages .m-toggle.off { opacity: .3; }
+.m .m-seq-pages .m-toggle.now { text-decoration: underline; text-underline-offset: 3px; }
 .m-seq-steps { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; height: auto; min-height: 60px; touch-action: none; }
 .m-seq-steps i { --up: 0; --dn: 0; position: relative; border-radius: 2px;
   background: linear-gradient(var(--ink), var(--ink)) center / 100% 2px no-repeat, repeating-linear-gradient(to top, var(--ghost) 0 5px, transparent 5px 8px); }
@@ -542,7 +547,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-seq[hidden] .m-seq-card { opacity: .28; pointer-events: none; }
   .m-seq-card { max-width: none; height: clamp(130px, 22vh, 190px); padding: 8px 24px 0 4px; border: 0; border-top: var(--rule); border-radius: 0;
     background: none; box-shadow: none; grid-template-columns: minmax(0, 1fr) minmax(250px, 36%) 230px; grid-template-rows: auto repeat(4, minmax(0, 1fr)); gap: 4px 16px; }
-  .m-seq-card > .m-chead { grid-area: 1 / 1 / 2 / 2; min-width: 0; } .m-seq-card > .m-chead b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .m-seq-card > .m-chead { grid-area: 1 / 1 / 2 / 3; min-width: 0; } .m-seq-card > .m-chead b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .m-seq-steps { grid-area: 2 / 1 / 6 / 2; grid-template-columns: repeat(16, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
   .m-seq-lenrow { grid-column: 2; grid-template-columns: 3.6em minmax(0, 1fr) 4.2em; gap: 8px; }
   .m-seq-lenrow output { min-width: 0; }
