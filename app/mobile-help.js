@@ -15,9 +15,8 @@ const HELP = [
 <li>Click to randomise. Drag up or down on one to set how far it goes, 10% to 100% (a dotted bar along its foot below 100%): at 30% it moves everything only 30% of the way to the new sound, and switches choices like the style 30% of the time.</li>
 <li>Hold one still for half a second for its settings, the ranges and chances it uses.</li>
 <li><b>options</b> › <b>randomise on next bar</b>: while playing, randomises wait for the start of the next bar (the button flashes until then).</li></ul>`],
-  ['mute', 'mute and solo', `<p>Beside the knobs, a row for each track (drum 1, 2, 3, snare, cymbal, closed and open hat).</p>
-<ul><li><b>mute</b> stops that track being hit; <b>solo</b> leaves only the soloed tracks hit. <b>clear</b> lifts them all.</li>
-<li>They work on the notes, not the sound: a muted drum's last hit, its decay and its echo ring on; it just isn't played again until you unmute it. Presets keep them.</li></ul>`],
+  ['mute', 'mutes', `<p>Beside the knobs, a column for each drum (drum 1, 2, 3, snare, cymbal, hihat): its level meter over its mute button. Keys <b>z</b> <b>x</b> <b>c</b> <b>v</b> <b>b</b> <b>n</b> mute them; <b>clear</b> lifts them all.</p>
+<ul><li>They work on the notes, not the sound: a muted drum's last hit, its decay and its echo ring on; it just isn't played again until you unmute it. The hihat's mute covers both its closed and open hits. Presets keep them.</li></ul>`],
   ['seq', 'step sequencer', `<p>Under the knobs. Touch any knob or fader, here or on a page on the right, and its sequencer shows there (greyed out until it runs). It starts once you paint a step or press a shape or a random button, and nothing runs for a control until then.</p>
 <ul><li>2 to 64 steps, each moving the control up or down from where you leave it, so you can still play it. Paint them with the mouse. Past 16 steps they're on pages: the <b>1</b> to <b>4</b> buttons by the name show each sixteen (the one playing is underlined). On an empty sequencer they also set the length: 16, 32, 48 or 64.</li>
 <li><b>length</b> the number of steps (2 to 64); <b>slew</b> glides between them; <b>speed</b> each step's length, a 16th up to 8 bars; <b>depth</b> how far they reach.</li>
@@ -49,7 +48,7 @@ const HELP = [
   ['rec', 'recording', `<ul><li><b>rec</b> records a WAV: press it to start (it starts playing too), again to stop, and the file downloads.</li>
 <li>Hold or right-click <b>rec</b> to choose what it records: <b>free</b>, or an exact loop of 1, 2, 4, 8, 16, 32, 64 or 128 bars. A loop starts at the next bar, shows its progress on the button and downloads by itself, cut to repeat seamlessly in any other app.</li></ul>`],
   ['keys', 'keyboard and mouse', `<ul><li><b>space</b> play and stop. <b>r</b> record, <b>l</b> record a loop.</li>
-<li><b>e</b> everything, <b>k</b> kit, <b>a</b> alter, <b>p</b> pattern, <b>c</b> crossfeed, <b>f</b> random fx, <b>g</b> alter fx, <b>z</b> or <b>u</b> undo. <b>n</b> randomise on next bar.</li>
+<li><b>e</b> everything, <b>k</b> kit, <b>a</b> alter, <b>p</b> pattern, <b>w</b> crossfeed, <b>f</b> random fx, <b>g</b> alter fx, <b>u</b> undo. <b>m</b> randomise on next bar. <b>z x c v b n</b> mute drum 1, 2, 3, snare, cymbal, hihat.</li>
 <li><b>1</b> to <b>6</b> show the voice page with that drum; <b>[</b> and <b>]</b> step through its tabs.</li>
 <li><b>o</b> presets, <b>/</b> search presets, <b>h</b> help. <b>esc</b> closes whatever is open.</li>
 <li>Click a knob or fader, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>

@@ -532,9 +532,9 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
   /* -- the perform knobs: one rounded box round them all -- */
   .m-play-card { grid-area: 2 / 1 / 4 / 2; min-height: 0; padding: 14px 24px 10px 4px; border-top: var(--rule); }
-  /* (the box as wide as the step sequencer's steps under it, its right edge over theirs; each knob's readout over its
+  /* (the box as wide as the step sequencer's steps under it (both 80% of what the bars' column used to leave), each knob's readout over its
      ring and its name under it) */
-  .m-play-card { grid-template-columns: minmax(0, 1fr) 270px; column-gap: 18px; }
+  .m-play-card { grid-template-columns: calc((100% - 288px) * .8) minmax(0, 1fr); column-gap: 18px; }
   #m-faders { grid-column: 1; gap: 8px 10px; padding: 10px 12px; border: 1.5px solid var(--ink); border-radius: 14px; }
   #m-faders .m-knob { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 0; }
   .m #m-faders .m-knob .m-vtrack { flex: 1; width: 100%; height: auto; min-height: 28px; max-height: 64px; }
@@ -550,7 +550,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   /* (the steps take the width, the four bars in a narrow column beside them, and the shapes and kinds of random in one
      slim row of small buttons under both) */
   .m-seq-card { max-width: none; height: clamp(220px, 40vh, 340px); padding: 8px 24px 0 4px; border: 0; border-top: var(--rule); border-radius: 0;
-    background: none; box-shadow: none; grid-template-columns: minmax(0, 1fr) 270px; grid-template-rows: auto auto repeat(4, minmax(0, 1fr)) 30px; gap: 6px 18px; }
+    background: none; box-shadow: none; grid-template-columns: calc((100% - 288px) * .8) minmax(0, 1fr); grid-template-rows: auto auto repeat(4, minmax(0, 1fr)) 30px; gap: 6px 18px; }
   .m-seq-card > .m-chead { grid-area: 1 / 1 / 2 / 3; min-width: 0; } .m-seq-card > .m-chead b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .m-seq-steps { grid-area: 2 / 1 / 7 / 2; grid-template-columns: repeat(16, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
   .m-seq-lenrow { grid-column: 2; grid-template-columns: 3.4em minmax(0, 1fr) 4em; gap: 8px; }
@@ -573,16 +573,20 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   /* (no perform button: it's always open; no x/y page on the laptop) */
   .m > .m-tabs button[data-m-tab="play"], .m > .m-tabs button[data-m-tab="xy"] { display: none; }
   .m > .m-tabs button { min-height: 40px; }
-  /* -- mute and solo, beside the knobs: a row a track (its name, mute, solo), a quiet track's name faint -- */
-  .m-mutes { grid-column: 2; min-width: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 6px; min-height: 0; }
+  /* -- mutes, beside the knobs: a column a drum, its level meter over its mute button and key; a muted one's meter faint -- */
+  .m-mutes { grid-column: 2; min-width: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 8px; min-height: 0; }
   .m-mutes-head { display: flex; align-items: center; justify-content: space-between; }
   .m-mutes-head b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-s); }
   .m .m-mutes-head .m-toggle { min-height: 28px; padding: 0 8px; font-size: var(--fs-xs) !important; }
-  .m-mute-rows { display: grid; grid-template-rows: repeat(7, minmax(0, 1fr)); gap: 4px; min-height: 0; }
-  .m-mute-row { display: grid; grid-template-columns: 3em minmax(0, 1fr) minmax(0, 1fr); gap: 6px; align-items: stretch; min-height: 0; }
-  .m-mute-row > span { align-self: center; text-transform: uppercase; font-size: var(--fs-xs); letter-spacing: .04em; }
-  .m-mute-row.quiet > span { opacity: .35; }
-  .m .m-mute-row .m-toggle { min-height: 0; padding: 0; font-size: var(--fs-xs) !important; text-transform: uppercase; }
+  .m-mute-rows { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; min-height: 0; }
+  .m-mute-col { display: grid; grid-template-rows: minmax(0, 1fr) auto auto; justify-items: center; gap: 4px; min-height: 0; min-width: 0; }
+  .m-mute-meter { --m: 0; --h: 0; position: relative; width: 14px; height: 100%; min-height: 40px; text-decoration: none;
+    background: repeating-linear-gradient(to top, var(--ghost) 0 3px, transparent 3px 5px); }
+  .m-mute-meter .m-lvm-on { position: absolute; left: 0; right: 0; bottom: 0; height: round(down, calc(var(--m) * 100%), 5px); background: repeating-linear-gradient(to top, var(--ink) 0 3px, transparent 3px 5px); }
+  .m-mute-meter .m-lvm-pk { position: absolute; left: 0; right: 0; height: 3px; bottom: round(down, calc(var(--h) * (100% - 3px)), 5px); background: var(--ink); opacity: calc(var(--h) * 4); }
+  .m-mute-col.quiet .m-mute-meter { opacity: .3; }
+  .m .m-mute-col .m-toggle { width: 100%; min-width: 0 !important; min-height: 34px; padding: 0; font-size: var(--fs-xs) !important; text-transform: uppercase; }
+  .m-mute-col small { font-size: var(--fs-xs); opacity: .55; text-transform: uppercase; line-height: 1; }
   .m .m-tabs button { font-size: var(--fs-m) !important; }
   .m-panel:not([data-m-panel="play"]) { grid-area: 3 / 2 / 5 / 3; display: none; padding: 8px 0 0 24px; border-left: var(--rule); }
   .m[data-page="beat"] [data-m-panel="beat"], .m[data-page="dice"] [data-m-panel="dice"], .m[data-page="fx"] [data-m-panel="fx"],
