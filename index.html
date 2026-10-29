@@ -1231,7 +1231,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-seq-len i { position: absolute; left: 4px; top: 4px; bottom: 4px; width: calc((100% - 8px) * var(--w, 1));
   background: repeating-linear-gradient(to right, var(--ink) 0 5px, transparent 5px 8px); }
 .m-seq-btns { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; }
-.m-seq-shapes { display: none; }
+.m-seq-shapes, .m-seq-midi { display: none; }
 .m-seq-btns .m-btn { min-height: 52px; }
 
 /* ---- pop-ups over the whole screen: the randomisers' settings (hold a randomise button), the perf slot chooser, the
@@ -1397,16 +1397,18 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   /* (the steps take the width, the four bars in a narrow column beside them, and the shapes and kinds of random in one
      slim row of small buttons under both) */
   .m-seq-card { max-width: none; height: clamp(220px, 40vh, 340px); padding: 8px 24px 0 4px; border: 0; border-top: var(--rule); border-radius: 0;
-    background: none; box-shadow: none; grid-template-columns: minmax(0, 1fr) 270px; grid-template-rows: auto repeat(4, minmax(0, 1fr)) 30px; gap: 6px 18px; }
+    background: none; box-shadow: none; grid-template-columns: minmax(0, 1fr) 270px; grid-template-rows: auto auto repeat(4, minmax(0, 1fr)) 30px; gap: 6px 18px; }
   .m-seq-card > .m-chead { grid-area: 1 / 1 / 2 / 3; min-width: 0; } .m-seq-card > .m-chead b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-  .m-seq-steps { grid-area: 2 / 1 / 6 / 2; grid-template-columns: repeat(16, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+  .m-seq-steps { grid-area: 2 / 1 / 7 / 2; grid-template-columns: repeat(16, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
   .m-seq-lenrow { grid-column: 2; grid-template-columns: 3.4em minmax(0, 1fr) 4em; gap: 8px; }
   .m-seq-lenrow output { min-width: 0; }
   .m .m-seq-lenrow, .m .m-seq-lenrow output { font-size: var(--fs-xs); }
-  .m-seq-card > .m-seq-lenrow:nth-child(3) { grid-row: 2; } .m-seq-card > .m-seq-lenrow:nth-child(4) { grid-row: 3; }
-  .m-seq-card > .m-seq-lenrow:nth-child(5) { grid-row: 4; } .m-seq-card > .m-seq-lenrow:nth-child(6) { grid-row: 5; }
+  .m-seq-card > .m-seq-lenrow:nth-child(3) { grid-row: 3; } .m-seq-card > .m-seq-lenrow:nth-child(4) { grid-row: 4; }
+  .m-seq-card > .m-seq-lenrow:nth-child(5) { grid-row: 5; } .m-seq-card > .m-seq-lenrow:nth-child(6) { grid-row: 6; }
+  /* (a note over the four bars: MIDI CC 21 to 24 set them) */
+  .m-seq-midi { display: block; grid-area: 2 / 2; font-size: var(--fs-xs); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; line-height: 1; }
   .m-seq-len { height: 100%; max-height: 26px; }
-  .m-seq-btns { grid-area: 6 / 1 / 7 / 3; grid-template-columns: repeat(5, minmax(0, 1fr)) 10px repeat(5, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 0 4px; }
+  .m-seq-btns { grid-area: 7 / 1 / 8 / 3; grid-template-columns: repeat(5, minmax(0, 1fr)) 10px repeat(5, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 0 4px; }
   .m-seq-shapes { display: contents; }
   .m-seq-rnds > :first-child { grid-column: 7; }
   #m-seq-close, #m-seq-rand { display: none; }
@@ -1485,7 +1487,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>175</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>176</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
@@ -1573,7 +1575,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v175, 29 Oct, 18:14</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v176, 29 Oct, 18:16</footer>
     </section>
   </div>
   </div>
@@ -1657,6 +1659,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
       <div class="m-seq-lenrow"><span>speed</span><div class="m-seq-len" id="m-seq-speed" role="slider" aria-label="speed"><i></i></div><output id="m-seq-speed-out"></output></div>
       <div class="m-seq-lenrow"><span>depth</span><div class="m-seq-len" id="m-seq-depth" role="slider" aria-label="depth"><i></i></div><output id="m-seq-depth-out"></output></div>
       <div class="m-seq-btns"><div class="m-seq-shapes" id="m-seq-shapes"><button class="m-btn" type="button" data-shape="up">ramp ↑</button><button class="m-btn" type="button" data-shape="down">ramp ↓</button><button class="m-btn" type="button" data-shape="tri">tri</button><button class="m-btn" type="button" data-shape="square">square</button><button class="m-btn" type="button" data-shape="sine">sine</button></div><div class="m-seq-shapes m-seq-rnds" id="m-seq-rnds"><button class="m-btn" type="button" data-rnd="rnd">rnd</button><button class="m-btn" type="button" data-rnd="drunk">drunk</button><button class="m-btn" type="button" data-rnd="hold">hold</button><button class="m-btn" type="button" data-rnd="sparse">sparse</button><button class="m-btn" type="button" data-rnd="smooth">smooth</button></div><button class="m-btn m-big" id="m-seq-rand" type="button">randomise</button><button class="m-btn" id="m-seq-close" type="button">done</button></div>
+      <span class="m-seq-midi">midi cc 21–24</span>
     </section>
   </div>
 

@@ -383,7 +383,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-seq-len i { position: absolute; left: 4px; top: 4px; bottom: 4px; width: calc((100% - 8px) * var(--w, 1));
   background: repeating-linear-gradient(to right, var(--ink) 0 5px, transparent 5px 8px); }
 .m-seq-btns { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; }
-.m-seq-shapes { display: none; }
+.m-seq-shapes, .m-seq-midi { display: none; }
 .m-seq-btns .m-btn { min-height: 52px; }
 
 /* ---- pop-ups over the whole screen: the randomisers' settings (hold a randomise button), the perf slot chooser, the
@@ -549,16 +549,18 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   /* (the steps take the width, the four bars in a narrow column beside them, and the shapes and kinds of random in one
      slim row of small buttons under both) */
   .m-seq-card { max-width: none; height: clamp(220px, 40vh, 340px); padding: 8px 24px 0 4px; border: 0; border-top: var(--rule); border-radius: 0;
-    background: none; box-shadow: none; grid-template-columns: minmax(0, 1fr) 270px; grid-template-rows: auto repeat(4, minmax(0, 1fr)) 30px; gap: 6px 18px; }
+    background: none; box-shadow: none; grid-template-columns: minmax(0, 1fr) 270px; grid-template-rows: auto auto repeat(4, minmax(0, 1fr)) 30px; gap: 6px 18px; }
   .m-seq-card > .m-chead { grid-area: 1 / 1 / 2 / 3; min-width: 0; } .m-seq-card > .m-chead b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-  .m-seq-steps { grid-area: 2 / 1 / 6 / 2; grid-template-columns: repeat(16, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+  .m-seq-steps { grid-area: 2 / 1 / 7 / 2; grid-template-columns: repeat(16, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
   .m-seq-lenrow { grid-column: 2; grid-template-columns: 3.4em minmax(0, 1fr) 4em; gap: 8px; }
   .m-seq-lenrow output { min-width: 0; }
   .m .m-seq-lenrow, .m .m-seq-lenrow output { font-size: var(--fs-xs); }
-  .m-seq-card > .m-seq-lenrow:nth-child(3) { grid-row: 2; } .m-seq-card > .m-seq-lenrow:nth-child(4) { grid-row: 3; }
-  .m-seq-card > .m-seq-lenrow:nth-child(5) { grid-row: 4; } .m-seq-card > .m-seq-lenrow:nth-child(6) { grid-row: 5; }
+  .m-seq-card > .m-seq-lenrow:nth-child(3) { grid-row: 3; } .m-seq-card > .m-seq-lenrow:nth-child(4) { grid-row: 4; }
+  .m-seq-card > .m-seq-lenrow:nth-child(5) { grid-row: 5; } .m-seq-card > .m-seq-lenrow:nth-child(6) { grid-row: 6; }
+  /* (a note over the four bars: MIDI CC 21 to 24 set them) */
+  .m-seq-midi { display: block; grid-area: 2 / 2; font-size: var(--fs-xs); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; line-height: 1; }
   .m-seq-len { height: 100%; max-height: 26px; }
-  .m-seq-btns { grid-area: 6 / 1 / 7 / 3; grid-template-columns: repeat(5, minmax(0, 1fr)) 10px repeat(5, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 0 4px; }
+  .m-seq-btns { grid-area: 7 / 1 / 8 / 3; grid-template-columns: repeat(5, minmax(0, 1fr)) 10px repeat(5, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 0 4px; }
   .m-seq-shapes { display: contents; }
   .m-seq-rnds > :first-child { grid-column: 7; }
   #m-seq-close, #m-seq-rand { display: none; }
