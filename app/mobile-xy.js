@@ -13,7 +13,7 @@ const XY_PLACES = (() => {
     { name: 'beat', groups: faders([['beat', 'm-beat-faders'], ['density', 'm-dens-faders']]) },
     { name: 'perf', groups: faders([['perf', 'm-perf-src']]) },
     { name: 'fx', groups: faders([['echo', 'm-fx-echo'], ['ring mod', 'm-fx-ring']]) },
-    { name: 'mix', groups: faders([['echo send', 'm-mix-echo'], ['ring send', 'm-mix-ring'], ['level', 'm-mix-vol']]) },
+    { name: 'mix', groups: faders([['echo send', 'm-mix-echo'], ['ring send', 'm-mix-ring'], ['pan', 'm-mix-pan'], ['level', 'm-mix-vol']]) },
     { name: 'master', groups: faders([['sidechain', 'm-duck'], ['distortion', 'm-dist'], ['compressor', 'm-comp']]) }];
 })();
 // two pads, one above the other, each with its own x and y picks: [pad][axis] = [place, group, item]

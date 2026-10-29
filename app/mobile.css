@@ -293,6 +293,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-xcell.hi b { background: none; }
 /* the mix page: the two send rows keep a short fixed track, the levels take the rest */
 .m-fx-card.m-mix-card { grid-template-rows: auto auto minmax(0, 1fr); }
+.m-mix-pan { display: none; } /* (the pan knobs are on the laptop's mixer only) */
 .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { flex: none; height: clamp(18px, 4vh, 40px); min-height: 0; }
 .m-fx-row { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 2px; min-height: 0; }
 .m-fx-row + .m-fx-row { border-top: var(--rule); padding-top: 6px; }
@@ -602,20 +603,23 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-xy-x, .m-xy-y { z-index: 1; background: var(--panel); padding: 0 4px; }
   /* fx: the crossfeed matrix's names and numbers */
   .m .m-xhead, .m-xcell { font-size: var(--fs-xs); }
-  /* mixer: a channel strip a drum: its echo send knob, its ring mod send knob, then its level fader with a meter
+  /* mixer: a channel strip a drum: its echo send knob, its ring mod send knob, its pan knob, then its level fader with a meter
      beside it. The rows and their fader boxes step aside so every control sits on one grid, a column a drum */
-  .m-fx-card.m-mix-card { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: auto auto auto minmax(0, 1fr); gap: 8px 10px; padding: 2px; }
+  .m-fx-card.m-mix-card { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: auto auto auto auto minmax(0, 1fr); gap: 8px 10px; padding: 2px; }
   .m-mix-card .m-fx-row, .m-mix-card .m-fx-row .m-faders { display: contents; }
   .m-mix-card .m-fx-row > b { padding: 0; white-space: nowrap; font-size: var(--fs-xs); letter-spacing: .04em; opacity: .75; }
   .m-mix-card .m-fx-row:nth-child(1) > b { grid-row: 1; grid-column: 1 / -1; font-size: 0; }
-  .m-mix-card .m-fx-row:nth-child(1) > b::before { content: "sends: echo (top) and ring mod (under), then level"; font-size: var(--fs-xs); }
+  .m-mix-card .m-fx-row:nth-child(1) > b::before { content: "echo send, ring send, pan, level"; font-size: var(--fs-xs); }
   .m-mix-card .m-fx-row:nth-child(n+2) > b { display: none; }
-  #m-mix-echo > .m-vf { grid-row: 2; } #m-mix-ring > .m-vf { grid-row: 3; } #m-mix-vol > .m-vf { grid-row: 4; }
+  #m-mix-echo > .m-vf { grid-row: 2; } #m-mix-ring > .m-vf { grid-row: 3; } #m-mix-pan > .m-vf { grid-row: 4; } #m-mix-vol > .m-vf { grid-row: 5; }
   /* (the sends' names would repeat the strip's; the level fader's name, under it, names the strip) */
-  #m-mix-echo .m-flab, #m-mix-ring .m-flab { display: none; }
+  #m-mix-echo .m-flab, #m-mix-ring .m-flab, #m-mix-pan .m-flab { display: none; }
+  /* (a pan knob's ring lights from the centre out to its side) */
+  .m #m-mix-pan .m-vtrack i { --lo: round(down, calc(min(var(--f), .496) * 270deg + .01deg), 13.5deg); --hi: round(up, calc(max(var(--f), .496) * 270deg - .01deg), 13.5deg);
+    background: conic-gradient(from 225deg, transparent 0 var(--lo), var(--ink) var(--lo) var(--hi), transparent var(--hi)); }
   .m-mix-card .m-knob { display: flex; flex-direction: column; align-items: center; justify-content: end; gap: 2px; }
   .m-mix-card .m-knob output { display: block; height: auto; white-space: nowrap; text-align: center; }
-  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { flex: none; width: 52px; height: 44px; min-height: 0; }
+  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack, .m .m-mix-card #m-mix-pan .m-vtrack { flex: none; width: 52px; height: 44px; min-height: 0; }
   .m .m-mix-card #m-mix-vol .m-vtrack { width: min(30px, 70%); overflow: visible; margin-right: 10px; }
   /* (the meter: segments up beside the fader, the peak held a moment as one segment) */
   .m-lvm { --m: 0; --h: 0; position: absolute; left: calc(100% + 4px); top: 0; bottom: 0; width: 6px; pointer-events: none;

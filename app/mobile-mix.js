@@ -35,6 +35,10 @@ XS.forEach((short, n) => {
     mFader($(box), short, { min: 0, max: 100, get: () => mix[k][n], show: (v) => (v ? String(v) : 'off'), dflt: 0, knob: true,
       set: (v) => { mix[k][n] = v; if (k === 'fx') fxButtons[n](); sendMix(); setDirty(true); } });
   }
+  // pan: left 63 .. centre (63, as the full mixer has it) .. right 64 (laptop; the phone's mix page has no room)
+  const pan = PAR.PAN1 + n;
+  mFader($('m-mix-pan'), short, { min: 0, max: 127, get: () => values[pan], dflt: () => initValues[pan], knob: true,
+    show: (v) => (v === 63 ? 'C' : v < 63 ? `L${63 - v}` : `R${v - 63}`), set: (v) => { setValue(pan, v, true); setDirty(true); } });
   const vol = PAR.VOL1 + n;
   mFader($('m-mix-vol'), short, { min: 0, max: 127, get: () => values[vol], show: String, dflt: () => initValues[vol],
     set: (v) => { setValue(vol, v, true); setDirty(true); } });

@@ -1141,6 +1141,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-xcell.hi b { background: none; }
 /* the mix page: the two send rows keep a short fixed track, the levels take the rest */
 .m-fx-card.m-mix-card { grid-template-rows: auto auto minmax(0, 1fr); }
+.m-mix-pan { display: none; } /* (the pan knobs are on the laptop's mixer only) */
 .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { flex: none; height: clamp(18px, 4vh, 40px); min-height: 0; }
 .m-fx-row { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 2px; min-height: 0; }
 .m-fx-row + .m-fx-row { border-top: var(--rule); padding-top: 6px; }
@@ -1450,20 +1451,23 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-xy-x, .m-xy-y { z-index: 1; background: var(--panel); padding: 0 4px; }
   /* fx: the crossfeed matrix's names and numbers */
   .m .m-xhead, .m-xcell { font-size: var(--fs-xs); }
-  /* mixer: a channel strip a drum: its echo send knob, its ring mod send knob, then its level fader with a meter
+  /* mixer: a channel strip a drum: its echo send knob, its ring mod send knob, its pan knob, then its level fader with a meter
      beside it. The rows and their fader boxes step aside so every control sits on one grid, a column a drum */
-  .m-fx-card.m-mix-card { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: auto auto auto minmax(0, 1fr); gap: 8px 10px; padding: 2px; }
+  .m-fx-card.m-mix-card { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: auto auto auto auto minmax(0, 1fr); gap: 8px 10px; padding: 2px; }
   .m-mix-card .m-fx-row, .m-mix-card .m-fx-row .m-faders { display: contents; }
   .m-mix-card .m-fx-row > b { padding: 0; white-space: nowrap; font-size: var(--fs-xs); letter-spacing: .04em; opacity: .75; }
   .m-mix-card .m-fx-row:nth-child(1) > b { grid-row: 1; grid-column: 1 / -1; font-size: 0; }
-  .m-mix-card .m-fx-row:nth-child(1) > b::before { content: "sends: echo (top) and ring mod (under), then level"; font-size: var(--fs-xs); }
+  .m-mix-card .m-fx-row:nth-child(1) > b::before { content: "echo send, ring send, pan, level"; font-size: var(--fs-xs); }
   .m-mix-card .m-fx-row:nth-child(n+2) > b { display: none; }
-  #m-mix-echo > .m-vf { grid-row: 2; } #m-mix-ring > .m-vf { grid-row: 3; } #m-mix-vol > .m-vf { grid-row: 4; }
+  #m-mix-echo > .m-vf { grid-row: 2; } #m-mix-ring > .m-vf { grid-row: 3; } #m-mix-pan > .m-vf { grid-row: 4; } #m-mix-vol > .m-vf { grid-row: 5; }
   /* (the sends' names would repeat the strip's; the level fader's name, under it, names the strip) */
-  #m-mix-echo .m-flab, #m-mix-ring .m-flab { display: none; }
+  #m-mix-echo .m-flab, #m-mix-ring .m-flab, #m-mix-pan .m-flab { display: none; }
+  /* (a pan knob's ring lights from the centre out to its side) */
+  .m #m-mix-pan .m-vtrack i { --lo: round(down, calc(min(var(--f), .496) * 270deg + .01deg), 13.5deg); --hi: round(up, calc(max(var(--f), .496) * 270deg - .01deg), 13.5deg);
+    background: conic-gradient(from 225deg, transparent 0 var(--lo), var(--ink) var(--lo) var(--hi), transparent var(--hi)); }
   .m-mix-card .m-knob { display: flex; flex-direction: column; align-items: center; justify-content: end; gap: 2px; }
   .m-mix-card .m-knob output { display: block; height: auto; white-space: nowrap; text-align: center; }
-  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack { flex: none; width: 52px; height: 44px; min-height: 0; }
+  .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack, .m .m-mix-card #m-mix-pan .m-vtrack { flex: none; width: 52px; height: 44px; min-height: 0; }
   .m .m-mix-card #m-mix-vol .m-vtrack { width: min(30px, 70%); overflow: visible; margin-right: 10px; }
   /* (the meter: segments up beside the fader, the peak held a moment as one segment) */
   .m-lvm { --m: 0; --h: 0; position: absolute; left: calc(100% + 4px); top: 0; bottom: 0; width: 6px; pointer-events: none;
@@ -1481,7 +1485,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>172</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>173</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
@@ -1541,6 +1545,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     <section class="m-card m-fx-card m-mix-card">
       <div class="m-fx-row"><b>echo send</b><div class="m-faders" id="m-mix-echo"></div></div>
       <div class="m-fx-row"><b>ring mod send</b><div class="m-faders" id="m-mix-ring"></div></div>
+      <div class="m-fx-row m-mix-pan"><b>pan</b><div class="m-faders" id="m-mix-pan"></div></div>
       <div class="m-fx-row m-mix-vol"><b>level</b><div class="m-faders" id="m-mix-vol"></div></div>
     </section>
   </div>
@@ -1568,7 +1573,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v172, 29 Oct, 18:02</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v173, 29 Oct, 18:06</footer>
     </section>
   </div>
   </div>
@@ -8809,6 +8814,10 @@ XS.forEach((short, n) => {
     mFader($(box), short, { min: 0, max: 100, get: () => mix[k][n], show: (v) => (v ? String(v) : 'off'), dflt: 0, knob: true,
       set: (v) => { mix[k][n] = v; if (k === 'fx') fxButtons[n](); sendMix(); setDirty(true); } });
   }
+  // pan: left 63 .. centre (63, as the full mixer has it) .. right 64 (laptop; the phone's mix page has no room)
+  const pan = PAR.PAN1 + n;
+  mFader($('m-mix-pan'), short, { min: 0, max: 127, get: () => values[pan], dflt: () => initValues[pan], knob: true,
+    show: (v) => (v === 63 ? 'C' : v < 63 ? `L${63 - v}` : `R${v - 63}`), set: (v) => { setValue(pan, v, true); setDirty(true); } });
   const vol = PAR.VOL1 + n;
   mFader($('m-mix-vol'), short, { min: 0, max: 127, get: () => values[vol], show: String, dflt: () => initValues[vol],
     set: (v) => { setValue(vol, v, true); setDirty(true); } });
@@ -9165,7 +9174,7 @@ const XY_PLACES = (() => {
     { name: 'beat', groups: faders([['beat', 'm-beat-faders'], ['density', 'm-dens-faders']]) },
     { name: 'perf', groups: faders([['perf', 'm-perf-src']]) },
     { name: 'fx', groups: faders([['echo', 'm-fx-echo'], ['ring mod', 'm-fx-ring']]) },
-    { name: 'mix', groups: faders([['echo send', 'm-mix-echo'], ['ring send', 'm-mix-ring'], ['level', 'm-mix-vol']]) },
+    { name: 'mix', groups: faders([['echo send', 'm-mix-echo'], ['ring send', 'm-mix-ring'], ['pan', 'm-mix-pan'], ['level', 'm-mix-vol']]) },
     { name: 'master', groups: faders([['sidechain', 'm-duck'], ['distortion', 'm-dist'], ['compressor', 'm-comp']]) }];
 })();
 // two pads, one above the other, each with its own x and y picks: [pad][axis] = [place, group, item]
@@ -9657,7 +9666,7 @@ const HELP = [
   ['fx', 'fx: echo, ring mod, crossfeed', `<ul><li><b>echo</b>: send, time (musical lengths), tone, feedback and width; tick <b>ping pong</b> to bounce it left and right.</li>
 <li><b>ring mod</b>: send, wave and frequency, for metallic tones.</li>
 <li><b>crossfeed</b>: drums feeding each other. A row is the drum it comes from, a column the drum it goes into; click a column's name to pick what it changes there (fm, filter or ring). Drag a cell up or down to set it; double-click to clear.</li></ul>`],
-  ['mix', 'mix: the channel strips', `<p>A strip for each drum: its echo send (left knob) and ring mod send (right knob) over its level fader, with a level meter beside it.</p>`],
+  ['mix', 'mix: the channel strips', `<p>A strip for each drum: its echo send knob, ring mod send knob and pan knob (L, C, R) over its level fader, with a level meter beside it.</p>`],
   ['mstr', 'mstr: the master chain', `<p>The whole mix runs top to bottom:</p>
 <ul><li><b>drum 1 sidechain</b>: drum 1 (the kick) ducks the rest; the meter shows how much. <b>space</b> carves the kick's room out of the others.</li>
 <li><b>distortion</b>: mix, type, drive, colour, tone and volume.</li><li><b>compressor</b>: glues it together; the meter shows the gain reduction.</li></ul>`],

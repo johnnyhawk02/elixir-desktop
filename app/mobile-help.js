@@ -34,7 +34,7 @@ const HELP = [
   ['fx', 'fx: echo, ring mod, crossfeed', `<ul><li><b>echo</b>: send, time (musical lengths), tone, feedback and width; tick <b>ping pong</b> to bounce it left and right.</li>
 <li><b>ring mod</b>: send, wave and frequency, for metallic tones.</li>
 <li><b>crossfeed</b>: drums feeding each other. A row is the drum it comes from, a column the drum it goes into; click a column's name to pick what it changes there (fm, filter or ring). Drag a cell up or down to set it; double-click to clear.</li></ul>`],
-  ['mix', 'mix: the channel strips', `<p>A strip for each drum: its echo send (left knob) and ring mod send (right knob) over its level fader, with a level meter beside it.</p>`],
+  ['mix', 'mix: the channel strips', `<p>A strip for each drum: its echo send knob, ring mod send knob and pan knob (L, C, R) over its level fader, with a level meter beside it.</p>`],
   ['mstr', 'mstr: the master chain', `<p>The whole mix runs top to bottom:</p>
 <ul><li><b>drum 1 sidechain</b>: drum 1 (the kick) ducks the rest; the meter shows how much. <b>space</b> carves the kick's room out of the others.</li>
 <li><b>distortion</b>: mix, type, drive, colour, tone and volume.</li><li><b>compressor</b>: glues it together; the meter shows the gain reduction.</li></ul>`],
