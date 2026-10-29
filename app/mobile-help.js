@@ -10,7 +10,8 @@ const HELP = [
 <li><b>crossfeed</b>: a new crossfeed patch (see fx). <b>random fx</b>: new effects and sends, echo times on musical lengths. <b>alter fx</b>: the effects nudged.</li>
 <li>Tick <b>next bar</b> and every randomise waits for the start of the next bar.</li>
 <li>Tick <b>assign</b>, then click a knob to choose what it does: any fader from any page, or any drum's setting.</li>
-<li>Hold a randomise button for its settings (see more).</li></ul>`],
+<li>Hold a randomise button for its settings (see more).</li>
+<li>Drag up or down on a randomise button to set how far it goes, 10% to 100% (a bar along its foot shows it below 100%): at 30% a randomise only moves things 30% of the way to the new sound.</li></ul>`],
   ['beat', 'beat: the pattern', `<p>Tempo, genre, beat and energy; fills, rush, rush on and velocity; groove, depth and accent.</p>
 <ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how often it fills.</li>
 <li><b>rush</b> builds a roll: the chosen drum (<b>rush on</b>) rolls faster and faster while the others drop out and a high-pass rises. Push it up for a build, drop it for the drop. Its curve is in settings (the gear).</li>
