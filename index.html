@@ -1029,10 +1029,31 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-tabs button[aria-selected="true"] { border-color: var(--ink); }
 .m .m-tabs button { min-height: 56px; padding: 0; font-size: min(1.4rem, 4.9vw, 20.2px) !important; letter-spacing: 0; }
 
-/* ---- perf: twelve faders, four by three (as beat and voice), and the randomise column beside them ---- */
+/* ---- perf: twenty-four knobs, four across and six down, and the randomise column beside them ---- */
 [data-m-panel="play"] { grid-template-columns: minmax(0, 1fr) 92px; gap: 8px; }
 .m-play-card { display: grid; grid-template-rows: 1fr; gap: 10px; min-height: 0; padding: 6px 2px; }
-#m-faders { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px 4px; min-height: 0; }
+#m-faders { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(6, minmax(0, 1fr)); gap: 6px 4px; min-height: 0; }
+/* a knob: readout on one line, then the ring (a square as big as its cell allows), then the name. The ring is 270 degrees
+   of segments from bottom left round to bottom right, filled to the value; a pointer from the middle shows it too, and
+   while a sequencer runs, a tick on the rim marks the knob's own setting */
+#m-faders .m-knob { gap: 1px; }
+#m-faders .m-knob output { display: block; height: 1.1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m #m-faders .m-knob .m-vtrack { container-type: size; width: 100%; min-height: 28px; background: none; overflow: visible; border-radius: 0; }
+.m .m-knob .m-vtrack i, .m .m-knob .m-vtrack::before, .m .m-knob .m-vtrack::after, .m .m-knob .m-vtrack.mod b {
+  --k: min(100cqw, 100cqh); position: absolute; left: 50%; top: 50%; width: var(--k); height: var(--k); margin: calc(var(--k) / -2) 0 0 calc(var(--k) / -2); bottom: auto; right: auto; }
+.m .m-knob .m-vtrack::before { content: ''; border-radius: 50%;
+  background: conic-gradient(from 225deg, var(--ghost) 0 270deg, transparent 270deg);
+  -webkit-mask: repeating-conic-gradient(from 225deg, #000 0 10deg, transparent 10deg 13.5deg), radial-gradient(closest-side, transparent 64%, #000 66% 98%, transparent 100%);
+  -webkit-mask-composite: source-in; mask-composite: intersect; }
+.m .m-knob .m-vtrack i { height: var(--k); border-radius: 50%;
+  background: conic-gradient(from 225deg, var(--ink) 0 round(down, calc(var(--f) * 270deg + .01deg), 13.5deg), transparent 0);
+  -webkit-mask: repeating-conic-gradient(from 225deg, #000 0 10deg, transparent 10deg 13.5deg), radial-gradient(closest-side, transparent 64%, #000 66% 98%, transparent 100%);
+  -webkit-mask-composite: source-in; mask-composite: intersect; }
+.m .m-knob .m-vtrack::after { content: ''; transform: rotate(calc(var(--f) * 270deg - 135deg));
+  background: linear-gradient(var(--ink), var(--ink)) 50% 22% / 3px 30% no-repeat; }
+.m .m-knob .m-vtrack.mod b { display: block; box-shadow: none; transform: rotate(calc(var(--b) * 270deg - 135deg));
+  background: linear-gradient(var(--ink), var(--ink)) 50% 0 / 4px 14% no-repeat; }
+.m .m-knob.held .m-vtrack { outline: 0; }
 .m-pages .m-rand-card { display: grid; min-height: 0; padding: 6px 2px 6px 8px; border-top: var(--rule); border-left: var(--rule); }
 /* two boxes (next bar, assign), then eight buttons sharing the column evenly */
 .m-rand { display: grid; }
@@ -1288,7 +1309,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v131</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v132</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1373,7 +1394,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v131, 29 Oct, 09:08</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v132, 29 Oct, 09:19</footer>
     </section>
   </div>
   </div>
@@ -7997,9 +8018,11 @@ mPlay.addEventListener('click', () => $('play').click());
 // holding one still opens its step sequencer (below). While a sequencer runs, the fader sets its base (fd.base) and the
 // sequencer moves the value around it: the fill is the value heard, the bar the base ----
 const mDraws = [], mFaders = [];
-function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel = 1 }) {
+// (a knob, knob: true, is the same control drawn as a segmented ring; it drags up and down over a fixed distance, as
+// the ring is too small to be the range. Any of them also turns with the mouse wheel or a two-finger trackpad scroll)
+function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel = 1, knob = false }) {
   const el = document.createElement('div');
-  el.className = 'm-vf';
+  el.className = knob ? 'm-vf m-knob' : 'm-vf';
   el.innerHTML = '<output></output><div class="m-vtrack" role="slider" tabindex="0"><i></i><b></b></div><span class="m-flab"></span>';
   el.querySelector('.m-flab').textContent = label;
   const tr = el.querySelector('.m-vtrack'), out = el.querySelector('output');
@@ -8024,7 +8047,7 @@ function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel =
   let drag = null, hold = 0;
   tr.addEventListener('pointerdown', (e) => {
     tr.setPointerCapture(e.pointerId); el.classList.add('held');
-    drag = { y: e.clientY, v: fd.base !== null ? fd.base : get(), h: tr.getBoundingClientRect().height };
+    drag = { y: e.clientY, v: fd.base !== null ? fd.base : get(), h: knob ? 160 : tr.getBoundingClientRect().height };
     clearTimeout(hold);
     hold = setTimeout(() => { if (!drag) return; const v = drag.v; end(); move(v); mSeqOpen(fd); }, 500);
   });
@@ -8035,6 +8058,15 @@ function mFader(box, label, { min, max, step = 1, get, set, show, dflt, travel =
   });
   const end = () => { clearTimeout(hold); drag = null; el.classList.remove('held'); };
   tr.addEventListener('pointerup', end); tr.addEventListener('pointercancel', end);
+  let wheel = null;
+  tr.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    // (scrolled distance kept between events, so slow trackpad scrolls still add up to steps)
+    const now = fd.base !== null ? fd.base : get();
+    if (!wheel || wheel.at !== now) wheel = { v: now, at: now };
+    wheel.v = Math.max(min, Math.min(hiOf(), wheel.v - e.deltaY / (600 * travel) * (hiOf() - min)));
+    move(wheel.v); wheel.at = fd.base !== null ? fd.base : get();
+  }, { passive: false });
   tr.addEventListener('keydown', (e) => {
     const d = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 10, PageDown: -10 }[e.key];
     if (d) { e.preventDefault(); move((fd.base !== null ? fd.base : get()) + d * step); }
@@ -8949,12 +8981,15 @@ $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][
   for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) rand.addEventListener(ev, () => clearTimeout(hold));
   rand.addEventListener('click', (e) => { if (held) { held = false; e.stopPropagation(); e.preventDefault(); } }, { capture: true });
 }
-// ---- the perf page's twelve slots: each fader can do anything on the x/y lists, and MIDI CCs (13..24 unless changed in the user
-// settings; any channel) move faders 1..12. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
+// ---- the perf page's twenty-four slots, knobs four across and six down: each can do anything on the x/y lists, and MIDI CCs
+// (1..24 unless changed in the user settings; any channel) move knobs 1..24. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
 // grouped as on that page. The picks are kept in this browser, as [place, group, name], so they survive list changes ----
 const SLOT_KEY = 'elixir-desktop-perfmap';
 const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'], ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
-  ['beat', 'beat', 'rush'], ['beat', 'beat', 'fills'], ['fx', 'echo', 'send'], ['master', 'distortion', 'mix']];
+  ['beat', 'beat', 'rush'], ['beat', 'beat', 'fills'], ['fx', 'echo', 'send'], ['master', 'distortion', 'mix'],
+  ['beat', 'beat', 'genre'], ['beat', 'beat', 'beat'], ['beat', 'beat', 'groove'], ['beat', 'beat', 'velocity'],
+  ['fx', 'echo', 'time'], ['fx', 'echo', 'feedback'], ['fx', 'ring mod', 'send'], ['fx', 'ring mod', 'freq'],
+  ['master', 'distortion', 'drive'], ['master', 'distortion', 'tone'], ['master', 'sidechain', 'space'], ['master', 'compressor', 'threshold']];
 let mSlots = (() => { try { const v = JSON.parse(localStorage.getItem(SLOT_KEY)); return Array.isArray(v) && v.length >= 7 ? v : null; } catch (e) { return null; } })() || SLOT0.map((x) => x.slice());
 while (mSlots.length < SLOT0.length) mSlots.push(SLOT0[mSlots.length].slice());
 const slotAxis = ([pl, g, n]) => { const P = XY_PLACES.find((x) => x.name === pl), G = P && P.groups.find((x) => x[0] === g); return G && G[1].find((a) => a.label === n); };
@@ -8968,8 +9003,8 @@ function mSlot(i) {
   // its group's name, echo send, dist mix; the perf and beat faders are the whole kit's, so they keep their own)
   const [pl, g] = mSlots[i], dr = XN.indexOf(pl), grp = { distortion: 'dist', compressor: 'comp', sidechain: 'side' }[g] || g.split(' ')[0];
   const label = dr >= 0 ? `${['dr1', 'dr2', 'dr3', 'sn', 'cy', 'hh'][dr]} ${A.label}` : ['fx', 'mix', 'master'].includes(pl) && !A.label.includes(' ') ? `${grp} ${A.label}` : A.label;
-  const draw = mFader(box, label, fd ? { min: fd.min, max: () => fd.hiOf(), step: fd.step, get: fd.get, set: (v) => { fd.put(v); mDrawAll(); }, show: fd.show, dflt: fd.dflt }
-    : { min: A.min, max: A.max, get: A.get, set: (v) => { A.set(v); mDrawAll(); setDirty(true); }, show: String, dflt: () => initValues[A.par] });
+  const draw = mFader(box, label, fd ? { min: fd.min, max: () => fd.hiOf(), step: fd.step, get: fd.get, set: (v) => { fd.put(v); mDrawAll(); }, show: fd.show, dflt: fd.dflt, knob: true }
+    : { min: A.min, max: A.max, get: A.get, set: (v) => { A.set(v); mDrawAll(); setDirty(true); }, show: String, dflt: () => initValues[A.par], knob: true });
   const el = mFaders[mFaders.length - 1].el;
   el.dataset.slot = i; mFaders[mFaders.length - 1].key = `m-faders:slot${i}`;
   el.dataset.full = label; mFitLabel(el);
@@ -9006,7 +9041,7 @@ new ResizeObserver(mFitSlots).observe($('m-faders'));
 // (and once the pixel font has loaded, since the names' widths change with it)
 if (document.fonts) document.fonts.ready.then(mFitSlots);
 $('m-assign').addEventListener('change', () => { $('m-faders').classList.toggle('assigning', $('m-assign').checked); });
-// MIDI: twelve CCs (13..24 unless changed) set faders 1..12 across their range, and nothing else listens (no other CCs, no notes); MIDI starts
+// MIDI: twenty-four CCs (1..24 unless changed) set knobs 1..24 across their range, and nothing else listens (no other CCs, no notes); MIDI starts
 // at the first touch, since the browser may ask first
 onMidi = (e) => { const [st, cc, val] = e.data; if ((st & 0xf0) === 0xb0) pc4Midi(cc, val); };
 // (a controller sends many CCs a second: only each fader's latest is kept, applied once a frame, and the moving
@@ -9015,9 +9050,9 @@ const mCcNext = new Map();
 let mCcFrame = 0;
 // (which CC moves which fader: mCc.map, set in the user settings' midi tab, CC 13..24 unless changed; kept in this browser)
 const CC_KEY = 'elixir-desktop-midicc';
-const CC_PRESETS0 = [{ name: 'cc1 to cc12', map: SLOT0.map((_, i) => i + 1) }, { name: 'cc13 to cc24', map: SLOT0.map((_, i) => i + 13) }];
+const CC_PRESETS0 = [{ name: 'cc1 to cc24', map: SLOT0.map((_, i) => i + 1) }, { name: 'cc25 to cc48', map: SLOT0.map((_, i) => i + 25) }];
 const mCc = (() => { let v = {}; try { v = JSON.parse(localStorage.getItem(CC_KEY)) || {}; } catch (e) {}
-  return { map: Array.isArray(v.map) && v.map.length === SLOT0.length ? v.map : CC_PRESETS0[1].map.slice(), presets: Array.isArray(v.presets) ? v.presets : [] }; })();
+  return { map: Array.isArray(v.map) && v.map.length === SLOT0.length ? v.map : CC_PRESETS0[0].map.slice(), presets: Array.isArray(v.presets) ? v.presets.filter((P) => P.map && P.map.length === SLOT0.length) : [] }; })();
 const mCcStore = () => { try { localStorage.setItem(CC_KEY, JSON.stringify(mCc)); } catch (e) {} };
 pc4Midi = function (cc, val) {
   let hit = false;
@@ -9221,8 +9256,8 @@ addEventListener('resize', mRushDraw);
 // the rush-now line follows the rush (a preset, the fader, a randomiser), and a preset's settings redraw it all
 setInterval(() => { if (!$('m-set').hidden && !rgDrag) { rgGlideDraws.forEach((d) => d()); mRushDraw(); } }, 250);
 // ---- user settings (the person by the title; no password): tabs. seq: whether the fader sequencers follow the groove.
-// midi: which CC moves each of the twelve PERF faders (mCc, app/mobile-slots.js), as a 4 by 3 grid like the page (tap
-// a fader to type its CC), the CC presets (cc1 to cc12, cc13 to cc24, and any saved here, which the ✕ deletes), and
+// midi: which CC moves each of the twenty-four PERF knobs (mCc, app/mobile-slots.js), as a 4 by 6 grid like the page (tap
+// a fader to type its CC), the CC presets (cc1 to cc24, cc25 to cc48, and any saved here, which the ✕ deletes), and
 // save as a preset ----
 $('m-user-open').addEventListener('click', () => { $('m-user').hidden = false; mCcDraw(); });
 mCloser('m-user');
@@ -9252,7 +9287,7 @@ function mCcDraw() {
     const name = (mSlotEls[i] && mSlotEls[i].el.querySelector('.m-flab').textContent) || `fader ${i + 1}`;
     c.innerHTML = `<small>${name}</small>cc ${cc}`;
     c.addEventListener('click', () => {
-      const v = prompt(`CC for fader ${i + 1} (${name}), 0 to 127`, cc);
+      const v = prompt(`CC for knob ${i + 1} (${name}), 0 to 127`, cc);
       if (v === null) return;
       const n = Math.round(Number(v));
       if (!Number.isFinite(n) || n < 0 || n > 127) { alert('A CC is a number from 0 to 127.'); return; }
@@ -9276,11 +9311,11 @@ const HELP = [
 <li>Play the faders, or press <b>kit</b>, <b>pattern</b> or <b>alter</b> to change one part. <b>undo</b> takes back the last one.</li></ol>
 <p>The buttons along the bottom change page; the page's name is at the top right. Drag a fader up or down; double tap its name to reset it. Hold a fader to give it a step sequencer.</p>
 <p>When you like it, <b>prst</b> › <b>save new</b>. <b>rec</b> records a WAV, <b>loop</b> a loop that repeats seamlessly.</p>`],
-  ['perf', 'perf: play it live', `<p>Twelve faders for playing, four by three, and the randomise buttons down the right.</p>
+  ['perf', 'perf: play it live', `<p>Twenty-four knobs for playing, four across and six down, and the randomise buttons down the right. Drag a knob up or down, or scroll on it with the mouse wheel or trackpad. MIDI CC 1 to 24 turn them.</p>
 <ul><li><b>everything</b>: a new beat (genre, groove, kit, effects, mix). <b>kit</b>: new sounds. <b>pattern</b>: a new beat on the same sounds. <b>alter</b>: the sounds nudged about 10%.</li>
 <li><b>crossfeed</b>: a new crossfeed patch (see fx). <b>random fx</b>: new effects and sends, echo times on musical lengths. <b>alter fx</b>: the effects nudged.</li>
 <li>Tick <b>next bar</b> and every randomise waits for the start of the next bar.</li>
-<li>Tick <b>assign</b>, then tap a fader to choose what it does: any fader from any page, or any drum's setting.</li>
+<li>Tick <b>assign</b>, then click a knob to choose what it does: any fader from any page, or any drum's setting.</li>
 <li>Hold a randomise button for its settings (see more).</li></ul>`],
   ['beat', 'beat: the pattern', `<p>Tempo, genre, beat and energy; fills, rush, rush on and velocity; groove, depth and accent.</p>
 <ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how often it fills.</li>
@@ -9308,7 +9343,7 @@ const HELP = [
   ['rec', 'recording', `<ul><li><b>rec</b> starts recording (and playing); press it again to stop, and the WAV downloads.</li>
 <li><b>loop</b> records an exact loop from the next bar and downloads it, ready to loop in any other app. Hold it to choose 1, 2, 4, 8, 16, 32, 64 or 128 bars.</li></ul>`],
   ['more', 'more', `<ul><li>Hold a randomise button to open the randomisers' settings, the ranges and chances each one uses.</li>
-<li>The person button: your settings. Its <b>midi</b> tab says which MIDI CC moves each perf fader, with presets (cc1 to cc12, cc13 to cc24) and your own.</li>
+<li>The person button: your settings. Its <b>midi</b> tab says which MIDI CC moves each perf fader, with presets (cc1 to cc24, cc25 to cc48) and your own.</li>
 <li>The gear: settings, including the <b>rush</b> graph of how the rush builds (drag its squares).</li>
 <li>Install it as an app: <b>install app</b> on the presets page, or your browser's "Add to home screen". It works offline.</li>
 <li>The version number is by the title; the latest arrives when you open the app with a connection.</li></ul>`],

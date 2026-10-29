@@ -5,11 +5,11 @@ const HELP = [
 <li>Play the faders, or press <b>kit</b>, <b>pattern</b> or <b>alter</b> to change one part. <b>undo</b> takes back the last one.</li></ol>
 <p>The buttons along the bottom change page; the page's name is at the top right. Drag a fader up or down; double tap its name to reset it. Hold a fader to give it a step sequencer.</p>
 <p>When you like it, <b>prst</b> › <b>save new</b>. <b>rec</b> records a WAV, <b>loop</b> a loop that repeats seamlessly.</p>`],
-  ['perf', 'perf: play it live', `<p>Twelve faders for playing, four by three, and the randomise buttons down the right.</p>
+  ['perf', 'perf: play it live', `<p>Twenty-four knobs for playing, four across and six down, and the randomise buttons down the right. Drag a knob up or down, or scroll on it with the mouse wheel or trackpad. MIDI CC 1 to 24 turn them.</p>
 <ul><li><b>everything</b>: a new beat (genre, groove, kit, effects, mix). <b>kit</b>: new sounds. <b>pattern</b>: a new beat on the same sounds. <b>alter</b>: the sounds nudged about 10%.</li>
 <li><b>crossfeed</b>: a new crossfeed patch (see fx). <b>random fx</b>: new effects and sends, echo times on musical lengths. <b>alter fx</b>: the effects nudged.</li>
 <li>Tick <b>next bar</b> and every randomise waits for the start of the next bar.</li>
-<li>Tick <b>assign</b>, then tap a fader to choose what it does: any fader from any page, or any drum's setting.</li>
+<li>Tick <b>assign</b>, then click a knob to choose what it does: any fader from any page, or any drum's setting.</li>
 <li>Hold a randomise button for its settings (see more).</li></ul>`],
   ['beat', 'beat: the pattern', `<p>Tempo, genre, beat and energy; fills, rush, rush on and velocity; groove, depth and accent.</p>
 <ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how often it fills.</li>
@@ -37,7 +37,7 @@ const HELP = [
   ['rec', 'recording', `<ul><li><b>rec</b> starts recording (and playing); press it again to stop, and the WAV downloads.</li>
 <li><b>loop</b> records an exact loop from the next bar and downloads it, ready to loop in any other app. Hold it to choose 1, 2, 4, 8, 16, 32, 64 or 128 bars.</li></ul>`],
   ['more', 'more', `<ul><li>Hold a randomise button to open the randomisers' settings, the ranges and chances each one uses.</li>
-<li>The person button: your settings. Its <b>midi</b> tab says which MIDI CC moves each perf fader, with presets (cc1 to cc12, cc13 to cc24) and your own.</li>
+<li>The person button: your settings. Its <b>midi</b> tab says which MIDI CC moves each perf fader, with presets (cc1 to cc24, cc25 to cc48) and your own.</li>
 <li>The gear: settings, including the <b>rush</b> graph of how the rush builds (drag its squares).</li>
 <li>Install it as an app: <b>install app</b> on the presets page, or your browser's "Add to home screen". It works offline.</li>
 <li>The version number is by the title; the latest arrives when you open the app with a connection.</li></ul>`],

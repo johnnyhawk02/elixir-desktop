@@ -1,9 +1,12 @@
-// ---- the perf page's twelve slots: each fader can do anything on the x/y lists, and MIDI CCs (13..24 unless changed in the user
-// settings; any channel) move faders 1..12. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
+// ---- the perf page's twenty-four slots, knobs four across and six down: each can do anything on the x/y lists, and MIDI CCs
+// (1..24 unless changed in the user settings; any channel) move knobs 1..24. The ASSIGN box (in the randomise column) turns on assign mode, where tapping a fader opens a chooser of where (a drum, beat, perf, fx, mix, master) and then what,
 // grouped as on that page. The picks are kept in this browser, as [place, group, name], so they survive list changes ----
 const SLOT_KEY = 'elixir-desktop-perfmap';
 const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'], ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
-  ['beat', 'beat', 'rush'], ['beat', 'beat', 'fills'], ['fx', 'echo', 'send'], ['master', 'distortion', 'mix']];
+  ['beat', 'beat', 'rush'], ['beat', 'beat', 'fills'], ['fx', 'echo', 'send'], ['master', 'distortion', 'mix'],
+  ['beat', 'beat', 'genre'], ['beat', 'beat', 'beat'], ['beat', 'beat', 'groove'], ['beat', 'beat', 'velocity'],
+  ['fx', 'echo', 'time'], ['fx', 'echo', 'feedback'], ['fx', 'ring mod', 'send'], ['fx', 'ring mod', 'freq'],
+  ['master', 'distortion', 'drive'], ['master', 'distortion', 'tone'], ['master', 'sidechain', 'space'], ['master', 'compressor', 'threshold']];
 let mSlots = (() => { try { const v = JSON.parse(localStorage.getItem(SLOT_KEY)); return Array.isArray(v) && v.length >= 7 ? v : null; } catch (e) { return null; } })() || SLOT0.map((x) => x.slice());
 while (mSlots.length < SLOT0.length) mSlots.push(SLOT0[mSlots.length].slice());
 const slotAxis = ([pl, g, n]) => { const P = XY_PLACES.find((x) => x.name === pl), G = P && P.groups.find((x) => x[0] === g); return G && G[1].find((a) => a.label === n); };
@@ -17,8 +20,8 @@ function mSlot(i) {
   // its group's name, echo send, dist mix; the perf and beat faders are the whole kit's, so they keep their own)
   const [pl, g] = mSlots[i], dr = XN.indexOf(pl), grp = { distortion: 'dist', compressor: 'comp', sidechain: 'side' }[g] || g.split(' ')[0];
   const label = dr >= 0 ? `${['dr1', 'dr2', 'dr3', 'sn', 'cy', 'hh'][dr]} ${A.label}` : ['fx', 'mix', 'master'].includes(pl) && !A.label.includes(' ') ? `${grp} ${A.label}` : A.label;
-  const draw = mFader(box, label, fd ? { min: fd.min, max: () => fd.hiOf(), step: fd.step, get: fd.get, set: (v) => { fd.put(v); mDrawAll(); }, show: fd.show, dflt: fd.dflt }
-    : { min: A.min, max: A.max, get: A.get, set: (v) => { A.set(v); mDrawAll(); setDirty(true); }, show: String, dflt: () => initValues[A.par] });
+  const draw = mFader(box, label, fd ? { min: fd.min, max: () => fd.hiOf(), step: fd.step, get: fd.get, set: (v) => { fd.put(v); mDrawAll(); }, show: fd.show, dflt: fd.dflt, knob: true }
+    : { min: A.min, max: A.max, get: A.get, set: (v) => { A.set(v); mDrawAll(); setDirty(true); }, show: String, dflt: () => initValues[A.par], knob: true });
   const el = mFaders[mFaders.length - 1].el;
   el.dataset.slot = i; mFaders[mFaders.length - 1].key = `m-faders:slot${i}`;
   el.dataset.full = label; mFitLabel(el);
@@ -55,7 +58,7 @@ new ResizeObserver(mFitSlots).observe($('m-faders'));
 // (and once the pixel font has loaded, since the names' widths change with it)
 if (document.fonts) document.fonts.ready.then(mFitSlots);
 $('m-assign').addEventListener('change', () => { $('m-faders').classList.toggle('assigning', $('m-assign').checked); });
-// MIDI: twelve CCs (13..24 unless changed) set faders 1..12 across their range, and nothing else listens (no other CCs, no notes); MIDI starts
+// MIDI: twenty-four CCs (1..24 unless changed) set knobs 1..24 across their range, and nothing else listens (no other CCs, no notes); MIDI starts
 // at the first touch, since the browser may ask first
 onMidi = (e) => { const [st, cc, val] = e.data; if ((st & 0xf0) === 0xb0) pc4Midi(cc, val); };
 // (a controller sends many CCs a second: only each fader's latest is kept, applied once a frame, and the moving
@@ -64,9 +67,9 @@ const mCcNext = new Map();
 let mCcFrame = 0;
 // (which CC moves which fader: mCc.map, set in the user settings' midi tab, CC 13..24 unless changed; kept in this browser)
 const CC_KEY = 'elixir-desktop-midicc';
-const CC_PRESETS0 = [{ name: 'cc1 to cc12', map: SLOT0.map((_, i) => i + 1) }, { name: 'cc13 to cc24', map: SLOT0.map((_, i) => i + 13) }];
+const CC_PRESETS0 = [{ name: 'cc1 to cc24', map: SLOT0.map((_, i) => i + 1) }, { name: 'cc25 to cc48', map: SLOT0.map((_, i) => i + 25) }];
 const mCc = (() => { let v = {}; try { v = JSON.parse(localStorage.getItem(CC_KEY)) || {}; } catch (e) {}
-  return { map: Array.isArray(v.map) && v.map.length === SLOT0.length ? v.map : CC_PRESETS0[1].map.slice(), presets: Array.isArray(v.presets) ? v.presets : [] }; })();
+  return { map: Array.isArray(v.map) && v.map.length === SLOT0.length ? v.map : CC_PRESETS0[0].map.slice(), presets: Array.isArray(v.presets) ? v.presets.filter((P) => P.map && P.map.length === SLOT0.length) : [] }; })();
 const mCcStore = () => { try { localStorage.setItem(CC_KEY, JSON.stringify(mCc)); } catch (e) {} };
 pc4Midi = function (cc, val) {
   let hit = false;

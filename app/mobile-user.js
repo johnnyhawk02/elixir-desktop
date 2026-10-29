@@ -1,6 +1,6 @@
 // ---- user settings (the person by the title; no password): tabs. seq: whether the fader sequencers follow the groove.
-// midi: which CC moves each of the twelve PERF faders (mCc, app/mobile-slots.js), as a 4 by 3 grid like the page (tap
-// a fader to type its CC), the CC presets (cc1 to cc12, cc13 to cc24, and any saved here, which the ✕ deletes), and
+// midi: which CC moves each of the twenty-four PERF knobs (mCc, app/mobile-slots.js), as a 4 by 6 grid like the page (tap
+// a fader to type its CC), the CC presets (cc1 to cc24, cc25 to cc48, and any saved here, which the ✕ deletes), and
 // save as a preset ----
 $('m-user-open').addEventListener('click', () => { $('m-user').hidden = false; mCcDraw(); });
 mCloser('m-user');
@@ -30,7 +30,7 @@ function mCcDraw() {
     const name = (mSlotEls[i] && mSlotEls[i].el.querySelector('.m-flab').textContent) || `fader ${i + 1}`;
     c.innerHTML = `<small>${name}</small>cc ${cc}`;
     c.addEventListener('click', () => {
-      const v = prompt(`CC for fader ${i + 1} (${name}), 0 to 127`, cc);
+      const v = prompt(`CC for knob ${i + 1} (${name}), 0 to 127`, cc);
       if (v === null) return;
       const n = Math.round(Number(v));
       if (!Number.isFinite(n) || n < 0 || n > 127) { alert('A CC is a number from 0 to 127.'); return; }

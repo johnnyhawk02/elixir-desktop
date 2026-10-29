@@ -181,10 +181,31 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-tabs button[aria-selected="true"] { border-color: var(--ink); }
 .m .m-tabs button { min-height: 56px; padding: 0; font-size: min(1.4rem, 4.9vw, 20.2px) !important; letter-spacing: 0; }
 
-/* ---- perf: twelve faders, four by three (as beat and voice), and the randomise column beside them ---- */
+/* ---- perf: twenty-four knobs, four across and six down, and the randomise column beside them ---- */
 [data-m-panel="play"] { grid-template-columns: minmax(0, 1fr) 92px; gap: 8px; }
 .m-play-card { display: grid; grid-template-rows: 1fr; gap: 10px; min-height: 0; padding: 6px 2px; }
-#m-faders { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px 4px; min-height: 0; }
+#m-faders { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(6, minmax(0, 1fr)); gap: 6px 4px; min-height: 0; }
+/* a knob: readout on one line, then the ring (a square as big as its cell allows), then the name. The ring is 270 degrees
+   of segments from bottom left round to bottom right, filled to the value; a pointer from the middle shows it too, and
+   while a sequencer runs, a tick on the rim marks the knob's own setting */
+#m-faders .m-knob { gap: 1px; }
+#m-faders .m-knob output { display: block; height: 1.1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m #m-faders .m-knob .m-vtrack { container-type: size; width: 100%; min-height: 28px; background: none; overflow: visible; border-radius: 0; }
+.m .m-knob .m-vtrack i, .m .m-knob .m-vtrack::before, .m .m-knob .m-vtrack::after, .m .m-knob .m-vtrack.mod b {
+  --k: min(100cqw, 100cqh); position: absolute; left: 50%; top: 50%; width: var(--k); height: var(--k); margin: calc(var(--k) / -2) 0 0 calc(var(--k) / -2); bottom: auto; right: auto; }
+.m .m-knob .m-vtrack::before { content: ''; border-radius: 50%;
+  background: conic-gradient(from 225deg, var(--ghost) 0 270deg, transparent 270deg);
+  -webkit-mask: repeating-conic-gradient(from 225deg, #000 0 10deg, transparent 10deg 13.5deg), radial-gradient(closest-side, transparent 64%, #000 66% 98%, transparent 100%);
+  -webkit-mask-composite: source-in; mask-composite: intersect; }
+.m .m-knob .m-vtrack i { height: var(--k); border-radius: 50%;
+  background: conic-gradient(from 225deg, var(--ink) 0 round(down, calc(var(--f) * 270deg + .01deg), 13.5deg), transparent 0);
+  -webkit-mask: repeating-conic-gradient(from 225deg, #000 0 10deg, transparent 10deg 13.5deg), radial-gradient(closest-side, transparent 64%, #000 66% 98%, transparent 100%);
+  -webkit-mask-composite: source-in; mask-composite: intersect; }
+.m .m-knob .m-vtrack::after { content: ''; transform: rotate(calc(var(--f) * 270deg - 135deg));
+  background: linear-gradient(var(--ink), var(--ink)) 50% 22% / 3px 30% no-repeat; }
+.m .m-knob .m-vtrack.mod b { display: block; box-shadow: none; transform: rotate(calc(var(--b) * 270deg - 135deg));
+  background: linear-gradient(var(--ink), var(--ink)) 50% 0 / 4px 14% no-repeat; }
+.m .m-knob.held .m-vtrack { outline: 0; }
 .m-pages .m-rand-card { display: grid; min-height: 0; padding: 6px 2px 6px 8px; border-top: var(--rule); border-left: var(--rule); }
 /* two boxes (next bar, assign), then eight buttons sharing the column evenly */
 .m-rand { display: grid; }
