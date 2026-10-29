@@ -25,7 +25,8 @@ const HELP = [
   ['beat', 'beat: the pattern', `<p>Tempo, genre, beat and energy; fills, rush, rush on and velocity; groove, depth and accent.</p>
 <ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how often it fills.</li>
 <li><b>rush</b> builds a roll: the chosen drum (<b>rush on</b>) rolls faster and faster while the others drop out and a high-pass rises. Push it up for a build, drop it for the drop. Its curve is in <b>options</b> › <b>settings</b> › <b>rush</b>.</li>
-<li><b>groove</b> and <b>depth</b> give it swing or push; <b>accent</b> how loud the accents are.</li></ul>`],
+<li><b>groove</b> and <b>depth</b> give it swing or push; <b>accent</b> how loud the accents are.</li>
+<li><b>density</b>, a fader for each track (drum 1, 2, 3, snare, cymbal, closed and open hat): under 100% it thins that track, off-beats first; over 100% it adds hits on its empty steps, eighths first, until at 200% every step plays. The same steps go or come each time, and presets keep it.</li></ul>`],
   ['voice', 'voice: shape a drum', `<p>Every setting of one drum. Pick the drum along the top (or keys 1 to 6), then a tab ([ and ] step through them):</p>
 <ul><li><b>tone</b>: tuning, wave and fm. <b>shape</b>: the envelope, the pitch drop and the click (the attack's sample).</li>
 <li><b>filter</b>: cutoff, resonance, type and drive, then the drum's volume, pan, sample rate and drive. <b>mod</b>: its lfo and what velocity does.</li></ul>`],

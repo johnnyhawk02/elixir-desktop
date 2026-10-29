@@ -10,7 +10,7 @@ const XY_PLACES = (() => {
   // a page's faders, by their row
   const faders = (rows) => rows.map(([heading, box]) => [heading, mFaders.filter((f) => f.key.startsWith(box + ':')).map((f) => ({ label: f.label, min: f.min, max: f.hiOf(), get: f.get, set: (x) => f.put(x), fd: f }))]);
   return [...drums,
-    { name: 'beat', groups: faders([['beat', 'm-beat-faders']]) },
+    { name: 'beat', groups: faders([['beat', 'm-beat-faders'], ['density', 'm-dens-faders']]) },
     { name: 'perf', groups: faders([['perf', 'm-perf-src']]) },
     { name: 'fx', groups: faders([['echo', 'm-fx-echo'], ['ring mod', 'm-fx-ring']]) },
     { name: 'mix', groups: faders([['echo send', 'm-mix-echo'], ['ring send', 'm-mix-ring'], ['level', 'm-mix-vol']]) },

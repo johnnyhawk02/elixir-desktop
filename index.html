@@ -1078,6 +1078,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 /* ---- beat: tempo, genre, beat, energy / fills, rush, rush on, velocity / groove, depth, accent ---- */
 .m-beat-card { display: grid; min-height: 0; padding: 6px 2px; }
 #m-beat-faders { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px 4px; min-height: 0; }
+/* (the density faders, a track each, are on the laptop's beat page only; they still work from knobs and MIDI) */
+.m-dens { display: none; }
 
 /* ---- voice: the drum strip, the page strip (tone, shape, filter, mod), then the page's faders (6 to 10) on the same
    4 by 3 grid as the beat page, any spare places left empty at the end ---- */
@@ -1416,6 +1418,15 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m #m-beat-faders .m-flab, .m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab,
   .m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output { font-size: var(--fs-xs); }
   .m #m-beat-faders .m-vf output, .m .m-vset .m-vf output { font-size: var(--fs-xs); white-space: nowrap; height: 1.2em; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; text-align: center; }
+  /* beat: its eleven faders six across, then a row of seven densities, one a track, under a heading */
+  .m-beat-card { grid-template-rows: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; }
+  #m-beat-faders { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .m-dens { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 4px; min-height: 0; padding-top: 8px; border-top: var(--rule); }
+  .m-dens > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-s); padding-left: 4px; }
+  #m-dens-faders { grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+  #m-dens-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
+  .m #m-dens-faders .m-vf output, .m #m-dens-faders .m-flab { font-size: var(--fs-xs); white-space: nowrap; }
+  .m #m-dens-faders .m-vtrack { width: min(44px, 100%); flex: 1; height: auto; min-height: 12px; }
   /* voice: only as many rows as the tab has faders, each as tall as the frame allows */
   .m .m-voice .m-btn { font-size: var(--fs-xs) !important; }
   .m-vset { grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); row-gap: 14px; }
@@ -1454,7 +1465,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>166</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>167</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
@@ -1487,7 +1498,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   </div>
 
   <div class="m-panel" data-m-panel="beat">
-    <section class="m-card m-beat-card"><div class="m-faders" id="m-beat-faders"></div></section>
+    <section class="m-card m-beat-card"><div class="m-faders" id="m-beat-faders"></div><div class="m-dens"><b>density</b><div class="m-faders" id="m-dens-faders"></div></div></section>
   </div>
 
   <div class="m-panel" data-m-panel="dice">
@@ -1541,7 +1552,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v166, 29 Oct, 14:20</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v167, 29 Oct, 15:18</footer>
     </section>
   </div>
   </div>
@@ -8455,6 +8466,50 @@ const mPct = (v) => (v ? Math.round(v) + '%' : 'off');
 const mAllSend = (k) => ({ min: 0, max: 100, get: () => Math.max(...mix[k]), show: (v) => `send ${mPct(v)}`,
   set: (v) => { mix[k].fill(v); if (k === 'fx') fxButtons.forEach((b) => b()); sendMix(); } });
 
+// ---- density: a fader a track on the beat page (drum 1, 2, 3, snare, cymbal, closed hat, open hat), 0 to 200%.
+// Under 100% it thins that track's hits, the off-beats going first and the downbeats last; over 100% it adds hits on
+// the empty steps, eighths first, until at 200% every step plays. Which hits go or come is fixed per step (not rolled
+// each time), so moving the fader back and forth is repeatable. It changes what's sent to the player, not the pattern
+// itself, and presets keep it (song.dens) ----
+perf.dens = new Array(7).fill(100);
+// (a step's fixed number 0..1: drawn from its track, step and page)
+const densHash = (t, s, p) => { let h = (t * 374761393 + s * 668265263 + p * 2147483647) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+// how readily a hit goes (higher goes first): mostly chance, the off-beats more so, downbeats least
+const densDrop = (t, s, p) => densHash(t, s, p) * 0.7 + (s % 4 === 0 ? 0 : s % 2 === 0 ? 0.15 : 0.3);
+// how readily an empty step fills (lower comes first): mostly chance, eighths before sixteenths
+const densAdd = (t, s, p) => densHash(t + 11, s, p) * 0.7 + (s % 2 ? 0.3 : 0);
+function densApply(P, p) {
+  const d = perf.dens;
+  for (let t = 0; t < 7; t++) {
+    const k = d[t] / 100; if (k === 1) continue;
+    for (let s = 0; s < 16; s++) {
+      if (P.on[t][s]) { if (k < 1 && densDrop(t, s, p) >= k) P.on[t][s] = 0; }
+      else if (k > 1 && densAdd(t, s, p) < k - 1) { P.on[t][s] = 1; P.acc[t][s] = 0; P.bar[t][s] = 0; }
+    }
+  }
+  return P;
+}
+// (the message to the player, thinned or filled; the pattern the steps show is left as it is)
+const densSend = send;
+send = function (m) {
+  if (m && m.type === 'seq' && m.pattern && perf.dens.some((v) => v !== 100)) {
+    const P = m.pattern;
+    if (P.pages) P.pages = P.pages.map((pg, i) => densApply(pg, i)); else densApply(P, 0);
+  }
+  densSend(m);
+};
+// the faders, under the beat page's (dr1 .. op), double-click to 100%
+const DENS_N = ['dr1', 'dr2', 'dr3', 'sn', 'cy', 'cl', 'op'];
+DENS_N.forEach((n, t) => mFader($('m-dens-faders'), n, { min: 0, max: 200, step: 5, get: () => perf.dens[t], dflt: 100,
+  set: (v) => { perf.dens[t] = v; sendSeq(); setDirty(true); }, show: (v) => `${v}%` }));
+// presets keep the densities; one saved without them plays at 100%
+const densSnap = songSnapshot, densUse = useSong;
+songSnapshot = function () { return { ...densSnap(), dens: perf.dens.slice() }; };
+useSong = function (g, keepTempo) {
+  perf.dens = Array.isArray(g.dens) && g.dens.length === 7 ? g.dens.map((v) => Math.max(0, Math.min(200, Number(v) || 0))) : new Array(7).fill(100);
+  densUse(g, keepTempo);
+  sendSeq(); mDrawAll();
+};
 // ---- presets: save, and a list to load or delete (kept in this browser, as on the desktop) ----
 // while playing, a preset waits for the next bar to come in: until it's heard, the one playing stays marked and the
 // new one's row flashes
@@ -9078,7 +9133,7 @@ const XY_PLACES = (() => {
   // a page's faders, by their row
   const faders = (rows) => rows.map(([heading, box]) => [heading, mFaders.filter((f) => f.key.startsWith(box + ':')).map((f) => ({ label: f.label, min: f.min, max: f.hiOf(), get: f.get, set: (x) => f.put(x), fd: f }))]);
   return [...drums,
-    { name: 'beat', groups: faders([['beat', 'm-beat-faders']]) },
+    { name: 'beat', groups: faders([['beat', 'm-beat-faders'], ['density', 'm-dens-faders']]) },
     { name: 'perf', groups: faders([['perf', 'm-perf-src']]) },
     { name: 'fx', groups: faders([['echo', 'm-fx-echo'], ['ring mod', 'm-fx-ring']]) },
     { name: 'mix', groups: faders([['echo send', 'm-mix-echo'], ['ring send', 'm-mix-ring'], ['level', 'm-mix-vol']]) },
@@ -9566,7 +9621,8 @@ const HELP = [
   ['beat', 'beat: the pattern', `<p>Tempo, genre, beat and energy; fills, rush, rush on and velocity; groove, depth and accent.</p>
 <ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how often it fills.</li>
 <li><b>rush</b> builds a roll: the chosen drum (<b>rush on</b>) rolls faster and faster while the others drop out and a high-pass rises. Push it up for a build, drop it for the drop. Its curve is in <b>options</b> › <b>settings</b> › <b>rush</b>.</li>
-<li><b>groove</b> and <b>depth</b> give it swing or push; <b>accent</b> how loud the accents are.</li></ul>`],
+<li><b>groove</b> and <b>depth</b> give it swing or push; <b>accent</b> how loud the accents are.</li>
+<li><b>density</b>, a fader for each track (drum 1, 2, 3, snare, cymbal, closed and open hat): under 100% it thins that track, off-beats first; over 100% it adds hits on its empty steps, eighths first, until at 200% every step plays. The same steps go or come each time, and presets keep it.</li></ul>`],
   ['voice', 'voice: shape a drum', `<p>Every setting of one drum. Pick the drum along the top (or keys 1 to 6), then a tab ([ and ] step through them):</p>
 <ul><li><b>tone</b>: tuning, wave and fm. <b>shape</b>: the envelope, the pitch drop and the click (the attack's sample).</li>
 <li><b>filter</b>: cutoff, resonance, type and drive, then the drum's volume, pan, sample rate and drive. <b>mod</b>: its lfo and what velocity does.</li></ul>`],

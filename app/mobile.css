@@ -230,6 +230,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 /* ---- beat: tempo, genre, beat, energy / fills, rush, rush on, velocity / groove, depth, accent ---- */
 .m-beat-card { display: grid; min-height: 0; padding: 6px 2px; }
 #m-beat-faders { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px 4px; min-height: 0; }
+/* (the density faders, a track each, are on the laptop's beat page only; they still work from knobs and MIDI) */
+.m-dens { display: none; }
 
 /* ---- voice: the drum strip, the page strip (tone, shape, filter, mod), then the page's faders (6 to 10) on the same
    4 by 3 grid as the beat page, any spare places left empty at the end ---- */
@@ -568,6 +570,15 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m #m-beat-faders .m-flab, .m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab,
   .m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output { font-size: var(--fs-xs); }
   .m #m-beat-faders .m-vf output, .m .m-vset .m-vf output { font-size: var(--fs-xs); white-space: nowrap; height: 1.2em; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; text-align: center; }
+  /* beat: its eleven faders six across, then a row of seven densities, one a track, under a heading */
+  .m-beat-card { grid-template-rows: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; }
+  #m-beat-faders { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .m-dens { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 4px; min-height: 0; padding-top: 8px; border-top: var(--rule); }
+  .m-dens > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-s); padding-left: 4px; }
+  #m-dens-faders { grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+  #m-dens-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
+  .m #m-dens-faders .m-vf output, .m #m-dens-faders .m-flab { font-size: var(--fs-xs); white-space: nowrap; }
+  .m #m-dens-faders .m-vtrack { width: min(44px, 100%); flex: 1; height: auto; min-height: 12px; }
   /* voice: only as many rows as the tab has faders, each as tall as the frame allows */
   .m .m-voice .m-btn { font-size: var(--fs-xs) !important; }
   .m-vset { grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); row-gap: 14px; }
