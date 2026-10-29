@@ -1034,12 +1034,13 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-play-card { display: grid; grid-template-rows: 1fr; gap: 10px; min-height: 0; padding: 6px 2px; }
 #m-faders { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(6, minmax(0, 1fr)); gap: 6px 4px; min-height: 0; }
 /* a knob: readout on one line, then the ring (a square as big as its cell allows), then the name. The ring is 270 degrees
-   of segments from bottom left round to bottom right, filled to the value; a pointer from the middle shows it too, and
-   while a sequencer runs, a tick on the rim marks the knob's own setting */
+   of segments from bottom left round to bottom right, filled to the value; a pointer from the middle shows it too. While
+   a sequencer runs, the pointer stays on the knob's own setting and the ring lights only the stretch from there to the
+   value the sequencer has moved it to */
 #m-faders .m-knob { gap: 1px; }
 #m-faders .m-knob output { display: block; height: 1.1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .m #m-faders .m-knob .m-vtrack, .m .m-mix-card .m-knob .m-vtrack { container-type: size; width: 100%; min-height: 28px; background: none; overflow: visible; border-radius: 0; }
-.m .m-knob .m-vtrack i, .m .m-knob .m-vtrack::before, .m .m-knob .m-vtrack::after, .m .m-knob .m-vtrack.mod b {
+.m .m-knob .m-vtrack i, .m .m-knob .m-vtrack::before, .m .m-knob .m-vtrack::after {
   --k: min(100cqw, 100cqh); position: absolute; left: 50%; top: 50%; width: var(--k); height: var(--k); margin: calc(var(--k) / -2) 0 0 calc(var(--k) / -2); bottom: auto; right: auto; }
 .m .m-knob .m-vtrack::before { content: ''; border-radius: 50%;
   background: conic-gradient(from 225deg, var(--ghost) 0 270deg, transparent 270deg);
@@ -1051,8 +1052,10 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   -webkit-mask-composite: source-in; mask-composite: intersect; }
 .m .m-knob .m-vtrack::after { content: ''; transform: rotate(calc(var(--f) * 270deg - 135deg));
   background: linear-gradient(var(--ink), var(--ink)) 50% 22% / 3px 30% no-repeat; }
-.m .m-knob .m-vtrack.mod b { display: block; box-shadow: none; transform: rotate(calc(var(--b) * 270deg - 135deg));
-  background: linear-gradient(var(--ink), var(--ink)) 50% 0 / 4px 14% no-repeat; }
+.m .m-knob .m-vtrack.mod::after { transform: rotate(calc(var(--b) * 270deg - 135deg)); }
+.m .m-knob .m-vtrack.mod i { --lo: round(down, calc(min(var(--f), var(--b)) * 270deg + .01deg), 13.5deg); --hi: round(up, calc(max(var(--f), var(--b)) * 270deg - .01deg), 13.5deg);
+  background: conic-gradient(from 225deg, transparent 0 var(--lo), var(--ink) var(--lo) var(--hi), transparent var(--hi)); }
+.m .m-knob .m-vtrack.mod b { display: none; }
 .m .m-knob.held .m-vtrack { outline: 0; }
 .m-pages .m-rand-card { display: grid; min-height: 0; padding: 6px 2px 6px 8px; border-top: var(--rule); border-left: var(--rule); }
 /* two boxes (next bar, assign), then eight buttons sharing the column evenly */
@@ -1421,7 +1424,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title">elixir<small class="m-ver">v143</small></b>
+    <b class="m-title" id="m-title">elixir<small class="m-ver">v144</small></b>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1507,7 +1510,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v143, 29 Oct, 10:00</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v144, 29 Oct, 10:13</footer>
     </section>
   </div>
   </div>
