@@ -34,7 +34,7 @@ const mMuteCols = MUTE_N.map((n, d) => {
     mFader(col, `${n} ${k === 'fx' ? 'echo' : 'verb'}`, { min: 0, max: 100, get: () => mix[k][d], dflt: 0, num: true,
       show: String, set: (v) => { mix[k][d] = v; if (k === 'fx') fxButtons[d](); sendMix(); setDirty(true); } });
     const box = col.lastElementChild, sm = document.createElement('button');
-    sm.type = 'button'; sm.className = 'm-toggle m-send-mute'; sm.textContent = 'mute';
+    sm.type = 'button'; sm.className = 'm-toggle m-send-mute'; sm.setAttribute('aria-pressed', 'false');
     sm.addEventListener('click', () => mSendMute_toggle(k, d)); col.append(sm);
     sends[k] = { box, sm };
   }
