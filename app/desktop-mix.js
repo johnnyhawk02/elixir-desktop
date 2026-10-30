@@ -17,3 +17,12 @@ lvmDraw = function (m) {
 // wide, and back for the phone layout ----
 const mXfPlace = () => (mWide.matches ? $('m-xf-card') : document.querySelector('[data-m-panel="fx"] .m-fx-card')).append(document.querySelector('.m-xrow'));
 mXfPlace(); mWide.addEventListener('change', mXfPlace);
+
+// every slider's name fitted to its column (shortened as the perf knobs' are), on the laptop, as the pages come into view
+// or change size
+{
+  const fit = () => { if (!mWide.matches) return; for (const fd of mFaders) { if (!fd.el.offsetParent || fd.el.closest('#m-faders')) continue; fd.el.dataset.full ||= fd.label; mFitLabel(fd.el); } };
+  const ro = new ResizeObserver(fit);
+  document.querySelectorAll('[data-m-panel]').forEach((p) => ro.observe(p));
+  if (document.fonts) document.fonts.ready.then(fit);
+}

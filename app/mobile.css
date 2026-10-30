@@ -570,6 +570,15 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-seq-shapes .m-btn { min-height: 0; padding: 0 2px; font-size: 14px !important; letter-spacing: 0; white-space: nowrap; overflow: hidden; }
   .m .m-vf.seq-edit { outline: 2px dashed var(--ink); outline-offset: 2px; }
 
+  /* -- every slider on the pages the same (not the knobs or number boxes): a 44px segmented track filling its cell's
+     height, a two-line readout over it (bottom-aligned, so the tracks start level) and its name under it, both in the
+     small print, the name shortened to fit (desktop-mix.js) -- */
+  #m [data-m-panel] .m-vf:not(.m-knob):not(.m-num) { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 0; }
+  #m [data-m-panel] .m-vf:not(.m-knob):not(.m-num) output { font-size: var(--fs-xs); white-space: pre-line; height: 2.1em; line-height: 1.05; width: 100%;
+    display: flex; align-items: flex-end; justify-content: center; text-align: center; overflow: visible; max-width: none; letter-spacing: -.02em; flex: none; }
+  #m [data-m-panel] .m-vf:not(.m-knob):not(.m-num) .m-flab { font-size: var(--fs-xs); letter-spacing: -.02em; white-space: nowrap; overflow: hidden; max-width: 100%; line-height: 1.2; }
+  #m [data-m-panel] .m-vf:not(.m-knob):not(.m-num) .m-vtrack { width: min(44px, 100%); flex: 1; height: auto; min-height: 12px; }
+
   /* -- the right: the page buttons, then the page chosen (beat until another is) -- */
   .m > .m-tabs { grid-area: 2 / 2; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0; padding: 10px 0 8px 24px; border-top: var(--rule); border-left: var(--rule); }
   /* (no perform button: it's always open; no x/y page on the laptop) */
@@ -632,8 +641,6 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   /* voice: only as many rows as the tab has faders, each as tall as the frame allows */
   .m .m-voice .m-btn { font-size: var(--fs-xs) !important; }
   .m-vset { grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); row-gap: 14px; }
-  /* fx: echo and reverb side by side, five faders each (their names tight so feedback fits) */
-  .m #m-fx-echo .m-flab, .m #m-fx-ring .m-flab { letter-spacing: -.05em; font-size: min(var(--fs-xs), 1.05vw); }
   /* fx: echo and reverb only (the crossfeed has its own page): taller faders */
   [data-m-panel="fx"] .m-fx-card { grid-template-rows: minmax(0, 1fr); }
   .m > .m-tabs button[data-m-tab="xf"] { display: block; }
