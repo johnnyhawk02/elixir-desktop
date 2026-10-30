@@ -1438,11 +1438,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-mutes-head b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-s); }
   .m .m-mutes-head .m-toggle { min-height: 28px; padding: 0 8px; font-size: var(--fs-xs) !important; }
   .m-mute-rows { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; min-height: 0; }
-  .m-mute-col { display: grid; grid-template-rows: minmax(0, 1fr) repeat(6, auto); justify-items: center; gap: 4px; min-height: 0; min-width: 0; }
-  /* (the sends' number boxes: the amount in a box, dragged or scrolled; a muted one black; under each its key, plain) */
-  /* (top to bottom: the meter, ring mod send, echo send, then the drum's mute at the foot, each over its key) */
-  .m-mute-col > :nth-child(6) { order: 1; } .m-mute-col > :nth-child(7) { order: 2; } .m-mute-col > :nth-child(4) { order: 3; }
-  .m-mute-col > :nth-child(5) { order: 4; } .m-mute-col > :nth-child(2) { order: 5; } .m-mute-col > :nth-child(3) { order: 6; }
+  .m-mute-col { display: flex; flex-direction: column; align-items: stretch; gap: 4px; min-height: 0; min-width: 0; }
+  /* the number boxes read as one line each; the send's mute under it, the level fader fills the rest, its meter beside its track */
   .m-mute-col .m-num { width: 100%; display: block; }
   .m-mute-col .m-num output, .m-mute-col .m-num .m-flab { display: none; }
   .m .m-mute-col .m-num .m-vtrack { width: 100%; height: 26px; border: 1.5px solid var(--ink); border-radius: 3px; background: none; display: grid; place-items: center; overflow: hidden; }
@@ -1451,14 +1448,18 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-mute-col .m-num.muted .m-vtrack { background: var(--ink); color: var(--panel); text-shadow: none; }
   .m .m-mute-col .m-send-mute { width: 100%; min-width: 0 !important; min-height: 0; padding: 0; border: 0; background: none !important; color: var(--ink) !important; box-shadow: none !important;
     font-size: var(--fs-xs) !important; text-transform: uppercase; line-height: 1; opacity: .55; }
-  .m-mute-meter { --m: 0; --h: 0; position: relative; width: 14px; height: 100%; min-height: 24px; max-height: 70px; text-decoration: none;
+  .m-mute-col .m-mute-level { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; }
+  .m-mute-col .m-mute-level .m-vtrack { position: relative; flex: 1; width: 44px; height: auto; min-height: 60px; overflow: visible; }
+  .m-mute-col .m-mute-level .m-flab { font-size: var(--fs-xs); }
+  .m-mute-col .m-mute-level output { display: none; }
+  .m-mute-meter { --m: 0; --h: 0; position: absolute; left: calc(100% + 5px); top: 0; bottom: 0; width: 7px; pointer-events: none; text-decoration: none;
     background: repeating-linear-gradient(to top, var(--ghost) 0 3px, transparent 3px 5px); }
   .m-mute-meter .m-lvm-on { position: absolute; left: 0; right: 0; bottom: 0; height: round(down, calc(var(--m) * 100%), 5px); background: repeating-linear-gradient(to top, var(--ink) 0 3px, transparent 3px 5px); }
   .m-mute-meter .m-lvm-pk { position: absolute; left: 0; right: 0; height: 3px; bottom: round(down, calc(var(--h) * (100% - 3px)), 5px); background: var(--ink); opacity: calc(var(--h) * 4); }
   .m-mute-col.quiet .m-mute-meter { opacity: .3; }
   .m .m-mute-col .m-toggle { width: 100%; min-width: 0 !important; min-height: 34px; padding: 0; font-size: var(--fs-xs) !important; text-transform: uppercase; }
-  .m-mute-col small { font-size: var(--fs-xs); opacity: .55; text-transform: uppercase; line-height: 1; }
-  .m-mute-col { align-content: end; }
+  .m-mute-col > small { font-size: var(--fs-xs); opacity: .55; text-transform: uppercase; line-height: 1; text-align: center; }
+    font-size: var(--fs-xs) !important; text-transform: uppercase; line-height: 1; opacity: .55; }
   .m .m-tabs button { font-size: var(--fs-m) !important; }
   .m-panel:not([data-m-panel="play"]) { grid-area: 3 / 2 / 5 / 3; display: none; padding: 8px 0 0 24px; border-left: var(--rule); }
   .m[data-page="beat"] [data-m-panel="beat"], .m[data-page="dice"] [data-m-panel="dice"], .m[data-page="fx"] [data-m-panel="fx"], .m[data-page="xf"] [data-m-panel="xf"],
@@ -1551,7 +1552,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>193</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>194</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
@@ -1646,7 +1647,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v193, 30 Oct, 07:03</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v194, 30 Oct, 07:26</footer>
     </section>
   </div>
   </div>
@@ -10072,21 +10073,32 @@ function mSendToggle(k, n) { mSendMute[k][n] = !mSendMute[k][n]; mMuteDraw(); se
 const MUTE_N = ['dr1', 'dr2', 'dr3', 'sn', 'cy', 'hh'], MUTE_KEYS = ['z', 'x', 'c', 'v', 'b', 'n'];
 const mMuteCols = MUTE_N.map((n, d) => {
   const col = document.createElement('div'); col.className = 'm-mute-col';
-  col.innerHTML = `<u class="m-mute-meter" aria-hidden="true"><span class="m-lvm-on"></span><span class="m-lvm-pk"></span></u><button class="m-toggle" type="button">${n}</button><small>${MUTE_KEYS[d]}</small>`;
-  const b = col.querySelector('button');
-  b.addEventListener('click', () => mMuteToggle(d));
-  // (the sends: a number box each, dragged or scrolled like a knob, and its mute under it)
+  // top to bottom: the reverb send, the echo send (each a number box with its mute), the drum's level fader with its
+  // level meter beside it, its mute, its key
   const sends = {};
-  for (const k of ['fx', 'ring']) {
+  for (const k of ['ring', 'fx']) {
     mFader(col, `${n} ${k === 'fx' ? 'echo' : 'verb'}`, { min: 0, max: 100, get: () => mix[k][d], dflt: 0, num: true,
       show: String, set: (v) => { mix[k][d] = v; if (k === 'fx') fxButtons[d](); sendMix(); setDirty(true); } });
     const box = col.lastElementChild, sm = document.createElement('button');
     sm.type = 'button'; sm.className = 'm-toggle m-send-mute'; sm.textContent = SEND_KEYS[k][d];
-    sm.addEventListener('click', () => mSendToggle(k, d)); col.append(sm);
+    sm.addEventListener('click', () => mSendMute_toggle(k, d)); col.append(sm);
     sends[k] = { box, sm };
   }
-  $('m-mute-rows').append(col); return { col, b, meter: col.querySelector('.m-mute-meter'), sends };
+  // the level: a fader like the mixer's, its meter beside the track (the same peaks as the mixer's)
+  const vol = PAR.VOL1 + d;
+  mFader(col, 'lvl', { min: 0, max: 127, get: () => values[vol], dflt: () => initValues[vol], knob: false,
+    show: String, set: (v) => { setValue(vol, v, true); setDirty(true); } });
+  const lvlEl = col.lastElementChild, meter = document.createElement('u');
+  meter.className = 'm-mute-meter'; meter.setAttribute('aria-hidden', 'true'); meter.innerHTML = '<span class="m-lvm-on"></span><span class="m-lvm-pk"></span>';
+  lvlEl.querySelector('.m-vtrack').append(meter);
+  lvlEl.classList.add('m-mute-level');
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'm-toggle'; b.textContent = n;
+  b.addEventListener('click', () => mMuteToggle(d)); col.append(b);
+  const key = document.createElement('small'); key.textContent = MUTE_KEYS[d]; col.append(key);
+  $('m-mute-rows').append(col);
+  return { col, b, meter, sends };
 });
+function mSendMute_toggle(k, d) { mSendToggle(k, d); }
 function mMuteToggle(d) { mMute[d] = !mMute[d]; mMuteDraw(); sendSeq(); setDirty(true); }
 function mMuteDraw() {
   mMuteCols.forEach(({ col, b, sends }, d) => {
