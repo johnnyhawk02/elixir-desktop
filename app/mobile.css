@@ -680,3 +680,11 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-rs-tabs .m-btn, .m .m-ch-list .m-btn, .m-big { font-size: var(--fs-xs) !important; }
   .m .m-cccell small { font-size: var(--fs-xs); }
 }
+
+/* ---- the density faders' hit lights (laptop): a square over each track that lights on its hits and fades ---- */
+@media (min-width: 1000px) {
+  #m-dens-faders .m-vf { position: relative; }
+  .m-dens-led { display: block; width: 14px; height: 14px; background: var(--ghost); border-radius: 2px; flex: none; margin-bottom: 2px; }
+  .m-dens-led.on { background: var(--ink); transition: none; }
+  .m-dens-led:not(.on) { transition: background-color .25s ease-out; }
+}

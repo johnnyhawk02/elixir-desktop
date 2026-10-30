@@ -34,6 +34,21 @@ send = function (m) {
 const DENS_N = ['dr1', 'dr2', 'dr3', 'sn', 'cy', 'cl', 'op'];
 DENS_N.forEach((n, t) => mFader($('m-dens-faders'), n, { min: 0, max: 200, step: 5, get: () => perf.dens[t], dflt: 100,
   set: (v) => { perf.dens[t] = v; sendSeq(); setDirty(true); }, show: (v) => `${v}%` }));
+// each track's light: a square over its fader that lights on every hit of that track (the sequencer's and the pads'),
+// at the same moment as the sound (the output latency), and fades
+const densLeds = mFaders.slice(-DENS_N.length).map((fd) => {
+  const led = document.createElement('i'); led.className = 'm-dens-led'; led.setAttribute('aria-hidden', 'true');
+  fd.el.prepend(led); return led;
+});
+const densOnEvent = onEvent;
+onEvent = function (ev) {
+  if (ev.type === 'step' && ev.hits && playing) {
+    const lat = ctx && ctx.outputLatency ? ctx.outputLatency * 1000 : 0;
+    const lit = [...new Set(ev.hits)].filter((t) => t >= 0 && t < densLeds.length);
+    setTimeout(() => lit.forEach((t) => { const l = densLeds[t]; l.classList.remove('on'); void l.offsetWidth; l.classList.add('on'); clearTimeout(l._t); l._t = setTimeout(() => l.classList.remove('on'), 110); }), lat);
+  }
+  densOnEvent(ev);
+};
 // presets keep the densities; one saved without them plays at 100%
 const densSnap = songSnapshot, densUse = useSong;
 songSnapshot = function () { return { ...densSnap(), dens: perf.dens.slice() }; };

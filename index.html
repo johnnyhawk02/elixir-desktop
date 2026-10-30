@@ -1528,11 +1528,19 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-rs-tabs .m-btn, .m .m-ch-list .m-btn, .m-big { font-size: var(--fs-xs) !important; }
   .m .m-cccell small { font-size: var(--fs-xs); }
 }
+
+/* ---- the density faders' hit lights (laptop): a square over each track that lights on its hits and fades ---- */
+@media (min-width: 1000px) {
+  #m-dens-faders .m-vf { position: relative; }
+  .m-dens-led { display: block; width: 14px; height: 14px; background: var(--ghost); border-radius: 2px; flex: none; margin-bottom: 2px; }
+  .m-dens-led.on { background: var(--ink); transition: none; }
+  .m-dens-led:not(.on) { transition: background-color .25s ease-out; }
+}
 </style>
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>187</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>190</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
@@ -1625,7 +1633,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v187, 30 Oct, 01:58</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v190, 30 Oct, 06:23</footer>
     </section>
   </div>
   </div>
@@ -8700,6 +8708,21 @@ send = function (m) {
 const DENS_N = ['dr1', 'dr2', 'dr3', 'sn', 'cy', 'cl', 'op'];
 DENS_N.forEach((n, t) => mFader($('m-dens-faders'), n, { min: 0, max: 200, step: 5, get: () => perf.dens[t], dflt: 100,
   set: (v) => { perf.dens[t] = v; sendSeq(); setDirty(true); }, show: (v) => `${v}%` }));
+// each track's light: a square over its fader that lights on every hit of that track (the sequencer's and the pads'),
+// at the same moment as the sound (the output latency), and fades
+const densLeds = mFaders.slice(-DENS_N.length).map((fd) => {
+  const led = document.createElement('i'); led.className = 'm-dens-led'; led.setAttribute('aria-hidden', 'true');
+  fd.el.prepend(led); return led;
+});
+const densOnEvent = onEvent;
+onEvent = function (ev) {
+  if (ev.type === 'step' && ev.hits && playing) {
+    const lat = ctx && ctx.outputLatency ? ctx.outputLatency * 1000 : 0;
+    const lit = [...new Set(ev.hits)].filter((t) => t >= 0 && t < densLeds.length);
+    setTimeout(() => lit.forEach((t) => { const l = densLeds[t]; l.classList.remove('on'); void l.offsetWidth; l.classList.add('on'); clearTimeout(l._t); l._t = setTimeout(() => l.classList.remove('on'), 110); }), lat);
+  }
+  densOnEvent(ev);
+};
 // presets keep the densities; one saved without them plays at 100%
 const densSnap = songSnapshot, densUse = useSong;
 songSnapshot = function () { return { ...densSnap(), dens: perf.dens.slice() }; };
@@ -9844,7 +9867,7 @@ const HELP = [
 <ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how often it fills.</li>
 <li><b>rush</b> builds a roll: the chosen drum (<b>rush on</b>) rolls faster and faster while the others drop out and a high-pass rises. Push it up for a build, drop it for the drop. Its curve is in <b>options</b> › <b>settings</b> › <b>rush</b>.</li>
 <li><b>groove</b> and <b>depth</b> give it swing or push; <b>accent</b> how loud the accents are.</li>
-<li><b>density</b>, a fader for each track (drum 1, 2, 3, snare, cymbal, closed and open hat): under 100% it thins that track, off-beats first; over 100% it adds hits on its empty steps, eighths first, until at 200% every step plays. The same steps go or come each time, and presets keep it.</li></ul>`],
+<li><b>density</b>, a fader for each track (drum 1, 2, 3, snare, cymbal, closed and open hat): under 100% it thins that track, off-beats first; over 100% it adds hits on its empty steps, eighths first, until at 200% every step plays. The same steps go or come each time, and presets keep it. A square over each track lights on its hits, so you can see what the density is doing.</li></ul>`],
   ['voice', 'voice: shape a drum', `<p>Every setting of one drum. Pick the drum along the top (or keys 1 to 6), then a tab ([ and ] step through them):</p>
 <ul><li><b>tone</b>: tuning, wave and fm. <b>shape</b>: the envelope, the pitch drop and the click (the attack's sample).</li>
 <li><b>filter</b>: cutoff, resonance, type and drive, then the drum's volume, pan, sample rate and drive. <b>mod</b>: its lfo and what velocity does.</li></ul>`],
