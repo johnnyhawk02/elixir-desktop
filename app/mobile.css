@@ -271,7 +271,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-fx-card { display: grid; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px; min-height: 0; padding: 8px 2px; }
 /* the fx page: echo and ring mod side by side (five faders and three), taking what the crossfeed matrix under them leaves */
 [data-m-panel="fx"] .m-fx-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; column-gap: 0; }
-#m-fx-echo { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+#m-fx-echo { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 #m-fx-ring { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 [data-m-panel="fx"] .m-fx-row + .m-fx-row { border-top: 0; padding-top: 0; border-left: var(--rule); padding-left: 4px; margin-left: 4px; }
 [data-m-panel="fx"] .m-fx-row.m-xrow { grid-column: 1 / -1; border-left: 0; padding-left: 0; margin-left: 0; border-top: var(--rule); padding-top: 6px; }
@@ -653,7 +653,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   [data-m-panel="fx"] .m-fx-row.m-fx-slot { display: grid; border-top: var(--rule); padding-top: 8px; }
   [data-m-panel="fx"] .m-fx-empty { border: 1.5px dashed var(--ghost); border-radius: 4px; display: grid; place-items: center; color: var(--muted); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; }
   #m [data-m-panel="fx"] #m-fx-echo > .m-vf:first-child, #m [data-m-panel="fx"] #m-fx-ring > .m-vf:first-child { display: none; }
-  #m-fx-echo, #m-fx-ring { grid-template-columns: repeat(4, minmax(0, 1fr)); min-height: 0; }
+  #m-fx-echo { grid-template-columns: repeat(5, minmax(0, 1fr)); min-height: 0; }
+  #m-fx-ring { grid-template-columns: repeat(4, minmax(0, 1fr)); min-height: 0; }
   .m-fx-slot { display: none; }
   [data-m-panel="fx"] .m-fx-slot { display: grid; }
   .m > .m-tabs button[data-m-tab="xf"] { display: block; }

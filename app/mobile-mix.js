@@ -8,11 +8,18 @@ const fx3P = (i) => ({ min: 0, max: 127, get: () => fx3.dist.p[i], set: (v) => {
 $('m-pp').addEventListener('change', () => { setValue(PAR.FX_DELAY_TYPE, $('m-pp').checked ? 1 : 0, true); setDirty(true); });
 mDraws.push(() => { $('m-pp').checked = values[PAR.FX_DELAY_TYPE] === 1; });
 fxF('m-fx-echo', 'send', fxSend('fx'));
-fxF('m-fx-echo', 'time', { min: 0, max: 1000, get: () => Math.round(delayPos * 1000), set: (v) => { delayPos = v / 1000; send({ type: 'delay', pos: delayPos }); },
-  show: (v) => showDelay(v).replace(/^\d+% /, ''), dflt: Math.round(posOf(3 / 16) * 1000) });
+fxF('m-fx-echo', 'time', { min: 0, max: 1000, get: echoTime, set: setEchoTime,
+  show: echoTimeShow, dflt: Math.round(posOf(3 / 16) * 1000) });
 fxF('m-fx-echo', 'tone', fxPar(PAR.FX_P3));
 fxF('m-fx-echo', 'feedback', fxPar(PAR.FX_P4));
 fxF('m-fx-echo', 'width', { min: 0, max: 200, get: () => fx3.echo.pct, set: (v) => { fx3.echo.pct = v; sendMix(); }, show: (v) => v + '%', dflt: FX3_0.echo.pct });
+// fine tune: ±1% of the echo time, in hundredths of a percent (synced or free)
+fxF('m-fx-echo', 'fine', { min: -100, max: 100, get: () => fx3.echo.fine || 0, set: (v) => { fx3.echo.fine = v; sendMix(); }, show: (v) => `${v > 0 ? '+' : ''}${(v / 100).toFixed(2)}%`, dflt: 0 });
+// the sync box: on, the time is on the musical lengths; off, free milliseconds (the same knob)
+$('m-sync').addEventListener('change', () => { fx3.echo.sync = $('m-sync').checked; sendMix(); setDirty(true); mDrawAll(); });
+mDraws.push(() => { $('m-sync').checked = echoSynced(); });
+// EVERYTHING: a new patch has the echo synced, with its fine tune randomised
+$('m-everything').addEventListener('click', () => { fx3.echo.sync = true; fx3.echo.fine = rIn(-100, 100); sendMix(); mDrawAll(); });
 // reverb (send 2, where the ring mod was; its sends are still mix.ring): send, time (the pre-delay), decay, tone (dark ..
 // bright) and early (the early reflections' level)
 fxF('m-fx-ring', 'send', fxSend('ring'));

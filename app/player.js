@@ -67,6 +67,7 @@ class Player {
     // delay: tempo-synced time, 0 = 1/128 .. 1 = one bar, and run as a send effect (all wet,
     // the voices keep their dry path); not in the firmware
     this.delayPos = 1 + Math.log2(3 / 16) / 7;
+    this.echoSync = true; this.echoFree = 0.25; this.echoFine = 0;
     // two more of the firmware's FX: the reverb (written for it but never switched on) as the second send bus (wet only, the
     // voices keep their dry path; the engine's own FX bus is the echo), and in Elixir Mobile the distortion as an insert
     // on the whole mix, before the compressor. (Send 2 was the ring mod; its sends, sendR, now feed the reverb)
@@ -100,6 +101,9 @@ class Player {
         this.distMix = (m.dist.mix || 0) / 100;
         if (m.verb) ['time', 'decay', 'tone', 'early'].forEach((k, i) => this.verb.setParameter(i, m.verb[k] / 127));
         this.sendD.set(m.sendD); this.sendR.set(m.sendR); this.echoWidth = m.echo.pct / 100;
+        // the echo's time: tempo-synced (the position, as before) or free (milliseconds, 1..2000, linear in the TIME knob); fine
+        // tunes either by up to 1% (-100..100 hundredths of a percent)
+        this.echoSync = m.echo.sync !== false; this.echoFree = m.echo.free ?? 0.25; this.echoFine = m.echo.fine || 0;
       } this.fxAmt.set(m.fx); }
     else if (m.type === 'rec') {
       // recorder: free starts now; a loop waits for the first step of a bar and stops after its bars
@@ -300,7 +304,8 @@ class Player {
     const M = this.master, k = out[0];
     const isDelay = e.fx.fxType === LXR.FX_DELAY;
     e.fx.forceWet = isDelay;
-    e.fx.setDelaySync(isDelay ? delaySamples(this.delayPos, this.bpm) : null);
+    const eTime = this.echoSync ? delaySamples(this.delayPos, this.bpm) : (1 + 1999 * this.echoFree) / 1000 * LXR.REAL_FS;
+    e.fx.setDelaySync(isDelay ? eTime * (1 + this.echoFine / 10000) : null);
     let pk = 0;
     for (let i = 0; i < 64; i++) pk = Math.max(pk, Math.abs(k[i]));
     pk = pk / 32768 * this.gainTo[0];

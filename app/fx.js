@@ -14,6 +14,16 @@ function showDelay(v) {
   return `${Math.round(v / 10)}% ${Math.abs(nf / frac - 1) < 0.004 ? '' : '≈'}${name}`;
 }
 let delayPos = posOf(3 / 16);
+// the echo's time, two ways: synced to the tempo (the position above, on the musical lengths) or free (1..2000 ms, the same
+// knob, linear). The sync box and fine tune (±1%) are in fx3.echo, sent with the mix
+const echoSynced = () => fx3.echo.sync !== false;
+const echoFreeMs = (v) => Math.round(1 + 1.999 * v); // (v: the knob, 0..1000)
+const echoTime = () => Math.round((echoSynced() ? delayPos : (fx3.echo.free ?? 0.25)) * 1000);
+const echoTimeShow = (v) => (echoSynced() ? showDelay(v) : `${echoFreeMs(v)} ms`);
+function setEchoTime(v) {
+  if (echoSynced()) { delayPos = v / 1000; send({ type: 'delay', pos: delayPos }); }
+  else { fx3.echo.free = v / 1000; sendMix(); }
+}
 // a kit's own delay time (TIME and RANGE, as the firmware computes it) as a synced position
 function kitDelayPos() {
   const p1 = values[PAR.FX_P1] / 127, rng = values[PAR.FX_P2] / 127, pp = values[PAR.FX_DELAY_TYPE] === 1, fs = LXR.REAL_FS;
@@ -59,8 +69,8 @@ function syncFx() {
   const ke = $('k-echo'); ke.innerHTML = '';
   // detents on the musical lengths: straight notes are the major ticks, dotted and triplet the small ones
   const detents = NOTES.map(([fr, name]) => [Math.round(posOf(fr) * 1000), !/[.t]$/.test(name)]).filter(([v]) => v >= 0 && v <= 1000);
-  ke.append(dialKnob('time', { max: 1000, show: showDelay, detents, get: () => Math.round(delayPos * 1000),
-    set: (v) => { delayPos = v / 1000; send({ type: 'delay', pos: delayPos }); }, dflt: () => Math.round(posOf(3 / 16) * 1000) }),
+  ke.append(dialKnob('time', { max: 1000, show: echoTimeShow, detents, get: echoTime,
+    set: setEchoTime, dflt: () => Math.round(posOf(3 / 16) * 1000) }),
     knob('tone', PAR.FX_P3, true), knob('feedback', PAR.FX_P4, true), dialKnob('width', { max: 200, show: (v) => v + '%', detents: [[100, true]], jump: false, get: () => fx3.echo.pct,
       set: (v) => { fx3.echo.pct = v; sendMix(); }, dflt: () => FX3_0.echo.pct }));
   fxPick($('r-dist'), LXR.DIST_NAMES.map((n) => n.toLowerCase()), () => fx3.dist.type, (i) => { fx3.dist.type = i; sendMix(); });
