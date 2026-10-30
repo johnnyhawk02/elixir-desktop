@@ -34,7 +34,7 @@ const mMuteCols = MUTE_N.map((n, d) => {
     mFader(col, `${n} ${k === 'fx' ? 'echo' : 'verb'}`, { min: 0, max: 100, get: () => mix[k][d], dflt: 0, num: true,
       show: String, set: (v) => { mix[k][d] = v; if (k === 'fx') fxButtons[d](); sendMix(); setDirty(true); } });
     const box = col.lastElementChild, sm = document.createElement('button');
-    sm.type = 'button'; sm.className = 'm-toggle m-send-mute'; sm.textContent = SEND_KEYS[k][d];
+    sm.type = 'button'; sm.className = 'm-toggle m-send-mute'; sm.textContent = 'mute';
     sm.addEventListener('click', () => mSendMute_toggle(k, d)); col.append(sm);
     sends[k] = { box, sm };
   }
@@ -48,7 +48,6 @@ const mMuteCols = MUTE_N.map((n, d) => {
   lvlEl.classList.add('m-mute-level');
   const b = document.createElement('button'); b.type = 'button'; b.className = 'm-toggle'; b.textContent = n;
   b.addEventListener('click', () => mMuteToggle(d)); col.append(b);
-  const key = document.createElement('small'); key.textContent = MUTE_KEYS[d]; col.append(key);
   $('m-mute-rows').append(col);
   return { col, b, meter, sends };
 });
@@ -56,10 +55,10 @@ function mSendMute_toggle(k, d) { mSendToggle(k, d); }
 function mMuteToggle(d) { mMute[d] = !mMute[d]; mMuteDraw(); sendSeq(); setDirty(true); }
 function mMuteDraw() {
   mMuteCols.forEach(({ col, b, sends }, d) => {
-    b.setAttribute('aria-pressed', mMute[d]); b.setAttribute('aria-label', `mute ${XN[d]} (${MUTE_KEYS[d]})`); col.classList.toggle('quiet', mMute[d]);
+    b.setAttribute('aria-pressed', mMute[d]); b.setAttribute('aria-label', `mute ${XN[d]}`); col.classList.toggle('quiet', mMute[d]);
     for (const k of ['fx', 'ring']) {
       const on = mSendMute[k][d]; sends[k].sm.setAttribute('aria-pressed', on); sends[k].box.classList.toggle('muted', on);
-      sends[k].sm.setAttribute('aria-label', `mute ${XN[d]} ${k === 'fx' ? 'echo' : 'reverb'} send (${SEND_KEYS[k][d]})`);
+      sends[k].sm.setAttribute('aria-label', `mute ${XN[d]} ${k === 'fx' ? 'echo' : 'reverb'} send`);
     }
   });
 }
