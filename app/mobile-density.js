@@ -34,11 +34,11 @@ send = function (m) {
 const DENS_N = ['dr1', 'dr2', 'dr3', 'sn', 'cy', 'cl', 'op'];
 DENS_N.forEach((n, t) => mFader($('m-dens-faders'), n, { min: 0, max: 200, step: 5, get: () => perf.dens[t], dflt: 100,
   set: (v) => { perf.dens[t] = v; sendSeq(); setDirty(true); }, show: (v) => `${v}%` }));
-// each track's light: a square over its fader that lights on every hit of that track (the sequencer's and the pads'),
+// each track's light: a thin line under its name that lights on every hit of that track (the sequencer's and the pads'),
 // at the same moment as the sound (the output latency), and fades
 const densLeds = mFaders.slice(-DENS_N.length).map((fd) => {
   const led = document.createElement('i'); led.className = 'm-dens-led'; led.setAttribute('aria-hidden', 'true');
-  fd.el.prepend(led); return led;
+  fd.el.append(led); return led; // (under the name)
 });
 const densOnEvent = onEvent;
 onEvent = function (ev) {
