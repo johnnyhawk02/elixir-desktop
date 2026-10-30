@@ -1447,7 +1447,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-mute-col .m-num .m-vtrack::after { content: attr(aria-valuetext); font-size: var(--fs-xs); line-height: 1; }
   .m .m-mute-col .m-num.muted .m-vtrack { background: var(--ink); color: var(--panel); text-shadow: none; }
   /* a send's mute: a small square under its box, empty while the send is heard, filled when it's muted */
-  .m .m-mute-col .m-send-mute { justify-self: center; width: 16px; height: 16px; min-width: 0 !important; min-height: 0; padding: 0; border: 1.5px solid var(--ink) !important; border-radius: 2px; background: none !important; box-shadow: none !important; }
+  .m .m-mute-col .m-send-mute { align-self: center; width: 16px !important; height: 16px; flex: none; min-width: 0 !important; min-height: 0; padding: 0; border: 1.5px solid var(--ink) !important; border-radius: 2px; background: none !important; box-shadow: none !important; }
   .m .m-mute-col .m-send-mute[aria-pressed="true"] { background: var(--ink) !important; }
   .m-mute-col .m-mute-level { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; }
   .m-mute-col .m-mute-level .m-vtrack { position: relative; flex: 1; width: 44px; height: auto; min-height: 60px; overflow: visible; }
@@ -1553,7 +1553,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>196</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>197</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
@@ -1569,7 +1569,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   <div class="m-pages" id="m-pages">
   <div class="m-panel" data-m-panel="play">
     <section class="m-card m-play-card"><div class="m-faders" id="m-faders"></div><div id="m-perf-src" hidden></div>
-      <div class="m-mutes" id="m-mutes"><div class="m-mutes-head"><b>verb · echo · mute</b><button class="m-toggle" id="m-mute-clear" type="button">clear</button></div><div class="m-mute-rows" id="m-mute-rows"></div></div></section>
+      <div class="m-mutes" id="m-mutes"><div class="m-mutes-head"><b>verb · echo · level</b><button class="m-toggle" id="m-mute-clear" type="button">clear</button></div><div class="m-mute-rows" id="m-mute-rows"></div></div></section>
     <section class="m-card m-rand-card" aria-label="randomise">
       <div class="m-rand">
         <label class="m-chk m-nextbar"><input id="m-nextbar" type="checkbox"><i aria-hidden="true"></i>next bar</label>
@@ -1648,7 +1648,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v196, 30 Oct, 07:42</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v197, 30 Oct, 07:42</footer>
     </section>
   </div>
   </div>
