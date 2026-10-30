@@ -278,10 +278,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 /* the crossfeed matrix: drum names down the side (from) and along the top (into, with what it modulates); each cell
    fills with segments from the bottom as it goes up, from the top when it's negative */
 .m-xrow { grid-template-rows: auto auto; }
-.m-xgrid { display: grid; grid-template-columns: 2.2em repeat(6, minmax(0, 1fr)) 4px repeat(2, minmax(0, 1fr)); grid-auto-rows: clamp(22px, 3.7vh, 36px); gap: 3px; touch-action: none; }
-/* (the gap before the echo and reverb columns, a faint line down it) */
-.m-xgap { border-left: 1px dashed rgba(23, 32, 14, .3); margin-left: 2px; }
-.m .m-xhead-fx { cursor: default; }
+.m-xgrid { display: grid; grid-template-columns: 2.2em repeat(6, minmax(0, 1fr)); grid-auto-rows: clamp(22px, 3.7vh, 36px); gap: 3px; touch-action: none; }
 .m .m-xhead { min-height: 0; padding: 0; border: 0; background: none; display: grid; place-items: center; line-height: .9; font-size: min(var(--fs-xs), 3.7vw, 15.2px); text-transform: uppercase; }
 .m .m-xhead small { font-size: .8em; opacity: .75; }
 .m-xlab { display: grid; place-items: center start; font-size: min(var(--fs-xs), 3.7vw, 15.2px); text-transform: uppercase; }

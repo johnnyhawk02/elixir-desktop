@@ -7,7 +7,7 @@ const mRDepth = (() => { try { return JSON.parse(localStorage.getItem(RD_KEY)) |
 const mDepthOf = (id) => mRDepth[id] || 100;
 const mDepthDraw = (b) => { b.style.setProperty('--rd', mDepthOf(b.id) / 100); b.classList.toggle('rd', mDepthOf(b.id) < 100); };
 // the whole sound and song, as a preset keeps them (as everything's undo does)
-const mRdSnap = () => ({ name: '', kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice(), fx: xm.fx.slice() }, fx: mix.fx.slice(),
+const mRdSnap = () => ({ name: '', kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice() }, fx: mix.fx.slice(),
   fx3: fx3Snapshot(), dpos: delayPos, song: songSnapshot(), userSamples: 0 });
 // part way from a to b: numbers by d, choices with chance d (a key named for a choice, or anything not a number)
 const RD_CHOICE = /^(target|type|wave|style|user|view|source|on|comp|duckOn)$/;

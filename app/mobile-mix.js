@@ -86,32 +86,12 @@ $('m-fx-alter').addEventListener('click', async () => {
   });
 });
 
-// the crossfeed matrix: a row for each drum it comes from, a column for each it goes into, the column's head what it
-// modulates there (tap: fm, filter, ring); then, past a gap, the echo and the reverb, where a drum's hits open the
-// effect's return (positive: it's heard only as that drum plays) or duck it (negative). Drag a cell up or down for
-// -100..100, double tap for none. It is the desktop's matrix (xm), and redraws with it (its draws join xcells)
+// the fx page's crossfeed matrix: a row for each drum it comes from, a column for each it goes into, the column's head
+// what it modulates there (tap: fm, filter, ring). Drag a cell up or down for -100..100, double tap for none. It is the
+// desktop's matrix (xm), and redraws with it (its draws join xcells)
 {
-  const grid = $('m-xgrid'), SH = ['d1', 'd2', 'd3', 'sn', 'cy', 'hh'], T = ['fm', 'filter', 'ring'], FXN = ['echo', 'verb'];
+  const grid = $('m-xgrid'), SH = ['d1', 'd2', 'd3', 'sn', 'cy', 'hh'], T = ['fm', 'filter', 'ring'];
   const changed = () => { xcells.forEach((d) => d()); sendX(); setDirty(true); };
-  const gap = () => { const g = document.createElement('span'); g.className = 'm-xgap'; grid.append(g); };
-  // a cell: its amount from get, set by set
-  const cell = (label, get, put, diag) => {
-    const c = document.createElement('div');
-    c.className = 'm-xcell' + (diag ? ' diag' : ''); c.setAttribute('role', 'slider'); c.tabIndex = 0; c.setAttribute('aria-label', label);
-    const draw = () => { const a = get(); c.style.setProperty('--a', Math.abs(a) / 100); c.classList.toggle('neg', a < 0); c.classList.toggle('hi', a >= 70); c.innerHTML = a ? `<b>${a}</b>` : ''; c.setAttribute('aria-valuenow', a); };
-    const set = (v) => { v = Math.max(-100, Math.min(100, Math.round(v / 5) * 5)); if (v !== get()) { put(v); changed(); } };
-    let drag = null, lastTap = 0;
-    c.addEventListener('pointerdown', (e) => { c.setPointerCapture(e.pointerId); drag = { y: e.clientY, v: get() }; c.classList.add('held'); });
-    c.addEventListener('pointermove', (e) => { if (drag) set(drag.v + (drag.y - e.clientY) * 1.5); });
-    const up = (e) => {
-      if (!drag) return;
-      if (Math.abs(drag.y - e.clientY) < 4) { if (e.timeStamp - lastTap < 350) set(0); lastTap = e.timeStamp; }
-      drag = null; c.classList.remove('held');
-    };
-    c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
-    c.addEventListener('keydown', (e) => { const st = { ArrowUp: 5, ArrowDown: -5, PageUp: 25, PageDown: -25 }[e.key]; if (st) { e.preventDefault(); set(get() + st); } else if (e.key === '0' || e.key === 'Delete') set(0); });
-    xcells.push(draw); grid.append(c);
-  };
   grid.append(document.createElement('span'));
   SH.forEach((n, d) => {
     const h = document.createElement('button'); h.type = 'button'; h.className = 'm-xhead';
@@ -120,14 +100,27 @@ $('m-fx-alter').addEventListener('click', async () => {
     xcells.push(() => { h.innerHTML = `${n}<small>${xm.target[d]}</small>`; });
     grid.append(h);
   });
-  gap();
-  FXN.forEach((n) => { const h = document.createElement('span'); h.className = 'm-xhead m-xhead-fx'; h.innerHTML = `${n}<small>fx</small>`; grid.append(h); });
   SH.forEach((n, s) => {
     const lab = document.createElement('span'); lab.className = 'm-xlab'; lab.textContent = n; grid.append(lab);
-    SH.forEach((_, d) => cell(`${XN[s]} into ${XN[d]}`, () => xm.amt[s * 6 + d], (v) => { xm.amt[s * 6 + d] = v; }, s === d));
-    gap();
-    FXN.forEach((fxn, k) => cell(`${XN[s]} opens or ducks the ${fxn === 'echo' ? 'echo' : 'reverb'}`, () => xm.fx[s * 2 + k], (v) => { xm.fx[s * 2 + k] = v; }, false));
+    SH.forEach((_, d) => {
+      const k = s * 6 + d, c = document.createElement('div');
+      c.className = 'm-xcell' + (s === d ? ' diag' : ''); c.setAttribute('role', 'slider'); c.tabIndex = 0;
+      c.setAttribute('aria-label', `${XN[s]} into ${XN[d]}`);
+      const draw = () => { const a = xm.amt[k]; c.style.setProperty('--a', Math.abs(a) / 100); c.classList.toggle('neg', a < 0); c.classList.toggle('hi', a >= 70); c.innerHTML = a ? `<b>${a}</b>` : ''; c.setAttribute('aria-valuenow', a); };
+      const set = (v) => { v = Math.max(-100, Math.min(100, Math.round(v / 5) * 5)); if (v !== xm.amt[k]) { xm.amt[k] = v; changed(); } };
+      let drag = null, lastTap = 0;
+      c.addEventListener('pointerdown', (e) => { c.setPointerCapture(e.pointerId); drag = { y: e.clientY, v: xm.amt[k] }; c.classList.add('held'); });
+      c.addEventListener('pointermove', (e) => { if (drag) set(drag.v + (drag.y - e.clientY) * 1.5); });
+      const up = (e) => {
+        if (!drag) return;
+        if (Math.abs(drag.y - e.clientY) < 4) { if (e.timeStamp - lastTap < 350) set(0); lastTap = e.timeStamp; }
+        drag = null; c.classList.remove('held');
+      };
+      c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
+      c.addEventListener('keydown', (e) => { const st = { ArrowUp: 5, ArrowDown: -5, PageUp: 25, PageDown: -25 }[e.key]; if (st) { e.preventDefault(); set(xm.amt[k] + st); } else if (e.key === '0' || e.key === 'Delete') set(0); });
+      xcells.push(draw); grid.append(c);
+    });
   });
-  $('m-xclear').addEventListener('click', () => { xm.amt.fill(0); xm.fx.fill(0); changed(); });
+  $('m-xclear').addEventListener('click', () => { xm.amt.fill(0); changed(); });
   xcells.forEach((d) => d());
 }

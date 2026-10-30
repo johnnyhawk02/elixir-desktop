@@ -1,10 +1,9 @@
 // ---- crossfeed matrix ----
 const XN = ['drum 1', 'drum 2', 'drum 3', 'snare', 'cymbal', 'hihat'];
-// (fx: each drum into the echo and the reverb, [drum * 2 + 0 echo / 1 reverb], opening or ducking their returns)
-const xm = { amt: new Array(36).fill(0), target: ['fm', 'fm', 'fm', 'filter', 'fm', 'ring'], fx: new Array(12).fill(0) };
+const xm = { amt: new Array(36).fill(0), target: ['fm', 'fm', 'fm', 'filter', 'fm', 'ring'] };
 const xgrid = $('xgrid');
 const xDepth = () => Number($('xdepth').value) / 100;
-const sendX = () => send({ type: 'xmod', amt: xm.amt.map((a) => a / 100 * xDepth()), target: xm.target.slice(), fx: xm.fx.map((a) => a / 100 * xDepth()) });
+const sendX = () => send({ type: 'xmod', amt: xm.amt.map((a) => a / 100 * xDepth()), target: xm.target.slice() });
 xgrid.appendChild(document.createElement('span'));
 XN.forEach((name, d) => {
   const col = document.createElement('div'); col.className = 'col';
@@ -39,7 +38,7 @@ XN.forEach((src, sIdx) => {
     draw(); xcells.push(draw); xgrid.appendChild(c);
   });
 });
-$('xclear').addEventListener('click', () => { xm.amt.fill(0); xm.fx.fill(0); xcells.forEach((d) => d()); sendX(); });
+$('xclear').addEventListener('click', () => { xm.amt.fill(0); xcells.forEach((d) => d()); sendX(); });
 $('xdepth').addEventListener('input', () => { $('xdepth-out').textContent = $('xdepth').value + '%'; sendX(); });
 // a sparse random patch: 3 to 6 connections, mostly positive, and a fresh target for each column that gets one
 const xSelects = [...xgrid.querySelectorAll('select')];

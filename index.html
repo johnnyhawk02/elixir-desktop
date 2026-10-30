@@ -1126,10 +1126,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 /* the crossfeed matrix: drum names down the side (from) and along the top (into, with what it modulates); each cell
    fills with segments from the bottom as it goes up, from the top when it's negative */
 .m-xrow { grid-template-rows: auto auto; }
-.m-xgrid { display: grid; grid-template-columns: 2.2em repeat(6, minmax(0, 1fr)) 4px repeat(2, minmax(0, 1fr)); grid-auto-rows: clamp(22px, 3.7vh, 36px); gap: 3px; touch-action: none; }
-/* (the gap before the echo and reverb columns, a faint line down it) */
-.m-xgap { border-left: 1px dashed rgba(23, 32, 14, .3); margin-left: 2px; }
-.m .m-xhead-fx { cursor: default; }
+.m-xgrid { display: grid; grid-template-columns: 2.2em repeat(6, minmax(0, 1fr)); grid-auto-rows: clamp(22px, 3.7vh, 36px); gap: 3px; touch-action: none; }
 .m .m-xhead { min-height: 0; padding: 0; border: 0; background: none; display: grid; place-items: center; line-height: .9; font-size: min(var(--fs-xs), 3.7vw, 15.2px); text-transform: uppercase; }
 .m .m-xhead small { font-size: .8em; opacity: .75; }
 .m-xlab { display: grid; place-items: center start; font-size: min(var(--fs-xs), 3.7vw, 15.2px); text-transform: uppercase; }
@@ -1535,7 +1532,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>188</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>187</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
@@ -1628,7 +1625,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v188, 30 Oct, 02:03</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v187, 30 Oct, 01:58</footer>
     </section>
   </div>
   </div>
@@ -5696,11 +5693,6 @@ class Player {
     this.verb = new LXR.ReverbBus();
     this.fxRng = new LXR.Rng(0x2545f491);
     this.sendD = new Float32Array(6); this.sendR = new Float32Array(6); this.echoWidth = 1;
-    // crossfeed into the fx (not in the firmware): each drum's level (a peak follower, ~150 ms release) opens (positive)
-    // or ducks (negative) the echo's and the reverb's returns; xfx[s * 2 + 0 echo / 1 reverb], -1..1; the gains glide
-    // across each block
-    this.xfx = new Float32Array(12); this.xEnv = new Float32Array(6); this.xGain = new Float32Array([1, 1]);
-    this.xRel = Math.exp(-64 / (0.15 * sampleRate));
     this.distMix = 0; this.distAt = 0;
     this.busIn = new Float32Array(128); this.busOut = new Int16Array(128);
     this.duckEnv = 0; this.duckAt = 1; this.compEnv = 0; this.gr = 0; this.duckMin = 1;
@@ -5716,7 +5708,7 @@ class Player {
     else if (m.type === 'rush') { this.rush = m.v; if (m.t !== undefined) this.rushT = m.t; }
     else if (m.type === 'rushSet') Object.assign(this.rs, m.set);
     else if (m.type === 'mute') m.muted.forEach((v, n) => { this.muted[n] = v ? 1 : 0; });
-    else if (m.type === 'xmod') { this.e.setCrossMod(m.amt, m.target); if (m.fx) this.xfx.set(m.fx); }
+    else if (m.type === 'xmod') this.e.setCrossMod(m.amt, m.target);
     else if (m.type === 'delay') this.delayPos = m.pos;
     else if (m.type === 'atBar') { if (this.playing) this.atBar.push(m.m); else this.msg(m.m); }
     else if (m.type === 'mix') {
@@ -5968,17 +5960,6 @@ class Player {
     }
     // the firmware's FX bus (distortion, ring mod, compressor or delay), sample-exact
     const fx = e.renderFx(this.fxGain, this.echoWidth);
-    // crossfeed into the fx: each return's gain this block, from every drum's level
-    const xg0 = this.xGain[0], xg1 = this.xGain[1];
-    {
-      const g = [1, 1];
-      for (let s = 0; s < 6; s++) {
-        let pk = 0; const o = out[s]; for (let i = 0; i < 64; i++) { const a = Math.abs(o[i]); if (a > pk) pk = a; }
-        const env = this.xEnv[s] = Math.max(Math.min(1, pk / 12000), this.xEnv[s] * this.xRel);
-        for (let k = 0; k < 2; k++) { const a = this.xfx[s * 2 + k]; if (a > 0) g[k] *= 1 - a + a * env; else if (a < 0) g[k] *= 1 + a * env; }
-      }
-      this.xGain[0] = g[0]; this.xGain[1] = g[1];
-    }
     // with duck fx on, the three FX returns are ducked too (all of them, drum 1's sends included), ramped over the block
     const fd0 = M.duckFx ? duck0 : 1, fdd = M.duckFx ? (duck1 - duck0) / 64 : 0;
     // the reverb's bus: each voice panned in at its send, saturated to int16
@@ -5995,9 +5976,9 @@ class Player {
       for (let i = 0; i < 128; i++) bus.input[i] = Math.max(-32768, Math.min(32767, Math.round(bi[i])));
       const bo = this.busOut; bo.fill(0);
       bus.process(bo, 64, this.fxRng);
-      if (any || bo.some((v) => v)) for (let i = 0; i < 64; i++) { const g = mk / 32768 * (fd0 + fdd * i) * (xg1 + (this.xGain[1] - xg1) * (i + 1) / 64); L[i] += bo[2 * i] * g; R[i] += bo[2 * i + 1] * g; }
+      if (any || bo.some((v) => v)) for (let i = 0; i < 64; i++) { const g = mk / 32768 * (fd0 + fdd * i); L[i] += bo[2 * i] * g; R[i] += bo[2 * i + 1] * g; }
     }
-    for (let i = 0; i < 64; i++) { const g = (fd0 + fdd * i) / 32768 * (xg0 + (this.xGain[0] - xg0) * (i + 1) / 64); L[i] += fx[2 * i] * g; R[i] += fx[2 * i + 1] * g; }
+    for (let i = 0; i < 64; i++) { const g = (fd0 + fdd * i) / 32768; L[i] += fx[2 * i] * g; R[i] += fx[2 * i + 1] * g; }
     // the distortion, a master insert (not in the firmware's routing): the whole mix through the firmware's distortion,
     // blended in at its mix amount, ramped across the block, before the high-pass and the compressor; at 0 it's bypassed
     if (this.distMix || this.distAt) {
@@ -6927,7 +6908,7 @@ function useKit(k) {
   const routed = [0, 1, 2, 3, 4, 5].map((n) => k.kit[PAR.AUDIO_OUT1 + n] === LXR.MIXER_ROUTING_FX_BUS);
   const deflt = (t, on = 25) => routed.map((r) => (r && (kitFx === t || (t === LXR.FX_DELAY && kitFx !== LXR.FX_DISTORTION && kitFx !== LXR.FX_RING)) ? on : 0));
   initValues.set(k.kit); asDelay(initValues); values.set(initValues);
-  if (k.xm) { xm.amt.splice(0, 36, ...k.xm.amt); xm.target.splice(0, 6, ...k.xm.target); xm.fx.splice(0, 12, ...(Array.isArray(k.xm.fx) && k.xm.fx.length === 12 ? k.xm.fx : new Array(12).fill(0))); xm.target.forEach((t, d) => { xSelects[d].value = t; }); xcells.forEach((d) => d()); sendX(); }
+  if (k.xm) { xm.amt.splice(0, 36, ...k.xm.amt); xm.target.splice(0, 6, ...k.xm.target); xm.target.forEach((t, d) => { xSelects[d].value = t; }); xcells.forEach((d) => d()); sendX(); }
   mix.fx.splice(0, 6, ...(k.fx || deflt(LXR.FX_DELAY)));
   mix.dist.fill(0); // (no distortion sends: it's on the master)
   mix.ring.splice(0, 6, ...(k.fx3 ? k.fx3.ring : deflt(LXR.FX_RING)));
@@ -7002,7 +6983,7 @@ function useSong(g, keepTempo) {
   Object.assign(macro, g.macro); drawMacros(); sendMacros();
 }
 $('kit-save').addEventListener('click', () => {
-  const k = { name: presetName(), kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice(), fx: xm.fx.slice() }, fx: mix.fx.slice(),
+  const k = { name: presetName(), kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice() }, fx: mix.fx.slice(),
     fx3: fx3Snapshot(), dpos: delayPos, song: songSnapshot(), saved: true, userSamples: 0 };
   kitList.push(k); storePresets(); fillKits();
   kitSel.value = kitList.length - 1;
@@ -7026,7 +7007,7 @@ $('new-kit').addEventListener('click', async () => {
   const kit = Uint8Array.from(src.length ? pick(src).kit : values);
   if (src.length) for (let v = 0; v < 6; v++) { const k = pick(src); for (const par of voiceOwned(v)) kit[par] = k.kit[par]; }
   for (let v = 0; v < 6; v++) kit[PAR.VOL1 + v] = values[PAR.VOL1 + v]; // the mixer levels stay as they are
-  useKit({ name: '', kit, xm: { amt: new Array(36).fill(0), target: xm.target.slice(), fx: new Array(12).fill(0) }, userSamples: 0 });
+  useKit({ name: '', kit, xm: { amt: new Array(36).fill(0), target: xm.target.slice() }, userSamples: 0 });
   const E = RAND.every; // (its settings: see RAND0)
   for (let v = 0; v < 6; v++) randomiseVoice(v, E.vary / 100);
   // the effects exactly as RANDOM FX makes them, by its settings (RAND.fx): each drum's sends, the echo (a musical
@@ -7039,7 +7020,7 @@ $('new-kit').addEventListener('click', async () => {
   for (const h in homes) delete homes[h];
   send({ type: 'kit', values: effValues() });
   buildKnobs(); drawScope();
-  if (E.xfeed) randomiseX(); else { xm.amt.fill(0); xm.fx.fill(0); xcells.forEach((d) => d()); sendX(); }
+  if (E.xfeed) randomiseX(); else { xm.amt.fill(0); xcells.forEach((d) => d()); sendX(); }
   // a new genre too (any built-in style, never user; unless switched off), and a beat from its grooves
   const genres = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
   if (E.genre) setStyle(genres[Math.floor(rnd() * genres.length)]);
@@ -8185,11 +8166,10 @@ if (pc4Map.some(Boolean)) startMidi(); // the mapped knobs work from load, not j
 
 // ---- crossfeed matrix ----
 const XN = ['drum 1', 'drum 2', 'drum 3', 'snare', 'cymbal', 'hihat'];
-// (fx: each drum into the echo and the reverb, [drum * 2 + 0 echo / 1 reverb], opening or ducking their returns)
-const xm = { amt: new Array(36).fill(0), target: ['fm', 'fm', 'fm', 'filter', 'fm', 'ring'], fx: new Array(12).fill(0) };
+const xm = { amt: new Array(36).fill(0), target: ['fm', 'fm', 'fm', 'filter', 'fm', 'ring'] };
 const xgrid = $('xgrid');
 const xDepth = () => Number($('xdepth').value) / 100;
-const sendX = () => send({ type: 'xmod', amt: xm.amt.map((a) => a / 100 * xDepth()), target: xm.target.slice(), fx: xm.fx.map((a) => a / 100 * xDepth()) });
+const sendX = () => send({ type: 'xmod', amt: xm.amt.map((a) => a / 100 * xDepth()), target: xm.target.slice() });
 xgrid.appendChild(document.createElement('span'));
 XN.forEach((name, d) => {
   const col = document.createElement('div'); col.className = 'col';
@@ -8224,7 +8204,7 @@ XN.forEach((src, sIdx) => {
     draw(); xcells.push(draw); xgrid.appendChild(c);
   });
 });
-$('xclear').addEventListener('click', () => { xm.amt.fill(0); xm.fx.fill(0); xcells.forEach((d) => d()); sendX(); });
+$('xclear').addEventListener('click', () => { xm.amt.fill(0); xcells.forEach((d) => d()); sendX(); });
 $('xdepth').addEventListener('input', () => { $('xdepth-out').textContent = $('xdepth').value + '%'; sendX(); });
 // a sparse random patch: 3 to 6 connections, mostly positive, and a fresh target for each column that gets one
 const xSelects = [...xgrid.querySelectorAll('select')];
@@ -8565,7 +8545,7 @@ duckVu.set = (db) => {
 // everything loads a new kit, which clears the desktop's undo, so it keeps its own: the whole sound and song as they
 // were (as a preset would save them), put back by loading that
 $('m-everything').addEventListener('click', () => {
-  const was = { name: '', kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice(), fx: xm.fx.slice() }, fx: mix.fx.slice(),
+  const was = { name: '', kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice() }, fx: mix.fx.slice(),
     fx3: fx3Snapshot(), dpos: delayPos, song: songSnapshot(), userSamples: 0 };
   $('new-kit').click();
   mUndoFn = () => { useKit(was); useSong(was.song, false); initValues.set(was.kit); setDirty(true); };
@@ -8819,7 +8799,7 @@ function mOverDraw() {
 $('m-pover').addEventListener('click', () => {
   const k = mOverTarget();
   if (!k || !confirm(`Save the current sound over ${k.name}?`)) return;
-  Object.assign(k, { kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice(), fx: xm.fx.slice() }, fx: mix.fx.slice(), fx3: fx3Snapshot(), dpos: delayPos, song: songSnapshot() });
+  Object.assign(k, { kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice() }, fx: mix.fx.slice(), fx3: fx3Snapshot(), dpos: delayPos, song: songSnapshot() });
   if (k.saved) storePresets();
   else { k.edited = true; mEdits[k.name] = presetData(k); try { localStorage.setItem(EDIT_KEY, JSON.stringify(mEdits)); } catch (e) {} }
   initValues.set(values); buildKnobs(); setDirty(false);
@@ -9062,32 +9042,12 @@ $('m-fx-alter').addEventListener('click', async () => {
   });
 });
 
-// the crossfeed matrix: a row for each drum it comes from, a column for each it goes into, the column's head what it
-// modulates there (tap: fm, filter, ring); then, past a gap, the echo and the reverb, where a drum's hits open the
-// effect's return (positive: it's heard only as that drum plays) or duck it (negative). Drag a cell up or down for
-// -100..100, double tap for none. It is the desktop's matrix (xm), and redraws with it (its draws join xcells)
+// the fx page's crossfeed matrix: a row for each drum it comes from, a column for each it goes into, the column's head
+// what it modulates there (tap: fm, filter, ring). Drag a cell up or down for -100..100, double tap for none. It is the
+// desktop's matrix (xm), and redraws with it (its draws join xcells)
 {
-  const grid = $('m-xgrid'), SH = ['d1', 'd2', 'd3', 'sn', 'cy', 'hh'], T = ['fm', 'filter', 'ring'], FXN = ['echo', 'verb'];
+  const grid = $('m-xgrid'), SH = ['d1', 'd2', 'd3', 'sn', 'cy', 'hh'], T = ['fm', 'filter', 'ring'];
   const changed = () => { xcells.forEach((d) => d()); sendX(); setDirty(true); };
-  const gap = () => { const g = document.createElement('span'); g.className = 'm-xgap'; grid.append(g); };
-  // a cell: its amount from get, set by set
-  const cell = (label, get, put, diag) => {
-    const c = document.createElement('div');
-    c.className = 'm-xcell' + (diag ? ' diag' : ''); c.setAttribute('role', 'slider'); c.tabIndex = 0; c.setAttribute('aria-label', label);
-    const draw = () => { const a = get(); c.style.setProperty('--a', Math.abs(a) / 100); c.classList.toggle('neg', a < 0); c.classList.toggle('hi', a >= 70); c.innerHTML = a ? `<b>${a}</b>` : ''; c.setAttribute('aria-valuenow', a); };
-    const set = (v) => { v = Math.max(-100, Math.min(100, Math.round(v / 5) * 5)); if (v !== get()) { put(v); changed(); } };
-    let drag = null, lastTap = 0;
-    c.addEventListener('pointerdown', (e) => { c.setPointerCapture(e.pointerId); drag = { y: e.clientY, v: get() }; c.classList.add('held'); });
-    c.addEventListener('pointermove', (e) => { if (drag) set(drag.v + (drag.y - e.clientY) * 1.5); });
-    const up = (e) => {
-      if (!drag) return;
-      if (Math.abs(drag.y - e.clientY) < 4) { if (e.timeStamp - lastTap < 350) set(0); lastTap = e.timeStamp; }
-      drag = null; c.classList.remove('held');
-    };
-    c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
-    c.addEventListener('keydown', (e) => { const st = { ArrowUp: 5, ArrowDown: -5, PageUp: 25, PageDown: -25 }[e.key]; if (st) { e.preventDefault(); set(get() + st); } else if (e.key === '0' || e.key === 'Delete') set(0); });
-    xcells.push(draw); grid.append(c);
-  };
   grid.append(document.createElement('span'));
   SH.forEach((n, d) => {
     const h = document.createElement('button'); h.type = 'button'; h.className = 'm-xhead';
@@ -9096,15 +9056,28 @@ $('m-fx-alter').addEventListener('click', async () => {
     xcells.push(() => { h.innerHTML = `${n}<small>${xm.target[d]}</small>`; });
     grid.append(h);
   });
-  gap();
-  FXN.forEach((n) => { const h = document.createElement('span'); h.className = 'm-xhead m-xhead-fx'; h.innerHTML = `${n}<small>fx</small>`; grid.append(h); });
   SH.forEach((n, s) => {
     const lab = document.createElement('span'); lab.className = 'm-xlab'; lab.textContent = n; grid.append(lab);
-    SH.forEach((_, d) => cell(`${XN[s]} into ${XN[d]}`, () => xm.amt[s * 6 + d], (v) => { xm.amt[s * 6 + d] = v; }, s === d));
-    gap();
-    FXN.forEach((fxn, k) => cell(`${XN[s]} opens or ducks the ${fxn === 'echo' ? 'echo' : 'reverb'}`, () => xm.fx[s * 2 + k], (v) => { xm.fx[s * 2 + k] = v; }, false));
+    SH.forEach((_, d) => {
+      const k = s * 6 + d, c = document.createElement('div');
+      c.className = 'm-xcell' + (s === d ? ' diag' : ''); c.setAttribute('role', 'slider'); c.tabIndex = 0;
+      c.setAttribute('aria-label', `${XN[s]} into ${XN[d]}`);
+      const draw = () => { const a = xm.amt[k]; c.style.setProperty('--a', Math.abs(a) / 100); c.classList.toggle('neg', a < 0); c.classList.toggle('hi', a >= 70); c.innerHTML = a ? `<b>${a}</b>` : ''; c.setAttribute('aria-valuenow', a); };
+      const set = (v) => { v = Math.max(-100, Math.min(100, Math.round(v / 5) * 5)); if (v !== xm.amt[k]) { xm.amt[k] = v; changed(); } };
+      let drag = null, lastTap = 0;
+      c.addEventListener('pointerdown', (e) => { c.setPointerCapture(e.pointerId); drag = { y: e.clientY, v: xm.amt[k] }; c.classList.add('held'); });
+      c.addEventListener('pointermove', (e) => { if (drag) set(drag.v + (drag.y - e.clientY) * 1.5); });
+      const up = (e) => {
+        if (!drag) return;
+        if (Math.abs(drag.y - e.clientY) < 4) { if (e.timeStamp - lastTap < 350) set(0); lastTap = e.timeStamp; }
+        drag = null; c.classList.remove('held');
+      };
+      c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
+      c.addEventListener('keydown', (e) => { const st = { ArrowUp: 5, ArrowDown: -5, PageUp: 25, PageDown: -25 }[e.key]; if (st) { e.preventDefault(); set(xm.amt[k] + st); } else if (e.key === '0' || e.key === 'Delete') set(0); });
+      xcells.push(draw); grid.append(c);
+    });
   });
-  $('m-xclear').addEventListener('click', () => { xm.amt.fill(0); xm.fx.fill(0); changed(); });
+  $('m-xclear').addEventListener('click', () => { xm.amt.fill(0); changed(); });
   xcells.forEach((d) => d());
 }
 // ---- step sequencers: holding a fader opens one for it: 2 to 64 steps (shown sixteen at a time, a page each), each an offset from the fader's setting (up or
@@ -9877,8 +9850,7 @@ const HELP = [
 <li><b>filter</b>: cutoff, resonance, type and drive, then the drum's volume, pan, sample rate and drive. <b>mod</b>: its lfo and what velocity does.</li></ul>`],
   ['fx', 'fx: echo, reverb, crossfeed (xfeed)', `<ul><li><b>echo</b>: send, time (musical lengths), tone, feedback and width; tick <b>ping pong</b> to bounce it left and right.</li>
 <li><b>reverb</b>: send, time (the pre-delay before it), decay, tone (dark to bright) and early (the early reflections' level). It's the LXR firmware's own reverb, written for it but never switched on in the hardware.</li>
-<li><b>crossfeed</b>: drums feeding each other. A row is the drum it comes from, a column the drum it goes into; click a column's name to pick what it changes there (fm, filter or ring). Drag a cell up or down to set it; double-click to clear.</li>
-<li>The last two columns, <b>echo</b> and <b>verb</b>, are the effects: a drum's hits open that effect (positive: you hear it only as the drum plays, a gate) or duck it (negative: the drum pushes it down, as a kick ducking the reverb).</li></ul>`],
+<li><b>crossfeed</b>: drums feeding each other. A row is the drum it comes from, a column the drum it goes into; click a column's name to pick what it changes there (fm, filter or ring). Drag a cell up or down to set it; double-click to clear.</li></ul>`],
   ['mix', 'mix: the channel strips', `<p>A strip for each drum: its echo send knob, reverb send knob and pan knob (L, C, R) over its level fader, with a level meter beside it.</p>`],
   ['mstr', 'mstr: the master chain', `<p>The whole mix runs top to bottom:</p>
 <ul><li><b>drum 1 sidechain</b>: drum 1 (the kick) ducks the rest; the meter shows how much. <b>space</b> carves the kick's room out of the others.</li>
@@ -10115,7 +10087,7 @@ const mRDepth = (() => { try { return JSON.parse(localStorage.getItem(RD_KEY)) |
 const mDepthOf = (id) => mRDepth[id] || 100;
 const mDepthDraw = (b) => { b.style.setProperty('--rd', mDepthOf(b.id) / 100); b.classList.toggle('rd', mDepthOf(b.id) < 100); };
 // the whole sound and song, as a preset keeps them (as everything's undo does)
-const mRdSnap = () => ({ name: '', kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice(), fx: xm.fx.slice() }, fx: mix.fx.slice(),
+const mRdSnap = () => ({ name: '', kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice() }, fx: mix.fx.slice(),
   fx3: fx3Snapshot(), dpos: delayPos, song: songSnapshot(), userSamples: 0 });
 // part way from a to b: numbers by d, choices with chance d (a key named for a choice, or anything not a number)
 const RD_CHOICE = /^(target|type|wave|style|user|view|source|on|comp|duckOn)$/;
