@@ -12,3 +12,8 @@ lvmDraw = function (m) {
   el.style.setProperty('--h', ((Math.max(LVM_FLOOR, m.hold) - LVM_FLOOR) / -LVM_FLOOR).toFixed(3));
 };
 
+
+// ---- crossfeed on its own page (laptop): the matrix moves from the fx page to the crossfeed page while the screen is
+// wide, and back for the phone layout ----
+const mXfPlace = () => (mWide.matches ? $('m-xf-card') : document.querySelector('[data-m-panel="fx"] .m-fx-card')).append(document.querySelector('.m-xrow'));
+mXfPlace(); mWide.addEventListener('change', mXfPlace);

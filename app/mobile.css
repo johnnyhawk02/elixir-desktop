@@ -477,6 +477,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   box-shadow: 4px 5px 0 rgba(23, 32, 14, .25); }
 .m .m-menu .m-btn { min-height: 34px; justify-content: flex-start; text-align: left; padding: 0 10px; font-size: var(--fs-s) !important; }
 .m .m-menu .m-btn:hover, .m .m-menu .m-btn:focus-visible { background: var(--ink); color: var(--panel); text-shadow: none; outline: 0; }
+/* ---- crossfeed has its own page on the laptop only (on the phone it's on fx) ---- */
+.m > .m-tabs button[data-m-tab="xf"] { display: none; }
 /* ---- mute and solo (laptop only) ---- */
 .m-mutes { display: none; }
 /* ---- the presets search, and a presets file dropped anywhere on the page ---- */
@@ -569,7 +571,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-vf.seq-edit { outline: 2px dashed var(--ink); outline-offset: 2px; }
 
   /* -- the right: the page buttons, then the page chosen (beat until another is) -- */
-  .m > .m-tabs { grid-area: 2 / 2; grid-template-columns: repeat(6, minmax(0, 1fr)); margin: 0; padding: 10px 0 8px 24px; border-top: var(--rule); border-left: var(--rule); }
+  .m > .m-tabs { grid-area: 2 / 2; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0; padding: 10px 0 8px 24px; border-top: var(--rule); border-left: var(--rule); }
   /* (no perform button: it's always open; no x/y page on the laptop) */
   .m > .m-tabs button[data-m-tab="play"], .m > .m-tabs button[data-m-tab="xy"] { display: none; }
   .m > .m-tabs button { min-height: 40px; }
@@ -602,7 +604,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-mute-col { align-content: end; }
   .m .m-tabs button { font-size: var(--fs-m) !important; }
   .m-panel:not([data-m-panel="play"]) { grid-area: 3 / 2 / 5 / 3; display: none; padding: 8px 0 0 24px; border-left: var(--rule); }
-  .m[data-page="beat"] [data-m-panel="beat"], .m[data-page="dice"] [data-m-panel="dice"], .m[data-page="fx"] [data-m-panel="fx"],
+  .m[data-page="beat"] [data-m-panel="beat"], .m[data-page="dice"] [data-m-panel="dice"], .m[data-page="fx"] [data-m-panel="fx"], .m[data-page="xf"] [data-m-panel="xf"],
   .m[data-page="mix"] [data-m-panel="mix"], .m[data-page="comp"] [data-m-panel="comp"], .m[data-page="presets"] [data-m-panel="presets"] { display: grid; }
   /* (every page's faders: readouts and names in the bigger small print; beat's and voice's readouts on one line, so
      every track starts at the same height) */
@@ -632,6 +634,13 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-vset { grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); row-gap: 14px; }
   /* fx: echo and reverb side by side, five faders each (their names tight so feedback fits) */
   .m #m-fx-echo .m-flab, .m #m-fx-ring .m-flab { letter-spacing: -.05em; font-size: min(var(--fs-xs), 1.05vw); }
+  /* fx: echo and reverb only (the crossfeed has its own page): taller faders */
+  [data-m-panel="fx"] .m-fx-card { grid-template-rows: minmax(0, 1fr); }
+  .m > .m-tabs button[data-m-tab="xf"] { display: block; }
+  /* crossfeed: the matrix filling its page */
+  .m-xf-card { display: grid; grid-template-rows: minmax(0, 1fr); padding: 2px; min-height: 0; }
+  .m-xf-card .m-xrow { grid-template-rows: auto minmax(0, 1fr); border: 0; padding: 0; margin: 0; min-height: 0; }
+  .m-xf-card .m-xgrid { grid-template-rows: auto repeat(6, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 6px; min-height: 0; }
   /* fx: the crossfeed matrix's names and numbers */
   .m .m-xhead, .m-xcell { font-size: var(--fs-xs); }
   /* mixer: a channel strip a drum: its echo send knob, its ring mod send knob, its pan knob, then its level fader with a meter
