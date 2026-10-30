@@ -1,5 +1,5 @@
 // ---- mutes (laptop), beside the knobs: a column a drum (drum 1, 2, 3, snare, cymbal, hihat: the hat's closed and open
-// together), each a level meter over its mute button (keys z x c v b n), then its echo send and ring mod send as number
+// together), each a level meter over its mute button (keys z x c v b n), then its echo send and reverb send as number
 // boxes, each with its own mute (keys a s d f g h and q w e r t y). A muted send sends nothing, its amount kept. They work on the notes, not the sound: a muted
 // drum's steps aren't sent to the player, so it stops being hit while anything already sounding (a decay, an echo) rings
 // on. Like density, they change what's sent, not the pattern; presets keep them (song.mute) ----
@@ -33,7 +33,7 @@ const mMuteCols = MUTE_N.map((n, d) => {
   // (the sends: a number box each, dragged or scrolled like a knob, and its mute under it)
   const sends = {};
   for (const k of ['fx', 'ring']) {
-    mFader(col, `${n} ${k === 'fx' ? 'echo' : 'ring'}`, { min: 0, max: 100, get: () => mix[k][d], dflt: 0, num: true,
+    mFader(col, `${n} ${k === 'fx' ? 'echo' : 'verb'}`, { min: 0, max: 100, get: () => mix[k][d], dflt: 0, num: true,
       show: String, set: (v) => { mix[k][d] = v; if (k === 'fx') fxButtons[d](); sendMix(); setDirty(true); } });
     const box = col.lastElementChild, sm = document.createElement('button');
     sm.type = 'button'; sm.className = 'm-toggle m-send-mute'; sm.textContent = SEND_KEYS[k][d];
@@ -48,7 +48,7 @@ function mMuteDraw() {
     b.setAttribute('aria-pressed', mMute[d]); b.setAttribute('aria-label', `mute ${XN[d]} (${MUTE_KEYS[d]})`); col.classList.toggle('quiet', mMute[d]);
     for (const k of ['fx', 'ring']) {
       const on = mSendMute[k][d]; sends[k].sm.setAttribute('aria-pressed', on); sends[k].box.classList.toggle('muted', on);
-      sends[k].sm.setAttribute('aria-label', `mute ${XN[d]} ${k === 'fx' ? 'echo' : 'ring mod'} send (${SEND_KEYS[k][d]})`);
+      sends[k].sm.setAttribute('aria-label', `mute ${XN[d]} ${k === 'fx' ? 'echo' : 'reverb'} send (${SEND_KEYS[k][d]})`);
     }
   });
 }

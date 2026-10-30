@@ -1795,3 +1795,126 @@ export class LxrEngine {
     }
   }
 }
+
+// ---------------------------------------------------------------------------------------
+// Reverb: FX/Reverb.c with FX/VerbTools (AllpassDelay.c, VerbDelay.c, VerbModDelay.c, sinCos.c) and TiltEq.c, from
+// the firmware's sources, where it was written but compiled out (USE_REVERB 0) so no LXR ever ran it. The active
+// path: SPIN_SEMI 0, USE_LOWER_DENSITY 1, USE_OUT_2 0, HIGH_RES_SINE_COS 0. Mono in (the stereo bus summed at half),
+// four input allpasses, two cross-fed loops of a modulated allpass, a delay, an allpass and a delay, early reflections,
+// output taps, tilt EQ; the wet signal on both sides. Its buffers are __fp16 in the firmware, kept as floats here.
+// Parameters (0..1): time (the pre-delay), feedback (decay), composition (tilt EQ and feedback damping: dark .. bright),
+// variation (the early reflections' level).
+// One change, marked: the modulated delays' smoothed length starts at its target, not at 0 (the firmware's smoothing
+// is so slow, 0.00013 Hz, that from 0 it would sit at about one sample for minutes).
+// ---------------------------------------------------------------------------------------
+const VERB_SIZE = 0x800; // MAX_ALLPASS_SIZE
+function makeVerbDelay() { return { buf: new Float32Array(VERB_SIZE), readPtr: 0, length: 256, writePtr: 256, roomSz: 1 }; }
+function verbCalcLength(d) {
+  let pos = d.writePtr - f(d.length * d.roomSz);
+  if (pos < 0) pos += VERB_SIZE;
+  d.readPtr = Math.trunc(pos) & (VERB_SIZE - 1);
+}
+function verbSetLength(d, l) { d.length = l; verbCalcLength(d); }
+function verbSetRoomSize(d, sz) { d.roomSz = sz; verbCalcLength(d); }
+function verbRead(d) { const r = d.buf[d.readPtr]; d.readPtr = (d.readPtr + 1) & (VERB_SIZE - 1); return r; }
+function verbWrite(d, x) { d.buf[d.writePtr] = x; d.writePtr = (d.writePtr + 1) & (VERB_SIZE - 1); }
+function verbReadTap(d, percent) { const off = Math.trunc(percent / 100 * d.length) & 0xffff; return d.buf[(d.readPtr - off) & (VERB_SIZE - 1)]; }
+function verbReadTapSample(d, idx) { return d.buf[(d.readPtr - idx) & (VERB_SIZE - 1)]; }
+function verbProcess(d, x) { verbWrite(d, x); return verbRead(d); }
+// VerbModDelay: its length smoothed by a one-pole, read with linear interpolation by process (not by the allpass)
+function makeVerbModDelay() {
+  const d = { ...makeVerbDelay(), lp: makeOnePole(), frac: 0, depth: 0, modVal: 0 };
+  d.lp.r = f(1 - Math.exp(-2 * Math.PI * 0.0001308911269084528 / REAL_FS));
+  return d;
+}
+function verbModCalcLength(d) {
+  const filtered = calcOnePole(d.lp, f(d.length * d.roomSz) + d.depth * d.modVal);
+  let pos = d.writePtr - filtered;
+  if (pos < 0) pos += VERB_SIZE;
+  const itg = Math.trunc(pos);
+  d.frac = pos - itg; d.readPtr = itg & (VERB_SIZE - 1);
+}
+function verbModSetLength(d, l) { d.length = l; d.lp.b = f(l * d.roomSz); } // (the change: the smoothing starts at the length)
+function verbModSetValue(d, v) { d.modVal = v; verbModCalcLength(d); }
+// allpasses (g 0.5 unless set: INITIAL_ALLPASS_COFF)
+function makeAllpass(mod) { return { g: 0.5, out: 0, in: 0, d: mod ? makeVerbModDelay() : makeVerbDelay(), mod }; }
+function allpassProcess(a, x) {
+  if (a.mod) verbModCalcLength(a.d);
+  a.out = verbRead(a.d);
+  a.in = x + a.g * a.out;
+  verbWrite(a.d, a.in);
+  return a.out + -a.g * a.in;
+}
+// TiltEq.c (SR3 = 3 × REAL_FS)
+function makeTilt() { const e = { a0: 0, b1: 0, lp: 0, lgain: 0, hgain: 0 }; tiltSetFreq(e, 400); return e; }
+function tiltSetFreq(e, fc) { const w = 2 * Math.PI * fc, n = 1 / (3 * REAL_FS + w); e.a0 = 2 * w * n; e.b1 = (3 * REAL_FS - w) * n; }
+function tiltSetParameter(e, p) {
+  p = p * p * p;
+  if (p >= 0) { e.lgain = 0; e.hgain = 1; tiltSetFreq(e, 20000 * p); } else { e.lgain = 1; e.hgain = 0; tiltSetFreq(e, 20000 * (1 + p)); }
+}
+function tiltProcess(e, x) { e.lp = e.a0 * x + e.b1 * e.lp; return e.lgain * e.lp + e.hgain * (x - e.lp); }
+const VERB_EARLY = [12, 24, 38, 50];
+export class ReverbBus {
+  constructor() {
+    this.input = new Int16Array(BLOCK * 2);
+    this.eq = makeTilt(); this.eqFb = makeTilt();
+    this.lfo = { s: [0.5, 0], a: 2 * Math.sin(Math.PI * 1.31 / REAL_FS) };
+    this.earlyVolume = 1; this.feedback = 0;
+    this.lpFeedback = makeOnePole(); this.lpFeedback.r = 0.5; this.lpImpulse = makeOnePole(); this.lpImpulse.r = 0.5;
+    this.lastOut = 0; this.lastOut2 = 0;
+    this.apDelay = [makeAllpass(false), makeAllpass(false)]; this.apModDelay = [makeAllpass(true), makeAllpass(true)];
+    this.inputAllpass = [0, 1, 2, 3].map(() => makeAllpass(false));
+    this.delay = [0, 1, 2, 3].map(() => makeVerbDelay());
+    this.early = makeVerbDelay(); this.preDelay = makeVerbDelay();
+    verbSetLength(this.early, 2000); verbSetLength(this.preDelay, 2031);
+    [142, 107, 379, 277].forEach((l, i) => verbSetLength(this.inputAllpass[i].d, l));
+    [2047, 1913, 1720, 1163].forEach((l, i) => verbSetLength(this.delay[i], l));
+    verbSetLength(this.apDelay[0].d, 1800); verbSetLength(this.apDelay[1].d, 2039);
+    verbModSetLength(this.apModDelay[0].d, 672); verbModSetLength(this.apModDelay[1].d, 908);
+    [0.75, 0.75, 0.625, 0.625].forEach((g, i) => { this.inputAllpass[i].g = g; });
+    this.parameter = new Float32Array([0.3, 0.6, 0.5, 0.5]);
+    for (let i = 0; i < 4; i++) this.setParameter(i, this.parameter[i]);
+  }
+  // FxBus_updateParameter, case FX_REVERB: 0 time, 1 feedback, 2 composition, 3 variation
+  setParameter(idx, v) {
+    this.parameter[idx] = v;
+    if (idx === 0) verbSetRoomSize(this.preDelay, 0.02166 + v * 0.97784342688330871492);
+    else if (idx === 1) this.feedback = v;
+    else if (idx === 2) { tiltSetParameter(this.eq, -1 + 2 * v); tiltSetParameter(this.eqFb, -1 + 2 * v); this.lpFeedback.r = f(v); }
+    else if (idx === 3) this.earlyVolume = v;
+  }
+  /** Reverb_process, all wet: this.input (stereo int16, interleaved) -> added into out */
+  process(out, size) {
+    const fx = this.input, lfo = this.lfo;
+    lfo.s[0] = lfo.s[0] - lfo.a * lfo.s[1]; lfo.s[1] = lfo.s[1] + lfo.a * lfo.s[0];
+    verbModSetValue(this.apModDelay[1].d, lfo.s[0]); verbModSetValue(this.apModDelay[0].d, lfo.s[1]);
+    for (let i = 0; i < size; i++) {
+      const mix = Math.max(-32768, Math.min(32767, Math.trunc(fx[2 * i] / 2) + Math.trunc(fx[2 * i + 1] / 2)));
+      let x = verbProcess(this.preDelay, mix / 32768);
+      verbProcess(this.early, x);
+      let early = verbReadTap(this.early, VERB_EARLY[0]) + verbReadTap(this.early, VERB_EARLY[1]) * 0.5
+        + verbReadTap(this.early, VERB_EARLY[2]) * 0.125 + verbReadTap(this.early, VERB_EARLY[3]) * 0.25;
+      x = 0.5 * tiltProcess(this.eq, x);
+      const in1 = allpassProcess(this.inputAllpass[0], allpassProcess(this.inputAllpass[1], x));
+      const in2 = allpassProcess(this.inputAllpass[2], allpassProcess(this.inputAllpass[3], x));
+      let t = allpassProcess(this.apModDelay[0], in1 + this.lastOut2);
+      t = verbProcess(this.delay[0], t) * this.feedback;
+      t = allpassProcess(this.apDelay[1], t);
+      t = verbProcess(this.delay[1], t);
+      this.lastOut = calcOnePole(this.lpFeedback, t * this.feedback);
+      t = allpassProcess(this.apModDelay[1], in2 + this.lastOut);
+      t = verbProcess(this.delay[2], t) * this.feedback;
+      t = allpassProcess(this.apDelay[1], t);
+      t = verbProcess(this.delay[3], t);
+      this.lastOut2 = t * this.feedback;
+      let o2 = verbReadTapSample(this.delay[2], 266) * 0.6;
+      o2 -= verbReadTapSample(this.apDelay[1].d, 1913) * 0.6;
+      o2 += verbReadTapSample(this.delay[3], 996) * 0.6;
+      o2 -= verbReadTapSample(this.apDelay[0].d, 187) * 0.6;
+      o2 -= verbReadTapSample(this.delay[1], 1066) * 0.6;
+      const o = tiltProcess(this.eqFb, early * this.earlyVolume + o2);
+      const wet = Math.max(-32768, Math.min(32767, Math.trunc(o * 32768)));
+      out[2 * i] = qadd16(out[2 * i], wet); out[2 * i + 1] = qadd16(out[2 * i + 1], wet);
+    }
+  }
+}

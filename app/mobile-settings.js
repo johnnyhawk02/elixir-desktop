@@ -11,8 +11,8 @@ const RS_PAGES = [
   ['pattern', 'pattern', 'm-pattern', [['genre', 'genre', 0, 1, onoff], ['energyLo', 'energy min', 0, 100, pc], ['energyHi', 'energy max', 0, 100, pc], ['fillsLo', 'fills min', 0, 100, pc],
     ['fillsHi', 'fills max', 0, 100, pc], ['groove', 'groove', 0, 1, onoff], ['depthLo', 'depth min', 0, 100, pc], ['depthHi', 'depth max', 0, 100, pc]]],
   ['xfeed', 'crossfeed', 'm-xrand', [['linksLo', 'links min', 1, 36, String], ['linksHi', 'links max', 1, 36, String], ['amtLo', 'amount min', 5, 100, pc], ['amtHi', 'amount max', 5, 100, pc], ['neg', 'negative', 0, 100, pc]]],
-  ['fx', 'random fx', 'm-fx-rand', [['pingpong', 'ping pong', 0, 100, pc], ['echoOn', 'echo chance', 0, 100, pc], ['echoLo', 'echo min', 0, 100, String], ['echoHi', 'echo max', 0, 100, String], ['ringOn', 'ring chance', 0, 100, pc],
-    ['ringLo', 'ring min', 0, 100, String], ['ringHi', 'ring max', 0, 100, String], ['fbLo', 'feedback min', 0, 127, String], ['fbHi', 'feedback max', 0, 127, String], ['fbWild', 'wild feedback', 0, 100, pc],
+  ['fx', 'random fx', 'm-fx-rand', [['pingpong', 'ping pong', 0, 100, pc], ['echoOn', 'echo chance', 0, 100, pc], ['echoLo', 'echo min', 0, 100, String], ['echoHi', 'echo max', 0, 100, String], ['ringOn', 'verb chance', 0, 100, pc],
+    ['ringLo', 'verb min', 0, 100, String], ['ringHi', 'verb max', 0, 100, String], ['fbLo', 'feedback min', 0, 127, String], ['fbHi', 'feedback max', 0, 127, String], ['fbWild', 'wild feedback', 0, 100, pc],
     ['toneLo', 'tone min', 0, 127, String], ['toneHi', 'tone max', 0, 127, String], ['widthLo', 'width min', 0, 200, pc], ['widthHi', 'width max', 0, 200, pc]]],
   ['alterfx', 'alter fx', 'm-fx-alter', [['amount', 'amount', 1, 50, pc]]],
 ];

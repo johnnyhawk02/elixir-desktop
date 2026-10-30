@@ -10,7 +10,7 @@ function barOk(b, bar) {
 }
 // the tempo-synced delay: 1/128 of a bar at 0, a whole bar at 1, evenly in octaves between
 const delaySamples = (pos, bpm) => 240 / bpm * Math.pow(2, -7 * (1 - pos)) * LXR.REAL_FS;
-const RING_MAKEUP = 3;
+const VERB_MAKEUP = 1;
 // snare rush: a fixed hash of (track, page, step) in 0..1; a hit whose hash is under the rush amount goes to the snare,
 // so the hits it takes stay put and more join as it goes up
 function rushHash(t, pg, s) {
@@ -67,10 +67,11 @@ class Player {
     // delay: tempo-synced time, 0 = 1/128 .. 1 = one bar, and run as a send effect (all wet,
     // the voices keep their dry path); not in the firmware
     this.delayPos = 1 + Math.log2(3 / 16) / 7;
-    // two more of the firmware's FX: ring mod as its own send bus (wet only, the voices keep their dry path; the engine's
-    // own FX bus is the echo), and in Elixir Mobile the distortion as an insert on the whole mix, before the compressor
+    // two more of the firmware's FX: the reverb (written for it but never switched on) as the second send bus (wet only, the
+    // voices keep their dry path; the engine's own FX bus is the echo), and in Elixir Mobile the distortion as an insert
+    // on the whole mix, before the compressor. (Send 2 was the ring mod; its sends, sendR, now feed the reverb)
     this.dist = new LXR.FxBus(); this.dist.fxType = LXR.FX_DISTORTION; this.dist.forceWet = true;
-    this.ring = new LXR.FxBus(); this.ring.fxType = LXR.FX_RING; this.ring.forceWet = true;
+    this.verb = new LXR.ReverbBus();
     this.fxRng = new LXR.Rng(0x2545f491);
     this.sendD = new Float32Array(6); this.sendR = new Float32Array(6); this.echoWidth = 1;
     this.distMix = 0; this.distAt = 0;
@@ -97,8 +98,7 @@ class Player {
         this.dist.distortion.type = m.dist.type;
         m.dist.p.forEach((v, i) => this.dist.setParameter(i, v / 127));
         this.distMix = (m.dist.mix || 0) / 100;
-        this.ring.ringmod.osc.waveform = m.ring.wave;
-        this.ring.setParameter(0, m.ring.freq / 127);
+        if (m.verb) ['time', 'decay', 'tone', 'early'].forEach((k, i) => this.verb.setParameter(i, m.verb[k] / 127));
         this.sendD.set(m.sendD); this.sendR.set(m.sendR); this.echoWidth = m.echo.pct / 100;
       } this.fxAmt.set(m.fx); }
     else if (m.type === 'rec') {
@@ -343,9 +343,8 @@ class Player {
     const fx = e.renderFx(this.fxGain, this.echoWidth);
     // with duck fx on, the three FX returns are ducked too (all of them, drum 1's sends included), ramped over the block
     const fd0 = M.duckFx ? duck0 : 1, fdd = M.duckFx ? (duck1 - duck0) / 64 : 0;
-    // distortion and ring mod buses: each voice panned in at its send, saturated to int16.
-    // The firmware's ring mod carrier is quiet (about a third of a plain multiply), so its bus gets makeup gain.
-    for (const [bus, sends, mk] of [[this.ring, this.sendR, RING_MAKEUP]]) {
+    // the reverb's bus: each voice panned in at its send, saturated to int16
+    for (const [bus, sends, mk] of [[this.verb, this.sendR, VERB_MAKEUP]]) {
       const bi = this.busIn; bi.fill(0);
       let any = false;
       for (let n = 0; n < 6; n++) {

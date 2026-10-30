@@ -2,7 +2,7 @@
 // hidden desktop panels' own keys (space and 1..7 sound a drum, r randomises) never fire; typing in a box, and keys
 // with cmd, ctrl or alt, are left alone ----
 // (the randomisers on 1..7 in the bar's order; enter records, l records a loop even where rec is set to free; the
-// letter rows are the mutes: z..n the drums, a..h their echo sends, q..y their ring mod sends)
+// letter rows are the mutes: z..n the drums, a..h their echo sends, q..y their reverb sends)
 const KEYS = { ' ': 'm-play', Enter: 'm-rec', l: 'm-loop', 1: 'm-everything', 2: 'm-kit', 3: 'm-alter', 4: 'm-pattern', 5: 'm-xrand',
   6: 'm-fx-rand', 7: 'm-fx-alter', u: 'm-undo' };
 // (the open pop-up, if any: Escape presses its done button; on the laptop the step sequencer is a strip under the knobs,

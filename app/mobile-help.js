@@ -15,8 +15,8 @@ const HELP = [
 <li>Click to randomise. Drag up or down on one to set how far it goes, 10% to 100% (a dotted bar along its foot below 100%): at 30% it moves everything only 30% of the way to the new sound, and switches choices like the style 30% of the time.</li>
 <li>Hold one still for half a second for its settings, the ranges and chances it uses.</li>
 <li><b>options</b> › <b>randomise on next bar</b>: while playing, randomises wait for the start of the next bar (the button flashes until then).</li></ul>`],
-  ['mute', 'mutes and sends', `<p>Beside the knobs, a column for each drum (drum 1, 2, 3, snare, cymbal, hihat): its level meter, its ring mod send and echo send as number boxes (each with its own mute), and its mute at the foot.</p>
-<ul><li>Keys: <b>z x c v b n</b> mute the drums; <b>a s d f g h</b> mute their echo sends; <b>q w e r t y</b> their ring mod sends. <b>clear</b> lifts every mute.</li>
+  ['mute', 'mutes and sends', `<p>Beside the knobs, a column for each drum (drum 1, 2, 3, snare, cymbal, hihat): its level meter, its reverb send and echo send as number boxes (each with its own mute), and its mute at the foot.</p>
+<ul><li>Keys: <b>z x c v b n</b> mute the drums; <b>a s d f g h</b> mute their echo sends; <b>q w e r t y</b> their reverb sends. <b>clear</b> lifts every mute.</li>
 <li>Drag a number box up or down, or scroll on it, to set the send; double-click to reset. A muted send sends nothing but keeps its amount (its box goes black).</li>
 <li>Mutes work on the notes, not the sound: a muted drum's last hit, its decay and its echo ring on. The hihat's mute covers both its closed and open hits. Presets keep them all.</li></ul>`],
   ['seq', 'step sequencer', `<p>Under the knobs. Touch any knob or fader, here or on a page on the right, and its sequencer shows there (greyed out until it runs). It starts once you paint a step or press a shape or a random button, and nothing runs for a control until then.</p>
@@ -35,10 +35,10 @@ const HELP = [
   ['voice', 'voice: shape a drum', `<p>Every setting of one drum. Pick the drum along the top (or keys 1 to 6), then a tab ([ and ] step through them):</p>
 <ul><li><b>tone</b>: tuning, wave and fm. <b>shape</b>: the envelope, the pitch drop and the click (the attack's sample).</li>
 <li><b>filter</b>: cutoff, resonance, type and drive, then the drum's volume, pan, sample rate and drive. <b>mod</b>: its lfo and what velocity does.</li></ul>`],
-  ['fx', 'fx: echo, ring mod, crossfeed', `<ul><li><b>echo</b>: send, time (musical lengths), tone, feedback and width; tick <b>ping pong</b> to bounce it left and right.</li>
-<li><b>ring mod</b>: send, wave and frequency, for metallic tones.</li>
+  ['fx', 'fx: echo, reverb, crossfeed', `<ul><li><b>echo</b>: send, time (musical lengths), tone, feedback and width; tick <b>ping pong</b> to bounce it left and right.</li>
+<li><b>reverb</b>: send, time (the pre-delay before it), decay, tone (dark to bright) and early (the early reflections' level). It's the LXR firmware's own reverb, written for it but never switched on in the hardware.</li>
 <li><b>crossfeed</b>: drums feeding each other. A row is the drum it comes from, a column the drum it goes into; click a column's name to pick what it changes there (fm, filter or ring). Drag a cell up or down to set it; double-click to clear.</li></ul>`],
-  ['mix', 'mix: the channel strips', `<p>A strip for each drum: its echo send knob, ring mod send knob and pan knob (L, C, R) over its level fader, with a level meter beside it.</p>`],
+  ['mix', 'mix: the channel strips', `<p>A strip for each drum: its echo send knob, reverb send knob and pan knob (L, C, R) over its level fader, with a level meter beside it.</p>`],
   ['mstr', 'mstr: the master chain', `<p>The whole mix runs top to bottom:</p>
 <ul><li><b>drum 1 sidechain</b>: drum 1 (the kick) ducks the rest; the meter shows how much. <b>space</b> carves the kick's room out of the others.</li>
 <li><b>distortion</b>: mix, type, drive, colour, tone and volume.</li><li><b>compressor</b>: glues it together; the meter shows the gain reduction.</li></ul>`],
@@ -51,7 +51,7 @@ const HELP = [
 <li>Hold or right-click <b>rec</b> to choose what it records: <b>free</b>, or an exact loop of 1, 2, 4, 8, 16, 32, 64 or 128 bars. A loop starts at the next bar, shows its progress on the button and downloads by itself, cut to repeat seamlessly in any other app.</li></ul>`],
   ['keys', 'keyboard and mouse', `<ul><li><b>space</b> play and stop. <b>enter</b> record, <b>l</b> record a loop.</li>
 <li><b>1</b> everything, <b>2</b> kit, <b>3</b> alter, <b>4</b> pattern, <b>5</b> crossfeed, <b>6</b> random fx, <b>7</b> alter fx (the bar's order), <b>u</b> undo. <b>m</b> randomise on next bar.</li>
-<li><b>z x c v b n</b> mute drum 1, 2, 3, snare, cymbal, hihat; <b>a s d f g h</b> mute their echo sends; <b>q w e r t y</b> their ring mod sends.</li>
+<li><b>z x c v b n</b> mute drum 1, 2, 3, snare, cymbal, hihat; <b>a s d f g h</b> mute their echo sends; <b>q w e r t y</b> their reverb sends.</li>
 <li><b>shift</b> + <b>1</b> to <b>6</b> show the voice page with that drum; <b>[</b> and <b>]</b> step through its tabs.</li>
 <li><b>o</b> presets, <b>/</b> search presets, <b>?</b> help. <b>esc</b> closes whatever is open.</li>
 <li>Click a knob or fader, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>

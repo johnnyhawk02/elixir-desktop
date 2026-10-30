@@ -270,9 +270,9 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 /* ---- fx and mix: a row of faders per effect (fx) or per send (mix), its name above it ---- */
 .m-fx-card { display: grid; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px; min-height: 0; padding: 8px 2px; }
 /* the fx page: echo and ring mod side by side (five faders and three), taking what the crossfeed matrix under them leaves */
-[data-m-panel="fx"] .m-fx-card { grid-template-columns: minmax(0, 5fr) minmax(0, 3fr); grid-template-rows: minmax(0, 1fr) auto; column-gap: 0; }
+[data-m-panel="fx"] .m-fx-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; column-gap: 0; }
 #m-fx-echo { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-#m-fx-ring { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+#m-fx-ring { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 [data-m-panel="fx"] .m-fx-row + .m-fx-row { border-top: 0; padding-top: 0; border-left: var(--rule); padding-left: 4px; margin-left: 4px; }
 [data-m-panel="fx"] .m-fx-row.m-xrow { grid-column: 1 / -1; border-left: 0; padding-left: 0; margin-left: 0; border-top: var(--rule); padding-top: 6px; }
 /* the crossfeed matrix: drum names down the side (from) and along the top (into, with what it modulates); each cell
@@ -630,6 +630,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   /* voice: only as many rows as the tab has faders, each as tall as the frame allows */
   .m .m-voice .m-btn { font-size: var(--fs-xs) !important; }
   .m-vset { grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); row-gap: 14px; }
+  /* fx: echo and reverb side by side, five faders each (their names tight so feedback fits) */
+  .m #m-fx-echo .m-flab, .m #m-fx-ring .m-flab { letter-spacing: -.05em; font-size: min(var(--fs-xs), 1.05vw); }
   /* fx: the crossfeed matrix's names and numbers */
   .m .m-xhead, .m-xcell { font-size: var(--fs-xs); }
   /* mixer: a channel strip a drum: its echo send knob, its ring mod send knob, its pan knob, then its level fader with a meter
@@ -638,7 +640,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-mix-card .m-fx-row, .m-mix-card .m-fx-row .m-faders { display: contents; }
   .m-mix-card .m-fx-row > b { padding: 0; white-space: nowrap; font-size: var(--fs-xs); letter-spacing: .04em; opacity: .75; }
   .m-mix-card .m-fx-row:nth-child(1) > b { grid-row: 1; grid-column: 1 / -1; font-size: 0; }
-  .m-mix-card .m-fx-row:nth-child(1) > b::before { content: "echo send, ring send, pan, level"; font-size: var(--fs-xs); }
+  .m-mix-card .m-fx-row:nth-child(1) > b::before { content: "echo send, reverb send, pan, level"; font-size: var(--fs-xs); }
   .m-mix-card .m-fx-row:nth-child(n+2) > b { display: none; }
   #m-mix-echo > .m-vf { grid-row: 2; } #m-mix-ring > .m-vf { grid-row: 3; } #m-mix-pan > .m-vf { grid-row: 4; } #m-mix-vol > .m-vf { grid-row: 5; }
   /* (the sends' names would repeat the strip's; the level fader's name, under it, names the strip) */

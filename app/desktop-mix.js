@@ -1,4 +1,4 @@
-// ---- the mixer on the laptop: a channel strip a drum (its echo and ring mod send knobs over its level fader), with a
+// ---- the mixer on the laptop: a channel strip a drum (its echo and reverb send knobs over its level fader), with a
 // level meter beside each fader, fed by the same peaks as the full desktop mixer's meters (lvms in app/mixer.js) ----
 const mLvm = [...$('m-mix-vol').children].map((vf) => {
   const m = document.createElement('u'); m.className = 'm-lvm'; m.setAttribute('aria-hidden', 'true');
