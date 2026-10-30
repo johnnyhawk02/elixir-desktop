@@ -86,7 +86,7 @@ duckVu.set = (db) => {
 // everything loads a new kit, which clears the desktop's undo, so it keeps its own: the whole sound and song as they
 // were (as a preset would save them), put back by loading that
 $('m-everything').addEventListener('click', () => {
-  const was = { name: '', kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice() }, fx: mix.fx.slice(),
+  const was = { name: '', kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice(), fx: xm.fx.slice() }, fx: mix.fx.slice(),
     fx3: fx3Snapshot(), dpos: delayPos, song: songSnapshot(), userSamples: 0 };
   $('new-kit').click();
   mUndoFn = () => { useKit(was); useSong(was.song, false); initValues.set(was.kit); setDirty(true); };

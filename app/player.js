@@ -74,6 +74,11 @@ class Player {
     this.verb = new LXR.ReverbBus();
     this.fxRng = new LXR.Rng(0x2545f491);
     this.sendD = new Float32Array(6); this.sendR = new Float32Array(6); this.echoWidth = 1;
+    // crossfeed into the fx (not in the firmware): each drum's level (a peak follower, ~150 ms release) opens (positive)
+    // or ducks (negative) the echo's and the reverb's returns; xfx[s * 2 + 0 echo / 1 reverb], -1..1; the gains glide
+    // across each block
+    this.xfx = new Float32Array(12); this.xEnv = new Float32Array(6); this.xGain = new Float32Array([1, 1]);
+    this.xRel = Math.exp(-64 / (0.15 * sampleRate));
     this.distMix = 0; this.distAt = 0;
     this.busIn = new Float32Array(128); this.busOut = new Int16Array(128);
     this.duckEnv = 0; this.duckAt = 1; this.compEnv = 0; this.gr = 0; this.duckMin = 1;
@@ -89,7 +94,7 @@ class Player {
     else if (m.type === 'rush') { this.rush = m.v; if (m.t !== undefined) this.rushT = m.t; }
     else if (m.type === 'rushSet') Object.assign(this.rs, m.set);
     else if (m.type === 'mute') m.muted.forEach((v, n) => { this.muted[n] = v ? 1 : 0; });
-    else if (m.type === 'xmod') this.e.setCrossMod(m.amt, m.target);
+    else if (m.type === 'xmod') { this.e.setCrossMod(m.amt, m.target); if (m.fx) this.xfx.set(m.fx); }
     else if (m.type === 'delay') this.delayPos = m.pos;
     else if (m.type === 'atBar') { if (this.playing) this.atBar.push(m.m); else this.msg(m.m); }
     else if (m.type === 'mix') {
@@ -341,6 +346,17 @@ class Player {
     }
     // the firmware's FX bus (distortion, ring mod, compressor or delay), sample-exact
     const fx = e.renderFx(this.fxGain, this.echoWidth);
+    // crossfeed into the fx: each return's gain this block, from every drum's level
+    const xg0 = this.xGain[0], xg1 = this.xGain[1];
+    {
+      const g = [1, 1];
+      for (let s = 0; s < 6; s++) {
+        let pk = 0; const o = out[s]; for (let i = 0; i < 64; i++) { const a = Math.abs(o[i]); if (a > pk) pk = a; }
+        const env = this.xEnv[s] = Math.max(Math.min(1, pk / 12000), this.xEnv[s] * this.xRel);
+        for (let k = 0; k < 2; k++) { const a = this.xfx[s * 2 + k]; if (a > 0) g[k] *= 1 - a + a * env; else if (a < 0) g[k] *= 1 + a * env; }
+      }
+      this.xGain[0] = g[0]; this.xGain[1] = g[1];
+    }
     // with duck fx on, the three FX returns are ducked too (all of them, drum 1's sends included), ramped over the block
     const fd0 = M.duckFx ? duck0 : 1, fdd = M.duckFx ? (duck1 - duck0) / 64 : 0;
     // the reverb's bus: each voice panned in at its send, saturated to int16
@@ -357,9 +373,9 @@ class Player {
       for (let i = 0; i < 128; i++) bus.input[i] = Math.max(-32768, Math.min(32767, Math.round(bi[i])));
       const bo = this.busOut; bo.fill(0);
       bus.process(bo, 64, this.fxRng);
-      if (any || bo.some((v) => v)) for (let i = 0; i < 64; i++) { const g = mk / 32768 * (fd0 + fdd * i); L[i] += bo[2 * i] * g; R[i] += bo[2 * i + 1] * g; }
+      if (any || bo.some((v) => v)) for (let i = 0; i < 64; i++) { const g = mk / 32768 * (fd0 + fdd * i) * (xg1 + (this.xGain[1] - xg1) * (i + 1) / 64); L[i] += bo[2 * i] * g; R[i] += bo[2 * i + 1] * g; }
     }
-    for (let i = 0; i < 64; i++) { const g = (fd0 + fdd * i) / 32768; L[i] += fx[2 * i] * g; R[i] += fx[2 * i + 1] * g; }
+    for (let i = 0; i < 64; i++) { const g = (fd0 + fdd * i) / 32768 * (xg0 + (this.xGain[0] - xg0) * (i + 1) / 64); L[i] += fx[2 * i] * g; R[i] += fx[2 * i + 1] * g; }
     // the distortion, a master insert (not in the firmware's routing): the whole mix through the firmware's distortion,
     // blended in at its mix amount, ramped across the block, before the high-pass and the compressor; at 0 it's bypassed
     if (this.distMix || this.distAt) {
