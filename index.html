@@ -1490,11 +1490,18 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-voice .m-btn { font-size: var(--fs-xs) !important; }
   .m-vset { grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); row-gap: 14px; }
   /* fx: echo and reverb only (the crossfeed has its own page): taller faders */
-  /* the fx page: each effect takes half the height, one above the other (the inserts to come will fit the same way) */
-  [data-m-panel="fx"] .m-fx-card { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 0; }
-  [data-m-panel="fx"] .m-fx-row { grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
-  [data-m-panel="fx"] .m-fx-row + .m-fx-row { border-left: 0; padding-left: 0; margin-left: 0; border-top: var(--rule); padding-top: 8px; }
-  #m-fx-echo, #m-fx-ring { min-height: 0; }
+  /* the fx page: a two-by-two grid of effect slots, each half the height: echo and reverb on top, two insert slots
+     below for the effects to come. Each effect's send fader is off this page (the mixer has the sends) */
+  [data-m-panel="fx"] .m-fx-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 0; }
+  [data-m-panel="fx"] .m-fx-row { grid-template-rows: auto minmax(0, 1fr); min-height: 0; padding: 0 10px; }
+  [data-m-panel="fx"] .m-fx-row + .m-fx-row { border-left: 0; padding-left: 10px; margin-left: 0; border-top: 0; padding-top: 0; }
+  [data-m-panel="fx"] .m-fx-row:nth-child(2) { border-left: var(--rule); }
+  [data-m-panel="fx"] .m-fx-row.m-fx-slot { display: grid; border-top: var(--rule); padding-top: 8px; }
+  [data-m-panel="fx"] .m-fx-empty { border: 1.5px dashed var(--ghost); border-radius: 4px; display: grid; place-items: center; color: var(--muted); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; }
+  #m [data-m-panel="fx"] #m-fx-echo > .m-vf:first-child, #m [data-m-panel="fx"] #m-fx-ring > .m-vf:first-child { display: none; }
+  #m-fx-echo, #m-fx-ring { grid-template-columns: repeat(4, minmax(0, 1fr)); min-height: 0; }
+  .m-fx-slot { display: none; }
+  [data-m-panel="fx"] .m-fx-slot { display: grid; }
   .m > .m-tabs button[data-m-tab="xf"] { display: block; }
   /* crossfeed: the matrix filling its page */
   .m-xf-card { display: grid; grid-template-rows: minmax(0, 1fr); padding: 2px; min-height: 0; }
@@ -1544,7 +1551,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>191</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>192</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
@@ -1597,6 +1604,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     <section class="m-card m-fx-card">
       <div class="m-fx-row"><div class="m-fxhead"><b>echo</b><label class="m-chk"><input id="m-pp" type="checkbox"><i aria-hidden="true"></i>ping pong</label></div><div class="m-faders" id="m-fx-echo"></div></div>
       <div class="m-fx-row"><b>reverb</b><div class="m-faders" id="m-fx-ring"></div></div>
+      <div class="m-fx-row m-fx-slot"><b>insert</b><div class="m-fx-empty">empty slot</div></div>
+      <div class="m-fx-row m-fx-slot"><b>insert</b><div class="m-fx-empty">empty slot</div></div>
       <div class="m-fx-row m-xrow"><div class="m-fxhead"><b>crossfeed</b><button class="m-toggle" id="m-xclear" type="button">clear</button></div><div class="m-xgrid" id="m-xgrid" role="grid" aria-label="crossfeed: from each drum (rows) into each drum (columns)"></div></div>
     </section>
   </div>
@@ -1637,7 +1646,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v191, 30 Oct, 06:35</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v192, 30 Oct, 06:43</footer>
     </section>
   </div>
   </div>

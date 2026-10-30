@@ -642,11 +642,18 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-voice .m-btn { font-size: var(--fs-xs) !important; }
   .m-vset { grid-template-rows: none; grid-auto-rows: minmax(0, 1fr); row-gap: 14px; }
   /* fx: echo and reverb only (the crossfeed has its own page): taller faders */
-  /* the fx page: each effect takes half the height, one above the other (the inserts to come will fit the same way) */
-  [data-m-panel="fx"] .m-fx-card { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 0; }
-  [data-m-panel="fx"] .m-fx-row { grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
-  [data-m-panel="fx"] .m-fx-row + .m-fx-row { border-left: 0; padding-left: 0; margin-left: 0; border-top: var(--rule); padding-top: 8px; }
-  #m-fx-echo, #m-fx-ring { min-height: 0; }
+  /* the fx page: a two-by-two grid of effect slots, each half the height: echo and reverb on top, two insert slots
+     below for the effects to come. Each effect's send fader is off this page (the mixer has the sends) */
+  [data-m-panel="fx"] .m-fx-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 0; }
+  [data-m-panel="fx"] .m-fx-row { grid-template-rows: auto minmax(0, 1fr); min-height: 0; padding: 0 10px; }
+  [data-m-panel="fx"] .m-fx-row + .m-fx-row { border-left: 0; padding-left: 10px; margin-left: 0; border-top: 0; padding-top: 0; }
+  [data-m-panel="fx"] .m-fx-row:nth-child(2) { border-left: var(--rule); }
+  [data-m-panel="fx"] .m-fx-row.m-fx-slot { display: grid; border-top: var(--rule); padding-top: 8px; }
+  [data-m-panel="fx"] .m-fx-empty { border: 1.5px dashed var(--ghost); border-radius: 4px; display: grid; place-items: center; color: var(--muted); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; }
+  #m [data-m-panel="fx"] #m-fx-echo > .m-vf:first-child, #m [data-m-panel="fx"] #m-fx-ring > .m-vf:first-child { display: none; }
+  #m-fx-echo, #m-fx-ring { grid-template-columns: repeat(4, minmax(0, 1fr)); min-height: 0; }
+  .m-fx-slot { display: none; }
+  [data-m-panel="fx"] .m-fx-slot { display: grid; }
   .m > .m-tabs button[data-m-tab="xf"] { display: block; }
   /* crossfeed: the matrix filling its page */
   .m-xf-card { display: grid; grid-template-rows: minmax(0, 1fr); padding: 2px; min-height: 0; }
