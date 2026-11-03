@@ -1,6 +1,33 @@
 <meta charset="utf-8">
 <title>Elixir Desktop</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+/* Phones and tablets get the laptop layout, shrunk to fit: the page is laid out at least 1280 x 710 (the smallest
+   laptop window it was made for, wider on a long phone so it fills the height) and the browser scales that down to
+   the screen. Landscape only: held upright it shows a note to turn it sideways (.m-turn). */
+(() => {
+  if (!matchMedia('(pointer: coarse)').matches) return;
+  document.documentElement.classList.add('fit');
+  const vp = document.querySelector('meta[name="viewport"]');
+  let last = 0;
+  const fit = () => {
+    const land = innerWidth >= innerHeight;
+    let w = Math.max(1280, Math.ceil(710 * (land ? innerWidth / innerHeight : 1) / 10) * 10);
+    if (Math.abs(w - last) < 40) w = last; // (a small change is rounding from the last fit: keeping it stops the page see-sawing)
+    const dev = land ? Math.max(screen.width, screen.height) : Math.min(screen.width, screen.height), s = +(dev / w).toFixed(4);
+    const c = `width=${w}, initial-scale=${s}, minimum-scale=${s}, maximum-scale=${s}, user-scalable=no, viewport-fit=cover`;
+    if (vp.content !== c) { last = w; vp.content = c; }
+  };
+  fit(); addEventListener('resize', fit); addEventListener('orientationchange', () => setTimeout(fit, 300));
+  // (where the browser can, the note offers full screen held in landscape: Android Chrome; iPhones can't)
+  addEventListener('DOMContentLoaded', () => {
+    const b = document.getElementById('m-turn-fs'), el = document.documentElement;
+    if (!el.requestFullscreen || !screen.orientation?.lock) return;
+    b.hidden = false;
+    b.onclick = () => el.requestFullscreen().then(() => screen.orientation.lock('landscape')).catch(() => {});
+  });
+})();
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1b1d1a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1550,11 +1577,25 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-dens-led.on { background: var(--ink); transition: none; }
   .m-dens-led:not(.on) { transition: background-color .25s ease-out; }
 }
+
+/* ---- phones and tablets (html.fit, set by the script in the page's head): the laptop layout shrunk to the screen,
+   no width cap so a long phone's extra width is used; held upright, a note in the LCD's colours to turn it sideways ---- */
+.fit .m { max-width: none; }
+.m-turn { display: none; }
+@media (orientation: portrait) {
+  .fit .m-turn { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; background: #161815; }
+  .fit .m-turn > div { display: grid; justify-items: center; gap: 28px; padding: 90px 110px; border: 14px solid #0b0c0a; border-radius: 28px;
+    background: #a7b58c; color: #17200e; font-family: "VT323", ui-monospace, monospace; text-shadow: 4px 4px 0 rgba(23, 32, 14, .17); }
+  .fit .m-turn b { font-size: 120px; font-weight: 400; letter-spacing: .04em; }
+  .fit .m-turn span { font-size: 64px; opacity: .7; }
+  .fit .m-turn b::before { content: "\21BB"; display: block; text-align: center; font-size: 200px; line-height: 1; }
+  .fit .m-turn button { font: inherit; font-size: 64px; color: inherit; background: none; border: 5px solid #17200e; border-radius: 10px; padding: 10px 40px; cursor: pointer; }
+}
 </style>
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>199</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>200</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
@@ -1649,7 +1690,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v199, 30 Oct, 19:04</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v200, 3 Nov, 07:48</footer>
     </section>
   </div>
   </div>
@@ -1749,6 +1790,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     <button type="button" role="tab" data-m-tab="presets" aria-selected="false">prst</button>
   </nav>
 </main>
+<div class="m-turn" id="m-turn"><div><b>turn it sideways</b><span>elixir plays in landscape</span><button type="button" id="m-turn-fs" hidden>full screen</button></div></div>
 
 <div class="wrap" aria-hidden="true">
   <header class="topbar">

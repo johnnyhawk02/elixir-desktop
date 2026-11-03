@@ -1,6 +1,33 @@
 <meta charset="utf-8">
 <title>Elixir Desktop</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+/* Phones and tablets get the laptop layout, shrunk to fit: the page is laid out at least 1280 x 710 (the smallest
+   laptop window it was made for, wider on a long phone so it fills the height) and the browser scales that down to
+   the screen. Landscape only: held upright it shows a note to turn it sideways (.m-turn). */
+(() => {
+  if (!matchMedia('(pointer: coarse)').matches) return;
+  document.documentElement.classList.add('fit');
+  const vp = document.querySelector('meta[name="viewport"]');
+  let last = 0;
+  const fit = () => {
+    const land = innerWidth >= innerHeight;
+    let w = Math.max(1280, Math.ceil(710 * (land ? innerWidth / innerHeight : 1) / 10) * 10);
+    if (Math.abs(w - last) < 40) w = last; // (a small change is rounding from the last fit: keeping it stops the page see-sawing)
+    const dev = land ? Math.max(screen.width, screen.height) : Math.min(screen.width, screen.height), s = +(dev / w).toFixed(4);
+    const c = `width=${w}, initial-scale=${s}, minimum-scale=${s}, maximum-scale=${s}, user-scalable=no, viewport-fit=cover`;
+    if (vp.content !== c) { last = w; vp.content = c; }
+  };
+  fit(); addEventListener('resize', fit); addEventListener('orientationchange', () => setTimeout(fit, 300));
+  // (where the browser can, the note offers full screen held in landscape: Android Chrome; iPhones can't)
+  addEventListener('DOMContentLoaded', () => {
+    const b = document.getElementById('m-turn-fs'), el = document.documentElement;
+    if (!el.requestFullscreen || !screen.orientation?.lock) return;
+    b.hidden = false;
+    b.onclick = () => el.requestFullscreen().then(() => screen.orientation.lock('landscape')).catch(() => {});
+  });
+})();
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1b1d1a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -211,6 +238,7 @@
     <button type="button" role="tab" data-m-tab="presets" aria-selected="false">prst</button>
   </nav>
 </main>
+<div class="m-turn" id="m-turn"><div><b>turn it sideways</b><span>elixir plays in landscape</span><button type="button" id="m-turn-fs" hidden>full screen</button></div></div>
 
 <div class="wrap" aria-hidden="true">
   <header class="topbar">

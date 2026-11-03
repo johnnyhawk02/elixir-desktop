@@ -702,3 +702,17 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-dens-led.on { background: var(--ink); transition: none; }
   .m-dens-led:not(.on) { transition: background-color .25s ease-out; }
 }
+
+/* ---- phones and tablets (html.fit, set by the script in the page's head): the laptop layout shrunk to the screen,
+   no width cap so a long phone's extra width is used; held upright, a note in the LCD's colours to turn it sideways ---- */
+.fit .m { max-width: none; }
+.m-turn { display: none; }
+@media (orientation: portrait) {
+  .fit .m-turn { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; background: #161815; }
+  .fit .m-turn > div { display: grid; justify-items: center; gap: 28px; padding: 90px 110px; border: 14px solid #0b0c0a; border-radius: 28px;
+    background: #a7b58c; color: #17200e; font-family: "VT323", ui-monospace, monospace; text-shadow: 4px 4px 0 rgba(23, 32, 14, .17); }
+  .fit .m-turn b { font-size: 120px; font-weight: 400; letter-spacing: .04em; }
+  .fit .m-turn span { font-size: 64px; opacity: .7; }
+  .fit .m-turn b::before { content: "\21BB"; display: block; text-align: center; font-size: 200px; line-height: 1; }
+  .fit .m-turn button { font: inherit; font-size: 64px; color: inherit; background: none; border: 5px solid #17200e; border-radius: 10px; padding: 10px 40px; cursor: pointer; }
+}
