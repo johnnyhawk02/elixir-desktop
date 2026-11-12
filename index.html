@@ -1608,7 +1608,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>204</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>205</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1807,7 +1807,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
       <button class="m-btn" id="m-pexport" type="button">export</button>
       <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
     </div>
-    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v204, 12 Nov, 07:02</footer>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v205, 12 Nov, 07:03</footer>
   </section>
 </main>
 <div class="m-turn" id="m-turn"><div><b>turn it sideways</b><span>elixir plays in landscape</span><button type="button" id="m-turn-fs" hidden>full screen</button></div></div>
@@ -10217,7 +10217,7 @@ const HELP = [
 <p>The <b>randomise</b> button opens a pop-up with all the randomisers and undo (it stays open while you click; click elsewhere or esc to close):</p>
 <ul><li><b>everything</b>: a new beat (genre, groove, kit, effects, mix). <b>kit</b>: new sounds. <b>alter</b>: the sounds nudged about 10%. <b>pattern</b>: a new beat on the same sounds.</li>
 <li><b>crossfeed</b>: a new crossfeed patch (see fx). <b>random fx</b>: new effects and sends. <b>alter fx</b>: the effects nudged.</li>
-<li><b>knob seqs</b>: a new step sequencer on every perform knob: 8 or 16 steps, each step a 16th up to 8 bars long (mostly the long ones), random steps, depth and slew. Undo puts the old ones back.</li>
+<li><b>knob seqs</b>: a new step sequencer on every perform knob except tempo, genre and beat: 8 or 16 steps, each step a 16th up to 8 bars long (mostly the long ones), random steps, depth and slew. Undo puts the old ones back.</li>
 <li>Click to randomise. Drag up or down on one to set how far it goes, 10% to 100% (a dotted bar along its foot below 100%): at 30% it moves everything only 30% of the way to the new sound, and switches choices like the style 30% of the time.</li>
 <li>Hold one still for half a second for its settings, the ranges and chances it uses.</li>
 <li><b>options</b> › <b>randomise on next bar</b>: while playing, randomises wait for the start of the next bar (the button flashes until then).</li></ul>`],
@@ -10370,7 +10370,7 @@ $('m').addEventListener('pointerdown', (e) => {
   const tr = e.target.closest('.m-vtrack'), fd = tr && mFdOf(tr.closest('.m-vf'));
   if (fd && fd !== mSeqF && !$('m-faders').classList.contains('assigning')) mSeqOpen(fd);
 });
-// ---- knob seqs (in the randomise pop-up): every perform knob gets a new step sequencer, switched on: 8 or 16 steps,
+// ---- knob seqs (in the randomise pop-up): every perform knob but tempo, genre and beat gets a new step sequencer, switched on: 8 or 16 steps,
 // each step a 16th up to 8 bars long, picked mostly from the long ones (the chance grows with the square of the
 // length's place: 8 bars is 64 times as likely as a 16th), its steps made one of the five random ways, with a random
 // depth and slew. Undo puts the knobs' sequencers back ----
@@ -10380,7 +10380,12 @@ const mSeqRandStep = () => {
   for (let i = 0; i < SEQ_STEPS.length; i++) if ((r -= SEQR_W[i]) < 0) return SEQ_STEPS[i];
   return SEQ_STEPS[SEQ_STEPS.length - 1];
 };
-const mKnobFaders = () => mFaders.filter((f) => /^m-faders:slot\d+$/.test(f.key));
+// (any knob, whatever it's assigned to, except tempo, genre and beat, which it leaves alone)
+const SEQR_SKIP = ['tempo', 'genre', 'beat'];
+const mKnobFaders = () => mFaders.filter((f) => {
+  const m = /^m-faders:slot(\d+)$/.exec(f.key), sl = m && mSlots[Number(m[1])];
+  return sl && !((sl[0] === 'perf' || sl[0] === 'beat') && SEQR_SKIP.includes(sl[2]));
+});
 $('m-knobseq').addEventListener('click', () => {
   const fs = mKnobFaders(), was = fs.map((f) => (f.seq ? { ...f.seq, vals: f.seq.vals.slice() } : null));
   const kinds = Object.keys(SEQ_RNDS);
