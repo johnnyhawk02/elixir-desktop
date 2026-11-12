@@ -1621,7 +1621,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
    in place of everything else: two across held upright, five across sideways ---- */
 .m-ph { display: none; }
 html.phone body > :not(.m-ph) { display: none !important; }
-html.phone .m-ph { display: grid; max-width: none; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(7, 1fr) auto; gap: 10px; padding: 12px; }
+html.phone .m-ph { display: grid; max-width: none; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(9, 1fr) auto; gap: 10px; padding: 12px; }
 .m-ph .m-btn, .m-ph .m-play { min-height: 0; font-size: 1.9rem !important; line-height: 1.05; padding: 4px; }
 .m-ph .m-play { display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 3px; color: var(--panel); text-transform: uppercase; letter-spacing: .06em; }
 .m-ph .m-play svg { width: 1em; height: 1em; fill: currentColor; }
@@ -1633,12 +1633,21 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: repeat
 .m-ph-bpm .m-vtrack b::after { content: "bpm"; display: block; font-size: 1.1rem; line-height: 1; opacity: .7; }
 .m-ph .m-ph-bpm { grid-row: span 2; }
 .m .m-ph-bpm .m-vtrack::after { background-position: 50% 9%; background-size: 3px 16%; } /* (the pointer kept out over the ring, clear of the number) */
+.m-ph-dec { grid-column: 1 / -1; grid-row: span 2; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 4px 6px; min-height: 0; }
+.m-ph-dec .m-knob { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 0; }
+.m .m-ph-dec .m-vtrack { container-type: size; flex: 1; width: 100%; min-height: 0; background: none; border: 0; overflow: visible; border-radius: 0; touch-action: none; }
+.m-ph-dec .m-flab { font-size: 1.15rem; line-height: 1; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
 .m-ph .m-ph-install { grid-column: 1 / -1; min-height: 56px; }
 .m-ph-save { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
 .m-ph-save small { font-size: 1.05rem; text-transform: none; letter-spacing: 0; opacity: .7; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (orientation: landscape) {
-  html.phone .m-ph { grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(3, 1fr) auto; gap: 8px; padding: 8px; }
+  html.phone .m-ph { grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr) auto; gap: 8px; padding: 8px; }
   .m-ph .m-ph-bpm { grid-row: span 2; } .m-ph .m-ph-save { grid-column: span 2; }
+  .m-ph-dec { grid-row: auto; grid-template-columns: repeat(7, 1fr); grid-template-rows: minmax(0, 1fr); }
+  /* (sideways the decay row goes under the second row of buttons: rows play knob everything kit alter / pattern
+     crossfeed random fx alter fx / decay / knob seqs, clear seqs, undo, save) */
+  .m-ph-dec { order: 1; }
+  .m-ph [data-for="m-knobseq"], #m-ph-seqclear, #m-ph-undo, .m-ph-save, .m-ph-install { order: 2; }
   .m-ph .m-btn, .m-ph .m-play { font-size: 1.6rem !important; }
   .m-ph-bpm .m-vtrack b { font-size: 2rem; }
   .m-ph-bpm .m-vtrack b::after { font-size: .9rem; }
@@ -1647,7 +1656,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: repeat
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>210</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>211</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1846,13 +1855,14 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: repeat
       <button class="m-btn" id="m-pexport" type="button">export</button>
       <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
     </div>
-    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v210, 12 Nov, 15:05</footer>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v211, 12 Nov, 15:08</footer>
   </section>
 </main>
 <main class="m m-ph" id="m-ph" aria-label="elixir">
   <button class="m-play m-ph-play" id="m-ph-play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 4.5v15l13-7.5z"/><rect class="i-stop" x="5.5" y="5.5" width="13" height="13" rx="2"/></svg><span>play</span></button>
   <div class="m-ph-bpm m-vf m-knob"><div class="m-vtrack" id="m-ph-knob" role="slider" tabindex="0" aria-label="Tempo"><i></i><b id="m-ph-tempo">118</b></div></div>
   <button class="m-btn m-big m-ph-every" data-for="m-everything" type="button">everything</button>
+  <div class="m-ph-dec" id="m-ph-dec" aria-label="decay"></div>
   <button class="m-btn" data-for="m-kit" type="button">kit</button>
   <button class="m-btn" data-for="m-alter" type="button">alter</button>
   <button class="m-btn" data-for="m-pattern" type="button">pattern</button>
@@ -10722,7 +10732,7 @@ addEventListener('resize', mDepth);
 requestAnimationFrame(mDepth);
 mSync(); mUndo(); mCompOn(); mDrawAll();
 // ---- phones (html.phone, set by the script in the page's head): one big screen, .m-ph, in place of the rest: play,
-// the tempo (a knob), every randomiser, clear knob seqs, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
+// the tempo (a knob), a decay knob for each drum, every randomiser, clear knob seqs, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
 if (document.documentElement.classList.contains('phone')) {
   for (const b of $('m-ph').querySelectorAll('[data-for]')) b.addEventListener('click', () => $(b.dataset.for).click());
   $('m-ph-seqclear').addEventListener('click', mKnobSeqClear);
@@ -10740,7 +10750,7 @@ if (document.documentElement.classList.contains('phone')) {
   new MutationObserver(phSync).observe($('m-undo'), { attributes: true, attributeFilter: ['disabled'] });
   new MutationObserver(phSync).observe($('m-pname'), { childList: true, characterData: true, subtree: true });
   perfDraws.push(phSync); // (a preset or a knob changing the tempo)
-  // the tempo knob: drag up or down (about 1.5 px a bpm), or turn it with the wheel
+  // the tempo knob: drag up or down (about 1.5 px a bpm)
   const knob = $('m-ph-knob'), [tLo, tHi] = PERF_RANGE.tempo;
   const setT = (v) => { v = clampTempo(Math.round(v)); if (v !== perf.tempo) { setPerf('tempo', v); setDirty(true); } phSync(); };
   let drag = null;
@@ -10748,6 +10758,33 @@ if (document.documentElement.classList.contains('phone')) {
   knob.addEventListener('pointermove', (e) => { if (drag) setT(drag.v + (drag.y - e.clientY) / 1.5); });
   for (const ev of ['pointerup', 'pointercancel']) knob.addEventListener(ev, () => { drag = null; });
   knob.addEventListener('contextmenu', (e) => e.preventDefault());
+  // decay knobs, one for each drum (the hihat's two: closed and open): its amp decay in the kit, as on the voice page.
+  // Drag up or down, 200 px the whole range; they follow randomisers and presets (redrawn with the other sliders)
+  const decBox = $('m-ph-dec'), decs = [];
+  XN.forEach((name, v) => {
+    for (const [label, pn] of vpSections(v).flatMap((sc) => sc.params).filter(([l]) => l.startsWith('decay'))) {
+      const par = PAR[pn], hi = spec(par).max, el = document.createElement('div');
+      el.className = 'm-vf m-knob';
+      el.innerHTML = '<div class="m-vtrack" role="slider" tabindex="0"><i></i></div><span class="m-flab"></span>';
+      el.querySelector('.m-flab').textContent = label === 'decay' ? name : label === 'decay cl' ? 'cl hat' : 'op hat';
+      const tr = el.firstChild; tr.setAttribute('aria-label', `${name} ${label}`);
+      const draw = () => tr.style.setProperty('--f', values[par] / (hi || 1));
+      let d = null;
+      tr.addEventListener('pointerdown', (e) => { e.preventDefault(); tr.setPointerCapture(e.pointerId); d = { y: e.clientY, v: values[par] }; });
+      tr.addEventListener('pointermove', (e) => {
+        if (!d) return;
+        const x = Math.max(0, Math.min(hi, Math.round(d.v + (d.y - e.clientY) / 200 * hi)));
+        if (x !== values[par]) { setValue(par, x); setDirty(true); } draw();
+      });
+      for (const ev of ['pointerup', 'pointercancel']) tr.addEventListener(ev, () => { d = null; });
+      tr.addEventListener('contextmenu', (e) => e.preventDefault());
+      decBox.append(el); decs.push(draw);
+    }
+  });
+  const decDraw = () => decs.forEach((f) => f());
+  mDraws.push(decDraw); decDraw();
+  // (a kit randomise doesn't always go through the sliders' redraw, so check now and then too)
+  setInterval(decDraw, 400);
   // install app: only where the browser offers it (mobile-extras.js keeps the offer in mInstallEv; Android Chrome)
   const inst = $('m-ph-install');
   new MutationObserver(() => { inst.hidden = $('m-install').hidden; }).observe($('m-install'), { attributes: true, attributeFilter: ['hidden'] });

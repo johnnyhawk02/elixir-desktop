@@ -1,5 +1,5 @@
 // ---- phones (html.phone, set by the script in the page's head): one big screen, .m-ph, in place of the rest: play,
-// the tempo (a knob), every randomiser, clear knob seqs, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
+// the tempo (a knob), a decay knob for each drum, every randomiser, clear knob seqs, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
 if (document.documentElement.classList.contains('phone')) {
   for (const b of $('m-ph').querySelectorAll('[data-for]')) b.addEventListener('click', () => $(b.dataset.for).click());
   $('m-ph-seqclear').addEventListener('click', mKnobSeqClear);
@@ -17,7 +17,7 @@ if (document.documentElement.classList.contains('phone')) {
   new MutationObserver(phSync).observe($('m-undo'), { attributes: true, attributeFilter: ['disabled'] });
   new MutationObserver(phSync).observe($('m-pname'), { childList: true, characterData: true, subtree: true });
   perfDraws.push(phSync); // (a preset or a knob changing the tempo)
-  // the tempo knob: drag up or down (about 1.5 px a bpm), or turn it with the wheel
+  // the tempo knob: drag up or down (about 1.5 px a bpm)
   const knob = $('m-ph-knob'), [tLo, tHi] = PERF_RANGE.tempo;
   const setT = (v) => { v = clampTempo(Math.round(v)); if (v !== perf.tempo) { setPerf('tempo', v); setDirty(true); } phSync(); };
   let drag = null;
@@ -25,6 +25,33 @@ if (document.documentElement.classList.contains('phone')) {
   knob.addEventListener('pointermove', (e) => { if (drag) setT(drag.v + (drag.y - e.clientY) / 1.5); });
   for (const ev of ['pointerup', 'pointercancel']) knob.addEventListener(ev, () => { drag = null; });
   knob.addEventListener('contextmenu', (e) => e.preventDefault());
+  // decay knobs, one for each drum (the hihat's two: closed and open): its amp decay in the kit, as on the voice page.
+  // Drag up or down, 200 px the whole range; they follow randomisers and presets (redrawn with the other sliders)
+  const decBox = $('m-ph-dec'), decs = [];
+  XN.forEach((name, v) => {
+    for (const [label, pn] of vpSections(v).flatMap((sc) => sc.params).filter(([l]) => l.startsWith('decay'))) {
+      const par = PAR[pn], hi = spec(par).max, el = document.createElement('div');
+      el.className = 'm-vf m-knob';
+      el.innerHTML = '<div class="m-vtrack" role="slider" tabindex="0"><i></i></div><span class="m-flab"></span>';
+      el.querySelector('.m-flab').textContent = label === 'decay' ? name : label === 'decay cl' ? 'cl hat' : 'op hat';
+      const tr = el.firstChild; tr.setAttribute('aria-label', `${name} ${label}`);
+      const draw = () => tr.style.setProperty('--f', values[par] / (hi || 1));
+      let d = null;
+      tr.addEventListener('pointerdown', (e) => { e.preventDefault(); tr.setPointerCapture(e.pointerId); d = { y: e.clientY, v: values[par] }; });
+      tr.addEventListener('pointermove', (e) => {
+        if (!d) return;
+        const x = Math.max(0, Math.min(hi, Math.round(d.v + (d.y - e.clientY) / 200 * hi)));
+        if (x !== values[par]) { setValue(par, x); setDirty(true); } draw();
+      });
+      for (const ev of ['pointerup', 'pointercancel']) tr.addEventListener(ev, () => { d = null; });
+      tr.addEventListener('contextmenu', (e) => e.preventDefault());
+      decBox.append(el); decs.push(draw);
+    }
+  });
+  const decDraw = () => decs.forEach((f) => f());
+  mDraws.push(decDraw); decDraw();
+  // (a kit randomise doesn't always go through the sliders' redraw, so check now and then too)
+  setInterval(decDraw, 400);
   // install app: only where the browser offers it (mobile-extras.js keeps the offer in mInstallEv; Android Chrome)
   const inst = $('m-ph-install');
   new MutationObserver(() => { inst.hidden = $('m-install').hidden; }).observe($('m-install'), { attributes: true, attributeFilter: ['hidden'] });
