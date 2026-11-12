@@ -744,7 +744,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
    sideways, five across with the decays in a row ---- */
 .m-ph { display: none; }
 html.phone body > :not(.m-ph) { display: none !important; }
-html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(7, 1fr) auto; gap: 10px 8px; padding: 12px 10px; }
+html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(8, 1fr) auto; gap: 10px 8px; padding: 12px 10px; }
 .m-ph .m-btn, .m-ph .m-play { min-height: 0; font-size: 1.55rem !important; line-height: 1.05; padding: 4px; }
 .m-ph .m-play { display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 3px; color: var(--panel); text-transform: uppercase; letter-spacing: .06em; }
 .m-ph .m-play svg { width: 1em; height: 1em; fill: currentColor; }
@@ -756,12 +756,13 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 .m-ph-bpm .m-vtrack b::after { content: "bpm"; display: block; font-size: 1.1rem; line-height: 1; opacity: .7; }
 .m-ph .m-ph-bpm { grid-row: span 2; }
 .m .m-ph-bpm .m-vtrack::after { background-position: 50% 9%; background-size: 3px 16%; } /* (the pointer kept out over the ring, clear of the number) */
-.m-ph-dec { grid-column: 1; grid-row: 1 / 8; display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(7, minmax(0, 1fr)); gap: 4px; min-height: 0; }
+.m-ph-dec { grid-column: 1; grid-row: 1 / 9; display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(7, minmax(0, 1fr)); gap: 4px; min-height: 0; }
 .m-ph-dec .m-knob { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 0; }
 .m .m-ph-dec .m-vtrack { container-type: size; flex: 1; width: 100%; min-height: 0; background: none; border: 0; overflow: visible; border-radius: 0; touch-action: none; }
 .m-ph-dec .m-flab { font-size: 1.05rem; line-height: 1; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
 .m-ph-kseq { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
 /* (touch-action none so a finger's drag is the fader's, not a scroll; no pressed look, as a drag isn't a press) */
+.m-ph .m-ph-slew { grid-column: span 2; }
 .m .m-ph-kseq.m-btn { touch-action: none; color: var(--ink) !important; background: linear-gradient(to top, rgba(23, 32, 14, .2) calc(var(--f, .8) * 100%), transparent 0) !important; }
 .m .m-ph-kseq.m-btn.flash { background: var(--spot) !important; color: var(--panel) !important; }
 .m-ph-kseq small { font-size: 1.05rem; text-transform: none; letter-spacing: 0; opacity: .7; }
@@ -770,12 +771,12 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 .m-ph-save small { font-size: 1.05rem; text-transform: none; letter-spacing: 0; opacity: .7; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (orientation: landscape) {
   html.phone .m-ph { grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr) auto; gap: 8px; padding: 8px; }
-  .m-ph .m-ph-bpm { grid-row: span 2; } .m-ph .m-ph-save { grid-column: span 2; }
+  .m-ph .m-ph-bpm { grid-row: span 2; } .m-ph .m-ph-slew { grid-column: auto; }
   .m-ph-dec { grid-column: 1 / -1; grid-row: auto; grid-template-columns: repeat(7, 1fr); grid-template-rows: minmax(0, 1fr); gap: 4px 6px; }
   /* (sideways the decay row goes under the second row of buttons: rows play knob everything kit alter / pattern
      crossfeed random fx alter fx / decay / knob seqs, clear seqs, undo, save) */
   .m-ph-dec { order: 1; }
-  #m-ph-kseq, #m-ph-seqclear, #m-ph-undo, .m-ph-save, .m-ph-install { order: 2; }
+  #m-ph-kseq, #m-ph-seqclear, #m-ph-slew, #m-ph-undo, .m-ph-save, .m-ph-install { order: 2; }
   .m-ph .m-btn, .m-ph .m-play { font-size: 1.6rem !important; }
   .m-ph-bpm .m-vtrack b { font-size: 2rem; }
   .m-ph-bpm .m-vtrack b::after { font-size: .9rem; }

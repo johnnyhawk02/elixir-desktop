@@ -1,31 +1,43 @@
 // ---- phones (html.phone, set by the script in the page's head): one big screen, .m-ph, in place of the rest: play,
-// the tempo (a knob), a decay knob for each drum, every randomiser, clear knob seqs, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
+// the tempo (a knob), a decay knob for each drum, every randomiser, clear knob seqs, their slew, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
 if (document.documentElement.classList.contains('phone')) {
   for (const b of $('m-ph').querySelectorAll('[data-for]')) b.addEventListener('click', () => $(b.dataset.for).click());
   $('m-ph-seqclear').addEventListener('click', mKnobSeqClear);
-  // knob seqs is a fader too: drag up or down (200 px the whole way) to set the step lengths it picks, from 1/16
-  // at the bottom to 8 bars at the top (the fill and the length under the name); a tap randomises. Kept in this browser
-  const KS_KEY = 'elixir-desktop-kseqlen', ks = $('m-ph-kseq');
-  try { const x = parseFloat(localStorage.getItem(KS_KEY)); mKseqAt = x >= 0 && x <= 1 ? x : .8; } catch (e) { mKseqAt = .8; }
-  const ksDraw = () => {
-    ks.style.setProperty('--f', mKseqAt);
-    $('m-ph-kseq-out').textContent = stepName(SEQ_STEPS[Math.round(mKseqAt * (SEQ_STEPS.length - 1))]);
+  // a button that is a fader too: drag up or down (200 px the whole way) sets its value 0..1 (the fill), a tap with no
+  // drag runs tap(). The value is kept in this browser under key
+  const phFaderBtn = (el, key, dflt, onSet, tap) => {
+    let v = dflt;
+    try { const x = parseFloat(localStorage.getItem(key)); if (x >= 0 && x <= 1) v = x; } catch (e) {}
+    const put = (x) => { v = x; el.style.setProperty('--f', v); onSet(v); };
+    let d = null, moved = false;
+    el.addEventListener('pointerdown', (e) => { el.setPointerCapture(e.pointerId); d = { y: e.clientY, v }; moved = false; });
+    el.addEventListener('pointermove', (e) => {
+      if (!d || (!moved && Math.abs(e.clientY - d.y) < 8)) return;
+      moved = true; put(Math.max(0, Math.min(1, d.v + (d.y - e.clientY) / 200)));
+    });
+    const end = () => { if (d && moved) try { localStorage.setItem(key, String(v)); } catch (e) {} d = null; };
+    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', () => { end(); moved = true; });
+    // (a tap shows pressed for a moment once it has run, so the pressed look never comes up under a drag)
+    el.addEventListener('click', () => {
+      if (moved) { moved = false; return; }
+      if (!tap) return;
+      tap(); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 150);
+    });
+    el.addEventListener('contextmenu', (e) => e.preventDefault());
+    put(v);
   };
-  let ksd = null, ksMoved = false;
-  ks.addEventListener('pointerdown', (e) => { ks.setPointerCapture(e.pointerId); ksd = { y: e.clientY, v: mKseqAt }; ksMoved = false; });
-  ks.addEventListener('pointermove', (e) => {
-    if (!ksd || (!ksMoved && Math.abs(e.clientY - ksd.y) < 8)) return;
-    ksMoved = true; mKseqAt = Math.max(0, Math.min(1, ksd.v + (ksd.y - e.clientY) / 200)); ksDraw();
+  // slew: one slew for every knob seq (off to a whole step, in fives), set on all of them as it moves, and given to
+  // the new ones knob seqs makes here
+  let phSlew = 0;
+  const slewAll = () => { for (const f of mFaders) if (/^m-faders:slot\d+$/.test(f.key) && f.seq) f.seq.slew = phSlew; if (mSeqF) mSeqDraw(); };
+  phFaderBtn($('m-ph-slew'), 'elixir-desktop-kslew', 0, (x) => {
+    const s = Math.round(x * 20) * 5; $('m-ph-slew-out').textContent = s ? `${s}%` : 'off';
+    if (s !== phSlew) { phSlew = s; slewAll(); }
   });
-  const ksEnd = () => { if (ksd && ksMoved) try { localStorage.setItem(KS_KEY, String(mKseqAt)); } catch (e) {} ksd = null; };
-  ks.addEventListener('pointerup', ksEnd); ks.addEventListener('pointercancel', () => { ksEnd(); ksMoved = true; });
-  // (a tap shows pressed for a moment once it has randomised, so the pressed look never comes up under a drag)
-  ks.addEventListener('click', () => {
-    if (ksMoved) { ksMoved = false; return; }
-    $('m-knobseq').click(); ks.classList.add('flash'); setTimeout(() => ks.classList.remove('flash'), 150);
-  });
-  ks.addEventListener('contextmenu', (e) => e.preventDefault());
-  ksDraw();
+  // knob seqs: the fader sets the step lengths it picks, 1/16 at the bottom to 8 bars at the top (mKseqAt); a tap randomises
+  phFaderBtn($('m-ph-kseq'), 'elixir-desktop-kseqlen', .8, (x) => {
+    mKseqAt = x; $('m-ph-kseq-out').textContent = stepName(SEQ_STEPS[Math.round(x * (SEQ_STEPS.length - 1))]);
+  }, () => { $('m-knobseq').click(); slewAll(); });
   const play = $('m-ph-play');
   play.addEventListener('click', () => $('play').click());
   const phSync = () => {
