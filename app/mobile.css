@@ -743,7 +743,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
    in place of everything else: two across held upright, four across sideways ---- */
 .m-ph { display: none; }
 html.phone body > :not(.m-ph) { display: none !important; }
-html.phone .m-ph { display: grid; max-width: none; grid-template-columns: repeat(2, 1fr); grid-template-rows: none; grid-auto-rows: 1fr; gap: 10px; padding: 12px; }
+html.phone .m-ph { display: grid; max-width: none; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(6, 1fr) auto; gap: 10px; padding: 12px; }
 .m-ph .m-btn, .m-ph .m-play { min-height: 0; font-size: 1.9rem !important; line-height: 1.05; padding: 4px; }
 .m-ph .m-play { display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 3px; color: var(--panel); text-transform: uppercase; letter-spacing: .06em; }
 .m-ph .m-play svg { width: 1em; height: 1em; fill: currentColor; }
@@ -752,10 +752,11 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: repeat
 .m-ph-bpm .m-btn { font-size: 2.6rem !important; }
 .m-ph-bpm b { align-self: center; font-weight: 400; font-size: 2.6rem; min-width: 2.2ch; text-align: center; }
 .m-ph-bpm b::after { content: "bpm"; display: block; font-size: 1.1rem; line-height: 1; opacity: .7; }
+.m-ph .m-ph-install { grid-column: 1 / -1; min-height: 56px; }
 .m-ph-save { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
 .m-ph-save small { font-size: 1.05rem; text-transform: none; letter-spacing: 0; opacity: .7; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (orientation: landscape) {
-  html.phone .m-ph { grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 8px; }
+  html.phone .m-ph { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr) auto; gap: 8px; padding: 8px; }
   .m-ph .m-btn, .m-ph .m-play { font-size: 1.6rem !important; }
   .m-ph-bpm .m-btn, .m-ph-bpm b { font-size: 2.2rem !important; }
 }

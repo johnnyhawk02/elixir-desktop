@@ -28,5 +28,10 @@ if (document.documentElement.classList.contains('phone')) {
     for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) b.addEventListener(ev, stop);
     b.addEventListener('contextmenu', (e) => e.preventDefault());
   }
+  // install app: only where the browser offers it (mobile-extras.js keeps the offer in mInstallEv; Android Chrome)
+  const inst = $('m-ph-install');
+  new MutationObserver(() => { inst.hidden = $('m-install').hidden; }).observe($('m-install'), { attributes: true, attributeFilter: ['hidden'] });
+  inst.hidden = $('m-install').hidden;
+  inst.addEventListener('click', () => $('m-install').click());
   phSync();
 }
