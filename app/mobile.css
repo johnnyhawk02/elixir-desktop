@@ -521,16 +521,16 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m > .m-card.m-trans { grid-area: 1 / 2; border-bottom: 0; padding: 6px 0 10px 24px; grid-template-columns: 130px 130px; justify-content: end; }
   .m .m-play, .m .m-rec { min-height: 38px; }
   .m .m-trans .m-loop { display: none; }
-  /* (the randomise bar runs on to the transport, over the start of the right half; every box the same size, undo too,
-     in groups: the sound ones, the effects ones, then undo; next bar and assign are in options) */
-  .m-pages .m-rand-card { grid-area: 1 / 1 / 2 / 3; align-self: center; margin: 0 310px 0 196px; padding: 6px 0 10px; border: 0; }
-  .m-rand-card .m-rand { grid-template-columns: repeat(4, minmax(0, 1fr)) 6px repeat(3, minmax(0, 1fr)) 6px minmax(0, 1fr); grid-template-rows: 40px; height: auto; gap: 0 6px; }
-  .m .m-rand-card .m-rand .m-btn { grid-row: 1; padding: 0 2px; letter-spacing: 0; font-size: clamp(14px, 1.13vw, 18px) !important; }
+  /* (the randomisers live in one pop-up under the randomise button, in two rows: the sound ones, then the effects ones and
+     undo; it stays open for more clicks until a click elsewhere or esc; next bar and assign are in options) */
+  .m-top { width: auto; }
+  .m-pages .m-rand-card { position: fixed; z-index: 30; display: none; padding: 10px; background-color: var(--panel); border: 2px solid var(--ink); border-radius: 4px;
+    box-shadow: 4px 5px 0 rgba(23, 32, 14, .25); }
+  .m.show-rand .m-pages .m-rand-card { display: grid; }
+  .m .m-randbtn[aria-expanded="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
+  .m-rand-card .m-rand { grid-template-columns: repeat(4, 150px); grid-template-rows: 50px 50px; height: auto; gap: 8px; }
+  .m .m-rand-card .m-rand .m-btn { padding: 0 4px; letter-spacing: .02em; font-size: var(--fs-xs) !important; }
   .m-rand > :nth-child(1), .m-rand > :nth-child(2) { display: none; }
-  .m-rand > :nth-child(3) { grid-column: 1; } .m-rand > :nth-child(4) { grid-column: 2; } .m-rand > :nth-child(5) { grid-column: 3; } .m-rand > :nth-child(6) { grid-column: 4; }
-  .m-rand > :nth-child(7) { grid-column: 6; } .m-rand > :nth-child(8) { grid-column: 7; } .m-rand > :nth-child(9) { grid-column: 8; } .m-rand > :nth-child(10) { grid-column: 10; }
-  /* (a small RND in the top left of each randomise button) */
-  .m .m-rand .m-btn:not(#m-undo)::before { content: "rnd"; position: absolute; left: 4px; top: 2px; font-size: 11px; line-height: 1; letter-spacing: .06em; opacity: .7; pointer-events: none; }
 
   /* -- the perform knobs: one rounded box round them all -- */
   .m-play-card { grid-area: 2 / 1 / 4 / 2; min-height: 0; padding: 14px 24px 10px 4px; border-top: var(--rule); }

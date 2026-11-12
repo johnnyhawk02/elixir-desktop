@@ -47,3 +47,16 @@ $('m-opts').addEventListener('click', (e) => {
     // (install app, while the browser offers it; its button under the presets is the phone's)
     ...(mInstallEv ? [['install app', () => $('m-install').click()]] : [])]);
 });
+
+// ---- the laptop's randomise button: opens the pop-up holding every randomiser and undo, under the button. It stays
+// open for more clicks (and drags that set the depth); a click anywhere else or esc closes it ----
+const mRandShow = (on) => {
+  $('m').classList.toggle('show-rand', on); $('m-rand-open').setAttribute('aria-expanded', on ? 'true' : 'false');
+  if (!on) return;
+  const r = $('m-rand-open').getBoundingClientRect(), c = document.querySelector('.m-rand-card');
+  c.style.left = Math.max(8, Math.min(r.left, innerWidth - c.offsetWidth - 8)) + 'px'; c.style.top = (r.bottom + 6) + 'px';
+};
+$('m-rand-open').addEventListener('click', () => mRandShow(!$('m').classList.contains('show-rand')));
+addEventListener('pointerdown', (e) => { if (!e.target.closest('.m-rand-card, #m-rand-open')) mRandShow(false); }, { capture: true });
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('m').classList.contains('show-rand')) { e.stopImmediatePropagation(); mRandShow(false); } }, { capture: true });
+addEventListener('resize', () => { if ($('m').classList.contains('show-rand')) mRandShow(true); });

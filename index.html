@@ -1396,16 +1396,16 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m > .m-card.m-trans { grid-area: 1 / 2; border-bottom: 0; padding: 6px 0 10px 24px; grid-template-columns: 130px 130px; justify-content: end; }
   .m .m-play, .m .m-rec { min-height: 38px; }
   .m .m-trans .m-loop { display: none; }
-  /* (the randomise bar runs on to the transport, over the start of the right half; every box the same size, undo too,
-     in groups: the sound ones, the effects ones, then undo; next bar and assign are in options) */
-  .m-pages .m-rand-card { grid-area: 1 / 1 / 2 / 3; align-self: center; margin: 0 310px 0 196px; padding: 6px 0 10px; border: 0; }
-  .m-rand-card .m-rand { grid-template-columns: repeat(4, minmax(0, 1fr)) 6px repeat(3, minmax(0, 1fr)) 6px minmax(0, 1fr); grid-template-rows: 40px; height: auto; gap: 0 6px; }
-  .m .m-rand-card .m-rand .m-btn { grid-row: 1; padding: 0 2px; letter-spacing: 0; font-size: clamp(14px, 1.13vw, 18px) !important; }
+  /* (the randomisers live in one pop-up under the randomise button, in two rows: the sound ones, then the effects ones and
+     undo; it stays open for more clicks until a click elsewhere or esc; next bar and assign are in options) */
+  .m-top { width: auto; }
+  .m-pages .m-rand-card { position: fixed; z-index: 30; display: none; padding: 10px; background-color: var(--panel); border: 2px solid var(--ink); border-radius: 4px;
+    box-shadow: 4px 5px 0 rgba(23, 32, 14, .25); }
+  .m.show-rand .m-pages .m-rand-card { display: grid; }
+  .m .m-randbtn[aria-expanded="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
+  .m-rand-card .m-rand { grid-template-columns: repeat(4, 150px); grid-template-rows: 50px 50px; height: auto; gap: 8px; }
+  .m .m-rand-card .m-rand .m-btn { padding: 0 4px; letter-spacing: .02em; font-size: var(--fs-xs) !important; }
   .m-rand > :nth-child(1), .m-rand > :nth-child(2) { display: none; }
-  .m-rand > :nth-child(3) { grid-column: 1; } .m-rand > :nth-child(4) { grid-column: 2; } .m-rand > :nth-child(5) { grid-column: 3; } .m-rand > :nth-child(6) { grid-column: 4; }
-  .m-rand > :nth-child(7) { grid-column: 6; } .m-rand > :nth-child(8) { grid-column: 7; } .m-rand > :nth-child(9) { grid-column: 8; } .m-rand > :nth-child(10) { grid-column: 10; }
-  /* (a small RND in the top left of each randomise button) */
-  .m .m-rand .m-btn:not(#m-undo)::before { content: "rnd"; position: absolute; left: 4px; top: 2px; font-size: 11px; line-height: 1; letter-spacing: .06em; opacity: .7; pointer-events: none; }
 
   /* -- the perform knobs: one rounded box round them all -- */
   .m-play-card { grid-area: 2 / 1 / 4 / 2; min-height: 0; padding: 14px 24px 10px 4px; border-top: var(--rule); }
@@ -1596,8 +1596,9 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>201</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>202</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
+    <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
     <button class="m-toggle m-setbtn" id="m-set-open" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
@@ -1691,7 +1692,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v201, 12 Nov, 06:46</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v202, 12 Nov, 06:52</footer>
     </section>
   </div>
   </div>
@@ -10146,13 +10147,13 @@ const HELP = [
   ['start', 'getting started', `<p>Elixir is a six voice drum machine: drum 1, 2 and 3, snare, cymbal and hihat. Three steps to a beat:</p>
 <ol><li>Press <b>play</b> (or space).</li><li>Press <b>everything</b> until you like what you hear: each press is a new beat, kit, effects and mix.</li>
 <li>Turn the knobs, or press <b>kit</b>, <b>pattern</b> or <b>alter</b> to change one part. <b>undo</b> takes back the last one.</li></ol>
-<p>The screen: the title line has <b>options</b>, the randomise buttons, then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, fx, xfeed, mix, mstr, prst), chosen by the buttons over it.</p>
+<p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, fx, xfeed, mix, mstr, prst), chosen by the buttons over it.</p>
 <p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>prst</b> › <b>save new</b>. <b>rec</b> records a WAV. Keys for nearly everything: see keyboard.</p>
 <p>(On a screen under 1000 px wide it becomes the phone layout: pages along the bottom, and hold a fader for its sequencer.)</p>`],
   ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: the perform controls (tempo, sidechain, pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and rush. MIDI CC 1 to 12 turn them (any channel).</p>
 <ul><li>Each knob's ring shows its value. While its step sequencer runs, the pointer stays on your setting and the lit part of the ring shows where the sequencer has moved it.</li>
 <li><b>options</b> › <b>assign knobs</b>, then click a knob to choose what it does: any fader from any page, or any drum's setting. Or right-click a knob › <b>assign</b>.</li></ul>
-<p>The randomise buttons (marked rnd):</p>
+<p>The <b>randomise</b> button opens a pop-up with all the randomisers and undo (it stays open while you click; click elsewhere or esc to close):</p>
 <ul><li><b>everything</b>: a new beat (genre, groove, kit, effects, mix). <b>kit</b>: new sounds. <b>alter</b>: the sounds nudged about 10%. <b>pattern</b>: a new beat on the same sounds.</li>
 <li><b>crossfeed</b>: a new crossfeed patch (see fx). <b>random fx</b>: new effects and sends. <b>alter fx</b>: the effects nudged.</li>
 <li>Click to randomise. Drag up or down on one to set how far it goes, 10% to 100% (a dotted bar along its foot below 100%): at 30% it moves everything only 30% of the way to the new sound, and switches choices like the style 30% of the time.</li>
@@ -10195,7 +10196,7 @@ const HELP = [
   ['rec', 'recording', `<ul><li><b>rec</b> records a WAV: press it to start (it starts playing too), again to stop, and the file downloads.</li>
 <li>Hold or right-click <b>rec</b> to choose what it records: <b>free</b>, or an exact loop of 1, 2, 4, 8, 16, 32, 64 or 128 bars. A loop starts at the next bar, shows its progress on the button and downloads by itself, cut to repeat seamlessly in any other app.</li></ul>`],
   ['keys', 'keyboard and mouse', `<ul><li><b>space</b> play and stop. <b>enter</b> record, <b>l</b> record a loop.</li>
-<li><b>1</b> everything, <b>2</b> kit, <b>3</b> alter, <b>4</b> pattern, <b>5</b> crossfeed, <b>6</b> random fx, <b>7</b> alter fx (the bar's order), <b>u</b> undo. <b>m</b> randomise on next bar.</li>
+<li><b>1</b> everything, <b>2</b> kit, <b>3</b> alter, <b>4</b> pattern, <b>5</b> crossfeed, <b>6</b> random fx, <b>7</b> alter fx (the pop-up's order; they work with it closed), <b>u</b> undo. <b>m</b> randomise on next bar.</li>
 <li><b>z x c v b n</b> mute drum 1, 2, 3, snare, cymbal, hihat; <b>a s d f g h</b> mute their echo sends; <b>q w e r t y</b> their reverb sends.</li>
 <li><b>shift</b> + <b>1</b> to <b>6</b> show the voice page with that drum; <b>[</b> and <b>]</b> step through its tabs.</li>
 <li><b>o</b> presets, <b>/</b> search presets, <b>?</b> help. <b>esc</b> closes whatever is open.</li>
@@ -10268,6 +10269,19 @@ $('m-opts').addEventListener('click', (e) => {
     // (install app, while the browser offers it; its button under the presets is the phone's)
     ...(mInstallEv ? [['install app', () => $('m-install').click()]] : [])]);
 });
+
+// ---- the laptop's randomise button: opens the pop-up holding every randomiser and undo, under the button. It stays
+// open for more clicks (and drags that set the depth); a click anywhere else or esc closes it ----
+const mRandShow = (on) => {
+  $('m').classList.toggle('show-rand', on); $('m-rand-open').setAttribute('aria-expanded', on ? 'true' : 'false');
+  if (!on) return;
+  const r = $('m-rand-open').getBoundingClientRect(), c = document.querySelector('.m-rand-card');
+  c.style.left = Math.max(8, Math.min(r.left, innerWidth - c.offsetWidth - 8)) + 'px'; c.style.top = (r.bottom + 6) + 'px';
+};
+$('m-rand-open').addEventListener('click', () => mRandShow(!$('m').classList.contains('show-rand')));
+addEventListener('pointerdown', (e) => { if (!e.target.closest('.m-rand-card, #m-rand-open')) mRandShow(false); }, { capture: true });
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('m').classList.contains('show-rand')) { e.stopImmediatePropagation(); mRandShow(false); } }, { capture: true });
+addEventListener('resize', () => { if ($('m').classList.contains('show-rand')) mRandShow(true); });
 // ---- the step sequencer on the laptop: touching any fader or knob shows its sequencer in the strip under the knobs,
 // headed with the control's whole name and where it is ----
 // (where a control is and its whole name: the page, its row or drum, and the name its label shortens)
@@ -10486,7 +10500,7 @@ addEventListener('click', (e) => {
 // ---- the keyboard (laptop): one key for each thing played often. It listens before anything else on the page, so the
 // hidden desktop panels' own keys (space and 1..7 sound a drum, r randomises) never fire; typing in a box, and keys
 // with cmd, ctrl or alt, are left alone ----
-// (the randomisers on 1..7 in the bar's order; enter records, l records a loop even where rec is set to free; the
+// (the randomisers on 1..7 in the pop-up's order; enter records, l records a loop even where rec is set to free; the
 // letter rows are the mutes: z..n the drums, a..h their echo sends, q..y their reverb sends)
 const KEYS = { ' ': 'm-play', Enter: 'm-rec', l: 'm-loop', 1: 'm-everything', 2: 'm-kit', 3: 'm-alter', 4: 'm-pattern', 5: 'm-xrand',
   6: 'm-fx-rand', 7: 'm-fx-alter', u: 'm-undo' };

@@ -3,13 +3,13 @@ const HELP = [
   ['start', 'getting started', `<p>Elixir is a six voice drum machine: drum 1, 2 and 3, snare, cymbal and hihat. Three steps to a beat:</p>
 <ol><li>Press <b>play</b> (or space).</li><li>Press <b>everything</b> until you like what you hear: each press is a new beat, kit, effects and mix.</li>
 <li>Turn the knobs, or press <b>kit</b>, <b>pattern</b> or <b>alter</b> to change one part. <b>undo</b> takes back the last one.</li></ol>
-<p>The screen: the title line has <b>options</b>, the randomise buttons, then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, fx, xfeed, mix, mstr, prst), chosen by the buttons over it.</p>
+<p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, fx, xfeed, mix, mstr, prst), chosen by the buttons over it.</p>
 <p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>prst</b> › <b>save new</b>. <b>rec</b> records a WAV. Keys for nearly everything: see keyboard.</p>
 <p>(On a screen under 1000 px wide it becomes the phone layout: pages along the bottom, and hold a fader for its sequencer.)</p>`],
   ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: the perform controls (tempo, sidechain, pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and rush. MIDI CC 1 to 12 turn them (any channel).</p>
 <ul><li>Each knob's ring shows its value. While its step sequencer runs, the pointer stays on your setting and the lit part of the ring shows where the sequencer has moved it.</li>
 <li><b>options</b> › <b>assign knobs</b>, then click a knob to choose what it does: any fader from any page, or any drum's setting. Or right-click a knob › <b>assign</b>.</li></ul>
-<p>The randomise buttons (marked rnd):</p>
+<p>The <b>randomise</b> button opens a pop-up with all the randomisers and undo (it stays open while you click; click elsewhere or esc to close):</p>
 <ul><li><b>everything</b>: a new beat (genre, groove, kit, effects, mix). <b>kit</b>: new sounds. <b>alter</b>: the sounds nudged about 10%. <b>pattern</b>: a new beat on the same sounds.</li>
 <li><b>crossfeed</b>: a new crossfeed patch (see fx). <b>random fx</b>: new effects and sends. <b>alter fx</b>: the effects nudged.</li>
 <li>Click to randomise. Drag up or down on one to set how far it goes, 10% to 100% (a dotted bar along its foot below 100%): at 30% it moves everything only 30% of the way to the new sound, and switches choices like the style 30% of the time.</li>
@@ -52,7 +52,7 @@ const HELP = [
   ['rec', 'recording', `<ul><li><b>rec</b> records a WAV: press it to start (it starts playing too), again to stop, and the file downloads.</li>
 <li>Hold or right-click <b>rec</b> to choose what it records: <b>free</b>, or an exact loop of 1, 2, 4, 8, 16, 32, 64 or 128 bars. A loop starts at the next bar, shows its progress on the button and downloads by itself, cut to repeat seamlessly in any other app.</li></ul>`],
   ['keys', 'keyboard and mouse', `<ul><li><b>space</b> play and stop. <b>enter</b> record, <b>l</b> record a loop.</li>
-<li><b>1</b> everything, <b>2</b> kit, <b>3</b> alter, <b>4</b> pattern, <b>5</b> crossfeed, <b>6</b> random fx, <b>7</b> alter fx (the bar's order), <b>u</b> undo. <b>m</b> randomise on next bar.</li>
+<li><b>1</b> everything, <b>2</b> kit, <b>3</b> alter, <b>4</b> pattern, <b>5</b> crossfeed, <b>6</b> random fx, <b>7</b> alter fx (the pop-up's order; they work with it closed), <b>u</b> undo. <b>m</b> randomise on next bar.</li>
 <li><b>z x c v b n</b> mute drum 1, 2, 3, snare, cymbal, hihat; <b>a s d f g h</b> mute their echo sends; <b>q w e r t y</b> their reverb sends.</li>
 <li><b>shift</b> + <b>1</b> to <b>6</b> show the voice page with that drum; <b>[</b> and <b>]</b> step through its tabs.</li>
 <li><b>o</b> presets, <b>/</b> search presets, <b>?</b> help. <b>esc</b> closes whatever is open.</li>
