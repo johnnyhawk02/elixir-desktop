@@ -1618,11 +1618,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 }
 
 /* ---- phones (html.phone, set by the script in the page's head): one big screen of buttons (.m-ph, app/phone.js)
-   in place of everything else: two across held upright, five across sideways ---- */
+   in place of everything else: held upright, the decay knobs in a column down the left and the buttons two across;
+   sideways, five across with the decays in a row ---- */
 .m-ph { display: none; }
 html.phone body > :not(.m-ph) { display: none !important; }
-html.phone .m-ph { display: grid; max-width: none; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(9, 1fr) auto; gap: 10px; padding: 12px; }
-.m-ph .m-btn, .m-ph .m-play { min-height: 0; font-size: 1.9rem !important; line-height: 1.05; padding: 4px; }
+html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(7, 1fr) auto; gap: 10px 8px; padding: 12px 10px; }
+.m-ph .m-btn, .m-ph .m-play { min-height: 0; font-size: 1.55rem !important; line-height: 1.05; padding: 4px; }
 .m-ph .m-play { display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 3px; color: var(--panel); text-transform: uppercase; letter-spacing: .06em; }
 .m-ph .m-play svg { width: 1em; height: 1em; fill: currentColor; }
 .m-ph .m-play[aria-pressed="true"] { background: var(--spot) !important; }
@@ -1633,17 +1634,17 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: repeat
 .m-ph-bpm .m-vtrack b::after { content: "bpm"; display: block; font-size: 1.1rem; line-height: 1; opacity: .7; }
 .m-ph .m-ph-bpm { grid-row: span 2; }
 .m .m-ph-bpm .m-vtrack::after { background-position: 50% 9%; background-size: 3px 16%; } /* (the pointer kept out over the ring, clear of the number) */
-.m-ph-dec { grid-column: 1 / -1; grid-row: span 2; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 4px 6px; min-height: 0; }
+.m-ph-dec { grid-column: 1; grid-row: 1 / 8; display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(7, minmax(0, 1fr)); gap: 4px; min-height: 0; }
 .m-ph-dec .m-knob { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 0; }
 .m .m-ph-dec .m-vtrack { container-type: size; flex: 1; width: 100%; min-height: 0; background: none; border: 0; overflow: visible; border-radius: 0; touch-action: none; }
-.m-ph-dec .m-flab { font-size: 1.15rem; line-height: 1; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+.m-ph-dec .m-flab { font-size: 1.05rem; line-height: 1; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
 .m-ph .m-ph-install { grid-column: 1 / -1; min-height: 56px; }
 .m-ph-save { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
 .m-ph-save small { font-size: 1.05rem; text-transform: none; letter-spacing: 0; opacity: .7; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (orientation: landscape) {
   html.phone .m-ph { grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr) auto; gap: 8px; padding: 8px; }
   .m-ph .m-ph-bpm { grid-row: span 2; } .m-ph .m-ph-save { grid-column: span 2; }
-  .m-ph-dec { grid-row: auto; grid-template-columns: repeat(7, 1fr); grid-template-rows: minmax(0, 1fr); }
+  .m-ph-dec { grid-column: 1 / -1; grid-row: auto; grid-template-columns: repeat(7, 1fr); grid-template-rows: minmax(0, 1fr); gap: 4px 6px; }
   /* (sideways the decay row goes under the second row of buttons: rows play knob everything kit alter / pattern
      crossfeed random fx alter fx / decay / knob seqs, clear seqs, undo, save) */
   .m-ph-dec { order: 1; }
@@ -1656,7 +1657,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: repeat
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>211</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>212</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1855,7 +1856,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: repeat
       <button class="m-btn" id="m-pexport" type="button">export</button>
       <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
     </div>
-    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v211, 12 Nov, 15:08</footer>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v212, 12 Nov, 17:58</footer>
   </section>
 </main>
 <main class="m m-ph" id="m-ph" aria-label="elixir">
