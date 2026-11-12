@@ -1089,7 +1089,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-pages .m-rand-card { display: grid; min-height: 0; padding: 6px 2px 6px 8px; border-top: var(--rule); border-left: var(--rule); }
 /* two boxes (next bar, assign), then eight buttons sharing the column evenly */
 .m-rand { display: grid; }
-.m-rand-card .m-rand { grid-template-columns: 1fr; grid-template-rows: auto auto repeat(8, minmax(0, 1fr)); grid-auto-rows: auto; gap: 6px; align-content: stretch; min-width: 0; height: 100%; }
+.m-rand-card .m-rand { grid-template-columns: 1fr; grid-template-rows: auto auto repeat(9, minmax(0, 1fr)); grid-auto-rows: auto; gap: 6px; align-content: stretch; min-width: 0; height: 100%; }
 .m-rand-card .m-rand .m-btn { min-height: 0; min-width: 0; padding: 0 2px; letter-spacing: .02em; overflow: hidden; }
 .m .m-rand-card .m-rand .m-btn { font-size: min(var(--fs-xs), 3.7vw, 15.2px) !important; white-space: nowrap; }
 .m-nextbar { gap: 6px; font-size: min(var(--fs-xs), 3.6vw, 14.8px); white-space: nowrap; }
@@ -1403,7 +1403,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     box-shadow: 4px 5px 0 rgba(23, 32, 14, .25); }
   .m.show-rand .m-pages .m-rand-card { display: grid; }
   .m .m-randbtn[aria-expanded="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
-  .m-rand-card .m-rand { grid-template-columns: repeat(4, 150px); grid-template-rows: 50px 50px; height: auto; gap: 8px; }
+  .m-rand-card .m-rand { grid-template-columns: repeat(5, 150px); grid-template-rows: 50px 50px; height: auto; gap: 8px; }
+  #m-knobseq { grid-area: 1 / 5; } #m-xrand { grid-area: 2 / 1; } #m-undo { grid-area: 2 / 5; }
   .m .m-rand-card .m-rand .m-btn { padding: 0 4px; letter-spacing: .02em; font-size: var(--fs-xs) !important; }
   .m-rand > :nth-child(1), .m-rand > :nth-child(2) { display: none; }
 
@@ -1596,7 +1597,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>202</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>203</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1625,6 +1626,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-xrand" type="button">crossfeed</button>
         <button class="m-btn" id="m-fx-rand" type="button">random fx</button>
         <button class="m-btn" id="m-fx-alter" type="button">alter fx</button>
+        <button class="m-btn" id="m-knobseq" type="button">knob seqs</button>
         <button class="m-btn" id="m-undo" data-m-undo type="button" disabled>undo</button>
       </div>
     </section>
@@ -1692,7 +1694,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
         <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
         <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
       </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v202, 12 Nov, 06:52</footer>
+      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v203, 12 Nov, 06:54</footer>
     </section>
   </div>
   </div>
@@ -10156,6 +10158,7 @@ const HELP = [
 <p>The <b>randomise</b> button opens a pop-up with all the randomisers and undo (it stays open while you click; click elsewhere or esc to close):</p>
 <ul><li><b>everything</b>: a new beat (genre, groove, kit, effects, mix). <b>kit</b>: new sounds. <b>alter</b>: the sounds nudged about 10%. <b>pattern</b>: a new beat on the same sounds.</li>
 <li><b>crossfeed</b>: a new crossfeed patch (see fx). <b>random fx</b>: new effects and sends. <b>alter fx</b>: the effects nudged.</li>
+<li><b>knob seqs</b>: a new step sequencer on every perform knob: 8 or 16 steps, each step a 16th up to 8 bars long (mostly the long ones), random steps, depth and slew. Undo puts the old ones back.</li>
 <li>Click to randomise. Drag up or down on one to set how far it goes, 10% to 100% (a dotted bar along its foot below 100%): at 30% it moves everything only 30% of the way to the new sound, and switches choices like the style 30% of the time.</li>
 <li>Hold one still for half a second for its settings, the ranges and chances it uses.</li>
 <li><b>options</b> › <b>randomise on next bar</b>: while playing, randomises wait for the start of the next bar (the button flashes until then).</li></ul>`],
@@ -10196,7 +10199,7 @@ const HELP = [
   ['rec', 'recording', `<ul><li><b>rec</b> records a WAV: press it to start (it starts playing too), again to stop, and the file downloads.</li>
 <li>Hold or right-click <b>rec</b> to choose what it records: <b>free</b>, or an exact loop of 1, 2, 4, 8, 16, 32, 64 or 128 bars. A loop starts at the next bar, shows its progress on the button and downloads by itself, cut to repeat seamlessly in any other app.</li></ul>`],
   ['keys', 'keyboard and mouse', `<ul><li><b>space</b> play and stop. <b>enter</b> record, <b>l</b> record a loop.</li>
-<li><b>1</b> everything, <b>2</b> kit, <b>3</b> alter, <b>4</b> pattern, <b>5</b> crossfeed, <b>6</b> random fx, <b>7</b> alter fx (the pop-up's order; they work with it closed), <b>u</b> undo. <b>m</b> randomise on next bar.</li>
+<li><b>1</b> everything, <b>2</b> kit, <b>3</b> alter, <b>4</b> pattern, <b>5</b> crossfeed, <b>6</b> random fx, <b>7</b> alter fx, <b>8</b> knob seqs (the pop-up's order; they work with it closed), <b>u</b> undo. <b>m</b> randomise on next bar.</li>
 <li><b>z x c v b n</b> mute drum 1, 2, 3, snare, cymbal, hihat; <b>a s d f g h</b> mute their echo sends; <b>q w e r t y</b> their reverb sends.</li>
 <li><b>shift</b> + <b>1</b> to <b>6</b> show the voice page with that drum; <b>[</b> and <b>]</b> step through its tabs.</li>
 <li><b>o</b> presets, <b>/</b> search presets, <b>?</b> help. <b>esc</b> closes whatever is open.</li>
@@ -10308,6 +10311,33 @@ $('m').addEventListener('pointerdown', (e) => {
   if (!mWide.matches || e.button !== 0) return;
   const tr = e.target.closest('.m-vtrack'), fd = tr && mFdOf(tr.closest('.m-vf'));
   if (fd && fd !== mSeqF && !$('m-faders').classList.contains('assigning')) mSeqOpen(fd);
+});
+// ---- knob seqs (in the randomise pop-up): every perform knob gets a new step sequencer, switched on: 8 or 16 steps,
+// each step a 16th up to 8 bars long, picked mostly from the long ones (the chance grows with the square of the
+// length's place: 8 bars is 64 times as likely as a 16th), its steps made one of the five random ways, with a random
+// depth and slew. Undo puts the knobs' sequencers back ----
+const SEQR_W = SEQ_STEPS.map((_, i) => (i + 1) * (i + 1));
+const mSeqRandStep = () => {
+  let r = Math.random() * SEQR_W.reduce((a, b) => a + b, 0);
+  for (let i = 0; i < SEQ_STEPS.length; i++) if ((r -= SEQR_W[i]) < 0) return SEQ_STEPS[i];
+  return SEQ_STEPS[SEQ_STEPS.length - 1];
+};
+const mKnobFaders = () => mFaders.filter((f) => /^m-faders:slot\d+$/.test(f.key));
+$('m-knobseq').addEventListener('click', () => {
+  const fs = mKnobFaders(), was = fs.map((f) => (f.seq ? { ...f.seq, vals: f.seq.vals.slice() } : null));
+  const kinds = Object.keys(SEQ_RNDS);
+  for (const f of fs) {
+    const len = Math.random() < .5 ? 8 : 16, v = SEQ_RNDS[kinds[Math.floor(Math.random() * kinds.length)]](len);
+    if (f.base !== null) mSeqRelease(f);
+    f.seq = { on: true, len, slew: Math.round(Math.random() * 10) * 10, step: mSeqRandStep(), depth: 20 + Math.round(Math.random() * 12) * 5,
+      vals: Array.from({ length: SEQ_MAX }, (_, i) => (i < len ? mSeqOff(v[i]) : 0)) };
+  }
+  if (mSeqF && fs.includes(mSeqF)) mSeqDraft = null;
+  if (mSeqF) mSeqDraw(); else mSeqMarks();
+  setDirty(true);
+  undoValues = null; $('undo').disabled = true;
+  mUndoFn = () => { fs.forEach((f, i) => { if (f.base !== null) mSeqRelease(f); f.seq = was[i]; }); if (mSeqF) { if (!mSeqF.seq) mSeqDraft = { ...newSeq(), on: false }; mSeqDraw(); } else mSeqMarks(); setDirty(true); };
+  mUndo();
 });
 // ---- the mixer on the laptop: a channel strip a drum (its echo and reverb send knobs over its level fader), with a
 // level meter beside each fader, fed by the same peaks as the full desktop mixer's meters (lvms in app/mixer.js) ----
@@ -10503,7 +10533,7 @@ addEventListener('click', (e) => {
 // (the randomisers on 1..7 in the pop-up's order; enter records, l records a loop even where rec is set to free; the
 // letter rows are the mutes: z..n the drums, a..h their echo sends, q..y their reverb sends)
 const KEYS = { ' ': 'm-play', Enter: 'm-rec', l: 'm-loop', 1: 'm-everything', 2: 'm-kit', 3: 'm-alter', 4: 'm-pattern', 5: 'm-xrand',
-  6: 'm-fx-rand', 7: 'm-fx-alter', u: 'm-undo' };
+  6: 'm-fx-rand', 7: 'm-fx-alter', 8: 'm-knobseq', u: 'm-undo' };
 // (the open pop-up, if any: Escape presses its done button; on the laptop the step sequencer is a strip under the knobs,
 // not a pop-up, so the keys still play while it's open)
 const mOpenPop = () => [...document.querySelectorAll(mWide.matches ? '.m-rs' : '.m-rs, .m-seq')].find((el) => !el.hidden);

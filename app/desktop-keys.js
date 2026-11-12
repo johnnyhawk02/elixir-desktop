@@ -4,7 +4,7 @@
 // (the randomisers on 1..7 in the pop-up's order; enter records, l records a loop even where rec is set to free; the
 // letter rows are the mutes: z..n the drums, a..h their echo sends, q..y their reverb sends)
 const KEYS = { ' ': 'm-play', Enter: 'm-rec', l: 'm-loop', 1: 'm-everything', 2: 'm-kit', 3: 'm-alter', 4: 'm-pattern', 5: 'm-xrand',
-  6: 'm-fx-rand', 7: 'm-fx-alter', u: 'm-undo' };
+  6: 'm-fx-rand', 7: 'm-fx-alter', 8: 'm-knobseq', u: 'm-undo' };
 // (the open pop-up, if any: Escape presses its done button; on the laptop the step sequencer is a strip under the knobs,
 // not a pop-up, so the keys still play while it's open)
 const mOpenPop = () => [...document.querySelectorAll(mWide.matches ? '.m-rs' : '.m-rs, .m-seq')].find((el) => !el.hidden);

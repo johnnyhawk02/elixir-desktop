@@ -214,7 +214,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-pages .m-rand-card { display: grid; min-height: 0; padding: 6px 2px 6px 8px; border-top: var(--rule); border-left: var(--rule); }
 /* two boxes (next bar, assign), then eight buttons sharing the column evenly */
 .m-rand { display: grid; }
-.m-rand-card .m-rand { grid-template-columns: 1fr; grid-template-rows: auto auto repeat(8, minmax(0, 1fr)); grid-auto-rows: auto; gap: 6px; align-content: stretch; min-width: 0; height: 100%; }
+.m-rand-card .m-rand { grid-template-columns: 1fr; grid-template-rows: auto auto repeat(9, minmax(0, 1fr)); grid-auto-rows: auto; gap: 6px; align-content: stretch; min-width: 0; height: 100%; }
 .m-rand-card .m-rand .m-btn { min-height: 0; min-width: 0; padding: 0 2px; letter-spacing: .02em; overflow: hidden; }
 .m .m-rand-card .m-rand .m-btn { font-size: min(var(--fs-xs), 3.7vw, 15.2px) !important; white-space: nowrap; }
 .m-nextbar { gap: 6px; font-size: min(var(--fs-xs), 3.6vw, 14.8px); white-space: nowrap; }
@@ -528,7 +528,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     box-shadow: 4px 5px 0 rgba(23, 32, 14, .25); }
   .m.show-rand .m-pages .m-rand-card { display: grid; }
   .m .m-randbtn[aria-expanded="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
-  .m-rand-card .m-rand { grid-template-columns: repeat(4, 150px); grid-template-rows: 50px 50px; height: auto; gap: 8px; }
+  .m-rand-card .m-rand { grid-template-columns: repeat(5, 150px); grid-template-rows: 50px 50px; height: auto; gap: 8px; }
+  #m-knobseq { grid-area: 1 / 5; } #m-xrand { grid-area: 2 / 1; } #m-undo { grid-area: 2 / 5; }
   .m .m-rand-card .m-rand .m-btn { padding: 0 4px; letter-spacing: .02em; font-size: var(--fs-xs) !important; }
   .m-rand > :nth-child(1), .m-rand > :nth-child(2) { display: none; }
 
