@@ -3,6 +3,25 @@
 if (document.documentElement.classList.contains('phone')) {
   for (const b of $('m-ph').querySelectorAll('[data-for]')) b.addEventListener('click', () => $(b.dataset.for).click());
   $('m-ph-seqclear').addEventListener('click', mKnobSeqClear);
+  // knob seqs is a fader too: drag up or down (200 px the whole way) to set the step lengths it picks, from 1/16
+  // at the bottom to 8 bars at the top (the fill and the length under the name); a tap randomises. Kept in this browser
+  const KS_KEY = 'elixir-desktop-kseqlen', ks = $('m-ph-kseq');
+  try { const x = parseFloat(localStorage.getItem(KS_KEY)); mKseqAt = x >= 0 && x <= 1 ? x : .8; } catch (e) { mKseqAt = .8; }
+  const ksDraw = () => {
+    ks.style.setProperty('--f', mKseqAt);
+    $('m-ph-kseq-out').textContent = stepName(SEQ_STEPS[Math.round(mKseqAt * (SEQ_STEPS.length - 1))]);
+  };
+  let ksd = null, ksMoved = false;
+  ks.addEventListener('pointerdown', (e) => { ks.setPointerCapture(e.pointerId); ksd = { y: e.clientY, v: mKseqAt }; ksMoved = false; });
+  ks.addEventListener('pointermove', (e) => {
+    if (!ksd || (!ksMoved && Math.abs(e.clientY - ksd.y) < 8)) return;
+    ksMoved = true; mKseqAt = Math.max(0, Math.min(1, ksd.v + (ksd.y - e.clientY) / 200)); ksDraw();
+  });
+  const ksEnd = () => { if (ksd && ksMoved) try { localStorage.setItem(KS_KEY, String(mKseqAt)); } catch (e) {} ksd = null; };
+  ks.addEventListener('pointerup', ksEnd); ks.addEventListener('pointercancel', () => { ksEnd(); ksMoved = true; });
+  ks.addEventListener('click', () => { if (ksMoved) { ksMoved = false; return; } $('m-knobseq').click(); });
+  ks.addEventListener('contextmenu', (e) => e.preventDefault());
+  ksDraw();
   const play = $('m-ph-play');
   play.addEventListener('click', () => $('play').click());
   const phSync = () => {

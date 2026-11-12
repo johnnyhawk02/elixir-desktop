@@ -1638,6 +1638,9 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 .m-ph-dec .m-knob { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 0; }
 .m .m-ph-dec .m-vtrack { container-type: size; flex: 1; width: 100%; min-height: 0; background: none; border: 0; overflow: visible; border-radius: 0; touch-action: none; }
 .m-ph-dec .m-flab { font-size: 1.05rem; line-height: 1; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+.m-ph-kseq { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; touch-action: none; }
+.m .m-ph-kseq.m-btn:not(:active) { background: linear-gradient(to top, rgba(23, 32, 14, .2) calc(var(--f, .8) * 100%), transparent 0) !important; }
+.m-ph-kseq small { font-size: 1.05rem; text-transform: none; letter-spacing: 0; opacity: .7; }
 .m-ph .m-ph-install { grid-column: 1 / -1; min-height: 56px; }
 .m-ph-save { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
 .m-ph-save small { font-size: 1.05rem; text-transform: none; letter-spacing: 0; opacity: .7; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1648,7 +1651,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
   /* (sideways the decay row goes under the second row of buttons: rows play knob everything kit alter / pattern
      crossfeed random fx alter fx / decay / knob seqs, clear seqs, undo, save) */
   .m-ph-dec { order: 1; }
-  .m-ph [data-for="m-knobseq"], #m-ph-seqclear, #m-ph-undo, .m-ph-save, .m-ph-install { order: 2; }
+  #m-ph-kseq, #m-ph-seqclear, #m-ph-undo, .m-ph-save, .m-ph-install { order: 2; }
   .m-ph .m-btn, .m-ph .m-play { font-size: 1.6rem !important; }
   .m-ph-bpm .m-vtrack b { font-size: 2rem; }
   .m-ph-bpm .m-vtrack b::after { font-size: .9rem; }
@@ -1657,7 +1660,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>212</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>213</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1856,7 +1859,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
       <button class="m-btn" id="m-pexport" type="button">export</button>
       <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
     </div>
-    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v212, 12 Nov, 17:58</footer>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v213, 12 Nov, 20:08</footer>
   </section>
 </main>
 <main class="m m-ph" id="m-ph" aria-label="elixir">
@@ -1870,7 +1873,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
   <button class="m-btn" data-for="m-xrand" type="button">crossfeed</button>
   <button class="m-btn" data-for="m-fx-rand" type="button">random fx</button>
   <button class="m-btn" data-for="m-fx-alter" type="button">alter fx</button>
-  <button class="m-btn" data-for="m-knobseq" type="button">knob seqs</button>
+  <button class="m-btn m-ph-kseq" id="m-ph-kseq" type="button">knob seqs<small id="m-ph-kseq-out"></small></button>
   <button class="m-btn" id="m-ph-seqclear" type="button">clear seqs</button>
   <button class="m-btn" id="m-ph-undo" data-for="m-undo" type="button" disabled>undo</button>
   <button class="m-btn m-ph-save" data-for="m-psave" type="button">save<small id="m-ph-pname"></small></button>
@@ -10454,7 +10457,16 @@ $('m').addEventListener('pointerdown', (e) => {
 // length's place: 8 bars is 64 times as likely as a 16th), its steps made one of the five random ways, with a random
 // depth and slew. Undo puts the knobs' sequencers back ----
 const SEQR_W = SEQ_STEPS.map((_, i) => (i + 1) * (i + 1));
+// (the phone's knob seqs button is also a fader: it sets mKseqAt, 0..1 from 1/16 to 8 bars, and the steps are then
+// picked round that length, mostly it and its neighbours; null, as on the laptop, keeps the long-skewed weights)
+let mKseqAt = null;
 const mSeqRandStep = () => {
+  if (mKseqAt !== null) {
+    const t = mKseqAt * (SEQ_STEPS.length - 1), w = SEQ_STEPS.map((_, i) => Math.exp(-((i - t) ** 2) / .98));
+    let r = Math.random() * w.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < SEQ_STEPS.length; i++) if ((r -= w[i]) < 0) return SEQ_STEPS[i];
+    return SEQ_STEPS[SEQ_STEPS.length - 1];
+  }
   let r = Math.random() * SEQR_W.reduce((a, b) => a + b, 0);
   for (let i = 0; i < SEQ_STEPS.length; i++) if ((r -= SEQR_W[i]) < 0) return SEQ_STEPS[i];
   return SEQ_STEPS[SEQ_STEPS.length - 1];
@@ -10737,6 +10749,25 @@ mSync(); mUndo(); mCompOn(); mDrawAll();
 if (document.documentElement.classList.contains('phone')) {
   for (const b of $('m-ph').querySelectorAll('[data-for]')) b.addEventListener('click', () => $(b.dataset.for).click());
   $('m-ph-seqclear').addEventListener('click', mKnobSeqClear);
+  // knob seqs is a fader too: drag up or down (200 px the whole way) to set the step lengths it picks, from 1/16
+  // at the bottom to 8 bars at the top (the fill and the length under the name); a tap randomises. Kept in this browser
+  const KS_KEY = 'elixir-desktop-kseqlen', ks = $('m-ph-kseq');
+  try { const x = parseFloat(localStorage.getItem(KS_KEY)); mKseqAt = x >= 0 && x <= 1 ? x : .8; } catch (e) { mKseqAt = .8; }
+  const ksDraw = () => {
+    ks.style.setProperty('--f', mKseqAt);
+    $('m-ph-kseq-out').textContent = stepName(SEQ_STEPS[Math.round(mKseqAt * (SEQ_STEPS.length - 1))]);
+  };
+  let ksd = null, ksMoved = false;
+  ks.addEventListener('pointerdown', (e) => { ks.setPointerCapture(e.pointerId); ksd = { y: e.clientY, v: mKseqAt }; ksMoved = false; });
+  ks.addEventListener('pointermove', (e) => {
+    if (!ksd || (!ksMoved && Math.abs(e.clientY - ksd.y) < 8)) return;
+    ksMoved = true; mKseqAt = Math.max(0, Math.min(1, ksd.v + (ksd.y - e.clientY) / 200)); ksDraw();
+  });
+  const ksEnd = () => { if (ksd && ksMoved) try { localStorage.setItem(KS_KEY, String(mKseqAt)); } catch (e) {} ksd = null; };
+  ks.addEventListener('pointerup', ksEnd); ks.addEventListener('pointercancel', () => { ksEnd(); ksMoved = true; });
+  ks.addEventListener('click', () => { if (ksMoved) { ksMoved = false; return; } $('m-knobseq').click(); });
+  ks.addEventListener('contextmenu', (e) => e.preventDefault());
+  ksDraw();
   const play = $('m-ph-play');
   play.addEventListener('click', () => $('play').click());
   const phSync = () => {

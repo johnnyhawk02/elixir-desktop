@@ -3,7 +3,16 @@
 // length's place: 8 bars is 64 times as likely as a 16th), its steps made one of the five random ways, with a random
 // depth and slew. Undo puts the knobs' sequencers back ----
 const SEQR_W = SEQ_STEPS.map((_, i) => (i + 1) * (i + 1));
+// (the phone's knob seqs button is also a fader: it sets mKseqAt, 0..1 from 1/16 to 8 bars, and the steps are then
+// picked round that length, mostly it and its neighbours; null, as on the laptop, keeps the long-skewed weights)
+let mKseqAt = null;
 const mSeqRandStep = () => {
+  if (mKseqAt !== null) {
+    const t = mKseqAt * (SEQ_STEPS.length - 1), w = SEQ_STEPS.map((_, i) => Math.exp(-((i - t) ** 2) / .98));
+    let r = Math.random() * w.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < SEQ_STEPS.length; i++) if ((r -= w[i]) < 0) return SEQ_STEPS[i];
+    return SEQ_STEPS[SEQ_STEPS.length - 1];
+  }
   let r = Math.random() * SEQR_W.reduce((a, b) => a + b, 0);
   for (let i = 0; i < SEQ_STEPS.length; i++) if ((r -= SEQR_W[i]) < 0) return SEQ_STEPS[i];
   return SEQ_STEPS[SEQ_STEPS.length - 1];
