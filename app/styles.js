@@ -66,8 +66,8 @@ let styleIdx = 0; // saved with presets by name; presets from before the styles 
 let userPats = [];
 try { userPats = JSON.parse(localStorage.getItem('elexir-user-patterns') || '[]'); } catch (e) {}
 const storeUserPats = () => { try { localStorage.setItem('elexir-user-patterns', JSON.stringify(userPats)); } catch (e) {} };
-const userSlot = () => Math.min(userPats.length - 1, Math.floor(perf.beat * userPats.length / 32));
-const slotBeat = (i) => Math.ceil(i * 32 / userPats.length);
+const userSlot = () => Math.min(userPats.length - 1, Math.floor(perf.beat * userPats.length / (PERF_RANGE.beat[1] + 1)));
+const slotBeat = (i) => Math.ceil(i * (PERF_RANGE.beat[1] + 1) / userPats.length);
 function userGroove(u) {
   const g = { name: u.name, cond: u.bar, acc: u.acc };
   ROW.forEach((r, t) => {
@@ -143,9 +143,54 @@ function generate() {
   if (u && u.pages) {
     pattern.pages = u.pages.map((pg) => { const P = blankPage(); genPage(userGroove({ name: u.name, ...pg }), P, energy, T, fill, fillOn, yields); return P; });
     copyInto(pattern, pattern.pages[0]);
+  } else if (!st.user && perf.var > 0) { // a phrase of 4 or 8 bars, the variations in it
+    pattern.pages = Array.from({ length: perf.bars }, (_, i) => { const P = blankPage(); genPage(varyGroove(g, i, perf.bars, perf.var, styleIdx * 64 + perf.beat), P, energy, T, fill, fillOn, yields); return P; });
+    copyInto(pattern, pattern.pages[0]);
   } else { delete pattern.pages; genPage(g, pattern, energy, T, fill, fillOn, yields); }
   drawPerf();
   sendSeq();
+}
+// ---- variations: a beat played as a phrase of 4 or 8 bars. Bar 1 is the beat itself and so is every other odd bar,
+// so it stays recognisable; the even bars answer it with small changes, each made from a fixed seed (the style, the beat,
+// the bar's role and the var), so a beat always plays the same phrase. 4 bars: A a A z; 8 bars: A a A b A a c z
+// (a, b, c the answers, z the last bar, which turns most). The last bar makes var changes (A 1 .. D 4), a and b one
+// fewer, c two fewer, so A changes only the last bar. Added hits come in at mid energy (levels 3 to 6), so a low energy keeps the phrase plain.
+const VAR_ROLES = { 4: [0, 'a', 0, 'z'], 8: [0, 'a', 0, 'b', 0, 'a', 'c', 'z'] };
+function varRng(seed) {
+  let h = seed >>> 0;
+  return () => { h = Math.imul(h ^ (h >>> 15), 0x2c1b3c6d) + 0x9e3779b9 >>> 0; h ^= h >>> 12; h = Math.imul(h, 0x297a2d39) >>> 0; return ((h ^ (h >>> 15)) >>> 0) / 4294967296; };
+}
+const VAR_OPS = [
+  // a kick off the beat moves a step or two
+  (g, r) => { const k = [...g.k], from = [...k.keys()].filter((s) => s % 4 && k[s] !== '.' && k[s] !== '1');
+    if (!from.length) return false; const s = from[Math.floor(r() * from.length)], to = s + (r() < .5 ? -1 : 1) * (r() < .7 ? 1 : 2);
+    if (to < 1 || to > 15 || k[to] !== '.') return false; k[to] = k[s]; k[s] = '.'; g.k = k.join(''); return true; },
+  // an extra kick off the beat
+  (g, r) => { const k = [...g.k], free = [2, 3, 6, 7, 10, 11, 13, 14, 15].filter((s) => k[s] === '.'); if (!free.length) return false;
+    k[free[Math.floor(r() * free.length)]] = String(3 + Math.floor(r() * 2)); g.k = k.join(''); return true; },
+  // a ghost snare by a backbeat
+  (g, r) => { const sn = [...g.s], free = [2, 3, 6, 7, 9, 10, 11, 14, 15].filter((s) => sn[s] === '.'); if (!free.length) return false;
+    sn[free[Math.floor(r() * free.length)]] = String(4 + Math.floor(r() * 3)); g.s = sn.join(''); return true; },
+  // a tom answer in the last beat: high then low
+  (g, r) => { const hi = [...g.hi], lo = [...g.lo], a = 12 + Math.floor(r() * 2), b = a + 2;
+    if (hi[a] !== '.' || lo[b] !== '.') return false; hi[a] = '5'; lo[b] = '5'; g.hi = hi.join(''); g.lo = lo.join(''); return true; },
+  // an open hat on an off-beat (the closed hat steps aside)
+  (g, r) => { const oh = [...g.oh], ch = [...g.ch], free = [2, 6, 10, 14].filter((s) => oh[s] === '.'); if (!free.length) return false;
+    const s = free[Math.floor(r() * free.length)]; oh[s] = '4'; ch[s] = '.'; g.oh = oh.join(''); g.ch = ch.join(''); return true; },
+  // the closed hat drops out for a beat (not the first)
+  (g, r) => { const ch = [...g.ch], b = 1 + Math.floor(r() * 3); if (ch.slice(b * 4, b * 4 + 4).every((c) => c === '.')) return false;
+    for (let s = b * 4; s < b * 4 + 4; s++) ch[s] = '.'; g.ch = ch.join(''); return true; },
+  // a kick off the beat drops out
+  (g, r) => { const k = [...g.k], from = [...k.keys()].filter((s) => s && k[s] !== '.' && k[s] !== '1'); if (!from.length) return false;
+    k[from[Math.floor(r() * from.length)]] = '.'; g.k = k.join(''); return true; },
+];
+function varyGroove(g, bar, bars, v, seed) {
+  const role = VAR_ROLES[bars][bar];
+  const n = !role ? 0 : role === 'z' ? v : role === 'c' ? Math.max(0, v - 2) : v - 1;
+  if (!n) return g;
+  const out = { ...g }, r = varRng(seed * 977 + 'zabc'.indexOf(role) * 131 + v * 7);
+  for (let i = 0, done = 0; done < n && i < 24; i++) if (VAR_OPS[Math.floor(r() * VAR_OPS.length)](out, r)) done++;
+  return out;
 }
 function genPage(g, pattern, energy, T, fill, fillOn, yields) {
   for (const a of [pattern.on, pattern.acc, pattern.bar]) a.forEach((r) => r.fill(0));

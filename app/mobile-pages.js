@@ -21,6 +21,9 @@ mFader($('m-beat-faders'), 'velocity', { ...pf('vel'), show: (v) => `${v}` });
 mFader($('m-beat-faders'), 'groove', { ...pf('groove'), show: () => perfText('groove').replace(' ', '\n') });
 mFader($('m-beat-faders'), 'depth', { ...pf('depth'), show: (v) => `${v}%` });
 mFader($('m-beat-faders'), 'accent', { ...pf('accent'), show: (v) => `+${v} dB` });
+// the beat's variations (off, A..D) and the phrase they play over (4 or 8 bars); on the laptop they sit at the end of the pattern row
+mFader($('m-beat-faders'), 'var', { ...pf('var'), show: () => perfText('var') });
+mFader($('m-beat-faders'), 'bars', { min: 0, max: 1, get: () => (perf.bars === 8 ? 1 : 0), set: (v) => setPerf('bars', v ? 8 : 4), show: (v) => `${v ? 8 : 4}\nbars`, dflt: 0 });
 // ---- the perf page's own controls: tempo, the sidechain, the sound macros and crossfeed. They live in a hidden box;
 // the page shows twelve assignable slots (below, after the x/y page's lists), these seven by default ----
 mFader($('m-perf-src'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });

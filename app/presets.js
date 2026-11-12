@@ -158,7 +158,7 @@ function setDirty(d) {
 }
 function songSnapshot() {
   const copy = (a) => a.map((r) => r.slice());
-  return { style: STYLES[styleIdx].name, user: STYLES[styleIdx].user && userPats.length ? structuredClone(userPats[userSlot()]) : undefined, energy: perf.energy, beat: perf.beat, fills: perf.fills,
+  return { style: STYLES[styleIdx].name, user: STYLES[styleIdx].user && userPats.length ? structuredClone(userPats[userSlot()]) : undefined, energy: perf.energy, beat: perf.beat, var: perf.var, bars: perf.bars, fills: perf.fills,
     tempo: perf.tempo, rush: perf.rush, rushT: perf.rushT, vel: perf.vel, accent: perf.accent, view, source, groove: structuredClone(groove), macro: { ...macro },
     pattern: { on: copy(pattern.on), acc: copy(pattern.acc), bar: copy(pattern.bar) }, stepPages: pages.slice(0, pageCount).map(copyPage),
     master: { ...master }, rushSet: { ...rushSet } };
@@ -167,6 +167,8 @@ function useSong(g, keepTempo) {
   setStyle(styleIndex(g.style));
   for (const k of ['energy', 'beat', 'fills', 'tempo', 'vel', 'accent']) if (!(keepTempo && k === 'tempo')) perf[k] = g[k];
   perf.tempo = clampTempo(perf.tempo); // presets from when the range was wider
+  // variations: presets from before them get B over 4 bars, like a new start
+  perf.var = Number.isInteger(g.var) ? Math.max(0, Math.min(4, g.var)) : PERF_RANGE.var[2]; perf.bars = g.bars === 8 ? 8 : 4;
   $('tempo').value = perf.tempo;
   if (STYLES[styleIdx].user && g.user) { const i = ensureUserPat(g.user); if (i >= 0) useUserSlot(i); }
   Object.assign(master, MASTER0, g.master); buildMaster(); // presets saved before the sidechain switch have it on
