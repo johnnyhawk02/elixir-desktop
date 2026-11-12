@@ -1638,8 +1638,10 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 .m-ph-dec .m-knob { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 0; }
 .m .m-ph-dec .m-vtrack { container-type: size; flex: 1; width: 100%; min-height: 0; background: none; border: 0; overflow: visible; border-radius: 0; touch-action: none; }
 .m-ph-dec .m-flab { font-size: 1.05rem; line-height: 1; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
-.m-ph-kseq { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; touch-action: none; }
-.m .m-ph-kseq.m-btn:not(:active) { background: linear-gradient(to top, rgba(23, 32, 14, .2) calc(var(--f, .8) * 100%), transparent 0) !important; }
+.m-ph-kseq { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+/* (touch-action none so a finger's drag is the fader's, not a scroll; no pressed look, as a drag isn't a press) */
+.m .m-ph-kseq.m-btn { touch-action: none; color: var(--ink) !important; background: linear-gradient(to top, rgba(23, 32, 14, .2) calc(var(--f, .8) * 100%), transparent 0) !important; }
+.m .m-ph-kseq.m-btn.flash { background: var(--spot) !important; color: var(--panel) !important; }
 .m-ph-kseq small { font-size: 1.05rem; text-transform: none; letter-spacing: 0; opacity: .7; }
 .m-ph .m-ph-install { grid-column: 1 / -1; min-height: 56px; }
 .m-ph-save { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
@@ -1660,7 +1662,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>213</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>214</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1859,7 +1861,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
       <button class="m-btn" id="m-pexport" type="button">export</button>
       <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
     </div>
-    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v213, 12 Nov, 20:08</footer>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v214, 12 Nov, 20:23</footer>
   </section>
 </main>
 <main class="m m-ph" id="m-ph" aria-label="elixir">
@@ -10765,7 +10767,11 @@ if (document.documentElement.classList.contains('phone')) {
   });
   const ksEnd = () => { if (ksd && ksMoved) try { localStorage.setItem(KS_KEY, String(mKseqAt)); } catch (e) {} ksd = null; };
   ks.addEventListener('pointerup', ksEnd); ks.addEventListener('pointercancel', () => { ksEnd(); ksMoved = true; });
-  ks.addEventListener('click', () => { if (ksMoved) { ksMoved = false; return; } $('m-knobseq').click(); });
+  // (a tap shows pressed for a moment once it has randomised, so the pressed look never comes up under a drag)
+  ks.addEventListener('click', () => {
+    if (ksMoved) { ksMoved = false; return; }
+    $('m-knobseq').click(); ks.classList.add('flash'); setTimeout(() => ks.classList.remove('flash'), 150);
+  });
   ks.addEventListener('contextmenu', (e) => e.preventDefault());
   ksDraw();
   const play = $('m-ph-play');

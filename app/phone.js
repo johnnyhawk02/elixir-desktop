@@ -19,7 +19,11 @@ if (document.documentElement.classList.contains('phone')) {
   });
   const ksEnd = () => { if (ksd && ksMoved) try { localStorage.setItem(KS_KEY, String(mKseqAt)); } catch (e) {} ksd = null; };
   ks.addEventListener('pointerup', ksEnd); ks.addEventListener('pointercancel', () => { ksEnd(); ksMoved = true; });
-  ks.addEventListener('click', () => { if (ksMoved) { ksMoved = false; return; } $('m-knobseq').click(); });
+  // (a tap shows pressed for a moment once it has randomised, so the pressed look never comes up under a drag)
+  ks.addEventListener('click', () => {
+    if (ksMoved) { ksMoved = false; return; }
+    $('m-knobseq').click(); ks.classList.add('flash'); setTimeout(() => ks.classList.remove('flash'), 150);
+  });
   ks.addEventListener('contextmenu', (e) => e.preventDefault());
   ksDraw();
   const play = $('m-ph-play');

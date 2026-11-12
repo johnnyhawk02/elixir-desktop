@@ -760,8 +760,10 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 .m-ph-dec .m-knob { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 0; }
 .m .m-ph-dec .m-vtrack { container-type: size; flex: 1; width: 100%; min-height: 0; background: none; border: 0; overflow: visible; border-radius: 0; touch-action: none; }
 .m-ph-dec .m-flab { font-size: 1.05rem; line-height: 1; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
-.m-ph-kseq { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; touch-action: none; }
-.m .m-ph-kseq.m-btn:not(:active) { background: linear-gradient(to top, rgba(23, 32, 14, .2) calc(var(--f, .8) * 100%), transparent 0) !important; }
+.m-ph-kseq { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+/* (touch-action none so a finger's drag is the fader's, not a scroll; no pressed look, as a drag isn't a press) */
+.m .m-ph-kseq.m-btn { touch-action: none; color: var(--ink) !important; background: linear-gradient(to top, rgba(23, 32, 14, .2) calc(var(--f, .8) * 100%), transparent 0) !important; }
+.m .m-ph-kseq.m-btn.flash { background: var(--spot) !important; color: var(--panel) !important; }
 .m-ph-kseq small { font-size: 1.05rem; text-transform: none; letter-spacing: 0; opacity: .7; }
 .m-ph .m-ph-install { grid-column: 1 / -1; min-height: 56px; }
 .m-ph-save { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
