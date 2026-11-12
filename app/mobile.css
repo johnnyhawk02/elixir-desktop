@@ -8,6 +8,13 @@
    Nothing scrolls but the presets list and the pop-ups' lists. Sizes that follow the screen's width (Nvw) stop
    growing past a 412 px screen (a Pixel 9a), so on a wider screen or a desktop browser the text still fits. */
 
+/* ---- accent colour (options > accent colour): one spot colour for lit things (pressed buttons, knob
+   rings, hit lights); off keeps the plain ink ---- */
+html[data-spot="red"] .m { --spot: #a3241a; }
+html[data-spot="orange"] .m { --spot: #a84a0c; }
+html[data-spot="blue"] .m { --spot: #1f418f; }
+html[data-spot="violet"] .m { --spot: #5d2c80; }
+
 /* ---- the page and the screen ---- */
 .wrap { display: none !important; }
 body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-inset-right, 0px)) max(6px, env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px));
@@ -18,6 +25,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   --display: "VT323", ui-monospace, monospace; --body: "VT323", ui-monospace, monospace; --mono: "VT323", ui-monospace, monospace;
   --fs-xs: 1.12rem; --fs-s: 1.25rem; --fs-m: 1.3rem; --fs-l: 1.6rem;
   --rule: 1px solid rgba(23, 32, 14, .32);
+  --spot: var(--ink);
   position: relative; max-width: 480px; margin: 0 auto; display: grid; grid-template-rows: auto auto 1fr auto; gap: 0;
   height: calc(100dvh - max(6px, env(safe-area-inset-top, 0px)) - max(6px, env(safe-area-inset-bottom, 0px))); padding: 8px 8px 10px;
   font-family: var(--body); color: var(--ink);
@@ -72,7 +80,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   background: transparent !important; border: 2px solid var(--ink); border-radius: 3px; font-weight: 400; text-transform: uppercase; letter-spacing: .06em; }
 .m .m-btn:active, .m .m-big, .m .m-play, .m-tabs button[aria-selected="true"], .m .m-toggle[aria-pressed="true"], .m .m-plist li.cur .m-pload, .m .m-rec.on,
 .m .m-voice .m-btn[aria-selected="true"], .m .m-rs-tabs .m-btn[aria-selected="true"], .m .m-ch-list .m-btn[aria-pressed="true"], .m .m-looplens .m-btn[aria-pressed="true"] {
-  background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
+  background: var(--spot) !important; color: var(--panel) !important; text-shadow: none; }
+.m .m-big, .m .m-play:not([aria-pressed="true"]) { background: var(--ink) !important; }
 .m .m-big:active, .m .m-play:active { transform: none; background: transparent !important; color: var(--ink) !important; }
 .m .m-btn:disabled { opacity: .3; }
 
@@ -201,14 +210,14 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   -webkit-mask: repeating-conic-gradient(from 225deg, #000 0 10deg, transparent 10deg 13.5deg), radial-gradient(closest-side, transparent 64%, #000 66% 98%, transparent 100%);
   -webkit-mask-composite: source-in; mask-composite: intersect; }
 .m .m-knob .m-vtrack i { height: var(--k); border-radius: 50%;
-  background: conic-gradient(from 225deg, var(--ink) 0 round(down, calc(var(--f) * 270deg + .01deg), 13.5deg), transparent 0);
+  background: conic-gradient(from 225deg, var(--spot) 0 round(down, calc(var(--f) * 270deg + .01deg), 13.5deg), transparent 0);
   -webkit-mask: repeating-conic-gradient(from 225deg, #000 0 10deg, transparent 10deg 13.5deg), radial-gradient(closest-side, transparent 64%, #000 66% 98%, transparent 100%);
   -webkit-mask-composite: source-in; mask-composite: intersect; }
 .m .m-knob .m-vtrack::after { content: ''; transform: rotate(calc(var(--f) * 270deg - 135deg));
   background: linear-gradient(var(--ink), var(--ink)) 50% 22% / 3px 30% no-repeat; }
 .m .m-knob .m-vtrack.mod::after { transform: rotate(calc(var(--b) * 270deg - 135deg)); }
 .m .m-knob .m-vtrack.mod i { --lo: round(down, calc(min(var(--f), var(--b)) * 270deg + .01deg), 13.5deg); --hi: round(up, calc(max(var(--f), var(--b)) * 270deg - .01deg), 13.5deg);
-  background: conic-gradient(from 225deg, transparent 0 var(--lo), var(--ink) var(--lo) var(--hi), transparent var(--hi)); }
+  background: conic-gradient(from 225deg, transparent 0 var(--lo), var(--spot) var(--lo) var(--hi), transparent var(--hi)); }
 .m .m-knob .m-vtrack.mod b { display: none; }
 .m .m-knob.held .m-vtrack { outline: 0; }
 .m-pages .m-rand-card { display: grid; min-height: 0; padding: 6px 2px 6px 8px; border-top: var(--rule); border-left: var(--rule); }
@@ -690,7 +699,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   #m-mix-echo .m-flab, #m-mix-ring .m-flab, #m-mix-pan .m-flab { display: none; }
   /* (a pan knob's ring lights from the centre out to its side) */
   .m #m-mix-pan .m-vtrack i { --lo: round(down, calc(min(var(--f), .496) * 270deg + .01deg), 13.5deg); --hi: round(up, calc(max(var(--f), .496) * 270deg - .01deg), 13.5deg);
-    background: conic-gradient(from 225deg, transparent 0 var(--lo), var(--ink) var(--lo) var(--hi), transparent var(--hi)); }
+    background: conic-gradient(from 225deg, transparent 0 var(--lo), var(--spot) var(--lo) var(--hi), transparent var(--hi)); }
   .m-mix-card .m-knob { display: flex; flex-direction: column; align-items: center; justify-content: end; gap: 2px; }
   .m-mix-card .m-knob output { display: block; height: auto; white-space: nowrap; text-align: center; }
   .m .m-mix-card #m-mix-echo .m-vtrack, .m .m-mix-card #m-mix-ring .m-vtrack, .m .m-mix-card #m-mix-pan .m-vtrack { flex: none; width: 52px; height: 44px; min-height: 0; }
@@ -712,7 +721,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 @media (min-width: 1000px) {
   #m-dens-faders .m-vf { position: relative; }
   .m-dens-led { display: block; width: 100%; height: 2px; background: var(--ghost); flex: none; margin-top: 1px; }
-  .m-dens-led.on { background: var(--ink); transition: none; }
+  .m-dens-led.on { background: var(--spot); transition: none; }
   .m-dens-led:not(.on) { transition: background-color .25s ease-out; }
 }
 

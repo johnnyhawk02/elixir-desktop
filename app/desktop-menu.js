@@ -35,6 +35,17 @@ $('m').addEventListener('dblclick', (e) => {
   const tr = e.target.closest('.m-vtrack'), fd = tr && mFdOf(tr.closest('.m-vf')); if (fd) mReset(fd);
 });
 
+// ---- accent colour: one spot colour for lit things (off = the plain LCD ink), kept per browser ----
+const SPOTS = ['off', 'red', 'orange', 'blue', 'violet'];
+let mSpot = 'off';
+try { const v = localStorage.getItem('elixir-desktop-spot'); if (SPOTS.includes(v)) mSpot = v; } catch (e) {}
+const mSpotSet = (v) => {
+  mSpot = v; if (v === 'off') delete document.documentElement.dataset.spot; else document.documentElement.dataset.spot = v;
+  try { localStorage.setItem('elixir-desktop-spot', v); } catch (e) {}
+};
+mSpotSet(mSpot);
+const mSpotMenu = (r) => mMenu({ clientX: r.left, clientY: r.bottom + 6 }, SPOTS.map((v) => [(v === mSpot ? '■ ' : '□ ') + v, () => mSpotSet(v)]));
+
 // ---- the laptop's one options button: next bar and assign (ticked when on), then the settings, user settings, help and
 // install app (whose own buttons the laptop hides) ----
 $('m-opts').addEventListener('click', (e) => {
@@ -43,6 +54,7 @@ $('m-opts').addEventListener('click', (e) => {
   mMenu({ clientX: r.left, clientY: r.bottom + 6 }, [
     [tick('m-nextbar') + 'randomise on next bar', () => $('m-nextbar').click()],
     [tick('m-assign') + 'assign knobs', () => $('m-assign').click()],
+    ['accent colour: ' + mSpot + '…', () => mSpotMenu(r)],
     ['settings', () => $('m-set-open').click()], ['user settings', () => $('m-user-open').click()], ['help', () => $('m-help-open').click()],
     // (install app, while the browser offers it; its button under the presets is the phone's)
     ...(mInstallEv ? [['install app', () => $('m-install').click()]] : [])]);

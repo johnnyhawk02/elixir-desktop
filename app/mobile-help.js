@@ -59,6 +59,7 @@ const HELP = [
 <li>Click a knob or fader, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>
 <li>Right-click a knob or fader for its step sequencer, reset and (on perform) assign. Double-click one to reset it.</li></ul>`],
   ['more', 'more', `<ul><li><b>options</b> (by the e) holds randomise on next bar, assign knobs, and:</li>
+<li><b>accent colour</b>: off (the plain screen), red, orange, blue or violet for lit buttons and knob rings.</li>
 <li><b>settings</b>: copy the knob assignments or your presets, export or clear presets, and the <b>rush</b> graph of how the rush builds (drag its squares).</li>
 <li><b>user settings</b>: <b>midi</b>, which CC moves each knob, with presets (cc1 to cc12, cc13 to cc24) and your own; <b>seq</b>, whether sequencers follow the groove.</li>
 <li>Install it as an app from your browser's menu; it works offline.</li>
