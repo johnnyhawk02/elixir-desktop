@@ -1,7 +1,8 @@
 // ---- phones (html.phone, set by the script in the page's head): one big screen, .m-ph, in place of the rest: play,
-// the tempo (a knob), every randomiser, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
+// the tempo (a knob), every randomiser, clear knob seqs, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
 if (document.documentElement.classList.contains('phone')) {
   for (const b of $('m-ph').querySelectorAll('[data-for]')) b.addEventListener('click', () => $(b.dataset.for).click());
+  $('m-ph-seqclear').addEventListener('click', mKnobSeqClear);
   const play = $('m-ph-play');
   play.addEventListener('click', () => $('play').click());
   const phSync = () => {

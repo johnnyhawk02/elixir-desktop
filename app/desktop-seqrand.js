@@ -30,3 +30,16 @@ $('m-knobseq').addEventListener('click', () => {
   mUndoFn = () => { fs.forEach((f, i) => { if (f.base !== null) mSeqRelease(f); f.seq = was[i]; }); if (mSeqF) { if (!mSeqF.seq) mSeqDraft = { ...newSeq(), on: false }; mSeqDraw(); } else mSeqMarks(); setDirty(true); };
   mUndo();
 });
+// clear knob seqs (the phone screen's button): every perform knob's sequencer gone, the knob back on its own setting.
+// Undo puts them back
+const mKnobSeqClear = () => {
+  const fs = mFaders.filter((f) => /^m-faders:slot\d+$/.test(f.key) && f.seq);
+  if (!fs.length) return;
+  const was = fs.map((f) => ({ ...f.seq, vals: f.seq.vals.slice() }));
+  for (const f of fs) { if (f.base !== null) mSeqRelease(f); f.seq = null; }
+  if (mSeqF && fs.includes(mSeqF)) { mSeqDraft = { ...newSeq(), on: false }; mSeqDraw(); } else mSeqMarks();
+  setDirty(true);
+  undoValues = null; $('undo').disabled = true;
+  mUndoFn = () => { fs.forEach((f, i) => { if (f.base !== null) mSeqRelease(f); f.seq = was[i]; }); if (mSeqF) mSeqDraw(); else mSeqMarks(); setDirty(true); };
+  mUndo();
+};
