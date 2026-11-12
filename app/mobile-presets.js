@@ -1,4 +1,6 @@
-// ---- presets: save, and a list to load or delete (kept in this browser, as on the desktop) ----
+// ---- presets: a bar on the title line (the loaded one's name, ‹ › to step through, save, manage presets) and the
+// manage pop-up under it: the list to load, star, rename or delete, search, save over, import and export (kept in this
+// browser) ----
 // while playing, a preset waits for the next bar to come in: until it's heard, the one playing stays marked and the
 // new one's row flashes
 let mPending = null, mPlayingPreset = null;
@@ -16,8 +18,39 @@ const FAV_KEY = 'elixir-desktop-favs';
 const mFavs = new Set((() => { try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch (e) { return []; } })());
 for (const k of kitList) if (k.saved && k.fav) mFavs.add(k.name);
 const mFavStore = () => { try { localStorage.setItem(FAV_KEY, JSON.stringify([...mFavs])); } catch (e) {} };
+// the bar: the name of the one loaded (flashing while it waits for the next bar)
+function mPbarDraw() {
+  const k = kitList[Number($('kit').value)], n = $('m-pname');
+  n.textContent = k ? k.name : ''; n.classList.toggle('pending', !!mPending);
+}
+const mStep = (d) => {
+  const opts = [...$('kit').options], i = opts.findIndex((o) => o.value === $('kit').value);
+  const o = opts[(i + d + opts.length) % opts.length];
+  if (o && o.value !== $('kit').value) mLoad(kitList[Number(o.value)]);
+};
+$('m-pprev').addEventListener('click', () => mStep(-1));
+$('m-pnext').addEventListener('click', () => mStep(1));
+// rename: the name becomes a box; enter (or a click away) keeps it, esc leaves it as it was. A name already used is refused
+function mRename(k, li) {
+  const b = li.querySelector('.m-pload'), box = document.createElement('input');
+  box.className = 'm-prename'; box.value = k.name; box.maxLength = 24; box.spellcheck = false; box.setAttribute('aria-label', `New name for ${k.name}`);
+  b.replaceWith(box); box.focus(); box.select();
+  let done = false;
+  const end = (keep) => {
+    if (done) return; done = true;
+    const name = box.value.trim().replace(/\s+/g, ' ');
+    if (keep && name && name !== k.name && !kitList.some((o) => o !== k && o.name === name)) {
+      if (mFavs.has(k.name)) { mFavs.delete(k.name); mFavs.add(name); mFavStore(); }
+      k.name = name; storePresets();
+      const v = $('kit').value; fillKits(); $('kit').value = v;
+    }
+    mDrawPresets();
+  };
+  box.addEventListener('keydown', (e) => { if (e.key === 'Enter') end(true); else if (e.key === 'Escape') { e.stopPropagation(); end(false); } });
+  box.addEventListener('blur', () => end(true));
+}
 function mDrawPresets() {
-  mOverDraw();
+  mPbarDraw(); mOverDraw();
   const list = $('m-plist'), cur = mPending ? mPlayingPreset : kitList[Number($('kit').value)];
   list.innerHTML = '';
   const group = (t) => { const li = document.createElement('li'); li.className = 'm-pgroup'; li.textContent = t; list.append(li); };
@@ -35,10 +68,12 @@ function mDrawPresets() {
       mFavStore(); mDrawPresets();
     });
     li.append(star);
-    // (a built-in one has a gap where a saved one's delete is, so every row's name lines up)
-    if (!k.saved) { const gap = document.createElement('span'); gap.className = 'm-pdel'; li.append(gap); }
+    // (a built-in one has gaps where a saved one's rename and delete are, so every row lines up)
+    if (!k.saved) for (let i = 0; i < 2; i++) { const gap = document.createElement('span'); gap.className = 'm-pdel'; li.append(gap); }
     if (k.saved) {
-      const d = document.createElement('button'); d.className = 'm-pdel'; d.type = 'button'; d.textContent = '✕';
+      const r = document.createElement('button'); r.className = 'm-pdel'; r.type = 'button'; r.textContent = 'rename';
+      r.addEventListener('click', () => mRename(k, li)); li.append(r);
+      const d = document.createElement('button'); d.className = 'm-pdel'; d.type = 'button'; d.textContent = 'delete';
       d.setAttribute('aria-label', `Delete ${k.name}`);
       d.addEventListener('click', () => {
         if (!confirm(`Delete ${k.name}?`)) return;
@@ -69,12 +104,7 @@ function mDrawPresets() {
   group('built in');
   kitList.filter((k) => k.builtin && !mFavs.has(k.name)).forEach(row);
 }
-$('m-psave').addEventListener('click', () => {
-  $('kit-save').click();
-  const k = kitList[kitList.length - 1];
-  $('m-pnote').textContent = `Saved as ${k.name}.`;
-  mDrawPresets();
-});
+$('m-psave').addEventListener('click', () => { $('kit-save').click(); mDrawPresets(); });
 // save over: the current sound and song replace the loaded preset's, name and star kept (to match levels across
 // presets). A built-in one's new version is kept in this browser over the factory one (and goes out with an export
 // of favourites); Init kit can't be overwritten
@@ -84,7 +114,7 @@ kitList.forEach((k, i) => { if (k.builtin && mEdits[k.name]) { const q = toCurre
 const mOverTarget = () => { const k = mPending ? null : kitList[Number($('kit').value)]; return k && (k.saved || k.builtin) && k.kit !== factoryInit ? k : null; };
 function mOverDraw() {
   const k = mOverTarget();
-  $('m-pover').disabled = !k; $('m-pover').textContent = k ? `save over ${k.name}` : 'save over';
+  $('m-pover').disabled = !k;
 }
 $('m-pover').addEventListener('click', () => {
   const k = mOverTarget();
@@ -93,7 +123,6 @@ $('m-pover').addEventListener('click', () => {
   if (k.saved) storePresets();
   else { k.edited = true; mEdits[k.name] = presetData(k); try { localStorage.setItem(EDIT_KEY, JSON.stringify(mEdits)); } catch (e) {} }
   initValues.set(values); buildKnobs(); setDirty(false);
-  $('m-pnote').textContent = `Saved over ${k.name}.`;
   mDrawPresets();
 });
 
@@ -113,7 +142,6 @@ async function mImport(files) {
     } catch (err) { bad++; }
   }
   if (n) { const v = $('kit').value; storePresets(); fillKits(); $('kit').value = v; }
-  $('m-pnote').textContent = (n ? `Imported ${n}.` : 'Nothing new to import.') + (old ? ` ${old} skipped: not a preset.` : '') + (bad ? ` ${bad} file${bad > 1 ? 's' : ''} not a presets file.` : '');
   mDrawPresets();
 }
 $('m-pimport').addEventListener('change', async (e) => { await mImport([...e.target.files]); e.target.value = ''; });
@@ -126,9 +154,9 @@ $('m-psearch').addEventListener('keydown', (e) => {
 // import stars it again), as the settings' export. It never deletes anything
 $('m-pexport').addEventListener('click', async () => {
   const list = mSetPresets(true);
-  if (!list.length) { $('m-pnote').textContent = 'No presets to export yet.'; return; }
+  if (!list.length) return;
   const blob = new Blob([JSON.stringify({ elixir: 1, presets: list }, null, 1)], { type: 'application/json' });
-  if (await mOffer({ blob, name: 'elixir-desktop-presets.json' }, 'application/json')) $('m-pnote').textContent = `Exported ${list.length} preset${list.length > 1 ? 's' : ''}.`;
+  await mOffer({ blob, name: 'elixir-desktop-presets.json' }, 'application/json');
 });
 // clear all (in settings): every saved preset deleted and every star cleared (the built-in ones stay)
 function mClearAll() {
@@ -140,3 +168,20 @@ function mClearAll() {
   return mine.length;
 }
 
+
+// ---- manage presets: a pop-up under its button; it stays open to try one after another, and a click elsewhere or esc
+// closes it ----
+function mPmShow(on) {
+  $('m-pm').hidden = !on; $('m-pm-open').setAttribute('aria-expanded', on ? 'true' : 'false');
+  if (!on) return;
+  mDrawPresets();
+  const r = $('m-pm-open').getBoundingClientRect(), c = $('m-pm');
+  c.style.left = Math.max(8, Math.min(r.right - c.offsetWidth, innerWidth - c.offsetWidth - 8)) + 'px'; c.style.top = (r.bottom + 6) + 'px';
+}
+$('m-pm-open').addEventListener('click', () => mPmShow($('m-pm').hidden));
+addEventListener('pointerdown', (e) => { if (!$('m-pm').hidden && !e.target.closest('#m-pm, #m-pm-open')) mPmShow(false); }, { capture: true });
+addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !$('m-pm').hidden && !e.target.closest('.m-prename')) { e.stopImmediatePropagation(); mPmShow(false); }
+}, { capture: true });
+addEventListener('resize', () => { if (!$('m-pm').hidden) mPmShow(true); });
+mPbarDraw();

@@ -51,6 +51,13 @@
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
+  <div class="m-pbar" aria-label="preset">
+    <button class="m-toggle m-pstep" id="m-pprev" type="button" aria-label="Previous preset">‹</button>
+    <b class="m-pname" id="m-pname"></b>
+    <button class="m-toggle m-pstep" id="m-pnext" type="button" aria-label="Next preset">›</button>
+    <button class="m-toggle m-pbtn" id="m-psave" type="button">save</button>
+    <button class="m-toggle m-pbtn" id="m-pm-open" type="button" aria-expanded="false">manage presets</button>
+  </div>
   <section class="m-card m-trans">
     <button class="m-play" id="m-play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 4.5v15l13-7.5z"/><rect class="i-stop" x="5.5" y="5.5" width="13" height="13" rx="2"/></svg><span>play</span></button>
     <button class="m-rec" id="m-rec" type="button" aria-pressed="false" aria-label="Record"><i></i><span id="m-rec-t">rec</span></button>
@@ -128,21 +135,6 @@
     </section>
   </div>
 
-  <div class="m-panel" data-m-panel="presets">
-    <section class="m-card m-presets-card">
-      <div class="m-psaves"><button class="m-btn m-big" id="m-psave" type="button">save new</button><button class="m-btn" id="m-pover" type="button">save over</button></div>
-      <label class="m-chk"><input id="m-pbpm" type="checkbox" checked><i aria-hidden="true"></i>loading a preset uses its tempo</label>
-      <input class="m-psearch" id="m-psearch" type="search" placeholder="search presets" aria-label="Search presets" autocomplete="off" spellcheck="false">
-      <p class="m-note" id="m-pnote" aria-live="polite"></p>
-      <ul class="m-plist" id="m-plist"></ul>
-      <div class="m-pio">
-        <label class="m-btn m-file" title="Reads a presets file exported here">import<input id="m-pimport" type="file" accept="application/json,.json" multiple></label>
-        <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
-        <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
-      </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v@VER@, @BUILT@</footer>
-    </section>
-  </div>
   </div>
 
   <div class="m-rs" id="m-set" hidden>
@@ -237,8 +229,21 @@
     <button type="button" role="tab" data-m-tab="xf" aria-selected="false">xfeed</button>
     <button type="button" role="tab" data-m-tab="mix" aria-selected="false">mix</button>
     <button type="button" role="tab" data-m-tab="comp" aria-selected="false">mstr</button>
-    <button type="button" role="tab" data-m-tab="presets" aria-selected="false">prst</button>
   </nav>
+  <section class="m-card m-pm" id="m-pm" role="dialog" aria-label="manage presets" hidden>
+    <div class="m-pm-top">
+      <input class="m-psearch" id="m-psearch" type="search" placeholder="search presets" aria-label="Search presets" autocomplete="off" spellcheck="false">
+      <label class="m-chk"><input id="m-pbpm" type="checkbox" checked><i aria-hidden="true"></i>use its tempo</label>
+    </div>
+    <ul class="m-plist" id="m-plist"></ul>
+    <div class="m-pio">
+      <button class="m-btn" id="m-pover" type="button">save over</button>
+      <label class="m-btn m-file">import<input id="m-pimport" type="file" accept="application/json,.json" multiple></label>
+      <button class="m-btn" id="m-pexport" type="button">export</button>
+      <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
+    </div>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v@VER@, @BUILT@</footer>
+  </section>
 </main>
 <div class="m-turn" id="m-turn"><div><b>turn it sideways</b><span>elixir plays in landscape</span><button type="button" id="m-turn-fs" hidden>full screen</button></div></div>
 

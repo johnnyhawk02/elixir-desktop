@@ -10,7 +10,7 @@
     e.preventDefault(); depth = 0; $('m').classList.remove('dropping');
     const files = [...e.dataTransfer.files].filter((f) => /\.json$/i.test(f.name) || f.type === 'application/json');
     if (!files.length) return;
-    mTab('presets');
+    mPmShow(true);
     await mImport(files);
   });
 }

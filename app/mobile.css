@@ -316,20 +316,29 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-comp-card .m-toggle { min-width: 52px; }
 #m-comp.off { opacity: .4; }
 
-/* ---- prst: save at the top, the list between (it scrolls), the file buttons and credits at the foot ---- */
-[data-m-panel="comp"], [data-m-panel="presets"] { grid-template-columns: minmax(0, 1fr); }
-.m-presets-card { display: grid; grid-template-rows: auto auto auto auto minmax(0, 1fr) auto auto; gap: 6px; min-height: 0; padding: 8px 2px; }
-/* save new, and save over the loaded preset */
-.m-psaves { display: grid; grid-template-columns: 1fr 1.6fr; gap: 8px; }
-.m-psaves .m-btn { min-height: 56px; font-size: var(--fs-xs) !important; padding: 0 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* a passing note under them, taking no room while empty */
+[data-m-panel="comp"] { grid-template-columns: minmax(0, 1fr); }
 .m-note { margin: 0; min-height: 1.2em; font-size: var(--fs-s); color: var(--muted); }
-.m-presets-card .m-note:empty { min-height: 0; height: 0; margin-top: -6px; }
+/* ---- presets: a bar on the title line (‹ the loaded one's name ›, save, manage presets), and manage presets' pop-up
+   under it: search and the tempo box, the list (it scrolls), save over, import, export, the credits ---- */
+.m-pbar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 6px 0; }
+.m .m-pbar .m-toggle { min-height: 38px; padding: 0 10px; font-size: var(--fs-xs) !important; letter-spacing: .04em; }
+.m .m-pbar .m-pstep { min-width: 38px; padding: 0; font-size: var(--fs-m) !important; }
+.m-pname { width: 240px; height: 38px; line-height: 34px; padding: 0 10px; border: 2px solid var(--ink); border-radius: 3px; font-weight: 400; text-align: center;
+  text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m .m-pname.pending { animation: m-flash .5s steps(1) infinite; }
+.m .m-pbar #m-pm-open[aria-expanded="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
+.m > .m-pm { position: fixed; z-index: 30; width: 560px; max-width: calc(100vw - 16px); max-height: min(640px, calc(100vh - 90px)); display: grid; grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto; gap: 8px; padding: 12px; background-color: var(--panel); border: 2px solid var(--ink); border-radius: 4px;
+  box-shadow: 4px 5px 0 rgba(23, 32, 14, .25); }
+.m > .m-pm[hidden] { display: none; }
+.m-pm-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px; }
+.m .m-prename { flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 2px solid var(--ink); border-radius: 3px; background: transparent; color: var(--ink);
+  font: inherit; font-size: var(--fs-s); text-transform: uppercase; letter-spacing: .06em; outline: none; }
 .m-plist { list-style: none; margin: 4px 0 0; padding: 4px 0 0; display: grid; gap: 4px; align-content: start; min-height: 0;
   overflow-y: auto; overscroll-behavior: contain; border-top: var(--rule); }
 .m-plist li { display: flex; align-items: center; gap: 6px; }
 .m-pgroup { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 10px 4px 2px; }
-.m-pload { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left; min-height: 46px; padding: 0 14px; }
+.m-pload { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left; min-height: 40px; padding: 0 12px; }
 .m-pload b { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .m-pload small { font-family: var(--mono); font-size: var(--fs-xs); color: var(--muted); flex: none; }
 .m-plist li.cur .m-pload small { color: inherit; opacity: .7; }
@@ -338,12 +347,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 @keyframes m-flash { 50% { opacity: .25; } }
 @media (prefers-reduced-motion: reduce) { .m .m-plist li.pending .m-pload { animation: none; outline: 2px dashed var(--ink); outline-offset: 2px; } }
 /* a preset's star, filled when it's a favourite, and a saved one's delete */
-.m .m-pfav { min-height: 46px; min-width: 44px; padding: 0 6px; background: none !important; border: 0 !important; box-shadow: none !important; font-size: 1.5rem !important; line-height: 1; color: var(--ink); }
+.m .m-pfav { min-height: 40px; min-width: 40px; padding: 0 6px; background: none !important; border: 0 !important; box-shadow: none !important; font-size: 1.5rem !important; line-height: 1; color: var(--ink); }
 .m .m-pfav[aria-pressed="false"] { opacity: .45; }
 .m-pdel { border-radius: 10px; background: none; color: var(--muted) !important; }
-.m .m-pdel { min-height: 46px; min-width: 40px; padding: 0; text-align: center; font-size: 1.2rem !important; text-transform: uppercase; }
+.m .m-pdel { min-height: 40px; min-width: 72px; padding: 0; text-align: center; font-size: var(--fs-xs) !important; text-transform: uppercase; box-shadow: none; }
 .m-pio { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 10px; }
-.m-pio .m-btn { min-height: 46px; font-size: var(--fs-xs) !important; white-space: nowrap; letter-spacing: 0; padding: 0 4px; }
+.m-pio .m-btn { min-height: 40px; font-size: var(--fs-xs) !important; white-space: nowrap; letter-spacing: 0; padding: 0 4px; }
 .m-file { display: grid; place-items: center; cursor: pointer; position: relative; overflow: hidden; }
 .m-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
 .m-install { margin-top: 10px; }
@@ -521,6 +530,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m > .m-card.m-trans { grid-area: 1 / 2; border-bottom: 0; padding: 6px 0 10px 24px; grid-template-columns: 130px 130px; justify-content: end; }
   .m .m-play, .m .m-rec { min-height: 38px; }
   .m .m-trans .m-loop { display: none; }
+  /* (the presets bar in the middle of the title line) */
+  .m > .m-pbar { grid-area: 1 / 1 / 2 / 3; justify-self: center; align-self: center; z-index: 1; padding: 0; }
   /* (the randomisers live in one pop-up under the randomise button, in two rows: the sound ones, then the effects ones and
      undo; it stays open for more clicks until a click elsewhere or esc; next bar and assign are in options) */
   .m-top { width: auto; }
@@ -617,7 +628,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-tabs button { font-size: var(--fs-m) !important; }
   .m-panel:not([data-m-panel="play"]) { grid-area: 3 / 2 / 5 / 3; display: none; padding: 8px 0 0 24px; border-left: var(--rule); }
   .m[data-page="beat"] [data-m-panel="beat"], .m[data-page="dice"] [data-m-panel="dice"], .m[data-page="fx"] [data-m-panel="fx"], .m[data-page="xf"] [data-m-panel="xf"],
-  .m[data-page="mix"] [data-m-panel="mix"], .m[data-page="comp"] [data-m-panel="comp"], .m[data-page="presets"] [data-m-panel="presets"] { display: grid; }
+  .m[data-page="mix"] [data-m-panel="mix"], .m[data-page="comp"] [data-m-panel="comp"] { display: grid; }
   /* (every page's faders: readouts and names in the bigger small print; beat's and voice's readouts on one line, so
      every track starts at the same height) */
   .m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab,
@@ -691,7 +702,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-lvm .m-lvm-pk { position: absolute; left: 0; right: 0; height: 3px; bottom: round(down, calc(var(--h) * (100% - 3px)), 5px); background: var(--ink); opacity: calc(var(--h) * 4); }
   /* presets: install app is in options instead */
   .m .m-pio .m-install { display: none !important; }
-  .m-foot { font-size: 1.15rem; }
+  .m-foot { font-size: 1rem; }
   /* the pop-ups' tabs and the slot chooser's buttons, and the midi grid */
   .m .m-rs-tabs .m-btn, .m .m-ch-list .m-btn, .m-big { font-size: var(--fs-xs) !important; }
   .m .m-cccell small { font-size: var(--fs-xs); }

@@ -3,8 +3,8 @@ const HELP = [
   ['start', 'getting started', `<p>Elixir is a six voice drum machine: drum 1, 2 and 3, snare, cymbal and hihat. Three steps to a beat:</p>
 <ol><li>Press <b>play</b> (or space).</li><li>Press <b>everything</b> until you like what you hear: each press is a new beat, kit, effects and mix.</li>
 <li>Turn the knobs, or press <b>kit</b>, <b>pattern</b> or <b>alter</b> to change one part. <b>undo</b> takes back the last one.</li></ol>
-<p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, fx, xfeed, mix, mstr, prst), chosen by the buttons over it.</p>
-<p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>prst</b> › <b>save new</b>. <b>rec</b> records a WAV. Keys for nearly everything: see keyboard.</p>
+<p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), the presets bar (‹ name ›, <b>save</b>, <b>manage presets</b>), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, fx, xfeed, mix, mstr), chosen by the buttons over it.</p>
+<p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>save</b> in the presets bar at the top. <b>rec</b> records a WAV. Keys for nearly everything: see keyboard.</p>
 <p>(On a screen under 1000 px wide it becomes the phone layout: pages along the bottom, and hold a fader for its sequencer.)</p>`],
   ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: the perform controls (tempo, sidechain, pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and rush. MIDI CC 1 to 12 turn them (any channel).</p>
 <ul><li>Each knob's ring shows its value. While its step sequencer runs, the pointer stays on your setting and the lit part of the ring shows where the sequencer has moved it.</li>
@@ -45,18 +45,17 @@ const HELP = [
   ['mstr', 'mstr: the master chain', `<p>The whole mix runs top to bottom:</p>
 <ul><li><b>drum 1 sidechain</b>: drum 1 (the kick) ducks the rest; the meter shows how much. <b>space</b> carves the kick's room out of the others.</li>
 <li><b>distortion</b>: mix, type, drive, colour, tone and volume.</li><li><b>compressor</b>: glues it together; the meter shows the gain reduction.</li></ul>`],
-  ['prst', 'prst: presets', `<ul><li>Click a preset to load it: while playing it flashes until the next bar, then takes over. Untick the tempo box to keep your tempo.</li>
-<li>Type in the search box (or press /) to find one by name; enter loads the first found, esc clears it.</li>
-<li>The star makes it a favourite (favourites are listed first).</li>
-<li><b>save new</b> keeps what you hear; <b>save over</b> replaces the one loaded.</li>
-<li><b>export presets</b> saves your presets to a file (it never deletes anything); <b>import</b> reads one back, or drop the file anywhere on the page.</li></ul>`],
+  ['prst', 'presets', `<ul><li>The bar at the top shows the preset loaded: <b>‹</b> and <b>›</b> step through them, <b>save</b> keeps what you hear as a new one. While playing, a new preset flashes until the next bar, then takes over.</li>
+<li><b>manage presets</b> opens the list: click one to load it (the list stays open to try another), the star makes it a favourite (listed first), and your own have <b>rename</b> and <b>delete</b>.</li>
+<li>Type in its search box (or press /) to find one by name; enter loads the first found. Untick <b>use its tempo</b> to keep your tempo when one loads.</li>
+<li><b>save over</b> replaces the one loaded. <b>export</b> saves your presets to a file (it never deletes anything); <b>import</b> reads one back, or drop the file anywhere on the page.</li></ul>`],
   ['rec', 'recording', `<ul><li><b>rec</b> records a WAV: press it to start (it starts playing too), again to stop, and the file downloads.</li>
 <li>Hold or right-click <b>rec</b> to choose what it records: <b>free</b>, or an exact loop of 1, 2, 4, 8, 16, 32, 64 or 128 bars. A loop starts at the next bar, shows its progress on the button and downloads by itself, cut to repeat seamlessly in any other app.</li></ul>`],
   ['keys', 'keyboard and mouse', `<ul><li><b>space</b> play and stop. <b>enter</b> record, <b>l</b> record a loop.</li>
 <li><b>1</b> everything, <b>2</b> kit, <b>3</b> alter, <b>4</b> pattern, <b>5</b> crossfeed, <b>6</b> random fx, <b>7</b> alter fx, <b>8</b> knob seqs (the pop-up's order; they work with it closed), <b>u</b> undo. <b>m</b> randomise on next bar.</li>
 <li><b>z x c v b n</b> mute drum 1, 2, 3, snare, cymbal, hihat; <b>a s d f g h</b> mute their echo sends; <b>q w e r t y</b> their reverb sends.</li>
 <li><b>shift</b> + <b>1</b> to <b>6</b> show the voice page with that drum; <b>[</b> and <b>]</b> step through its tabs.</li>
-<li><b>o</b> presets, <b>/</b> search presets, <b>?</b> help. <b>esc</b> closes whatever is open.</li>
+<li><b>o</b> manage presets, <b>/</b> search presets, <b>?</b> help. <b>esc</b> closes whatever is open.</li>
 <li>Click a knob or fader, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>
 <li>Right-click a knob or fader for its step sequencer, reset and (on perform) assign. Double-click one to reset it.</li></ul>`],
   ['more', 'more', `<ul><li><b>options</b> (by the e) holds randomise on next bar, assign knobs, and:</li>

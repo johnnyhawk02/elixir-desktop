@@ -1191,20 +1191,29 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-comp-card .m-toggle { min-width: 52px; }
 #m-comp.off { opacity: .4; }
 
-/* ---- prst: save at the top, the list between (it scrolls), the file buttons and credits at the foot ---- */
-[data-m-panel="comp"], [data-m-panel="presets"] { grid-template-columns: minmax(0, 1fr); }
-.m-presets-card { display: grid; grid-template-rows: auto auto auto auto minmax(0, 1fr) auto auto; gap: 6px; min-height: 0; padding: 8px 2px; }
-/* save new, and save over the loaded preset */
-.m-psaves { display: grid; grid-template-columns: 1fr 1.6fr; gap: 8px; }
-.m-psaves .m-btn { min-height: 56px; font-size: var(--fs-xs) !important; padding: 0 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* a passing note under them, taking no room while empty */
+[data-m-panel="comp"] { grid-template-columns: minmax(0, 1fr); }
 .m-note { margin: 0; min-height: 1.2em; font-size: var(--fs-s); color: var(--muted); }
-.m-presets-card .m-note:empty { min-height: 0; height: 0; margin-top: -6px; }
+/* ---- presets: a bar on the title line (‹ the loaded one's name ›, save, manage presets), and manage presets' pop-up
+   under it: search and the tempo box, the list (it scrolls), save over, import, export, the credits ---- */
+.m-pbar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 6px 0; }
+.m .m-pbar .m-toggle { min-height: 38px; padding: 0 10px; font-size: var(--fs-xs) !important; letter-spacing: .04em; }
+.m .m-pbar .m-pstep { min-width: 38px; padding: 0; font-size: var(--fs-m) !important; }
+.m-pname { width: 240px; height: 38px; line-height: 34px; padding: 0 10px; border: 2px solid var(--ink); border-radius: 3px; font-weight: 400; text-align: center;
+  text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m .m-pname.pending { animation: m-flash .5s steps(1) infinite; }
+.m .m-pbar #m-pm-open[aria-expanded="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
+.m > .m-pm { position: fixed; z-index: 30; width: 560px; max-width: calc(100vw - 16px); max-height: min(640px, calc(100vh - 90px)); display: grid; grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto; gap: 8px; padding: 12px; background-color: var(--panel); border: 2px solid var(--ink); border-radius: 4px;
+  box-shadow: 4px 5px 0 rgba(23, 32, 14, .25); }
+.m > .m-pm[hidden] { display: none; }
+.m-pm-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px; }
+.m .m-prename { flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 2px solid var(--ink); border-radius: 3px; background: transparent; color: var(--ink);
+  font: inherit; font-size: var(--fs-s); text-transform: uppercase; letter-spacing: .06em; outline: none; }
 .m-plist { list-style: none; margin: 4px 0 0; padding: 4px 0 0; display: grid; gap: 4px; align-content: start; min-height: 0;
   overflow-y: auto; overscroll-behavior: contain; border-top: var(--rule); }
 .m-plist li { display: flex; align-items: center; gap: 6px; }
 .m-pgroup { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 10px 4px 2px; }
-.m-pload { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left; min-height: 46px; padding: 0 14px; }
+.m-pload { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left; min-height: 40px; padding: 0 12px; }
 .m-pload b { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .m-pload small { font-family: var(--mono); font-size: var(--fs-xs); color: var(--muted); flex: none; }
 .m-plist li.cur .m-pload small { color: inherit; opacity: .7; }
@@ -1213,12 +1222,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 @keyframes m-flash { 50% { opacity: .25; } }
 @media (prefers-reduced-motion: reduce) { .m .m-plist li.pending .m-pload { animation: none; outline: 2px dashed var(--ink); outline-offset: 2px; } }
 /* a preset's star, filled when it's a favourite, and a saved one's delete */
-.m .m-pfav { min-height: 46px; min-width: 44px; padding: 0 6px; background: none !important; border: 0 !important; box-shadow: none !important; font-size: 1.5rem !important; line-height: 1; color: var(--ink); }
+.m .m-pfav { min-height: 40px; min-width: 40px; padding: 0 6px; background: none !important; border: 0 !important; box-shadow: none !important; font-size: 1.5rem !important; line-height: 1; color: var(--ink); }
 .m .m-pfav[aria-pressed="false"] { opacity: .45; }
 .m-pdel { border-radius: 10px; background: none; color: var(--muted) !important; }
-.m .m-pdel { min-height: 46px; min-width: 40px; padding: 0; text-align: center; font-size: 1.2rem !important; text-transform: uppercase; }
+.m .m-pdel { min-height: 40px; min-width: 72px; padding: 0; text-align: center; font-size: var(--fs-xs) !important; text-transform: uppercase; box-shadow: none; }
 .m-pio { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 10px; }
-.m-pio .m-btn { min-height: 46px; font-size: var(--fs-xs) !important; white-space: nowrap; letter-spacing: 0; padding: 0 4px; }
+.m-pio .m-btn { min-height: 40px; font-size: var(--fs-xs) !important; white-space: nowrap; letter-spacing: 0; padding: 0 4px; }
 .m-file { display: grid; place-items: center; cursor: pointer; position: relative; overflow: hidden; }
 .m-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
 .m-install { margin-top: 10px; }
@@ -1396,6 +1405,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m > .m-card.m-trans { grid-area: 1 / 2; border-bottom: 0; padding: 6px 0 10px 24px; grid-template-columns: 130px 130px; justify-content: end; }
   .m .m-play, .m .m-rec { min-height: 38px; }
   .m .m-trans .m-loop { display: none; }
+  /* (the presets bar in the middle of the title line) */
+  .m > .m-pbar { grid-area: 1 / 1 / 2 / 3; justify-self: center; align-self: center; z-index: 1; padding: 0; }
   /* (the randomisers live in one pop-up under the randomise button, in two rows: the sound ones, then the effects ones and
      undo; it stays open for more clicks until a click elsewhere or esc; next bar and assign are in options) */
   .m-top { width: auto; }
@@ -1492,7 +1503,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-tabs button { font-size: var(--fs-m) !important; }
   .m-panel:not([data-m-panel="play"]) { grid-area: 3 / 2 / 5 / 3; display: none; padding: 8px 0 0 24px; border-left: var(--rule); }
   .m[data-page="beat"] [data-m-panel="beat"], .m[data-page="dice"] [data-m-panel="dice"], .m[data-page="fx"] [data-m-panel="fx"], .m[data-page="xf"] [data-m-panel="xf"],
-  .m[data-page="mix"] [data-m-panel="mix"], .m[data-page="comp"] [data-m-panel="comp"], .m[data-page="presets"] [data-m-panel="presets"] { display: grid; }
+  .m[data-page="mix"] [data-m-panel="mix"], .m[data-page="comp"] [data-m-panel="comp"] { display: grid; }
   /* (every page's faders: readouts and names in the bigger small print; beat's and voice's readouts on one line, so
      every track starts at the same height) */
   .m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab,
@@ -1566,7 +1577,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m-lvm .m-lvm-pk { position: absolute; left: 0; right: 0; height: 3px; bottom: round(down, calc(var(--h) * (100% - 3px)), 5px); background: var(--ink); opacity: calc(var(--h) * 4); }
   /* presets: install app is in options instead */
   .m .m-pio .m-install { display: none !important; }
-  .m-foot { font-size: 1.15rem; }
+  .m-foot { font-size: 1rem; }
   /* the pop-ups' tabs and the slot chooser's buttons, and the midi grid */
   .m .m-rs-tabs .m-btn, .m .m-ch-list .m-btn, .m-big { font-size: var(--fs-xs) !important; }
   .m .m-cccell small { font-size: var(--fs-xs); }
@@ -1597,7 +1608,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>203</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>204</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1605,6 +1616,13 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     <button class="m-toggle m-setbtn m-helpbtn" id="m-help-open" type="button" aria-label="Help me!"><span class="m-help-long">help me!</span><span class="m-help-short" aria-hidden="true">?</span></button>
     <b class="m-pagename" id="m-pagename" aria-live="polite">perform</b>
   </header>
+  <div class="m-pbar" aria-label="preset">
+    <button class="m-toggle m-pstep" id="m-pprev" type="button" aria-label="Previous preset">‹</button>
+    <b class="m-pname" id="m-pname"></b>
+    <button class="m-toggle m-pstep" id="m-pnext" type="button" aria-label="Next preset">›</button>
+    <button class="m-toggle m-pbtn" id="m-psave" type="button">save</button>
+    <button class="m-toggle m-pbtn" id="m-pm-open" type="button" aria-expanded="false">manage presets</button>
+  </div>
   <section class="m-card m-trans">
     <button class="m-play" id="m-play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 4.5v15l13-7.5z"/><rect class="i-stop" x="5.5" y="5.5" width="13" height="13" rx="2"/></svg><span>play</span></button>
     <button class="m-rec" id="m-rec" type="button" aria-pressed="false" aria-label="Record"><i></i><span id="m-rec-t">rec</span></button>
@@ -1682,21 +1700,6 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     </section>
   </div>
 
-  <div class="m-panel" data-m-panel="presets">
-    <section class="m-card m-presets-card">
-      <div class="m-psaves"><button class="m-btn m-big" id="m-psave" type="button">save new</button><button class="m-btn" id="m-pover" type="button">save over</button></div>
-      <label class="m-chk"><input id="m-pbpm" type="checkbox" checked><i aria-hidden="true"></i>loading a preset uses its tempo</label>
-      <input class="m-psearch" id="m-psearch" type="search" placeholder="search presets" aria-label="Search presets" autocomplete="off" spellcheck="false">
-      <p class="m-note" id="m-pnote" aria-live="polite"></p>
-      <ul class="m-plist" id="m-plist"></ul>
-      <div class="m-pio">
-        <label class="m-btn m-file" title="Reads a presets file exported here">import<input id="m-pimport" type="file" accept="application/json,.json" multiple></label>
-        <button class="m-btn" id="m-pexport" type="button" title="Saves your presets, the built-in ones you saved over and every starred one, to a file">export presets</button>
-        <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
-      </div>
-      <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial<br><a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v203, 12 Nov, 06:54</footer>
-    </section>
-  </div>
   </div>
 
   <div class="m-rs" id="m-set" hidden>
@@ -1791,8 +1794,21 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     <button type="button" role="tab" data-m-tab="xf" aria-selected="false">xfeed</button>
     <button type="button" role="tab" data-m-tab="mix" aria-selected="false">mix</button>
     <button type="button" role="tab" data-m-tab="comp" aria-selected="false">mstr</button>
-    <button type="button" role="tab" data-m-tab="presets" aria-selected="false">prst</button>
   </nav>
+  <section class="m-card m-pm" id="m-pm" role="dialog" aria-label="manage presets" hidden>
+    <div class="m-pm-top">
+      <input class="m-psearch" id="m-psearch" type="search" placeholder="search presets" aria-label="Search presets" autocomplete="off" spellcheck="false">
+      <label class="m-chk"><input id="m-pbpm" type="checkbox" checked><i aria-hidden="true"></i>use its tempo</label>
+    </div>
+    <ul class="m-plist" id="m-plist"></ul>
+    <div class="m-pio">
+      <button class="m-btn" id="m-pover" type="button">save over</button>
+      <label class="m-btn m-file">import<input id="m-pimport" type="file" accept="application/json,.json" multiple></label>
+      <button class="m-btn" id="m-pexport" type="button">export</button>
+      <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
+    </div>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v204, 12 Nov, 07:02</footer>
+  </section>
 </main>
 <div class="m-turn" id="m-turn"><div><b>turn it sideways</b><span>elixir plays in landscape</span><button type="button" id="m-turn-fs" hidden>full screen</button></div></div>
 
@@ -8647,7 +8663,6 @@ function mTab(t) {
     if (t === 'play') return;
     $('m').dataset.page = t;
     document.querySelectorAll('[data-m-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.mTab === t));
-    if (t === 'presets') mDrawPresets();
     return;
   }
   const el = document.querySelector(`[data-m-panel="${t}"]`);
@@ -8656,13 +8671,12 @@ function mTab(t) {
 }
 // the tab that shows which page is in view
 // the page's name, beside the title
-const M_PAGE_NAMES = { play: 'perform', beat: 'beat', dice: 'voice', xy: 'x/y', fx: 'effects', xf: 'crossfeed', mix: 'mixer', comp: 'master', presets: 'presets' };
+const M_PAGE_NAMES = { play: 'perform', beat: 'beat', dice: 'voice', xy: 'x/y', fx: 'effects', xf: 'crossfeed', mix: 'mixer', comp: 'master' };
 function mShown(t) {
   if (t === mCur) return;
   mCur = t;
   $('m-pagename').textContent = M_PAGE_NAMES[t] || t;
   document.querySelectorAll('[data-m-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.mTab === t));
-  if (t === 'presets') mDrawPresets();
 }
 // at rest: the page nearest the scroll position
 function mSettled() {
@@ -9034,7 +9048,9 @@ useSong = function (g, keepTempo) {
   densUse(g, keepTempo);
   sendSeq(); mDrawAll();
 };
-// ---- presets: save, and a list to load or delete (kept in this browser, as on the desktop) ----
+// ---- presets: a bar on the title line (the loaded one's name, ‹ › to step through, save, manage presets) and the
+// manage pop-up under it: the list to load, star, rename or delete, search, save over, import and export (kept in this
+// browser) ----
 // while playing, a preset waits for the next bar to come in: until it's heard, the one playing stays marked and the
 // new one's row flashes
 let mPending = null, mPlayingPreset = null;
@@ -9052,8 +9068,39 @@ const FAV_KEY = 'elixir-desktop-favs';
 const mFavs = new Set((() => { try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch (e) { return []; } })());
 for (const k of kitList) if (k.saved && k.fav) mFavs.add(k.name);
 const mFavStore = () => { try { localStorage.setItem(FAV_KEY, JSON.stringify([...mFavs])); } catch (e) {} };
+// the bar: the name of the one loaded (flashing while it waits for the next bar)
+function mPbarDraw() {
+  const k = kitList[Number($('kit').value)], n = $('m-pname');
+  n.textContent = k ? k.name : ''; n.classList.toggle('pending', !!mPending);
+}
+const mStep = (d) => {
+  const opts = [...$('kit').options], i = opts.findIndex((o) => o.value === $('kit').value);
+  const o = opts[(i + d + opts.length) % opts.length];
+  if (o && o.value !== $('kit').value) mLoad(kitList[Number(o.value)]);
+};
+$('m-pprev').addEventListener('click', () => mStep(-1));
+$('m-pnext').addEventListener('click', () => mStep(1));
+// rename: the name becomes a box; enter (or a click away) keeps it, esc leaves it as it was. A name already used is refused
+function mRename(k, li) {
+  const b = li.querySelector('.m-pload'), box = document.createElement('input');
+  box.className = 'm-prename'; box.value = k.name; box.maxLength = 24; box.spellcheck = false; box.setAttribute('aria-label', `New name for ${k.name}`);
+  b.replaceWith(box); box.focus(); box.select();
+  let done = false;
+  const end = (keep) => {
+    if (done) return; done = true;
+    const name = box.value.trim().replace(/\s+/g, ' ');
+    if (keep && name && name !== k.name && !kitList.some((o) => o !== k && o.name === name)) {
+      if (mFavs.has(k.name)) { mFavs.delete(k.name); mFavs.add(name); mFavStore(); }
+      k.name = name; storePresets();
+      const v = $('kit').value; fillKits(); $('kit').value = v;
+    }
+    mDrawPresets();
+  };
+  box.addEventListener('keydown', (e) => { if (e.key === 'Enter') end(true); else if (e.key === 'Escape') { e.stopPropagation(); end(false); } });
+  box.addEventListener('blur', () => end(true));
+}
 function mDrawPresets() {
-  mOverDraw();
+  mPbarDraw(); mOverDraw();
   const list = $('m-plist'), cur = mPending ? mPlayingPreset : kitList[Number($('kit').value)];
   list.innerHTML = '';
   const group = (t) => { const li = document.createElement('li'); li.className = 'm-pgroup'; li.textContent = t; list.append(li); };
@@ -9071,10 +9118,12 @@ function mDrawPresets() {
       mFavStore(); mDrawPresets();
     });
     li.append(star);
-    // (a built-in one has a gap where a saved one's delete is, so every row's name lines up)
-    if (!k.saved) { const gap = document.createElement('span'); gap.className = 'm-pdel'; li.append(gap); }
+    // (a built-in one has gaps where a saved one's rename and delete are, so every row lines up)
+    if (!k.saved) for (let i = 0; i < 2; i++) { const gap = document.createElement('span'); gap.className = 'm-pdel'; li.append(gap); }
     if (k.saved) {
-      const d = document.createElement('button'); d.className = 'm-pdel'; d.type = 'button'; d.textContent = '✕';
+      const r = document.createElement('button'); r.className = 'm-pdel'; r.type = 'button'; r.textContent = 'rename';
+      r.addEventListener('click', () => mRename(k, li)); li.append(r);
+      const d = document.createElement('button'); d.className = 'm-pdel'; d.type = 'button'; d.textContent = 'delete';
       d.setAttribute('aria-label', `Delete ${k.name}`);
       d.addEventListener('click', () => {
         if (!confirm(`Delete ${k.name}?`)) return;
@@ -9105,12 +9154,7 @@ function mDrawPresets() {
   group('built in');
   kitList.filter((k) => k.builtin && !mFavs.has(k.name)).forEach(row);
 }
-$('m-psave').addEventListener('click', () => {
-  $('kit-save').click();
-  const k = kitList[kitList.length - 1];
-  $('m-pnote').textContent = `Saved as ${k.name}.`;
-  mDrawPresets();
-});
+$('m-psave').addEventListener('click', () => { $('kit-save').click(); mDrawPresets(); });
 // save over: the current sound and song replace the loaded preset's, name and star kept (to match levels across
 // presets). A built-in one's new version is kept in this browser over the factory one (and goes out with an export
 // of favourites); Init kit can't be overwritten
@@ -9120,7 +9164,7 @@ kitList.forEach((k, i) => { if (k.builtin && mEdits[k.name]) { const q = toCurre
 const mOverTarget = () => { const k = mPending ? null : kitList[Number($('kit').value)]; return k && (k.saved || k.builtin) && k.kit !== factoryInit ? k : null; };
 function mOverDraw() {
   const k = mOverTarget();
-  $('m-pover').disabled = !k; $('m-pover').textContent = k ? `save over ${k.name}` : 'save over';
+  $('m-pover').disabled = !k;
 }
 $('m-pover').addEventListener('click', () => {
   const k = mOverTarget();
@@ -9129,7 +9173,6 @@ $('m-pover').addEventListener('click', () => {
   if (k.saved) storePresets();
   else { k.edited = true; mEdits[k.name] = presetData(k); try { localStorage.setItem(EDIT_KEY, JSON.stringify(mEdits)); } catch (e) {} }
   initValues.set(values); buildKnobs(); setDirty(false);
-  $('m-pnote').textContent = `Saved over ${k.name}.`;
   mDrawPresets();
 });
 
@@ -9149,7 +9192,6 @@ async function mImport(files) {
     } catch (err) { bad++; }
   }
   if (n) { const v = $('kit').value; storePresets(); fillKits(); $('kit').value = v; }
-  $('m-pnote').textContent = (n ? `Imported ${n}.` : 'Nothing new to import.') + (old ? ` ${old} skipped: not a preset.` : '') + (bad ? ` ${bad} file${bad > 1 ? 's' : ''} not a presets file.` : '');
   mDrawPresets();
 }
 $('m-pimport').addEventListener('change', async (e) => { await mImport([...e.target.files]); e.target.value = ''; });
@@ -9162,9 +9204,9 @@ $('m-psearch').addEventListener('keydown', (e) => {
 // import stars it again), as the settings' export. It never deletes anything
 $('m-pexport').addEventListener('click', async () => {
   const list = mSetPresets(true);
-  if (!list.length) { $('m-pnote').textContent = 'No presets to export yet.'; return; }
+  if (!list.length) return;
   const blob = new Blob([JSON.stringify({ elixir: 1, presets: list }, null, 1)], { type: 'application/json' });
-  if (await mOffer({ blob, name: 'elixir-desktop-presets.json' }, 'application/json')) $('m-pnote').textContent = `Exported ${list.length} preset${list.length > 1 ? 's' : ''}.`;
+  await mOffer({ blob, name: 'elixir-desktop-presets.json' }, 'application/json');
 });
 // clear all (in settings): every saved preset deleted and every star cleared (the built-in ones stay)
 function mClearAll() {
@@ -9176,6 +9218,23 @@ function mClearAll() {
   return mine.length;
 }
 
+
+// ---- manage presets: a pop-up under its button; it stays open to try one after another, and a click elsewhere or esc
+// closes it ----
+function mPmShow(on) {
+  $('m-pm').hidden = !on; $('m-pm-open').setAttribute('aria-expanded', on ? 'true' : 'false');
+  if (!on) return;
+  mDrawPresets();
+  const r = $('m-pm-open').getBoundingClientRect(), c = $('m-pm');
+  c.style.left = Math.max(8, Math.min(r.right - c.offsetWidth, innerWidth - c.offsetWidth - 8)) + 'px'; c.style.top = (r.bottom + 6) + 'px';
+}
+$('m-pm-open').addEventListener('click', () => mPmShow($('m-pm').hidden));
+addEventListener('pointerdown', (e) => { if (!$('m-pm').hidden && !e.target.closest('#m-pm, #m-pm-open')) mPmShow(false); }, { capture: true });
+addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !$('m-pm').hidden && !e.target.closest('.m-prename')) { e.stopImmediatePropagation(); mPmShow(false); }
+}, { capture: true });
+addEventListener('resize', () => { if (!$('m-pm').hidden) mPmShow(true); });
+mPbarDraw();
 // ---- record: free length, no count-in; starts now (and starts playback), the second press stops and saves. Rec loop
 // records exactly LOOP_BARS bars (4 unless changed: hold it) from the start of the next bar (from bar 1 if stopped), cut to loop seamlessly, and
 // downloads it by itself; pressing it again while it runs stops it early ----
@@ -10149,8 +10208,8 @@ const HELP = [
   ['start', 'getting started', `<p>Elixir is a six voice drum machine: drum 1, 2 and 3, snare, cymbal and hihat. Three steps to a beat:</p>
 <ol><li>Press <b>play</b> (or space).</li><li>Press <b>everything</b> until you like what you hear: each press is a new beat, kit, effects and mix.</li>
 <li>Turn the knobs, or press <b>kit</b>, <b>pattern</b> or <b>alter</b> to change one part. <b>undo</b> takes back the last one.</li></ol>
-<p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, fx, xfeed, mix, mstr, prst), chosen by the buttons over it.</p>
-<p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>prst</b> › <b>save new</b>. <b>rec</b> records a WAV. Keys for nearly everything: see keyboard.</p>
+<p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), the presets bar (‹ name ›, <b>save</b>, <b>manage presets</b>), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, fx, xfeed, mix, mstr), chosen by the buttons over it.</p>
+<p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>save</b> in the presets bar at the top. <b>rec</b> records a WAV. Keys for nearly everything: see keyboard.</p>
 <p>(On a screen under 1000 px wide it becomes the phone layout: pages along the bottom, and hold a fader for its sequencer.)</p>`],
   ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: the perform controls (tempo, sidechain, pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and rush. MIDI CC 1 to 12 turn them (any channel).</p>
 <ul><li>Each knob's ring shows its value. While its step sequencer runs, the pointer stays on your setting and the lit part of the ring shows where the sequencer has moved it.</li>
@@ -10191,18 +10250,17 @@ const HELP = [
   ['mstr', 'mstr: the master chain', `<p>The whole mix runs top to bottom:</p>
 <ul><li><b>drum 1 sidechain</b>: drum 1 (the kick) ducks the rest; the meter shows how much. <b>space</b> carves the kick's room out of the others.</li>
 <li><b>distortion</b>: mix, type, drive, colour, tone and volume.</li><li><b>compressor</b>: glues it together; the meter shows the gain reduction.</li></ul>`],
-  ['prst', 'prst: presets', `<ul><li>Click a preset to load it: while playing it flashes until the next bar, then takes over. Untick the tempo box to keep your tempo.</li>
-<li>Type in the search box (or press /) to find one by name; enter loads the first found, esc clears it.</li>
-<li>The star makes it a favourite (favourites are listed first).</li>
-<li><b>save new</b> keeps what you hear; <b>save over</b> replaces the one loaded.</li>
-<li><b>export presets</b> saves your presets to a file (it never deletes anything); <b>import</b> reads one back, or drop the file anywhere on the page.</li></ul>`],
+  ['prst', 'presets', `<ul><li>The bar at the top shows the preset loaded: <b>‹</b> and <b>›</b> step through them, <b>save</b> keeps what you hear as a new one. While playing, a new preset flashes until the next bar, then takes over.</li>
+<li><b>manage presets</b> opens the list: click one to load it (the list stays open to try another), the star makes it a favourite (listed first), and your own have <b>rename</b> and <b>delete</b>.</li>
+<li>Type in its search box (or press /) to find one by name; enter loads the first found. Untick <b>use its tempo</b> to keep your tempo when one loads.</li>
+<li><b>save over</b> replaces the one loaded. <b>export</b> saves your presets to a file (it never deletes anything); <b>import</b> reads one back, or drop the file anywhere on the page.</li></ul>`],
   ['rec', 'recording', `<ul><li><b>rec</b> records a WAV: press it to start (it starts playing too), again to stop, and the file downloads.</li>
 <li>Hold or right-click <b>rec</b> to choose what it records: <b>free</b>, or an exact loop of 1, 2, 4, 8, 16, 32, 64 or 128 bars. A loop starts at the next bar, shows its progress on the button and downloads by itself, cut to repeat seamlessly in any other app.</li></ul>`],
   ['keys', 'keyboard and mouse', `<ul><li><b>space</b> play and stop. <b>enter</b> record, <b>l</b> record a loop.</li>
 <li><b>1</b> everything, <b>2</b> kit, <b>3</b> alter, <b>4</b> pattern, <b>5</b> crossfeed, <b>6</b> random fx, <b>7</b> alter fx, <b>8</b> knob seqs (the pop-up's order; they work with it closed), <b>u</b> undo. <b>m</b> randomise on next bar.</li>
 <li><b>z x c v b n</b> mute drum 1, 2, 3, snare, cymbal, hihat; <b>a s d f g h</b> mute their echo sends; <b>q w e r t y</b> their reverb sends.</li>
 <li><b>shift</b> + <b>1</b> to <b>6</b> show the voice page with that drum; <b>[</b> and <b>]</b> step through its tabs.</li>
-<li><b>o</b> presets, <b>/</b> search presets, <b>?</b> help. <b>esc</b> closes whatever is open.</li>
+<li><b>o</b> manage presets, <b>/</b> search presets, <b>?</b> help. <b>esc</b> closes whatever is open.</li>
 <li>Click a knob or fader, then the arrow keys step it. Scroll on one with the mouse wheel or trackpad to turn it.</li>
 <li>Right-click a knob or fader for its step sequencer, reset and (on perform) assign. Double-click one to reset it.</li></ul>`],
   ['more', 'more', `<ul><li><b>options</b> (by the e) holds randomise on next bar, assign knobs, and:</li>
@@ -10379,7 +10437,7 @@ mXfPlace(); mWide.addEventListener('change', mXfPlace);
     e.preventDefault(); depth = 0; $('m').classList.remove('dropping');
     const files = [...e.dataTransfer.files].filter((f) => /\.json$/i.test(f.name) || f.type === 'application/json');
     if (!files.length) return;
-    mTab('presets');
+    mPmShow(true);
     await mImport(files);
   });
 }
@@ -10558,8 +10616,8 @@ addEventListener('keydown', (e) => {
   else if (MUTE_KEYS.includes(k)) { e.preventDefault(); mMuteToggle(MUTE_KEYS.indexOf(k)); }
   else if (SEND_KEYS.fx.includes(k)) { e.preventDefault(); mSendToggle('fx', SEND_KEYS.fx.indexOf(k)); }
   else if (SEND_KEYS.ring.includes(k)) { e.preventDefault(); mSendToggle('ring', SEND_KEYS.ring.indexOf(k)); }
-  else if (k === 'o') { e.preventDefault(); mTab('presets'); }
-  else if (k === '/') { e.preventDefault(); mTab('presets'); $('m-psearch').focus(); }
+  else if (k === 'o') { e.preventDefault(); mPmShow($('m-pm').hidden); }
+  else if (k === '/') { e.preventDefault(); mPmShow(true); $('m-psearch').focus(); }
   else if (k === '?') { e.preventDefault(); $('m-help-open').click(); }
 }, { capture: true });
 // ---- the glass isn't flat: each control's ink shadow deepens a little toward the top right of the screen (--d, used

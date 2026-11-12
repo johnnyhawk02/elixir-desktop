@@ -41,7 +41,6 @@ function mTab(t) {
     if (t === 'play') return;
     $('m').dataset.page = t;
     document.querySelectorAll('[data-m-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.mTab === t));
-    if (t === 'presets') mDrawPresets();
     return;
   }
   const el = document.querySelector(`[data-m-panel="${t}"]`);
@@ -50,13 +49,12 @@ function mTab(t) {
 }
 // the tab that shows which page is in view
 // the page's name, beside the title
-const M_PAGE_NAMES = { play: 'perform', beat: 'beat', dice: 'voice', xy: 'x/y', fx: 'effects', xf: 'crossfeed', mix: 'mixer', comp: 'master', presets: 'presets' };
+const M_PAGE_NAMES = { play: 'perform', beat: 'beat', dice: 'voice', xy: 'x/y', fx: 'effects', xf: 'crossfeed', mix: 'mixer', comp: 'master' };
 function mShown(t) {
   if (t === mCur) return;
   mCur = t;
   $('m-pagename').textContent = M_PAGE_NAMES[t] || t;
   document.querySelectorAll('[data-m-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.mTab === t));
-  if (t === 'presets') mDrawPresets();
 }
 // at rest: the page nearest the scroll position
 function mSettled() {

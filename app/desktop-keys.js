@@ -29,7 +29,7 @@ addEventListener('keydown', (e) => {
   else if (MUTE_KEYS.includes(k)) { e.preventDefault(); mMuteToggle(MUTE_KEYS.indexOf(k)); }
   else if (SEND_KEYS.fx.includes(k)) { e.preventDefault(); mSendToggle('fx', SEND_KEYS.fx.indexOf(k)); }
   else if (SEND_KEYS.ring.includes(k)) { e.preventDefault(); mSendToggle('ring', SEND_KEYS.ring.indexOf(k)); }
-  else if (k === 'o') { e.preventDefault(); mTab('presets'); }
-  else if (k === '/') { e.preventDefault(); mTab('presets'); $('m-psearch').focus(); }
+  else if (k === 'o') { e.preventDefault(); mPmShow($('m-pm').hidden); }
+  else if (k === '/') { e.preventDefault(); mPmShow(true); $('m-psearch').focus(); }
   else if (k === '?') { e.preventDefault(); $('m-help-open').click(); }
 }, { capture: true });
