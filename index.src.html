@@ -7,6 +7,9 @@
    the screen. Landscape only: held upright it shows a note to turn it sideways (.m-turn). */
 (() => {
   if (!matchMedia('(pointer: coarse)').matches) return;
+  // a phone (its short side under 600 px) gets one big screen of its own instead: play, bpm, the randomisers, undo
+  // and save (.m-ph, app/phone.js), laid out at the phone's own width, either way up
+  if (Math.min(screen.width, screen.height) < 600) { document.documentElement.classList.add('phone'); return; }
   document.documentElement.classList.add('fit');
   const vp = document.querySelector('meta[name="viewport"]');
   let last = 0;
@@ -244,6 +247,20 @@
     </div>
     <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v@VER@, @BUILT@</footer>
   </section>
+</main>
+<main class="m m-ph" id="m-ph" aria-label="elixir">
+  <button class="m-play m-ph-play" id="m-ph-play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M7 4.5v15l13-7.5z"/><rect class="i-stop" x="5.5" y="5.5" width="13" height="13" rx="2"/></svg><span>play</span></button>
+  <div class="m-ph-bpm"><button class="m-btn" id="m-ph-down" type="button" aria-label="Slower">&minus;</button><b id="m-ph-tempo">118</b><button class="m-btn" id="m-ph-up" type="button" aria-label="Faster">+</button></div>
+  <button class="m-btn m-big m-ph-every" data-for="m-everything" type="button">everything</button>
+  <button class="m-btn" data-for="m-kit" type="button">kit</button>
+  <button class="m-btn" data-for="m-alter" type="button">alter</button>
+  <button class="m-btn" data-for="m-pattern" type="button">pattern</button>
+  <button class="m-btn" data-for="m-xrand" type="button">crossfeed</button>
+  <button class="m-btn" data-for="m-fx-rand" type="button">random fx</button>
+  <button class="m-btn" data-for="m-fx-alter" type="button">alter fx</button>
+  <button class="m-btn" data-for="m-knobseq" type="button">knob seqs</button>
+  <button class="m-btn" id="m-ph-undo" data-for="m-undo" type="button" disabled>undo</button>
+  <button class="m-btn m-ph-save" data-for="m-psave" type="button">save<small id="m-ph-pname"></small></button>
 </main>
 <div class="m-turn" id="m-turn"><div><b>turn it sideways</b><span>elixir plays in landscape</span><button type="button" id="m-turn-fs" hidden>full screen</button></div></div>
 
