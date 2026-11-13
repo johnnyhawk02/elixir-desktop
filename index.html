@@ -1640,7 +1640,11 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 .m-ph-dec .m-flab { font-size: 1.05rem; line-height: 1; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
 .m-ph-kseq { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
 /* (touch-action none so a finger's drag is the fader's, not a scroll; no pressed look, as a drag isn't a press) */
-.m-ph .m-ph-slew { grid-column: span 2; }
+/* rec: a round dot that blinks as a square while it records, the time beside it */
+.m .m-ph-rec { min-height: 0; gap: 12px !important; }
+.m-ph-rec i { width: .9em; height: .9em; border-radius: 50%; font-size: 1.55rem; }
+.m-ph-rec.on i { width: .9em; height: .9em; border-radius: 3px; }
+.m-ph-rec span { font-size: 1.55rem; text-transform: uppercase; letter-spacing: .06em; }
 .m .m-ph-kseq.m-btn { touch-action: none; color: var(--ink) !important; background: linear-gradient(to top, rgba(23, 32, 14, .2) calc(var(--f, .8) * 100%), transparent 0) !important; }
 .m .m-ph-kseq.m-btn.flash { background: var(--spot) !important; color: var(--panel) !important; }
 .m-ph-kseq small { font-size: 1.05rem; text-transform: none; letter-spacing: 0; opacity: .7; }
@@ -1649,21 +1653,22 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 .m-ph-save small { font-size: 1.05rem; text-transform: none; letter-spacing: 0; opacity: .7; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (orientation: landscape) {
   html.phone .m-ph { grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr) auto; gap: 8px; padding: 8px; }
-  .m-ph .m-ph-bpm { grid-row: span 2; } .m-ph .m-ph-slew { grid-column: auto; }
-  .m-ph-dec { grid-column: 1 / -1; grid-row: auto; grid-template-columns: repeat(7, 1fr); grid-template-rows: minmax(0, 1fr); gap: 4px 6px; }
+  .m-ph .m-ph-bpm { grid-row: span 2; }
+  .m-ph-dec { grid-column: 1 / 5; grid-row: auto; grid-template-columns: repeat(7, 1fr); grid-template-rows: minmax(0, 1fr); gap: 4px 6px; }
   /* (sideways the decay row goes under the second row of buttons: rows play knob everything kit alter / pattern
-     crossfeed random fx alter fx / decay / knob seqs, clear seqs, undo, save) */
-  .m-ph-dec { order: 1; }
+     crossfeed random fx alter fx / decay, rec / knob seqs, clear seqs, slew, undo, save) */
+  .m-ph-dec, .m-ph-rec { order: 1; }
   #m-ph-kseq, #m-ph-seqclear, #m-ph-slew, #m-ph-undo, .m-ph-save, .m-ph-install { order: 2; }
   .m-ph .m-btn, .m-ph .m-play { font-size: 1.6rem !important; }
   .m-ph-bpm .m-vtrack b { font-size: 2rem; }
+  .m-ph-rec i, .m-ph-rec span { font-size: 1.6rem; }
   .m-ph-bpm .m-vtrack b::after { font-size: .9rem; }
 }
 </style>
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>215</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>216</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1862,7 +1867,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
       <button class="m-btn" id="m-pexport" type="button">export</button>
       <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
     </div>
-    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v215, 12 Nov, 20:37</footer>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v216, 13 Nov, 01:35</footer>
   </section>
 </main>
 <main class="m m-ph" id="m-ph" aria-label="elixir">
@@ -1879,6 +1884,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
   <button class="m-btn m-ph-kseq" id="m-ph-kseq" type="button">knob seqs<small id="m-ph-kseq-out"></small></button>
   <button class="m-btn" id="m-ph-seqclear" type="button">clear seqs</button>
   <button class="m-btn m-ph-kseq m-ph-slew" id="m-ph-slew" type="button">slew<small id="m-ph-slew-out"></small></button>
+  <button class="m-rec m-ph-rec" id="m-ph-rec" type="button" aria-pressed="false" aria-label="Record"><i></i><span id="m-ph-rec-t">rec</span></button>
   <button class="m-btn" id="m-ph-undo" data-for="m-undo" type="button" disabled>undo</button>
   <button class="m-btn m-ph-save" data-for="m-psave" type="button">save<small id="m-ph-pname"></small></button>
   <button class="m-btn m-ph-install" id="m-ph-install" type="button" hidden>install app</button>
@@ -10749,7 +10755,7 @@ addEventListener('resize', mDepth);
 requestAnimationFrame(mDepth);
 mSync(); mUndo(); mCompOn(); mDrawAll();
 // ---- phones (html.phone, set by the script in the page's head): one big screen, .m-ph, in place of the rest: play,
-// the tempo (a knob), a decay knob for each drum, every randomiser, clear knob seqs, their slew, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
+// the tempo (a knob), a decay knob for each drum, rec, every randomiser, clear knob seqs, their slew, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
 if (document.documentElement.classList.contains('phone')) {
   for (const b of $('m-ph').querySelectorAll('[data-for]')) b.addEventListener('click', () => $(b.dataset.for).click());
   $('m-ph-seqclear').addEventListener('click', mKnobSeqClear);
@@ -10788,6 +10794,17 @@ if (document.documentElement.classList.contains('phone')) {
   phFaderBtn($('m-ph-kseq'), 'elixir-desktop-kseqlen', .8, (x) => {
     mKseqAt = x; $('m-ph-kseq-out').textContent = stepName(SEQ_STEPS[Math.round(x * (SEQ_STEPS.length - 1))]);
   }, () => { $('m-knobseq').click(); slewAll(); });
+  // rec: the phone's own free recording (mobile-record.js): starts playing if stopped, a second press stops it and
+  // offers the take (the share sheet, or a download); it shows the time while it runs
+  const rec = $('m-ph-rec');
+  rec.addEventListener('click', () => $('m-rec').click());
+  const recSync = () => {
+    rec.setAttribute('aria-pressed', $('m-rec').getAttribute('aria-pressed')); rec.classList.toggle('on', $('m-rec').classList.contains('on'));
+    $('m-ph-rec-t').textContent = $('m-rec-t').textContent;
+  };
+  new MutationObserver(recSync).observe($('m-rec'), { attributes: true, attributeFilter: ['aria-pressed', 'class'] });
+  new MutationObserver(recSync).observe($('m-rec-t'), { childList: true, characterData: true, subtree: true });
+  recSync();
   const play = $('m-ph-play');
   play.addEventListener('click', () => $('play').click());
   const phSync = () => {

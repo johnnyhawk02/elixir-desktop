@@ -1,5 +1,5 @@
 // ---- phones (html.phone, set by the script in the page's head): one big screen, .m-ph, in place of the rest: play,
-// the tempo (a knob), a decay knob for each drum, every randomiser, clear knob seqs, their slew, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
+// the tempo (a knob), a decay knob for each drum, rec, every randomiser, clear knob seqs, their slew, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
 if (document.documentElement.classList.contains('phone')) {
   for (const b of $('m-ph').querySelectorAll('[data-for]')) b.addEventListener('click', () => $(b.dataset.for).click());
   $('m-ph-seqclear').addEventListener('click', mKnobSeqClear);
@@ -38,6 +38,17 @@ if (document.documentElement.classList.contains('phone')) {
   phFaderBtn($('m-ph-kseq'), 'elixir-desktop-kseqlen', .8, (x) => {
     mKseqAt = x; $('m-ph-kseq-out').textContent = stepName(SEQ_STEPS[Math.round(x * (SEQ_STEPS.length - 1))]);
   }, () => { $('m-knobseq').click(); slewAll(); });
+  // rec: the phone's own free recording (mobile-record.js): starts playing if stopped, a second press stops it and
+  // offers the take (the share sheet, or a download); it shows the time while it runs
+  const rec = $('m-ph-rec');
+  rec.addEventListener('click', () => $('m-rec').click());
+  const recSync = () => {
+    rec.setAttribute('aria-pressed', $('m-rec').getAttribute('aria-pressed')); rec.classList.toggle('on', $('m-rec').classList.contains('on'));
+    $('m-ph-rec-t').textContent = $('m-rec-t').textContent;
+  };
+  new MutationObserver(recSync).observe($('m-rec'), { attributes: true, attributeFilter: ['aria-pressed', 'class'] });
+  new MutationObserver(recSync).observe($('m-rec-t'), { childList: true, characterData: true, subtree: true });
+  recSync();
   const play = $('m-ph-play');
   play.addEventListener('click', () => $('play').click());
   const phSync = () => {
