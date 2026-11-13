@@ -1,4 +1,4 @@
-// ---- the grid page: the step grid from 808-SC (its elixir/app/tr808-grid.js), on Elixir's seven tracks ----
+// ---- the seq page (its tab: seq; inside, 'grid'): the step grid from 808-SC (its elixir/app/tr808-grid.js), on Elixir's seven tracks ----
 // Eight patterns, a lane a track, 16 steps a bar and 1 to 8 bars (up to 128 steps); the bar buttons under the grid show
 // one bar at a time and add or take off bars. Tap a step for on or off, or drag across steps to paint (the first step
 // decides on or off); with cmd (ctrl) it's accents. The pattern buttons over the grid pick which pattern plays and is
@@ -241,7 +241,16 @@ function gDraw() {
   $('m-g-grid').setAttribute('aria-pressed', lanes); $('m-g-algo').setAttribute('aria-pressed', !lanes);
   $('m-g-ins').hidden = lanes; $('m-g-ins').textContent = `insert into pattern ${gr.cur + 1}`;
   $('m').classList.toggle('g-gen', !lanes);
+  $('m-g-body').hidden = !lanes;
 }
+// On a laptop screen the beat page lives on the seq page: algo shows it there in place of the grid (and its own tab goes);
+// on a narrow screen it goes back to its own page
+function gBeatPlace() {
+  const card = document.querySelector('.m-beat-card'), home = mWide.matches ? document.querySelector('.m-g-card') : document.querySelector('[data-m-panel="beat"]');
+  if (card.parentNode !== home) home.append(card);
+  if (mWide.matches && $('m').dataset.page === 'beat') mTab('grid');
+}
+gBeatPlace(); mWide.addEventListener('change', gBeatPlace);
 // the playhead (as heard), the lanes' names lighting as they hit, and the recording
 const gOnEvent = onEvent;
 onEvent = function (ev) {
@@ -273,7 +282,7 @@ addEventListener('keydown', (e) => {
   if (k === 'c') { e.preventDefault(); gClip = { L: gClean(gShown()), n: gLen() }; }
   else if (k === 'v' && gClip) { e.preventDefault(); gr.mode = 'lanes'; gr.pats[gr.cur] = gClean(gClip.L); gr.lens[gr.cur] = gClip.n; gr.page = 0; gSend(); gDraw(); }
 });
-M_PAGE_NAMES.grid = 'grid';
+M_PAGE_NAMES.grid = 'seq';
 if (mWide.matches) mTab('grid');
 gSend();
 gDraw();

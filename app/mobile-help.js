@@ -3,7 +3,7 @@ const HELP = [
   ['start', 'getting started', `<p>Elixir is a six voice drum machine: drum 1, 2 and 3, snare, cymbal and hihat. Three steps to a beat:</p>
 <ol><li>Press <b>play</b> (or space).</li><li>Press <b>everything</b> until you like what you hear: each press is a new beat, kit, effects and mix.</li>
 <li>Turn the knobs, or press <b>kit</b>, <b>pattern</b> or <b>alter</b> to change one part. <b>undo</b> takes back the last one.</li></ol>
-<p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), the presets bar (‹ name ›, <b>save</b>, <b>manage presets</b>), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (grid, beat, voice, fx, xfeed, mix, mstr), chosen by the buttons over it.</p>
+<p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), the presets bar (‹ name ›, <b>save</b>, <b>manage presets</b>), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (seq, voice, fx, xfeed, mix, mstr), chosen by the buttons over it.</p>
 <p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>save</b> in the presets bar at the top. <b>rec</b> records a WAV. Keys for nearly everything: see keyboard.</p>
 <p>(On a screen under 1000 px wide it becomes the phone layout: pages along the bottom, and hold a fader for its sequencer.)</p>`],
   ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: tempo, variation, the perform controls (pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and rush. MIDI CC 1 to 12 turn them (any channel).</p>
@@ -24,13 +24,13 @@ const HELP = [
 <li><b>on</b> switches it on and off. A control with a sequencer running has its name inverted. Presets keep them. esc greys the strip out.</li>
 <li>MIDI CC 21, 22, 23 and 24 set its length, slew, speed and depth (on the sequencer shown).</li>
 <li>The steps follow the groove and its depth, landing with the swung hits; switch that off in <b>options</b> › <b>user settings</b> › <b>seq</b>.</li></ul>`],
-  ['grid', 'grid: patterns', `<p>The first page on the right: a lane for each track (the kick at the bottom, the hats at the top), sixteen steps a bar.</p>
+  ['grid', 'seq: grid and algo', `<p>The first page on the right. <b>grid | algo</b> at its top picks what plays and what the page shows: <b>grid</b> your patterns, <b>algo</b> the generator, with the beat page's controls (pattern, feel, rush, density). The grid: a lane for each track (the kick at the bottom, the hats at the top), sixteen steps a bar.</p>
 <ul><li>Tap a step for on or off, or drag across steps to paint; with cmd (ctrl) it puts accents on or off.</li>
 <li><b>1</b> to <b>8</b> over the grid pick which pattern plays and is edited, straight away. Right-click one to <b>record</b> into it (from the next bar, whatever plays, until you press its STOP) or <b>clear</b> it.</li>
-<li><b>grid | algo</b> (top right) picks what plays: <b>grid</b> the pattern picked, <b>algo</b> the generator (the perform knobs, the beat page and the randomisers), shown in the lanes with its fills written out bar by bar. In algo, <b>insert into pattern N</b> (by the bars) puts what it plays into the pattern picked; editing a step or picking a pattern goes back to grid.</li>
+<li>In algo, <b>insert into pattern N</b> (top right) puts what the generator plays into the pattern picked, its fills written out bar by bar (up to 8 bars), and goes back to grid.</li>
 <li><b>bars</b>: a pattern is 1 to 8 bars. Tap a bar to show it (a dashed one adds bars up to it), <b>−</b> takes the last off, <b>+</b> adds a copy of the bar shown. <b>◀ ▶</b> shift the whole pattern a step (cmd/ctrl: a bar).</li>
 <li>Cmd/ctrl + c copies what plays, cmd/ctrl + v pastes it over the pattern picked. Tap a lane's name for its voice page. The patterns are kept in this browser.</li></ul>`],
-  ['beat', 'beat: the pattern', `<p>Tempo, genre, beat, energy, fills, var and bars; rush, rush on, velocity, groove, depth and accent.</p>
+  ['beat', 'algo: the generator', `<p>Tempo, genre, beat, energy, fills, var and bars; rush, rush on, velocity, groove, depth and accent.</p>
 <ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how often it fills.</li>
 <li>Every genre has 64 beats. <b>var</b> plays each beat as a phrase with variation bars in it: <b>off</b> loops one bar, <b>A</b> changes only the last bar, up to <b>D</b> which changes every second bar most. <b>bars</b> makes the phrase 4 or 8 bars long. Each beat always plays the same variations, and presets keep both.</li>
 <li><b>rush</b> builds a roll: the chosen drum (<b>rush on</b>) rolls faster and faster while the others drop out and a high-pass rises. Push it up for a build, drop it for the drop. Its curve is in <b>options</b> › <b>settings</b> › <b>rush</b>.</li>
