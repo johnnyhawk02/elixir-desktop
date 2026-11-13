@@ -51,12 +51,14 @@ XS.forEach((short, n) => {
     set: (v) => { setValue(vol, v, true); setDirty(true); } });
 });
 
-// random fx: new sends on every drum (each effect on some of them) and new settings for the echo and reverb;
+// random fx: new sends on every drum (each effect on some of them) and new settings for every effect: the echo, the
+// reverb, and on the master page the distortion and the compressor (its on/off stays);
 // alter fx: every send already on, and every setting, moved up to 10% of its range either way. Undo takes either back
-const fxSnap = () => ({ fx: mix.fx.slice(), ring: mix.ring.slice(), fx3: structuredClone(fx3), pos: delayPos, p3: values[PAR.FX_P3], p4: values[PAR.FX_P4], pp: values[PAR.FX_DELAY_TYPE] });
+const fxSnap = () => ({ fx: mix.fx.slice(), ring: mix.ring.slice(), fx3: structuredClone(fx3), master: { ...master }, pos: delayPos, p3: values[PAR.FX_P3], p4: values[PAR.FX_P4], pp: values[PAR.FX_DELAY_TYPE] });
 function fxUse(q) {
   mix.fx.splice(0, 6, ...q.fx); mix.ring.splice(0, 6, ...q.ring);
-  Object.assign(fx3.echo, q.fx3.echo); fx3.verb = { ...FX3_0.verb, ...q.fx3.verb };
+  Object.assign(fx3.echo, q.fx3.echo); fx3.verb = { ...FX3_0.verb, ...q.fx3.verb }; fx3.dist = structuredClone(q.fx3.dist);
+  Object.assign(master, q.master);
   delayPos = q.pos; send({ type: 'delay', pos: delayPos });
   setValue(PAR.FX_P3, q.p3, true); setValue(PAR.FX_P4, q.p4, true); setValue(PAR.FX_DELAY_TYPE, q.pp, true);
   fxButtons.forEach((b) => b()); sendMix(); mDrawAll(); setDirty(true);
@@ -79,6 +81,11 @@ function mFxRandomise(q) {
   q.p3 = rRange(F.toneLo, F.toneHi); q.p4 = rChance(F.fbWild) ? rIn(70, 105) : rRange(F.fbLo, F.fbHi);
   q.fx3.echo.pct = rRange(F.widthLo, F.widthHi);
   q.fx3.verb = { time: rIn(0, 70), decay: rIn(60, 115), tone: rIn(35, 100), early: rIn(20, 110) };
+  q.fx3.echo.fine = rIn(-100, 100);
+  // the distortion: half the time off, else some of the mix through it, any type, the level kept near unity
+  q.fx3.dist = { type: rIn(0, LXR.DIST_NAMES.length - 1), mix: Math.random() < .5 ? 0 : rIn(10, 70), p: [rIn(20, 110), rIn(20, 110), rIn(40, 110), rIn(80, 100)] };
+  // the compressor: musical settings (2:1 to 6:1, a gentle make-up)
+  Object.assign(q.master, { thresh: rIn(-24, -6), ratio: RATIOS[rIn(1, 4)], attack: rIn(1, 30), release: 10 * rIn(4, 30), makeup: rIn(0, 6) });
 }
 $('m-fx-rand').addEventListener('click', async () => { await startAudio(); fxChange(mFxRandomise); });
 $('m-fx-alter').addEventListener('click', async () => {
@@ -90,6 +97,11 @@ $('m-fx-alter').addEventListener('click', async () => {
     q.p3 = nudge(q.p3, 0, 127); q.p4 = nudge(q.p4, 0, 127);
     q.fx3.echo.pct = nudge(q.fx3.echo.pct, 0, 200);
     const vb = q.fx3.verb || { ...FX3_0.verb }; q.fx3.verb = Object.fromEntries(Object.entries(vb).map(([k, v]) => [k, nudge(v, 0, 127)]));
+    q.fx3.echo.fine = nudge(q.fx3.echo.fine || 0, -100, 100);
+    const d = q.fx3.dist; if (d.mix) d.mix = nudge(d.mix, 1, 100); d.p = d.p.map((v) => nudge(v, 0, 127));
+    const M = q.master, ri = RATIOS.indexOf(M.ratio);
+    M.thresh = nudge(M.thresh, -40, 0); M.attack = nudge(M.attack, 1, 50); M.release = Math.round(nudge(M.release, 20, 500) / 10) * 10; M.makeup = nudge(M.makeup, 0, 12);
+    if (ri >= 0 && Math.random() < a * 2) M.ratio = RATIOS[Math.max(0, Math.min(RATIOS.length - 1, ri + (Math.random() < .5 ? -1 : 1)))];
   });
 });
 
