@@ -53,17 +53,8 @@ class Player {
     // (hpLog: its cutoff in log Hz, gliding; hpMix: how much of it is heard, faded in and out so it never clicks;
     // hpOn false: off and its state cleared, the mix untouched)
     this.hpOn = false; this.hpLog = Math.log(30); this.hpMix = 0; this.hpG = 0; this.hpS = new Float64Array(4);
-    // master: drum 1 ducks the other voices (before the FX bus), then a compressor
-    // on the whole mix, the same design as the LXR-02's FX compressor
-    this.master = { comp: true, thresh: -12, ratio: 3, attack: 5, release: 120, makeup: 0, duck: 0.4, duckRelease: 150, duckFx: false, duckOn: true, space: 0 };
-    // the sidechain's spacer (after Trackspacer): drum 1 also carves room for itself in the other voices, band by band.
-    // Eight band-passes an octave apart from 60 Hz run on drum 1 and on the others' mix; where drum 1 has energy in a band,
-    // that band of the others is turned down, by up to space (100 = -20 dB). Each band is a peaking cut, x + (gain - 1)
-    // times its band-pass, so with drum 1 quiet the others pass untouched. The cut follows drum 1 with a 3 ms attack and
-    // the sidechain's release
-    this.spF = Array.from({ length: 8 }, (_, k) => Math.tan(Math.PI * 60 * Math.pow(2, k * 1.1) / LXR.REAL_FS));
-    this.spS = new Float64Array(48); this.spEnv = new Float32Array(8); this.spG = new Float32Array(8).fill(1);
-    this.spL = new Float32Array(64); this.spR = new Float32Array(64); this.spKey = new Float32Array(64); this.spOn = false;
+    // master: a compressor on the whole mix, the same design as the LXR-02's FX compressor
+    this.master = { comp: true, thresh: -12, ratio: 3, attack: 5, release: 120, makeup: 0 };
     // delay: tempo-synced time, 0 = 1/128 .. 1 = one bar, and run as a send effect (all wet,
     // the voices keep their dry path); not in the firmware
     this.delayPos = 1 + Math.log2(3 / 16) / 7;
@@ -77,8 +68,8 @@ class Player {
     this.sendD = new Float32Array(6); this.sendR = new Float32Array(6); this.echoWidth = 1;
     this.distMix = 0; this.distAt = 0;
     this.busIn = new Float32Array(128); this.busOut = new Int16Array(128);
-    this.duckEnv = 0; this.duckAt = 1; this.compEnv = 0; this.gr = 0; this.duckMin = 1;
-    // level meters: each voice's peak after its fader, accent, mute and duck
+    this.compEnv = 0; this.gr = 0;
+    // level meters: each voice's peak after its fader, accent and mute
     this.lvl = new Float32Array(6); this.lvlN = 0; this.lvlOn = false;
     this.events = [];
     this._render(this.A); this._render(this.B);
@@ -186,44 +177,6 @@ class Player {
     }
     this.sched[s] = hits;
   }
-  // the spacer: each band's peak in the key, followed, sets that band's cut in the left and right of the others
-  spacer(key, XL, XR) {
-    const FS = LXR.REAL_FS, cut = this.master.space / 100 * 0.9, k = 1 / 1.4, S = this.spS;
-    const att = 1 - Math.exp(-64 / (0.003 * FS)), rel = Math.exp(-64000 / (this.master.duckRelease * FS));
-    for (let b = 0; b < 8; b++) {
-      const g = this.spF[b], a = 1 / (1 + g * (g + k)), o = b * 6;
-      // TPT state-variable band-pass (unity at the centre: k times bp); states o, o+1 the key, o+2.. the left and right
-      let pk = 0, s1 = S[o], s2 = S[o + 1];
-      for (let i = 0; i < 64; i++) {
-        const hp = (key[i] - (g + k) * s1 - s2) * a, bp = g * hp + s1;
-        s1 = g * hp + bp; s2 += 2 * g * bp;
-        const m = bp < 0 ? -bp : bp; if (m > pk) pk = m;
-      }
-      S[o] = s1; S[o + 1] = s2;
-      pk *= k;
-      const e = this.spEnv[b] = pk > this.spEnv[b] ? this.spEnv[b] + (pk - this.spEnv[b]) * att : this.spEnv[b] * rel;
-      // full cut once drum 1's band reaches about -28 dBFS; the gain ramps across the block
-      const g0 = this.spG[b], g1 = 1 - cut * Math.min(1, e / 0.04);
-      this.spG[b] = g1;
-      if (g0 === 1 && g1 === 1) { // nothing to cut: keep the filters running so a cut starts clean
-        for (let c = 0; c < 2; c++) {
-          const X = c ? XR : XL; let t1 = S[o + 2 + 2 * c], t2 = S[o + 3 + 2 * c];
-          for (let i = 0; i < 64; i++) { const hp = (X[i] - (g + k) * t1 - t2) * a, bp = g * hp + t1; t1 = g * hp + bp; t2 += 2 * g * bp; }
-          S[o + 2 + 2 * c] = t1; S[o + 3 + 2 * c] = t2;
-        }
-        continue;
-      }
-      for (let c = 0; c < 2; c++) {
-        const X = c ? XR : XL; let t1 = S[o + 2 + 2 * c], t2 = S[o + 3 + 2 * c];
-        for (let i = 0; i < 64; i++) {
-          const hp = (X[i] - (g + k) * t1 - t2) * a, bp = g * hp + t1;
-          t1 = g * hp + bp; t2 += 2 * g * bp;
-          X[i] += (g0 + (g1 - g0) * (i + 1) / 64 - 1) * bp * k;
-        }
-        S[o + 2 + 2 * c] = t1; S[o + 3 + 2 * c] = t2;
-      }
-    }
-  }
   clickAt(hi) { this.clk = { n: 0, ph: 0, w: 2 * Math.PI * (hi ? 1760 : 880) / LXR.REAL_FS }; }
   _render(dst) {
     const rc = this.rec;
@@ -257,9 +210,9 @@ class Player {
         if (this.fresh) { this.fresh = false; this.schedule(this.step, this.bar, this.toNext); }
         const next = (this.step + 1) % 16;
         this.schedule(next, next === 0 ? this.bar + 1 : this.bar, this.toNext + len);
-        this.events.push({ type: 'step', step: this.step, bar: this.bar, hits: this.sched[this.step] || [], gr: this.gr, duck: this.duckMin });
+        this.events.push({ type: 'step', step: this.step, bar: this.bar, hits: this.sched[this.step] || [], gr: this.gr });
         this.sched[this.step] = [];
-        this.gr = 0; this.duckMin = 1;
+        this.gr = 0;
         this.step = next;
         if (this.step === 0) this.bar++;
         this.toNext += len;
@@ -300,43 +253,23 @@ class Player {
     const pans = [e.drums[0], e.drums[1], e.drums[2], e.snare, e.cymbal, e.hat];
     const [L, R] = dst;
     L.fill(0); R.fill(0);
-    // sidechain: follow drum 1's level (instant attack, set release) and turn the rest down
-    const M = this.master, k = out[0];
+    const M = this.master;
     const isDelay = e.fx.fxType === LXR.FX_DELAY;
     e.fx.forceWet = isDelay;
     const eTime = this.echoSync ? delaySamples(this.delayPos, this.bpm) : (1 + 1999 * this.echoFree) / 1000 * LXR.REAL_FS;
     e.fx.setDelaySync(isDelay ? eTime * (1 + this.echoFine / 10000) : null);
-    let pk = 0;
-    for (let i = 0; i < 64; i++) pk = Math.max(pk, Math.abs(k[i]));
-    pk = pk / 32768 * this.gainTo[0];
-    this.duckEnv = Math.max(pk, this.duckEnv * Math.exp(-64000 / (M.duckRelease * LXR.REAL_FS)));
-    const duck0 = this.duckAt, duck1 = 1 - (M.duckOn ? M.duck : 0) * Math.min(1, this.duckEnv / 0.3);
-    this.duckAt = duck1; this.duckMin = Math.min(this.duckMin, duck1);
-    // with the spacer on, the other voices mix apart from drum 1 first, so it can cut them
-    const sp = M.duckOn && M.space > 0, XL = sp ? this.spL : L, XR = sp ? this.spR : R;
-    if (sp) { XL.fill(0); XR.fill(0); } else if (this.spOn) { this.spS.fill(0); this.spEnv.fill(0); this.spG.fill(1); }
-    this.spOn = sp;
     for (let n = 0; n < 6; n++) {
-      // accent gain, ramped over the block, and the duck on every voice but drum 1
-      const d0 = n ? duck0 : 1, d1 = n ? duck1 : 1;
-      const g0 = this.gain[n] * d0, g1 = this.gainTo[n] * d1, dg = (g1 - g0) / 64;
+      // accent gain, ramped over the block
+      const g0 = this.gain[n], g1 = this.gainTo[n], dg = (g1 - g0) / 64;
       // every voice reaches the outputs; one routed to the echo bus also feeds it at its send
       const fa = e.audioRouting[n] === LXR.MIXER_ROUTING_FX_BUS ? this.fxAmt[n] : 0;
       const pl = pans[n].triggeredPanL / 32768, pr = pans[n].triggeredPanR / 32768;
       const o = out[n];
       let lv = 0;
-      const OL = n ? XL : L, OR = n ? XR : R;
-      for (let i = 0; i < 64; i++) { const v = o[i] * (g0 + dg * i); OL[i] += v * pl; OR[i] += v * pr; const a = v < 0 ? -v : v; if (a > lv) lv = a; }
+      for (let i = 0; i < 64; i++) { const v = o[i] * (g0 + dg * i); L[i] += v * pl; R[i] += v * pr; const a = v < 0 ? -v : v; if (a > lv) lv = a; }
       lv *= Math.max(pl, pr); if (lv > this.lvl[n]) this.lvl[n] = lv;
       this.fxGain[n] = g1 * fa;
       this.gain[n] = this.gainTo[n];
-    }
-    if (sp) {
-      // L and R hold drum 1 alone here: its mono is the key
-      const key = this.spKey;
-      for (let i = 0; i < 64; i++) key[i] = (L[i] + R[i]) / 2;
-      this.spacer(key, XL, XR);
-      for (let i = 0; i < 64; i++) { L[i] += XL[i]; R[i] += XR[i]; }
     }
     if (++this.lvlN >= 16) {
       this.lvlN = 0;
@@ -346,14 +279,12 @@ class Player {
     }
     // the firmware's FX bus (distortion, ring mod, compressor or delay), sample-exact
     const fx = e.renderFx(this.fxGain, this.echoWidth);
-    // with duck fx on, the three FX returns are ducked too (all of them, drum 1's sends included), ramped over the block
-    const fd0 = M.duckFx ? duck0 : 1, fdd = M.duckFx ? (duck1 - duck0) / 64 : 0;
     // the reverb's bus: each voice panned in at its send, saturated to int16
     for (const [bus, sends, mk] of [[this.verb, this.sendR, VERB_MAKEUP]]) {
       const bi = this.busIn; bi.fill(0);
       let any = false;
       for (let n = 0; n < 6; n++) {
-        const g = sends[n] * this.gainTo[n] * (n ? duck1 : 1);
+        const g = sends[n] * this.gainTo[n];
         if (!g) continue;
         any = true;
         const o = out[n], pl = pans[n].triggeredPanL * g, pr = pans[n].triggeredPanR * g;
@@ -362,9 +293,9 @@ class Player {
       for (let i = 0; i < 128; i++) bus.input[i] = Math.max(-32768, Math.min(32767, Math.round(bi[i])));
       const bo = this.busOut; bo.fill(0);
       bus.process(bo, 64, this.fxRng);
-      if (any || bo.some((v) => v)) for (let i = 0; i < 64; i++) { const g = mk / 32768 * (fd0 + fdd * i); L[i] += bo[2 * i] * g; R[i] += bo[2 * i + 1] * g; }
+      if (any || bo.some((v) => v)) for (let i = 0; i < 64; i++) { L[i] += bo[2 * i] * mk / 32768; R[i] += bo[2 * i + 1] * mk / 32768; }
     }
-    for (let i = 0; i < 64; i++) { const g = (fd0 + fdd * i) / 32768; L[i] += fx[2 * i] * g; R[i] += fx[2 * i + 1] * g; }
+    for (let i = 0; i < 64; i++) { L[i] += fx[2 * i] / 32768; R[i] += fx[2 * i + 1] / 32768; }
     // the distortion, a master insert (not in the firmware's routing): the whole mix through the firmware's distortion,
     // blended in at its mix amount, ramped across the block, before the high-pass and the compressor; at 0 it's bypassed
     if (this.distMix || this.distAt) {

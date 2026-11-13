@@ -317,7 +317,6 @@ input[type=checkbox] { accent-color: var(--ink); width: 16px; height: 16px; marg
 .mchk { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; cursor: pointer; }
 .mchk input { width: 12px; height: 12px; }
 #comp-knobs { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; }
-#duck-knobs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; }
 /* level meters: a recessed column of small LEDs (green, then yellow from -12 dB, red from -3 dB), with a held
    peak LED. In the mixer the meter is the fader: a triangle on its left points at the level, and the meter
    and triangle both drag. Fixed width, the meter centred under the name, with room either side to grab */
@@ -336,7 +335,7 @@ input[type=checkbox] { accent-color: var(--ink); width: 16px; height: 16px; marg
   clip-path: inset(100% 0 0 0); }
 .lvm s { position: absolute; left: 2px; right: 2px; height: 3px; bottom: 2px; background: var(--lvm-g); display: none; }
 .lvm s.y { background: var(--lvm-y); } .lvm s.r { background: var(--lvm-r); }
-/* needle meters for gain reduction and ducking: a fixed-size cream face, so nothing around them moves */
+/* needle meter for gain reduction: a fixed-size cream face, so nothing around them moves */
 .vu { display: flex; flex-direction: column; align-items: center; gap: 2px; padding-left: 6px; min-height: 0; }
 .vu span { font-family: var(--display); font-weight: 500; font-size: var(--fs-s); line-height: 1.25; color: var(--muted); }
 .vu svg { display: block; width: 58px; height: 38px; flex: none; margin-block: auto; }
@@ -641,7 +640,7 @@ pre { margin: 0; padding: 14px 18px; overflow: auto; max-width: 100%; background
    and a needle meter fills the right of each card */
 .bay-c { --vuw: clamp(60px, 18vw - 120px, 150px); }
 .tab-perform > .bay-c { display: flex; }
-.comp-card { flex: 5 1 calc(var(--vuw) + 262px); } .duck-card { flex: 2 1 calc(var(--vuw) + 130px); }
+.comp-card { flex: 5 1 calc(var(--vuw) + 262px); }
 .mbody { display: grid; grid-template-columns: minmax(0, 1fr) var(--vuw); gap: 14px; min-height: 0; min-width: 0; }
 .master-card .vu { display: grid; grid-template-rows: auto minmax(0, 1fr); justify-items: center; align-items: center; gap: 4px; padding: 0; min-height: 0;
   border-left: 1px solid var(--line); padding-left: 14px; margin-left: -14px; width: calc(100% + 14px); }
@@ -716,7 +715,7 @@ pre { margin: 0; padding: 14px 18px; overflow: auto; max-width: 100%; background
   .bay-c { grid-template-columns: minmax(0, 1fr); }
   .tab-perform .fx-groups { flex-direction: column; }
   .tab-perform .fxg + .fxg { padding-left: 0; }
-  .tab-perform > .bay-c { flex-direction: column; } .comp-card, .duck-card { flex: none; }
+  .tab-perform > .bay-c { flex-direction: column; } .comp-card { flex: none; }
   .mbody { grid-template-columns: minmax(0, 1fr); }
   .master-card .vu { border-left: 0; margin: 4px 0 0; padding: 0; width: auto; }
   .master-card .vu svg { width: 150px; max-height: none; }
@@ -975,7 +974,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-chead b { font-size: var(--fs-m); }
 .m .m-chead b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; }
 
-/* a meter (the sidechain's duck, the compressor's reduction), segmented */
+/* a meter (the compressor's reduction), segmented */
 .m-gr { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; font-size: var(--fs-s); }
 .m .m-gr i { height: 14px; border-radius: 0; overflow: hidden; display: flex; justify-content: flex-end;
   background: repeating-linear-gradient(to left, var(--ghost) 0 5px, transparent 5px 8px); }
@@ -1011,14 +1010,14 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 #m-beat-faders .m-vtrack { min-height: 16px; }
 
 /* the small faders (voice, fx, mix, master): a one-line readout, a narrow label */
-.m-fx-row .m-vf, #m-comp .m-vf, #m-duck .m-vf, #m-dist .m-vf, .m-vset .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
-.m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output, .m .m-vset .m-vf output {
+.m-fx-row .m-vf, #m-comp .m-vf, #m-dist .m-vf, .m-vset .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
+.m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-dist .m-vf output, .m .m-vset .m-vf output {
   font-size: min(var(--fs-xs), 3.9vw, 16.1px); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; }
-.m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output { white-space: nowrap; }
+.m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-dist .m-vf output { white-space: nowrap; }
 .m .m-fx-row .m-vf output { display: flex; align-items: flex-end; justify-content: center; }
-.m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab { font-size: min(1.05rem, 3.7vw, 15.2px); letter-spacing: 0; white-space: nowrap; }
+.m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-dist .m-flab { font-size: min(1.05rem, 3.7vw, 15.2px); letter-spacing: 0; white-space: nowrap; }
 .m .m-vset .m-flab, .m .m-vset .m-vf output { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-.m .m-fx-row .m-vtrack, .m #m-comp .m-vtrack, .m #m-duck .m-vtrack, .m #m-dist .m-vtrack, .m .m-vset .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 12px; }
+.m .m-fx-row .m-vtrack, .m #m-comp .m-vtrack, .m #m-dist .m-vtrack, .m .m-vset .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 12px; }
 .m .m-fx-row .m-vtrack { width: min(44px, 100%); }
 .m .m-vset .m-vtrack { width: min(56px, 100%); }
 
@@ -1192,9 +1191,9 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-fxhead .m-chk { min-height: 30px; gap: 8px; }
 .m-fxhead .m-chk i { width: 20px; height: 20px; }
 /* six to a row everywhere small faders sit in rows, so the columns line up (the master page's rows too) */
-.m-fx-row .m-faders, #m-comp, #m-duck, #m-dist { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+.m-fx-row .m-faders, #m-comp, #m-dist { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
 
-/* ---- mstr: the drum 1 sidechain, then distortion, then the compressor, each a heading and a row ---- */
+/* ---- mstr: distortion, then the compressor, each a heading and a row ---- */
 .m-comp-card { display: grid; grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 6px; min-height: 0; padding: 8px 6px 8px 4px; }
 .m-comp-card .m-chead { gap: 10px; }
 .m-comp-card .m-chead:not(:first-child) { border-top: var(--rule); padding-top: 6px; }
@@ -1518,8 +1517,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m[data-page="mix"] [data-m-panel="mix"], .m[data-page="comp"] [data-m-panel="comp"] { display: grid; }
   /* (every page's faders: readouts and names in the bigger small print; beat's and voice's readouts on one line, so
      every track starts at the same height) */
-  .m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab,
-  .m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output { font-size: var(--fs-xs); }
+  .m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-dist .m-flab,
+  .m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-dist .m-vf output { font-size: var(--fs-xs); }
   .m .m-vset .m-vf output { font-size: var(--fs-xs); white-space: nowrap; height: 1.2em; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; text-align: center; }
   /* beat: three rows on one seven-column grid, each under a heading and parted by a line: pattern (tempo, genre,
      beat, energy, fills), feel (velocity, groove, depth, accent) with the rush at the end (rush, rush on), then
@@ -1668,7 +1667,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>216</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>217</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1751,8 +1750,6 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 
   <div class="m-panel" data-m-panel="comp">
     <section class="m-card m-comp-card">
-      <div class="m-chead"><b>drum 1 sidechain</b><div class="m-gr" aria-label="sidechain duck"><i><b id="m-dk"></b></i><output id="m-dk-out">0 dB</output></div></div>
-      <div class="m-faders" id="m-duck"></div>
       <div class="m-chead"><b>distortion</b></div>
       <div class="m-faders" id="m-dist"></div>
       <div class="m-chead"><b>compressor</b><div class="m-gr" aria-label="gain reduction"><i><b id="m-gr"></b></i><output id="m-gr-out">0 dB</output></div><button class="m-toggle" id="m-comp-on" type="button" aria-pressed="true">on</button></div>
@@ -1867,7 +1864,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
       <button class="m-btn" id="m-pexport" type="button">export</button>
       <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
     </div>
-    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v216, 13 Nov, 01:35</footer>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v217, 13 Nov, 09:01</footer>
   </section>
 </main>
 <main class="m m-ph" id="m-ph" aria-label="elixir">
@@ -1951,10 +1948,6 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
     <div class="card master-card comp-card" role="group" aria-label="Compressor">
       <div class="mhead"><h2>compressor</h2><button class="mon" id="comp-on" type="button" aria-pressed="true" aria-label="Compressor on" title="Compressor on/off"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.2 4.1a5 5 0 1 0 5.6 0"/><path d="M8 2v6"/></svg></button></div>
       <div class="mbody"><div class="knobs" id="comp-knobs"></div></div>
-    </div>
-    <div class="card master-card duck-card" role="group" aria-label="Drum 1 sidechain">
-      <div class="mhead"><h2>drum 1 sidechain</h2><label class="mchk" for="duck-fx" title="Duck the echo, distortion and ring mod returns too"><input id="duck-fx" type="checkbox"> fx</label><button class="mon" id="duck-on" type="button" aria-pressed="true" aria-label="Sidechain on" title="Sidechain on/off"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.2 4.1a5 5 0 1 0 5.6 0"/><path d="M8 2v6"/></svg></button></div>
-      <div class="mbody"><div class="knobs" id="duck-knobs"></div></div>
     </div>
     </div>
     <div class="right-col">
@@ -2058,7 +2051,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
       <p class="note">The mixer's level and pan are the voices' own VOLUME and PAN parameters, so they are saved with the kit. Each fader is its level meter, with a triangle beside it marking the level: drag the meter or the triangle for fine control (it moves less than the mouse; hold Shift for finer still) or scroll on it; the strip's name shows the level while it moves.</p>
       <p class="note">Save keeps everything as a preset in this browser under a two-word alien name: the sound (kit, crossfeed, FX and sends) and the song (pattern, perform dials, tempo, velocity, accent, master), and loading it brings all of that back. A red star by save means a randomise has changed things since the last save or load. ‹ and › step through the presets; untick bpm beside them to keep the current tempo when a preset loads (everything else still loads); while playing, a new preset comes in at the start of the next bar. Presets opens the preset manager: load, delete, and star favourites; export favourites downloads them as a file, and favourites sent in that way are built into the next release. Open .snd there loads an LXR kit file as the current sound, and export .snd downloads it as an LXR kit file (.SND, without the crossfeed, which the hardware doesn't have).</p>
       <p class="note">There are three effects, all the LXR-02's own FX-slot code run as sends: each mixer strip has three send dials left of its fader: echo, dist and ring. Every voice keeps its dry sound and each effect's output is fully wet. The echo's time is synced to the tempo: from 1/128 of a bar fully left to one bar fully right, gliding through the musical lengths (the readout names the nearest, with ≈ when it is between); randomise picks 1/2, 1/4, dotted 1/8, 1/8 or 1/16 (now and then 1/128) and puts it within 10 ms of it either way (at 120 bpm; the window scales with the tempo). Ticks round the time dial mark the musical lengths (long for straight notes, short for dotted and triplet); a drag catches on them, and the scroll wheel and arrow keys step from one to the next (Shift + arrow for fine steps). The FX section above the mixer sets all three: echo mode (normal or ping-pong), time, tone, feedback and width (100% is the firmware's own; 0% is mono; the firmware's ping-pong only bounces sound that reaches it off-centre, and most drums sit in the middle, so above 100% width pushes the echo's input to one side, and at 200% a centred drum bounces fully; on a normal echo, above 100% widens the echoes' stereo); distortion type (tube, fold or rat), drive, color, tone and volume; ring mod carrier wave and frequency. A kit that used distortion or ring mod in its FX slot loads those settings into that effect with a little of each routed voice sent to it. The sync, the sends, the extra buses and the larger delay buffer are additions to the firmware.</p>
-      <p class="note">The master section sits after everything, in two cards, each with a power button: drum 1 sidechain ducks every other voice (before the FX bus) by up to the duck amount whenever drum 1 hits (tick fx to duck the echo, distortion and ring mod returns as well, so their tails pump with drum 1), and the compressor works on the whole mix like the LXR-02's FX-slot compressor; the needle meters show how far each is pulling down, in dB.</p>
+      <p class="note">The master section sits after everything: the compressor, with a power button, works on the whole mix like the LXR-02's FX-slot compressor; the needle meter shows how far it is pulling down, in dB.</p>
       <p class="note">The red circle by play opens the recorder: pick free (records until you press stop, up to ten minutes) or a loop of 1 to 16 bars, which starts on the next bar (starting playback from bar 1 if it is stopped) and is cut to exactly that many bars at the tempo, with the echo carried in from before so it loops cleanly. Tick count-in for a bar of beeps first (a high beep then three lower boops, with the music turned down; from bar 1 if stopped), and the take starts on the bar after it. Pressing record closes the recorder; the red circle by play blinks while it waits or counts and pulses while it records. Choose 44.1 or 48 kHz, 16-bit (dithered) or 24-bit, and normalise (peak at −0.3 dB). Each take is listed with a player and a save .wav button; takes are kept until you reload the page.</p>
       <p class="note">The sound knobs on the pattern card are performance macros over all six voices at once: fm depth (the drums' FM amount and the cymbal and hat FM), decay (every amp decay), pitch (every voice's coarse tune, up to two octaves either way) and filter (every filter's cutoff). Each sits in the middle as the kit is; turning it pushes every voice's own value towards the top or the bottom, so the kit's differences stay. They change what the engine plays, not the kit: the sound tab still shows the kit's own values, and double-click sets a macro back to the middle. They are saved with presets.</p>
       <p class="note">Perform builds the pattern from the dials while it plays: Energy goes from empty through a sparse groove up to the full kit, Beat picks one of thirty-two grooves in the pattern's style, and Fills sets how often a fill plays (every 8, 4 or 2 bars) and how long and busy it is. Rush hands the other drums' hits to the snare as it goes up, slowly at first and more as it rises (the hats go faster and are gone by 80%; from 98% only the snare plays); the kick's downbeats keep going up to 90%, then only the first kick of each bar plays, and from 95% none. Above 75% it also rolls the snare on every step alongside the drums still playing, doubling to 32nds at 77.5%; above 80% the roll comes off the grid and speeds up smoothly as the dial moves, gliding from 32nds at 80% to 256ths at 100% (at fast tempos it tops out at about 170 hits a second), the roll swelling louder as it rises. Above 90% a high-pass filter comes in on the whole mix, its cutoff rising from 30 Hz at 90% to 1.5 kHz at 100% so the low end drains away into the build. The small set button above rush opens its settings, with these numbers as the defaults: where the roll starts, the 1/32 point where the free roll begins (the 32nd band starts halfway between the two), its top speed at 100% (1/64, 1/128 or 1/256), when the hats are gone, when only the snare is left, how long all four beat kicks and then only the first keep going, where the filter starts and its top cutoff, and how quickly the roll's speed and the filter glide after the dial (0 to 500 ms). The curves keep their shape and stretch to the new points; reset puts them back. Presets save the rush dial and these settings (the built-in ones load with rush at 0 and the defaults), and the last ones used are kept in this browser. The arrows by the pattern card's title switch the style: electro (the original five grooves plus eleven after classic records and styles: Clear, Al-Naafiysh, Egypt Egypt, Numbers, freestyle, ghettotech, Drexciya, Detroit, Hip Hop Be Bop, Pack Jam, Sharevari), techno (four on the floor, off-beat open hats, snare builds), broken beat (syncopated kicks under a snare on 2 and 4, fills in threes), IDM (lopsided kicks, hats in threes, a second bar that answers the first, stutter fills), breakcore (chopped amen breaks, ghost snares, stuttering snare rolls, a second bar that re-cuts the first) and user (patterns you save from the steps tab with Save as user; beat picks one, energy thins it out, fills adds electro fills; Save over and Delete change the one beat has picked). Presets save the style, and a preset in user style carries its pattern with it. Off on the pattern card's switch turns the patterns off: the sequencer keeps time but plays nothing, and MIDI note-ons from a keyboard or another sequencer play the voices instead (any channel, General MIDI drum notes, velocity sets the level; the card shows the note map and which MIDI inputs it hears; needs a browser with Web MIDI, such as Chrome or Edge).</p>
@@ -5837,17 +5830,8 @@ class Player {
     // (hpLog: its cutoff in log Hz, gliding; hpMix: how much of it is heard, faded in and out so it never clicks;
     // hpOn false: off and its state cleared, the mix untouched)
     this.hpOn = false; this.hpLog = Math.log(30); this.hpMix = 0; this.hpG = 0; this.hpS = new Float64Array(4);
-    // master: drum 1 ducks the other voices (before the FX bus), then a compressor
-    // on the whole mix, the same design as the LXR-02's FX compressor
-    this.master = { comp: true, thresh: -12, ratio: 3, attack: 5, release: 120, makeup: 0, duck: 0.4, duckRelease: 150, duckFx: false, duckOn: true, space: 0 };
-    // the sidechain's spacer (after Trackspacer): drum 1 also carves room for itself in the other voices, band by band.
-    // Eight band-passes an octave apart from 60 Hz run on drum 1 and on the others' mix; where drum 1 has energy in a band,
-    // that band of the others is turned down, by up to space (100 = -20 dB). Each band is a peaking cut, x + (gain - 1)
-    // times its band-pass, so with drum 1 quiet the others pass untouched. The cut follows drum 1 with a 3 ms attack and
-    // the sidechain's release
-    this.spF = Array.from({ length: 8 }, (_, k) => Math.tan(Math.PI * 60 * Math.pow(2, k * 1.1) / LXR.REAL_FS));
-    this.spS = new Float64Array(48); this.spEnv = new Float32Array(8); this.spG = new Float32Array(8).fill(1);
-    this.spL = new Float32Array(64); this.spR = new Float32Array(64); this.spKey = new Float32Array(64); this.spOn = false;
+    // master: a compressor on the whole mix, the same design as the LXR-02's FX compressor
+    this.master = { comp: true, thresh: -12, ratio: 3, attack: 5, release: 120, makeup: 0 };
     // delay: tempo-synced time, 0 = 1/128 .. 1 = one bar, and run as a send effect (all wet,
     // the voices keep their dry path); not in the firmware
     this.delayPos = 1 + Math.log2(3 / 16) / 7;
@@ -5861,8 +5845,8 @@ class Player {
     this.sendD = new Float32Array(6); this.sendR = new Float32Array(6); this.echoWidth = 1;
     this.distMix = 0; this.distAt = 0;
     this.busIn = new Float32Array(128); this.busOut = new Int16Array(128);
-    this.duckEnv = 0; this.duckAt = 1; this.compEnv = 0; this.gr = 0; this.duckMin = 1;
-    // level meters: each voice's peak after its fader, accent, mute and duck
+    this.compEnv = 0; this.gr = 0;
+    // level meters: each voice's peak after its fader, accent and mute
     this.lvl = new Float32Array(6); this.lvlN = 0; this.lvlOn = false;
     this.events = [];
     this._render(this.A); this._render(this.B);
@@ -5970,44 +5954,6 @@ class Player {
     }
     this.sched[s] = hits;
   }
-  // the spacer: each band's peak in the key, followed, sets that band's cut in the left and right of the others
-  spacer(key, XL, XR) {
-    const FS = LXR.REAL_FS, cut = this.master.space / 100 * 0.9, k = 1 / 1.4, S = this.spS;
-    const att = 1 - Math.exp(-64 / (0.003 * FS)), rel = Math.exp(-64000 / (this.master.duckRelease * FS));
-    for (let b = 0; b < 8; b++) {
-      const g = this.spF[b], a = 1 / (1 + g * (g + k)), o = b * 6;
-      // TPT state-variable band-pass (unity at the centre: k times bp); states o, o+1 the key, o+2.. the left and right
-      let pk = 0, s1 = S[o], s2 = S[o + 1];
-      for (let i = 0; i < 64; i++) {
-        const hp = (key[i] - (g + k) * s1 - s2) * a, bp = g * hp + s1;
-        s1 = g * hp + bp; s2 += 2 * g * bp;
-        const m = bp < 0 ? -bp : bp; if (m > pk) pk = m;
-      }
-      S[o] = s1; S[o + 1] = s2;
-      pk *= k;
-      const e = this.spEnv[b] = pk > this.spEnv[b] ? this.spEnv[b] + (pk - this.spEnv[b]) * att : this.spEnv[b] * rel;
-      // full cut once drum 1's band reaches about -28 dBFS; the gain ramps across the block
-      const g0 = this.spG[b], g1 = 1 - cut * Math.min(1, e / 0.04);
-      this.spG[b] = g1;
-      if (g0 === 1 && g1 === 1) { // nothing to cut: keep the filters running so a cut starts clean
-        for (let c = 0; c < 2; c++) {
-          const X = c ? XR : XL; let t1 = S[o + 2 + 2 * c], t2 = S[o + 3 + 2 * c];
-          for (let i = 0; i < 64; i++) { const hp = (X[i] - (g + k) * t1 - t2) * a, bp = g * hp + t1; t1 = g * hp + bp; t2 += 2 * g * bp; }
-          S[o + 2 + 2 * c] = t1; S[o + 3 + 2 * c] = t2;
-        }
-        continue;
-      }
-      for (let c = 0; c < 2; c++) {
-        const X = c ? XR : XL; let t1 = S[o + 2 + 2 * c], t2 = S[o + 3 + 2 * c];
-        for (let i = 0; i < 64; i++) {
-          const hp = (X[i] - (g + k) * t1 - t2) * a, bp = g * hp + t1;
-          t1 = g * hp + bp; t2 += 2 * g * bp;
-          X[i] += (g0 + (g1 - g0) * (i + 1) / 64 - 1) * bp * k;
-        }
-        S[o + 2 + 2 * c] = t1; S[o + 3 + 2 * c] = t2;
-      }
-    }
-  }
   clickAt(hi) { this.clk = { n: 0, ph: 0, w: 2 * Math.PI * (hi ? 1760 : 880) / LXR.REAL_FS }; }
   _render(dst) {
     const rc = this.rec;
@@ -6041,9 +5987,9 @@ class Player {
         if (this.fresh) { this.fresh = false; this.schedule(this.step, this.bar, this.toNext); }
         const next = (this.step + 1) % 16;
         this.schedule(next, next === 0 ? this.bar + 1 : this.bar, this.toNext + len);
-        this.events.push({ type: 'step', step: this.step, bar: this.bar, hits: this.sched[this.step] || [], gr: this.gr, duck: this.duckMin });
+        this.events.push({ type: 'step', step: this.step, bar: this.bar, hits: this.sched[this.step] || [], gr: this.gr });
         this.sched[this.step] = [];
-        this.gr = 0; this.duckMin = 1;
+        this.gr = 0;
         this.step = next;
         if (this.step === 0) this.bar++;
         this.toNext += len;
@@ -6084,43 +6030,23 @@ class Player {
     const pans = [e.drums[0], e.drums[1], e.drums[2], e.snare, e.cymbal, e.hat];
     const [L, R] = dst;
     L.fill(0); R.fill(0);
-    // sidechain: follow drum 1's level (instant attack, set release) and turn the rest down
-    const M = this.master, k = out[0];
+    const M = this.master;
     const isDelay = e.fx.fxType === LXR.FX_DELAY;
     e.fx.forceWet = isDelay;
     const eTime = this.echoSync ? delaySamples(this.delayPos, this.bpm) : (1 + 1999 * this.echoFree) / 1000 * LXR.REAL_FS;
     e.fx.setDelaySync(isDelay ? eTime * (1 + this.echoFine / 10000) : null);
-    let pk = 0;
-    for (let i = 0; i < 64; i++) pk = Math.max(pk, Math.abs(k[i]));
-    pk = pk / 32768 * this.gainTo[0];
-    this.duckEnv = Math.max(pk, this.duckEnv * Math.exp(-64000 / (M.duckRelease * LXR.REAL_FS)));
-    const duck0 = this.duckAt, duck1 = 1 - (M.duckOn ? M.duck : 0) * Math.min(1, this.duckEnv / 0.3);
-    this.duckAt = duck1; this.duckMin = Math.min(this.duckMin, duck1);
-    // with the spacer on, the other voices mix apart from drum 1 first, so it can cut them
-    const sp = M.duckOn && M.space > 0, XL = sp ? this.spL : L, XR = sp ? this.spR : R;
-    if (sp) { XL.fill(0); XR.fill(0); } else if (this.spOn) { this.spS.fill(0); this.spEnv.fill(0); this.spG.fill(1); }
-    this.spOn = sp;
     for (let n = 0; n < 6; n++) {
-      // accent gain, ramped over the block, and the duck on every voice but drum 1
-      const d0 = n ? duck0 : 1, d1 = n ? duck1 : 1;
-      const g0 = this.gain[n] * d0, g1 = this.gainTo[n] * d1, dg = (g1 - g0) / 64;
+      // accent gain, ramped over the block
+      const g0 = this.gain[n], g1 = this.gainTo[n], dg = (g1 - g0) / 64;
       // every voice reaches the outputs; one routed to the echo bus also feeds it at its send
       const fa = e.audioRouting[n] === LXR.MIXER_ROUTING_FX_BUS ? this.fxAmt[n] : 0;
       const pl = pans[n].triggeredPanL / 32768, pr = pans[n].triggeredPanR / 32768;
       const o = out[n];
       let lv = 0;
-      const OL = n ? XL : L, OR = n ? XR : R;
-      for (let i = 0; i < 64; i++) { const v = o[i] * (g0 + dg * i); OL[i] += v * pl; OR[i] += v * pr; const a = v < 0 ? -v : v; if (a > lv) lv = a; }
+      for (let i = 0; i < 64; i++) { const v = o[i] * (g0 + dg * i); L[i] += v * pl; R[i] += v * pr; const a = v < 0 ? -v : v; if (a > lv) lv = a; }
       lv *= Math.max(pl, pr); if (lv > this.lvl[n]) this.lvl[n] = lv;
       this.fxGain[n] = g1 * fa;
       this.gain[n] = this.gainTo[n];
-    }
-    if (sp) {
-      // L and R hold drum 1 alone here: its mono is the key
-      const key = this.spKey;
-      for (let i = 0; i < 64; i++) key[i] = (L[i] + R[i]) / 2;
-      this.spacer(key, XL, XR);
-      for (let i = 0; i < 64; i++) { L[i] += XL[i]; R[i] += XR[i]; }
     }
     if (++this.lvlN >= 16) {
       this.lvlN = 0;
@@ -6130,14 +6056,12 @@ class Player {
     }
     // the firmware's FX bus (distortion, ring mod, compressor or delay), sample-exact
     const fx = e.renderFx(this.fxGain, this.echoWidth);
-    // with duck fx on, the three FX returns are ducked too (all of them, drum 1's sends included), ramped over the block
-    const fd0 = M.duckFx ? duck0 : 1, fdd = M.duckFx ? (duck1 - duck0) / 64 : 0;
     // the reverb's bus: each voice panned in at its send, saturated to int16
     for (const [bus, sends, mk] of [[this.verb, this.sendR, VERB_MAKEUP]]) {
       const bi = this.busIn; bi.fill(0);
       let any = false;
       for (let n = 0; n < 6; n++) {
-        const g = sends[n] * this.gainTo[n] * (n ? duck1 : 1);
+        const g = sends[n] * this.gainTo[n];
         if (!g) continue;
         any = true;
         const o = out[n], pl = pans[n].triggeredPanL * g, pr = pans[n].triggeredPanR * g;
@@ -6146,9 +6070,9 @@ class Player {
       for (let i = 0; i < 128; i++) bus.input[i] = Math.max(-32768, Math.min(32767, Math.round(bi[i])));
       const bo = this.busOut; bo.fill(0);
       bus.process(bo, 64, this.fxRng);
-      if (any || bo.some((v) => v)) for (let i = 0; i < 64; i++) { const g = mk / 32768 * (fd0 + fdd * i); L[i] += bo[2 * i] * g; R[i] += bo[2 * i + 1] * g; }
+      if (any || bo.some((v) => v)) for (let i = 0; i < 64; i++) { L[i] += bo[2 * i] * mk / 32768; R[i] += bo[2 * i + 1] * mk / 32768; }
     }
-    for (let i = 0; i < 64; i++) { const g = (fd0 + fdd * i) / 32768; L[i] += fx[2 * i] * g; R[i] += fx[2 * i + 1] * g; }
+    for (let i = 0; i < 64; i++) { L[i] += fx[2 * i] / 32768; R[i] += fx[2 * i + 1] / 32768; }
     // the distortion, a master insert (not in the firmware's routing): the whole mix through the firmware's distortion,
     // blended in at its mix amount, ramped across the block, before the high-pass and the compressor; at 0 it's bypassed
     if (this.distMix || this.distAt) {
@@ -6921,7 +6845,7 @@ $('play').addEventListener('click', async () => {
   await startAudio();
   playing = !playing;
   $('play').setAttribute('aria-pressed', playing); $('play').textContent = playing ? 'STOP' : 'PLAY';
-  if (!playing) { markStep(-1); markBar(-1); grVu.set(0); duckVu.set(0); }
+  if (!playing) { markStep(-1); markBar(-1); grVu.set(0); }
   sendSeq();
 });
 $('grab').addEventListener('click', () => {
@@ -6996,7 +6920,7 @@ for (const { kit } of sourceKits) for (let n = 1; n <= 6; n++) if (kit[PAR['TRAN
 // kit file: the sends and FX then come from the kit's own FX settings). Elixir Mobile's own format is v5 (see
 // PRESETS.md): any preset with a kit is brought into it as it's read (built in, stored or imported), whatever it
 // sounded like before: the distortion sends go (the distortion is a master insert, fx3.params.dist.mix, 0 = off), the
-// master gets its spacer (0), and a song too old to have its pattern pages and rush settings is dropped (the preset
+// sidechain's settings go (it was removed), and a song too old to have its pattern pages and rush settings is dropped (the preset
 // then loads its sound alone). build.mjs refuses a built-in preset in any other version.
 const PRESET_V = 5;
 const PRESET_FIELDS = ['name', 'kit', 'xm', 'fx', 'fx3', 'dpos', 'song', 'fav'];
@@ -7010,7 +6934,7 @@ function toCurrent(p) {
     if (d && typeof d.mix !== 'number') d.mix = 0;
   }
   if (q.song && !(q.song.pattern && q.song.stepPages && q.song.rushSet)) delete q.song;
-  if (q.song && q.song.master && typeof q.song.master.space !== 'number') q.song.master.space = 0;
+  if (q.song && q.song.master) for (const k of ['duck', 'duckRelease', 'duckFx', 'duckOn', 'space']) delete q.song.master[k];
   return q;
 }
 // a preset as stored and exported, from a kit list entry
@@ -7141,7 +7065,7 @@ function useSong(g, keepTempo) {
   perf.var = Number.isInteger(g.var) ? Math.max(0, Math.min(4, g.var)) : PERF_RANGE.var[2]; perf.bars = g.bars === 8 ? 8 : 4;
   $('tempo').value = perf.tempo;
   if (STYLES[styleIdx].user && g.user) { const i = ensureUserPat(g.user); if (i >= 0) useUserSlot(i); }
-  Object.assign(master, MASTER0, g.master); buildMaster(); // presets saved before the sidechain switch have it on
+  Object.assign(master, MASTER0, g.master); for (const k of Object.keys(master)) if (!(k in MASTER0)) delete master[k]; buildMaster();
   sendMix();
   perf.rush = Math.max(0, Math.min(100, Number(g.rush) || 0)); perf.rushT = Number.isInteger(g.rushT) ? Math.max(0, Math.min(6, g.rushT)) : 3;
   send({ type: 'rush', v: perf.rush, t: perf.rushT });
@@ -8072,7 +7996,7 @@ function genPage(g, pattern, energy, T, fill, fillOn, yields) {
   }
 }
 // ---- mixer ----
-const MASTER0 = { comp: true, thresh: -12, ratio: 3, attack: 5, release: 120, makeup: 0, duck: 0.4, duckRelease: 150, duckFx: false, duckOn: true, space: 0 };
+const MASTER0 = { comp: true, thresh: -12, ratio: 3, attack: 5, release: 120, makeup: 0 };
 const master = { ...MASTER0 };
 const CH = ['DRUM 1', 'DRUM 2', 'DRUM 3', 'SNARE', 'CYMBAL', 'HIHAT'];
 // sends per voice: fx = echo (the engine's FX bus), dist = distortion, ring = ring mod, 0..100
@@ -8310,7 +8234,7 @@ function sendMix() {
     sendD: mix.dist.map((v) => v / 100), sendR: mix.ring.map((v) => v / 100) });
 }
 
-// ---- master: compressor and drum 1 sidechain, each in its own card with an on button ----
+// ---- master: the compressor, in its own card with an on button ----
 const RATIOS = [1.5, 2, 3, 4, 6, 8, 20];
 const mKnob = (label, key, lo, hi, step, show, box) => box.appendChild(dialKnob(label, {
   max: Math.round((hi - lo) / step), show: (v) => show(lo + v * step), get: () => Math.round((master[key] - lo) / step),
@@ -8346,26 +8270,22 @@ const meterVu = (name, aria) => {
   return { el, set(db) { target = pos(db); if (!raf) raf = requestAnimationFrame(tick); } };
 };
 meterVu.n = 0;
-const grVu = meterVu('reduction', 'compressor gain reduction meter'), duckVu = meterVu('ducking', 'sidechain ducking meter');
+const grVu = meterVu('reduction', 'compressor gain reduction meter');
 // each card's power button lights when on; an off card's faders, meter and fx box are dimmed (the box can't be ticked)
 const showOn = (id, on) => { $(id + '-on').setAttribute('aria-pressed', on); const card = $(id + '-on').closest('.card'); card.classList.toggle('off', !on); card.querySelectorAll('.mchk input').forEach((i) => { i.disabled = !on; }); };
 function buildMaster() {
-$('comp-knobs').innerHTML = ''; $('duck-knobs').innerHTML = '';
-showOn('comp', master.comp); showOn('duck', master.duckOn); $('duck-fx').checked = master.duckFx;
+$('comp-knobs').innerHTML = '';
+showOn('comp', master.comp);
 mKnob('threshold', 'thresh', -40, 0, 1, (v) => v + ' dB', $('comp-knobs'));
 $('comp-knobs').appendChild(dialKnob('ratio', { max: RATIOS.length - 1, show: (v) => RATIOS[v] + ':1', get: () => RATIOS.indexOf(master.ratio),
   set: (v) => { master.ratio = RATIOS[v]; sendMix(); }, dflt: () => RATIOS.indexOf(MASTER0.ratio) }));
 mKnob('attack', 'attack', 1, 50, 1, (v) => v + ' ms', $('comp-knobs'));
 mKnob('release', 'release', 20, 500, 10, (v) => v + ' ms', $('comp-knobs'));
 mKnob('makeup', 'makeup', 0, 12, 1, (v) => '+' + v + ' dB', $('comp-knobs'));
-mKnob('duck', 'duck', 0, 1, 0.01, (v) => Math.round(v * 100) + '%', $('duck-knobs'));
-mKnob('release', 'duckRelease', 30, 600, 10, (v) => v + ' ms', $('duck-knobs'));
-$('comp-knobs').after(grVu.el); $('duck-knobs').after(duckVu.el);
+$('comp-knobs').after(grVu.el);
 }
 buildMaster();
 $('comp-on').addEventListener('click', () => { master.comp = !master.comp; showOn('comp', master.comp); sendMix(); });
-$('duck-on').addEventListener('click', () => { master.duckOn = !master.duckOn; showOn('duck', master.duckOn); sendMix(); });
-$('duck-fx').addEventListener('change', () => { master.duckFx = $('duck-fx').checked; sendMix(); });
 sendMix();
 
 // ---- the perform dials on the pattern card ----
@@ -8670,7 +8590,6 @@ function onEvent(ev) {
     if (!playing) return;
     markStep(ev.step); markBar(ev.bar);
     grVu.set(master.comp ? ev.gr : 0);
-    duckVu.set(-20 * Math.log10(Math.max(ev.duck, 0.001)));
     for (const t of ev.hits) { flash(voicesEl.children[t]); if (t === track) flash(pad); }
   }, delay);
 }
@@ -8884,16 +8803,9 @@ mFader($('m-beat-faders'), 'accent', { ...pf('accent'), show: (v) => `+${v} dB` 
 // the beat's variations (off, A..D) and the phrase they play over (4 or 8 bars); on the laptop they sit at the end of the pattern row
 mFader($('m-beat-faders'), 'var', { ...pf('var'), show: () => perfText('var') });
 mFader($('m-beat-faders'), 'bars', { min: 0, max: 1, get: () => (perf.bars === 8 ? 1 : 0), set: (v) => setPerf('bars', v ? 8 : 4), show: (v) => `${v ? 8 : 4}\nbars`, dflt: 0 });
-// ---- the perf page's own controls: tempo, the sidechain, the sound macros and crossfeed. They live in a hidden box;
-// the page shows twelve assignable slots (below, after the x/y page's lists), these seven by default ----
+// ---- the perf page's own controls: tempo, the sound macros and crossfeed. They live in a hidden box;
+// the page shows twelve assignable slots (below, after the x/y page's lists), these six by default ----
 mFader($('m-perf-src'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
-// the drum 1 sidechain duck: above 0 it switches the sidechain on
-const setDuck = (v) => {
-  master.duck = v / 100;
-  if (v > 0 && !master.duckOn) $('duck-on').click(); else sendMix();
-};
-const duckFader = { min: 0, max: 100, get: () => (master.duckOn ? Math.round(master.duck * 100) : 0), set: setDuck, show: (v) => (v ? v + '%' : 'off'), dflt: Math.round(MASTER0.duck * 100) };
-mFader($('m-perf-src'), 'sidechain', duckFader);
 // the sound macros, as on the desktop's pattern card: 100 (pitch 24) is the middle, the sound as it is
 for (const [m, label] of [['pitch', 'pitch'], ['decay', 'decay'], ['filter', 'filter'], ['fm', 'fm']]) {
   const pitch = m === 'pitch';
@@ -8917,10 +8829,6 @@ mFader($('m-comp'), 'ratio', { min: 0, max: RATIOS.length - 1, get: () => Math.m
 mMaster($('m-comp'), 'attack', 'attack', 1, 50, 1, (v) => v + ' ms');
 mMaster($('m-comp'), 'release', 'release', 20, 500, 10, (v) => v + ' ms');
 mMaster($('m-comp'), 'makeup', 'makeup', 0, 12, 1, (v) => '+' + v + ' dB');
-mFader($('m-duck'), 'amount', duckFader);
-mMaster($('m-duck'), 'release', 'duckRelease', 30, 600, 10, (v) => v + ' ms');
-// space: drum 1 also cuts the others' frequencies where it plays (a spacer, after Trackspacer), on the same switch and release
-mMaster($('m-duck'), 'space', 'space', 0, 100, 5, (v) => (v ? v + '%' : 'off'));
 const mCompOn = () => {
   const on = $('comp-on').getAttribute('aria-pressed') === 'true';
   $('m-comp-on').setAttribute('aria-pressed', on); $('m-comp-on').textContent = on ? 'on' : 'off';
@@ -8934,13 +8842,6 @@ grVu.set = (db) => {
   mGrSet(db);
   const d = Math.max(0, Math.min(20, db || 0));
   $('m-gr').style.width = (Math.log1p(d) / Math.log1p(20) * 100).toFixed(1) + '%'; $('m-gr-out').textContent = `${d.toFixed(1)} dB`;
-};
-// and the sidechain's: how far drum 1 is turning the rest down, the same scale
-const mDkSet = duckVu.set;
-duckVu.set = (db) => {
-  mDkSet(db);
-  const d = Math.max(0, Math.min(20, db || 0));
-  $('m-dk').style.width = (Math.log1p(d) / Math.log1p(20) * 100).toFixed(1) + '%'; $('m-dk-out').textContent = `${d.toFixed(1)} dB`;
 };
 
 // ---- randomisers ----
@@ -9446,8 +9347,8 @@ fxF('m-fx-ring', 'send', fxSend('ring'));
 const verbP = (k) => ({ min: 0, max: 127, get: () => (fx3.verb || (fx3.verb = { ...FX3_0.verb }))[k], set: (v) => { fx3.verb[k] = v; sendMix(); }, show: String, dflt: FX3_0.verb[k] });
 for (const k of ['time', 'decay', 'tone', 'early']) fxF('m-fx-ring', k, verbP(k));
 
-// ---- the master page's distortion: the whole mix through it (after the sidechain's duck), into the compressor; the
-// page runs top to bottom in signal order: sidechain, distortion, compressor. Mix (0 bypasses it), type (tube,
+// ---- the master page's distortion: the whole mix through it, into the compressor; the
+// page runs top to bottom in signal order: distortion, compressor. Mix (0 bypasses it), type (tube,
 // fold or rat), drive, color, tone, volume ----
 fxF('m-dist', 'mix', { min: 0, max: 100, get: () => fx3.dist.mix || 0, set: (v) => { fx3.dist.mix = v; sendMix(); }, show: (v) => (v ? v + '%' : 'off'), dflt: 0 });
 const DIST_T = LXR.DIST_NAMES.map((n) => n.toLowerCase());
@@ -9825,7 +9726,7 @@ const XY_PLACES = (() => {
     { name: 'perf', groups: faders([['perf', 'm-perf-src']]) },
     { name: 'fx', groups: faders([['echo', 'm-fx-echo'], ['reverb', 'm-fx-ring']]) },
     { name: 'mix', groups: faders([['echo send', 'm-mix-echo'], ['verb send', 'm-mix-ring'], ['pan', 'm-mix-pan'], ['level', 'm-mix-vol']]) },
-    { name: 'master', groups: faders([['sidechain', 'm-duck'], ['distortion', 'm-dist'], ['compressor', 'm-comp']]) }];
+    { name: 'master', groups: faders([['distortion', 'm-dist'], ['compressor', 'm-comp']]) }];
 })();
 // two pads, one above the other, each with its own x and y picks: [pad][axis] = [place, group, item]
 const XY_KEY = 'elixir-desktop-xy';
@@ -9959,7 +9860,7 @@ $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][
 const SLOT_KEY = 'elixir-desktop-perfmap2';
 try { localStorage.removeItem('elixir-desktop-perfmap'); } catch (e) {}
 // the defaults, four a row: the perform controls and energy, then the best of the beat page
-const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'],
+const SLOT0 = [['perf', 'perf', 'tempo'], ['beat', 'beat', 'var'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'],
   ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
   ['beat', 'beat', 'genre'], ['beat', 'beat', 'beat'], ['beat', 'beat', 'fills'], ['beat', 'beat', 'rush']];
 let mSlots = (() => { try { const v = JSON.parse(localStorage.getItem(SLOT_KEY)); return Array.isArray(v) && v.length >= 7 ? v : null; } catch (e) { return null; } })() || SLOT0.map((x) => x.slice());
@@ -9974,7 +9875,7 @@ function mSlot(i) {
   // a page's fader keeps its own steps, readout and reset; a drum's parameter is whole steps 0..its top
   // (its full name: a drum's setting starts with the drum, dr1 decay; a label that only makes sense on its own page takes
   // its group's name, echo send, dist mix; the perf and beat faders are the whole kit's, so they keep their own)
-  const [pl, g] = mSlots[i], dr = XN.indexOf(pl), grp = { distortion: 'dist', compressor: 'comp', sidechain: 'side' }[g] || g.split(' ')[0];
+  const [pl, g] = mSlots[i], dr = XN.indexOf(pl), grp = { distortion: 'dist', compressor: 'comp' }[g] || g.split(' ')[0];
   const label = dr >= 0 ? `${['dr1', 'dr2', 'dr3', 'sn', 'cy', 'hh'][dr]} ${A.label}` : ['fx', 'mix', 'master'].includes(pl) && !A.label.includes(' ') ? `${grp} ${A.label}` : A.label;
   const draw = mFader(box, label, fd ? { min: fd.min, max: () => fd.hiOf(), step: fd.step, get: fd.get, set: (v) => { fd.put(v); mDrawAll(); }, show: fd.show, dflt: fd.dflt, knob: true }
     : { min: A.min, max: A.max, get: A.get, set: (v) => { A.set(v); mDrawAll(); setDirty(true); }, show: String, dflt: () => initValues[A.par], knob: true });
@@ -9989,7 +9890,7 @@ function mSlot(i) {
 // ellipsis (the css)
 const M_SHORT = { decay: 'dcy', filter: 'flt', reso: 'res', slope: 'slp', freq: 'frq', pitch: 'ptch', amount: 'amt', attack: 'atk',
   release: 'rel', threshold: 'thr', volume: 'vol', level: 'lvl', sample: 'smp', rate: 'rt', drive: 'drv', offset: 'ofs', retrigger: 'rtrg',
-  feedback: 'fbk', width: 'wdth', sidechain: 'sdch', crossfeed: 'xfd', velocity: 'vel', repeat: 'rpt', noise: 'nse', coarse: 'crs',
+  feedback: 'fbk', width: 'wdth', crossfeed: 'xfd', velocity: 'vel', repeat: 'rpt', noise: 'nse', coarse: 'crs',
   transient: 'trn', makeup: 'mkup', ratio: 'rto', space: 'spc', closed: 'cl', open: 'op', wave: 'wv', mod: 'md', osc1: 'o1', osc2: 'o2', gain: 'gn' };
 const mShorten = (w) => M_SHORT[w] || (w.length > 3 ? w[0] + w.slice(1).replace(/[aeiou]/g, '') : w);
 function mFitLabel(el) {
@@ -10290,7 +10191,7 @@ const HELP = [
 <p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), the presets bar (‹ name ›, <b>save</b>, <b>manage presets</b>), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, fx, xfeed, mix, mstr), chosen by the buttons over it.</p>
 <p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>save</b> in the presets bar at the top. <b>rec</b> records a WAV. Keys for nearly everything: see keyboard.</p>
 <p>(On a screen under 1000 px wide it becomes the phone layout: pages along the bottom, and hold a fader for its sequencer.)</p>`],
-  ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: the perform controls (tempo, sidechain, pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and rush. MIDI CC 1 to 12 turn them (any channel).</p>
+  ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: tempo, variation, the perform controls (pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and rush. MIDI CC 1 to 12 turn them (any channel).</p>
 <ul><li>Each knob's ring shows its value. While its step sequencer runs, the pointer stays on your setting and the lit part of the ring shows where the sequencer has moved it.</li>
 <li><b>options</b> › <b>assign knobs</b>, then click a knob to choose what it does: any fader from any page, or any drum's setting. Or right-click a knob › <b>assign</b>.</li></ul>
 <p>The <b>randomise</b> button opens a pop-up with all the randomisers and undo (it stays open while you click; click elsewhere or esc to close):</p>
@@ -10327,8 +10228,7 @@ const HELP = [
 <li><b>crossfeed</b>: drums feeding each other. A row is the drum it comes from, a column the drum it goes into; click a column's name to pick what it changes there (fm, filter or ring). Drag a cell up or down to set it; double-click to clear.</li></ul>`],
   ['mix', 'mix: the channel strips', `<p>A strip for each drum: its echo send knob, reverb send knob and pan knob (L, C, R) over its level fader, with a level meter beside it.</p>`],
   ['mstr', 'mstr: the master chain', `<p>The whole mix runs top to bottom:</p>
-<ul><li><b>drum 1 sidechain</b>: drum 1 (the kick) ducks the rest; the meter shows how much. <b>space</b> carves the kick's room out of the others.</li>
-<li><b>distortion</b>: mix, type, drive, colour, tone and volume.</li><li><b>compressor</b>: glues it together; the meter shows the gain reduction.</li></ul>`],
+<ul><li><b>distortion</b>: mix, type, drive, colour, tone and volume.</li><li><b>compressor</b>: glues it together; the meter shows the gain reduction.</li></ul>`],
   ['prst', 'presets', `<ul><li>The bar at the top shows the preset loaded: <b>‹</b> and <b>›</b> step through them, <b>save</b> keeps what you hear as a new one. While playing, a new preset flashes until the next bar, then takes over.</li>
 <li><b>manage presets</b> opens the list: click one to load it (the list stays open to try another), the star makes it a favourite (listed first), and your own have <b>rename</b> and <b>delete</b>.</li>
 <li>Type in its search box (or press /) to find one by name; enter loads the first found. Untick <b>use its tempo</b> to keep your tempo when one loads.</li>
@@ -10441,7 +10341,7 @@ addEventListener('resize', () => { if ($('m').classList.contains('show-rand')) m
 function mPlaceName(el, fd) {
   const panel = el.closest('[data-m-panel]'), page = panel ? M_PAGE_NAMES[panel.dataset.mPanel] : '';
   const row = el.closest('.m-fx-row'), head = row && row.querySelector(':scope > b, .m-fxhead b');
-  const box = { 'm-duck': 'sidechain', 'm-dist': 'distortion', 'm-comp': 'compressor' }[el.parentElement.id];
+  const box = { 'm-dist': 'distortion', 'm-comp': 'compressor' }[el.parentElement.id];
   const where = panel && panel.dataset.mPanel === 'dice' ? `${page} · ${XN[mVoice]}` : head ? `${page} · ${head.textContent}` : box ? `${page} · ${box}` : page;
   // (the mixer's columns are named d1 .. hh; this gives the drum's name)
   const dr = ['d1', 'd2', 'd3', 'sn', 'cy', 'hh'].indexOf(fd.label);
@@ -10653,7 +10553,7 @@ const mDepthDraw = (b) => { b.style.setProperty('--rd', mDepthOf(b.id) / 100); b
 const mRdSnap = () => ({ name: '', kit: Uint8Array.from(values), xm: { amt: xm.amt.slice(), target: xm.target.slice() }, fx: mix.fx.slice(),
   fx3: fx3Snapshot(), dpos: delayPos, song: songSnapshot(), userSamples: 0 });
 // part way from a to b: numbers by d, choices with chance d (a key named for a choice, or anything not a number)
-const RD_CHOICE = /^(target|type|wave|style|user|view|source|on|comp|duckOn)$/;
+const RD_CHOICE = /^(target|type|wave|style|user|view|source|on|comp)$/;
 function mRdBlend(a, b, d, key = '') {
   if (a === b || b === undefined) return a;
   if (typeof a === 'number' && typeof b === 'number' && !RD_CHOICE.test(key)) { const v = a + (b - a) * d; return Number.isInteger(a) && Number.isInteger(b) ? Math.round(v) : v; }

@@ -93,7 +93,7 @@ $('play').addEventListener('click', async () => {
   await startAudio();
   playing = !playing;
   $('play').setAttribute('aria-pressed', playing); $('play').textContent = playing ? 'STOP' : 'PLAY';
-  if (!playing) { markStep(-1); markBar(-1); grVu.set(0); duckVu.set(0); }
+  if (!playing) { markStep(-1); markBar(-1); grVu.set(0); }
   sendSeq();
 });
 $('grab').addEventListener('click', () => {

@@ -26,8 +26,8 @@ fxF('m-fx-ring', 'send', fxSend('ring'));
 const verbP = (k) => ({ min: 0, max: 127, get: () => (fx3.verb || (fx3.verb = { ...FX3_0.verb }))[k], set: (v) => { fx3.verb[k] = v; sendMix(); }, show: String, dflt: FX3_0.verb[k] });
 for (const k of ['time', 'decay', 'tone', 'early']) fxF('m-fx-ring', k, verbP(k));
 
-// ---- the master page's distortion: the whole mix through it (after the sidechain's duck), into the compressor; the
-// page runs top to bottom in signal order: sidechain, distortion, compressor. Mix (0 bypasses it), type (tube,
+// ---- the master page's distortion: the whole mix through it, into the compressor; the
+// page runs top to bottom in signal order: distortion, compressor. Mix (0 bypasses it), type (tube,
 // fold or rat), drive, color, tone, volume ----
 fxF('m-dist', 'mix', { min: 0, max: 100, get: () => fx3.dist.mix || 0, set: (v) => { fx3.dist.mix = v; sendMix(); }, show: (v) => (v ? v + '%' : 'off'), dflt: 0 });
 const DIST_T = LXR.DIST_NAMES.map((n) => n.toLowerCase());

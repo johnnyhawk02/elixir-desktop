@@ -14,7 +14,7 @@ const XY_PLACES = (() => {
     { name: 'perf', groups: faders([['perf', 'm-perf-src']]) },
     { name: 'fx', groups: faders([['echo', 'm-fx-echo'], ['reverb', 'm-fx-ring']]) },
     { name: 'mix', groups: faders([['echo send', 'm-mix-echo'], ['verb send', 'm-mix-ring'], ['pan', 'm-mix-pan'], ['level', 'm-mix-vol']]) },
-    { name: 'master', groups: faders([['sidechain', 'm-duck'], ['distortion', 'm-dist'], ['compressor', 'm-comp']]) }];
+    { name: 'master', groups: faders([['distortion', 'm-dist'], ['compressor', 'm-comp']]) }];
 })();
 // two pads, one above the other, each with its own x and y picks: [pad][axis] = [place, group, item]
 const XY_KEY = 'elixir-desktop-xy';

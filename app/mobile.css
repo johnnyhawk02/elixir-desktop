@@ -97,7 +97,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-chead b { font-size: var(--fs-m); }
 .m .m-chead b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; }
 
-/* a meter (the sidechain's duck, the compressor's reduction), segmented */
+/* a meter (the compressor's reduction), segmented */
 .m-gr { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; font-size: var(--fs-s); }
 .m .m-gr i { height: 14px; border-radius: 0; overflow: hidden; display: flex; justify-content: flex-end;
   background: repeating-linear-gradient(to left, var(--ghost) 0 5px, transparent 5px 8px); }
@@ -133,14 +133,14 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 #m-beat-faders .m-vtrack { min-height: 16px; }
 
 /* the small faders (voice, fx, mix, master): a one-line readout, a narrow label */
-.m-fx-row .m-vf, #m-comp .m-vf, #m-duck .m-vf, #m-dist .m-vf, .m-vset .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
-.m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output, .m .m-vset .m-vf output {
+.m-fx-row .m-vf, #m-comp .m-vf, #m-dist .m-vf, .m-vset .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
+.m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-dist .m-vf output, .m .m-vset .m-vf output {
   font-size: min(var(--fs-xs), 3.9vw, 16.1px); line-height: 1; height: 1.1em; flex: none; align-self: stretch; text-align: center; }
-.m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output { white-space: nowrap; }
+.m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-dist .m-vf output { white-space: nowrap; }
 .m .m-fx-row .m-vf output { display: flex; align-items: flex-end; justify-content: center; }
-.m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab { font-size: min(1.05rem, 3.7vw, 15.2px); letter-spacing: 0; white-space: nowrap; }
+.m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-dist .m-flab { font-size: min(1.05rem, 3.7vw, 15.2px); letter-spacing: 0; white-space: nowrap; }
 .m .m-vset .m-flab, .m .m-vset .m-vf output { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-.m .m-fx-row .m-vtrack, .m #m-comp .m-vtrack, .m #m-duck .m-vtrack, .m #m-dist .m-vtrack, .m .m-vset .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 12px; }
+.m .m-fx-row .m-vtrack, .m #m-comp .m-vtrack, .m #m-dist .m-vtrack, .m .m-vset .m-vtrack { width: min(48px, 100%); flex: 1; height: auto; min-height: 12px; }
 .m .m-fx-row .m-vtrack { width: min(44px, 100%); }
 .m .m-vset .m-vtrack { width: min(56px, 100%); }
 
@@ -314,9 +314,9 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-fxhead .m-chk { min-height: 30px; gap: 8px; }
 .m-fxhead .m-chk i { width: 20px; height: 20px; }
 /* six to a row everywhere small faders sit in rows, so the columns line up (the master page's rows too) */
-.m-fx-row .m-faders, #m-comp, #m-duck, #m-dist { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
+.m-fx-row .m-faders, #m-comp, #m-dist { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px; min-height: 0; }
 
-/* ---- mstr: the drum 1 sidechain, then distortion, then the compressor, each a heading and a row ---- */
+/* ---- mstr: distortion, then the compressor, each a heading and a row ---- */
 .m-comp-card { display: grid; grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 6px; min-height: 0; padding: 8px 6px 8px 4px; }
 .m-comp-card .m-chead { gap: 10px; }
 .m-comp-card .m-chead:not(:first-child) { border-top: var(--rule); padding-top: 6px; }
@@ -640,8 +640,8 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m[data-page="mix"] [data-m-panel="mix"], .m[data-page="comp"] [data-m-panel="comp"] { display: grid; }
   /* (every page's faders: readouts and names in the bigger small print; beat's and voice's readouts on one line, so
      every track starts at the same height) */
-  .m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-duck .m-flab, .m #m-dist .m-flab,
-  .m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-duck .m-vf output, .m #m-dist .m-vf output { font-size: var(--fs-xs); }
+  .m .m-vset .m-flab, .m .m-fx-row .m-flab, .m #m-comp .m-flab, .m #m-dist .m-flab,
+  .m .m-fx-row .m-vf output, .m #m-comp .m-vf output, .m #m-dist .m-vf output { font-size: var(--fs-xs); }
   .m .m-vset .m-vf output { font-size: var(--fs-xs); white-space: nowrap; height: 1.2em; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; text-align: center; }
   /* beat: three rows on one seven-column grid, each under a heading and parted by a line: pattern (tempo, genre,
      beat, energy, fills), feel (velocity, groove, depth, accent) with the rush at the end (rush, rush on), then

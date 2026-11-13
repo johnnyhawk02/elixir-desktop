@@ -1,4 +1,4 @@
-// ---- master: compressor and drum 1 sidechain, each in its own card with an on button ----
+// ---- master: the compressor, in its own card with an on button ----
 const RATIOS = [1.5, 2, 3, 4, 6, 8, 20];
 const mKnob = (label, key, lo, hi, step, show, box) => box.appendChild(dialKnob(label, {
   max: Math.round((hi - lo) / step), show: (v) => show(lo + v * step), get: () => Math.round((master[key] - lo) / step),
@@ -34,25 +34,21 @@ const meterVu = (name, aria) => {
   return { el, set(db) { target = pos(db); if (!raf) raf = requestAnimationFrame(tick); } };
 };
 meterVu.n = 0;
-const grVu = meterVu('reduction', 'compressor gain reduction meter'), duckVu = meterVu('ducking', 'sidechain ducking meter');
+const grVu = meterVu('reduction', 'compressor gain reduction meter');
 // each card's power button lights when on; an off card's faders, meter and fx box are dimmed (the box can't be ticked)
 const showOn = (id, on) => { $(id + '-on').setAttribute('aria-pressed', on); const card = $(id + '-on').closest('.card'); card.classList.toggle('off', !on); card.querySelectorAll('.mchk input').forEach((i) => { i.disabled = !on; }); };
 function buildMaster() {
-$('comp-knobs').innerHTML = ''; $('duck-knobs').innerHTML = '';
-showOn('comp', master.comp); showOn('duck', master.duckOn); $('duck-fx').checked = master.duckFx;
+$('comp-knobs').innerHTML = '';
+showOn('comp', master.comp);
 mKnob('threshold', 'thresh', -40, 0, 1, (v) => v + ' dB', $('comp-knobs'));
 $('comp-knobs').appendChild(dialKnob('ratio', { max: RATIOS.length - 1, show: (v) => RATIOS[v] + ':1', get: () => RATIOS.indexOf(master.ratio),
   set: (v) => { master.ratio = RATIOS[v]; sendMix(); }, dflt: () => RATIOS.indexOf(MASTER0.ratio) }));
 mKnob('attack', 'attack', 1, 50, 1, (v) => v + ' ms', $('comp-knobs'));
 mKnob('release', 'release', 20, 500, 10, (v) => v + ' ms', $('comp-knobs'));
 mKnob('makeup', 'makeup', 0, 12, 1, (v) => '+' + v + ' dB', $('comp-knobs'));
-mKnob('duck', 'duck', 0, 1, 0.01, (v) => Math.round(v * 100) + '%', $('duck-knobs'));
-mKnob('release', 'duckRelease', 30, 600, 10, (v) => v + ' ms', $('duck-knobs'));
-$('comp-knobs').after(grVu.el); $('duck-knobs').after(duckVu.el);
+$('comp-knobs').after(grVu.el);
 }
 buildMaster();
 $('comp-on').addEventListener('click', () => { master.comp = !master.comp; showOn('comp', master.comp); sendMix(); });
-$('duck-on').addEventListener('click', () => { master.duckOn = !master.duckOn; showOn('duck', master.duckOn); sendMix(); });
-$('duck-fx').addEventListener('change', () => { master.duckFx = $('duck-fx').checked; sendMix(); });
 sendMix();
 

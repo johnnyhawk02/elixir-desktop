@@ -274,7 +274,6 @@ input[type=checkbox] { accent-color: var(--ink); width: 16px; height: 16px; marg
 .mchk { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; cursor: pointer; }
 .mchk input { width: 12px; height: 12px; }
 #comp-knobs { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; }
-#duck-knobs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; }
 /* level meters: a recessed column of small LEDs (green, then yellow from -12 dB, red from -3 dB), with a held
    peak LED. In the mixer the meter is the fader: a triangle on its left points at the level, and the meter
    and triangle both drag. Fixed width, the meter centred under the name, with room either side to grab */
@@ -293,7 +292,7 @@ input[type=checkbox] { accent-color: var(--ink); width: 16px; height: 16px; marg
   clip-path: inset(100% 0 0 0); }
 .lvm s { position: absolute; left: 2px; right: 2px; height: 3px; bottom: 2px; background: var(--lvm-g); display: none; }
 .lvm s.y { background: var(--lvm-y); } .lvm s.r { background: var(--lvm-r); }
-/* needle meters for gain reduction and ducking: a fixed-size cream face, so nothing around them moves */
+/* needle meter for gain reduction: a fixed-size cream face, so nothing around them moves */
 .vu { display: flex; flex-direction: column; align-items: center; gap: 2px; padding-left: 6px; min-height: 0; }
 .vu span { font-family: var(--display); font-weight: 500; font-size: var(--fs-s); line-height: 1.25; color: var(--muted); }
 .vu svg { display: block; width: 58px; height: 38px; flex: none; margin-block: auto; }
@@ -598,7 +597,7 @@ pre { margin: 0; padding: 14px 18px; overflow: auto; max-width: 100%; background
    and a needle meter fills the right of each card */
 .bay-c { --vuw: clamp(60px, 18vw - 120px, 150px); }
 .tab-perform > .bay-c { display: flex; }
-.comp-card { flex: 5 1 calc(var(--vuw) + 262px); } .duck-card { flex: 2 1 calc(var(--vuw) + 130px); }
+.comp-card { flex: 5 1 calc(var(--vuw) + 262px); }
 .mbody { display: grid; grid-template-columns: minmax(0, 1fr) var(--vuw); gap: 14px; min-height: 0; min-width: 0; }
 .master-card .vu { display: grid; grid-template-rows: auto minmax(0, 1fr); justify-items: center; align-items: center; gap: 4px; padding: 0; min-height: 0;
   border-left: 1px solid var(--line); padding-left: 14px; margin-left: -14px; width: calc(100% + 14px); }
@@ -673,7 +672,7 @@ pre { margin: 0; padding: 14px 18px; overflow: auto; max-width: 100%; background
   .bay-c { grid-template-columns: minmax(0, 1fr); }
   .tab-perform .fx-groups { flex-direction: column; }
   .tab-perform .fxg + .fxg { padding-left: 0; }
-  .tab-perform > .bay-c { flex-direction: column; } .comp-card, .duck-card { flex: none; }
+  .tab-perform > .bay-c { flex-direction: column; } .comp-card { flex: none; }
   .mbody { grid-template-columns: minmax(0, 1fr); }
   .master-card .vu { border-left: 0; margin: 4px 0 0; padding: 0; width: auto; }
   .master-card .vu svg { width: 150px; max-height: none; }

@@ -5,7 +5,7 @@
 const SLOT_KEY = 'elixir-desktop-perfmap2';
 try { localStorage.removeItem('elixir-desktop-perfmap'); } catch (e) {}
 // the defaults, four a row: the perform controls and energy, then the best of the beat page
-const SLOT0 = [['perf', 'perf', 'tempo'], ['perf', 'perf', 'sidechain'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'],
+const SLOT0 = [['perf', 'perf', 'tempo'], ['beat', 'beat', 'var'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'],
   ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
   ['beat', 'beat', 'genre'], ['beat', 'beat', 'beat'], ['beat', 'beat', 'fills'], ['beat', 'beat', 'rush']];
 let mSlots = (() => { try { const v = JSON.parse(localStorage.getItem(SLOT_KEY)); return Array.isArray(v) && v.length >= 7 ? v : null; } catch (e) { return null; } })() || SLOT0.map((x) => x.slice());
@@ -20,7 +20,7 @@ function mSlot(i) {
   // a page's fader keeps its own steps, readout and reset; a drum's parameter is whole steps 0..its top
   // (its full name: a drum's setting starts with the drum, dr1 decay; a label that only makes sense on its own page takes
   // its group's name, echo send, dist mix; the perf and beat faders are the whole kit's, so they keep their own)
-  const [pl, g] = mSlots[i], dr = XN.indexOf(pl), grp = { distortion: 'dist', compressor: 'comp', sidechain: 'side' }[g] || g.split(' ')[0];
+  const [pl, g] = mSlots[i], dr = XN.indexOf(pl), grp = { distortion: 'dist', compressor: 'comp' }[g] || g.split(' ')[0];
   const label = dr >= 0 ? `${['dr1', 'dr2', 'dr3', 'sn', 'cy', 'hh'][dr]} ${A.label}` : ['fx', 'mix', 'master'].includes(pl) && !A.label.includes(' ') ? `${grp} ${A.label}` : A.label;
   const draw = mFader(box, label, fd ? { min: fd.min, max: () => fd.hiOf(), step: fd.step, get: fd.get, set: (v) => { fd.put(v); mDrawAll(); }, show: fd.show, dflt: fd.dflt, knob: true }
     : { min: A.min, max: A.max, get: A.get, set: (v) => { A.set(v); mDrawAll(); setDirty(true); }, show: String, dflt: () => initValues[A.par], knob: true });
@@ -35,7 +35,7 @@ function mSlot(i) {
 // ellipsis (the css)
 const M_SHORT = { decay: 'dcy', filter: 'flt', reso: 'res', slope: 'slp', freq: 'frq', pitch: 'ptch', amount: 'amt', attack: 'atk',
   release: 'rel', threshold: 'thr', volume: 'vol', level: 'lvl', sample: 'smp', rate: 'rt', drive: 'drv', offset: 'ofs', retrigger: 'rtrg',
-  feedback: 'fbk', width: 'wdth', sidechain: 'sdch', crossfeed: 'xfd', velocity: 'vel', repeat: 'rpt', noise: 'nse', coarse: 'crs',
+  feedback: 'fbk', width: 'wdth', crossfeed: 'xfd', velocity: 'vel', repeat: 'rpt', noise: 'nse', coarse: 'crs',
   transient: 'trn', makeup: 'mkup', ratio: 'rto', space: 'spc', closed: 'cl', open: 'op', wave: 'wv', mod: 'md', osc1: 'o1', osc2: 'o2', gain: 'gn' };
 const mShorten = (w) => M_SHORT[w] || (w.length > 3 ? w[0] + w.slice(1).replace(/[aeiou]/g, '') : w);
 function mFitLabel(el) {

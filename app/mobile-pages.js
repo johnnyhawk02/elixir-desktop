@@ -24,16 +24,9 @@ mFader($('m-beat-faders'), 'accent', { ...pf('accent'), show: (v) => `+${v} dB` 
 // the beat's variations (off, A..D) and the phrase they play over (4 or 8 bars); on the laptop they sit at the end of the pattern row
 mFader($('m-beat-faders'), 'var', { ...pf('var'), show: () => perfText('var') });
 mFader($('m-beat-faders'), 'bars', { min: 0, max: 1, get: () => (perf.bars === 8 ? 1 : 0), set: (v) => setPerf('bars', v ? 8 : 4), show: (v) => `${v ? 8 : 4}\nbars`, dflt: 0 });
-// ---- the perf page's own controls: tempo, the sidechain, the sound macros and crossfeed. They live in a hidden box;
-// the page shows twelve assignable slots (below, after the x/y page's lists), these seven by default ----
+// ---- the perf page's own controls: tempo, the sound macros and crossfeed. They live in a hidden box;
+// the page shows twelve assignable slots (below, after the x/y page's lists), these six by default ----
 mFader($('m-perf-src'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
-// the drum 1 sidechain duck: above 0 it switches the sidechain on
-const setDuck = (v) => {
-  master.duck = v / 100;
-  if (v > 0 && !master.duckOn) $('duck-on').click(); else sendMix();
-};
-const duckFader = { min: 0, max: 100, get: () => (master.duckOn ? Math.round(master.duck * 100) : 0), set: setDuck, show: (v) => (v ? v + '%' : 'off'), dflt: Math.round(MASTER0.duck * 100) };
-mFader($('m-perf-src'), 'sidechain', duckFader);
 // the sound macros, as on the desktop's pattern card: 100 (pitch 24) is the middle, the sound as it is
 for (const [m, label] of [['pitch', 'pitch'], ['decay', 'decay'], ['filter', 'filter'], ['fm', 'fm']]) {
   const pitch = m === 'pitch';
@@ -57,10 +50,6 @@ mFader($('m-comp'), 'ratio', { min: 0, max: RATIOS.length - 1, get: () => Math.m
 mMaster($('m-comp'), 'attack', 'attack', 1, 50, 1, (v) => v + ' ms');
 mMaster($('m-comp'), 'release', 'release', 20, 500, 10, (v) => v + ' ms');
 mMaster($('m-comp'), 'makeup', 'makeup', 0, 12, 1, (v) => '+' + v + ' dB');
-mFader($('m-duck'), 'amount', duckFader);
-mMaster($('m-duck'), 'release', 'duckRelease', 30, 600, 10, (v) => v + ' ms');
-// space: drum 1 also cuts the others' frequencies where it plays (a spacer, after Trackspacer), on the same switch and release
-mMaster($('m-duck'), 'space', 'space', 0, 100, 5, (v) => (v ? v + '%' : 'off'));
 const mCompOn = () => {
   const on = $('comp-on').getAttribute('aria-pressed') === 'true';
   $('m-comp-on').setAttribute('aria-pressed', on); $('m-comp-on').textContent = on ? 'on' : 'off';
@@ -74,13 +63,6 @@ grVu.set = (db) => {
   mGrSet(db);
   const d = Math.max(0, Math.min(20, db || 0));
   $('m-gr').style.width = (Math.log1p(d) / Math.log1p(20) * 100).toFixed(1) + '%'; $('m-gr-out').textContent = `${d.toFixed(1)} dB`;
-};
-// and the sidechain's: how far drum 1 is turning the rest down, the same scale
-const mDkSet = duckVu.set;
-duckVu.set = (db) => {
-  mDkSet(db);
-  const d = Math.max(0, Math.min(20, db || 0));
-  $('m-dk').style.width = (Math.log1p(d) / Math.log1p(20) * 100).toFixed(1) + '%'; $('m-dk-out').textContent = `${d.toFixed(1)} dB`;
 };
 
 // ---- randomisers ----

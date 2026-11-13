@@ -26,7 +26,7 @@ for (const { kit } of sourceKits) for (let n = 1; n <= 6; n++) if (kit[PAR['TRAN
 // kit file: the sends and FX then come from the kit's own FX settings). Elixir Mobile's own format is v5 (see
 // PRESETS.md): any preset with a kit is brought into it as it's read (built in, stored or imported), whatever it
 // sounded like before: the distortion sends go (the distortion is a master insert, fx3.params.dist.mix, 0 = off), the
-// master gets its spacer (0), and a song too old to have its pattern pages and rush settings is dropped (the preset
+// sidechain's settings go (it was removed), and a song too old to have its pattern pages and rush settings is dropped (the preset
 // then loads its sound alone). build.mjs refuses a built-in preset in any other version.
 const PRESET_V = 5;
 const PRESET_FIELDS = ['name', 'kit', 'xm', 'fx', 'fx3', 'dpos', 'song', 'fav'];
@@ -40,7 +40,7 @@ function toCurrent(p) {
     if (d && typeof d.mix !== 'number') d.mix = 0;
   }
   if (q.song && !(q.song.pattern && q.song.stepPages && q.song.rushSet)) delete q.song;
-  if (q.song && q.song.master && typeof q.song.master.space !== 'number') q.song.master.space = 0;
+  if (q.song && q.song.master) for (const k of ['duck', 'duckRelease', 'duckFx', 'duckOn', 'space']) delete q.song.master[k];
   return q;
 }
 // a preset as stored and exported, from a kit list entry
@@ -171,7 +171,7 @@ function useSong(g, keepTempo) {
   perf.var = Number.isInteger(g.var) ? Math.max(0, Math.min(4, g.var)) : PERF_RANGE.var[2]; perf.bars = g.bars === 8 ? 8 : 4;
   $('tempo').value = perf.tempo;
   if (STYLES[styleIdx].user && g.user) { const i = ensureUserPat(g.user); if (i >= 0) useUserSlot(i); }
-  Object.assign(master, MASTER0, g.master); buildMaster(); // presets saved before the sidechain switch have it on
+  Object.assign(master, MASTER0, g.master); for (const k of Object.keys(master)) if (!(k in MASTER0)) delete master[k]; buildMaster();
   sendMix();
   perf.rush = Math.max(0, Math.min(100, Number(g.rush) || 0)); perf.rushT = Number.isInteger(g.rushT) ? Math.max(0, Math.min(6, g.rushT)) : 3;
   send({ type: 'rush', v: perf.rush, t: perf.rushT });

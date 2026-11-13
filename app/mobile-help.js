@@ -6,7 +6,7 @@ const HELP = [
 <p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), the presets bar (‹ name ›, <b>save</b>, <b>manage presets</b>), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, fx, xfeed, mix, mstr), chosen by the buttons over it.</p>
 <p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>save</b> in the presets bar at the top. <b>rec</b> records a WAV. Keys for nearly everything: see keyboard.</p>
 <p>(On a screen under 1000 px wide it becomes the phone layout: pages along the bottom, and hold a fader for its sequencer.)</p>`],
-  ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: the perform controls (tempo, sidechain, pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and rush. MIDI CC 1 to 12 turn them (any channel).</p>
+  ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: tempo, variation, the perform controls (pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and rush. MIDI CC 1 to 12 turn them (any channel).</p>
 <ul><li>Each knob's ring shows its value. While its step sequencer runs, the pointer stays on your setting and the lit part of the ring shows where the sequencer has moved it.</li>
 <li><b>options</b> › <b>assign knobs</b>, then click a knob to choose what it does: any fader from any page, or any drum's setting. Or right-click a knob › <b>assign</b>.</li></ul>
 <p>The <b>randomise</b> button opens a pop-up with all the randomisers and undo (it stays open while you click; click elsewhere or esc to close):</p>
@@ -43,8 +43,7 @@ const HELP = [
 <li><b>crossfeed</b>: drums feeding each other. A row is the drum it comes from, a column the drum it goes into; click a column's name to pick what it changes there (fm, filter or ring). Drag a cell up or down to set it; double-click to clear.</li></ul>`],
   ['mix', 'mix: the channel strips', `<p>A strip for each drum: its echo send knob, reverb send knob and pan knob (L, C, R) over its level fader, with a level meter beside it.</p>`],
   ['mstr', 'mstr: the master chain', `<p>The whole mix runs top to bottom:</p>
-<ul><li><b>drum 1 sidechain</b>: drum 1 (the kick) ducks the rest; the meter shows how much. <b>space</b> carves the kick's room out of the others.</li>
-<li><b>distortion</b>: mix, type, drive, colour, tone and volume.</li><li><b>compressor</b>: glues it together; the meter shows the gain reduction.</li></ul>`],
+<ul><li><b>distortion</b>: mix, type, drive, colour, tone and volume.</li><li><b>compressor</b>: glues it together; the meter shows the gain reduction.</li></ul>`],
   ['prst', 'presets', `<ul><li>The bar at the top shows the preset loaded: <b>‹</b> and <b>›</b> step through them, <b>save</b> keeps what you hear as a new one. While playing, a new preset flashes until the next bar, then takes over.</li>
 <li><b>manage presets</b> opens the list: click one to load it (the list stays open to try another), the star makes it a favourite (listed first), and your own have <b>rename</b> and <b>delete</b>.</li>
 <li>Type in its search box (or press /) to find one by name; enter loads the first found. Untick <b>use its tempo</b> to keep your tempo when one loads.</li>
