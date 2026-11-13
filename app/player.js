@@ -11,13 +11,6 @@ function barOk(b, bar) {
 // the tempo-synced delay: 1/128 of a bar at 0, a whole bar at 1, evenly in octaves between
 const delaySamples = (pos, bpm) => 240 / bpm * Math.pow(2, -7 * (1 - pos)) * LXR.REAL_FS;
 const VERB_MAKEUP = 1;
-// snare rush: a fixed hash of (track, page, step) in 0..1; a hit whose hash is under the rush amount goes to the snare,
-// so the hits it takes stay put and more join as it goes up
-function rushHash(t, pg, s) {
-  let h = Math.imul(t * 131 + pg * 17 + s + 1, 0x9e3779b1);
-  h ^= h >>> 15; h = Math.imul(h, 0x85ebca77); h ^= h >>> 13;
-  return (h >>> 0) / 4294967296;
-}
 class Player {
   constructor(outRate) {
     this.e = new LXR.LxrEngine();
@@ -41,20 +34,6 @@ class Player {
     this.fxGain = new Float32Array(6); this.fxAmt = new Float32Array(6).fill(1);
     // mixer mute: the sequencer skips a muted voice's steps; pads, MIDI and anything still ringing play on
     this.muted = new Uint8Array(6);
-    // snare rush 0..100: up to 98 the other tracks' hits go to the snare (the hats by 80), above 75 a snare roll that doubles
-    // in two bands up to 80, then above 80 a free roll off the grid: a phase that runs at 2 to 16 hits a step and fires a hit at each whole
-    // number, so it speeds up smoothly as the fader moves (rushHead: an accent waiting for the next free hit; rushLog: the
-    // roll's rate in log2 hits a step, gliding toward the fader's so a move never steps)
-    // rs: its break points and glides, from the rush settings popup (these are the defaults; top: log2 of the free roll's
-    // hits a step at 100, 4 = 256ths; hpTop in Hz, the glides' time constants in ms)
-    this.rs = { start: 75, p32: 80, top: 4, hats: 80, only: 98, kicks: 90, first: 95, hp: 90, hpTop: 1500, rollMs: 40, hpMs: 40 };
-    // rushT: the track the rush hands the hits to and rolls on (3, the snare, unless another is picked; Elixir Mobile)
-    this.rushT = 3;
-    this.rush = 0; this.rushPh = null; this.rushLog = 1; this.rushHead = null; this.rushGap = 0; this.clock = 0; this.snareAt = -1e9;
-    // and above 90 a high-pass on the whole mix, before the master compressor: 30 Hz at 90 up to 1.5 kHz at 100
-    // (hpLog: its cutoff in log Hz, gliding; hpMix: how much of it is heard, faded in and out so it never clicks;
-    // hpOn false: off and its state cleared, the mix untouched)
-    this.hpOn = false; this.hpLog = Math.log(30); this.hpMix = 0; this.hpG = 0; this.hpS = new Float64Array(4);
     // master: a compressor on the whole mix, the same design as the LXR-02's FX compressor
     this.master = { comp: true, thresh: -12, ratio: 3, attack: 5, release: 120, makeup: 0 };
     // delay: tempo-synced time, 0 = 1/128 .. 1 = one bar, and run as a send effect (all wet,
@@ -80,8 +59,6 @@ class Player {
     if (m.type === 'param') this.e.setParam(m.par, m.value);
     else if (m.type === 'kit') this.e.loadKit(m.values);
     else if (m.type === 'trig') { this.e.trigger(m.voice, m.vel, 60); this.gainTo[Math.min(m.voice, 5)] = 1; }
-    else if (m.type === 'rush') { this.rush = m.v; if (m.t !== undefined) this.rushT = m.t; }
-    else if (m.type === 'rushSet') Object.assign(this.rs, m.set);
     else if (m.type === 'mute') m.muted.forEach((v, n) => { this.muted[n] = v ? 1 : 0; });
     else if (m.type === 'xmod') this.e.setCrossMod(m.amt, m.target);
     else if (m.type === 'delay') this.delayPos = m.pos;
@@ -113,7 +90,7 @@ class Player {
       this.pattern = m.pattern; this.patternOn = m.patternOn !== false; this.bpm = m.bpm;
       if (m.groove) this.groove = m.groove; this.vel = m.vel; this.e.bpm = m.bpm;
       this.accGain = Math.pow(10, -m.accentDb / 20);
-      if (m.playing && !this.playing) { this.rushPh = null; this.rushHead = null; this.step = 0; this.bar = 0; this.toNext = 0; this.queue = []; this.fresh = true; }
+      if (m.playing && !this.playing) { this.step = 0; this.bar = 0; this.toNext = 0; this.queue = []; this.fresh = true; }
       const was = this.playing; this.playing = m.playing;
       // stopping ends a loop or a count-in (a count from stop is not playing yet, so it carries on)
       if (!this.playing) { this.flushBar(); if (this.rec && (this.rec.loop || this.rec.count) && (was || this.rec.count !== 'run')) this.recEnd(); }
@@ -137,47 +114,11 @@ class Player {
     const pg = pages ? bar % pages.length : 0;
     const P = pages ? pages[pg] : this.pattern; // pages: one bar each, in turn (the grid's, when it plays)
     const hits = [], { on, acc, bar: cond } = P, G = this.groove, len = LXR.REAL_FS * 60 / this.bpm / 4;
-    if (this.rush && this.patternOn) { this.scheduleRush(s, bar, pg, P, at0, len, hits); return; }
     for (let t = 0; t < 7 && this.patternOn; t++) {
       if (!on[t][s] || !barOk(cond[t][s], bar) || this.muted[Math.min(t, 5)]) continue;
       const off = G.off[t][s];
       this.queue.push({ at: Math.max(0, at0 + off * len), t, acc: !!acc[t][s] });
       hits.push(t);
-    }
-    this.sched[s] = hits;
-  }
-  // schedule() with the snare rush up (the numbers here are rs's defaults, which move with the rush settings): the snare takes the other drums' hits under (rush/98)^2.5, so it comes in slowly
-  // (all of them from 98; the hats, tracks 5 and 6, go faster, under (rush/80)^2.5, all of them from 80), one snare per step, accented if any hit it took was; the kick's off-beat hits go the same way,
-  // but its hits on the beat (steps 0, 4, 8, 12) play on below 90; from 90 only the bar's first (step 0) plays, and from 95
-  // none do, leaving just the roll.
-  // Above 75 the snare plays only the roll: every step, once or twice (16ths, then 32nds above 77.5), on the straight grid
-  // (the groove doesn't move it), every hit at one level that swells from 60% to full, so the pattern's own snares and the
-  // hits it took don't stand out; only an accent they carried plays, on the step's first roll hit.
-  // The roll's hits are tagged (roll 2 for a hit on a step the pattern plays, 1 for the rest): above 80 they don't play and
-  // the free roll in _render takes over, the first free hit after a roll-2 hit taking its accent
-  scheduleRush(s, bar, pg, P, at0, len, hits) {
-    const rt = this.rushT; // (the track the rush rolls on: the snare unless set)
-    const { on, acc, bar: cond } = P, G = this.groove, R = this.rush, S = this.rs;
-    const p = Math.pow(Math.min(1, R / S.only), 2.5), pHat = Math.pow(Math.min(1, R / S.hats), 2.5);
-    let snare = R > S.start, sAcc = false, orig = false;
-    for (let t = 0; t < 7; t++) {
-      if (!on[t][s] || !barOk(cond[t][s], bar)) continue;
-      orig = true;
-      const down = !t && !(s & 3);
-      if (down && (R >= S.first || (R >= S.kicks && s))) continue; // the roll covers the step
-      if (t === rt || (!down && rushHash(t, pg, s) < (t >= 5 ? pHat : p))) { snare = true; sAcc = sAcc || !!acc[t][s]; continue; } // a muted drum is still taken
-      if (this.muted[Math.min(t, 5)]) continue;
-      this.queue.push({ at: Math.max(0, at0 + G.off[t][s] * len), t, acc: !!acc[t][s] });
-      hits.push(t);
-    }
-    if (snare && !this.muted[Math.min(rt, 5)]) {
-      const n = R > (S.start + S.p32) / 2 ? 2 : 1, at = R > S.start ? at0 : at0 + G.off[rt][s] * len;
-      const sw = R > S.start ? 0.6 + 0.4 * (R - S.start) / (100 - S.start) : 1;
-      for (let i = 0; i < n; i++) {
-        const first = !i && orig;
-        this.queue.push({ at: Math.max(0, at + i * len / n), t: rt, acc: first && sAcc, sw, roll: R > S.start ? (first ? 2 : 1) : 0 });
-      }
-      hits.push(3);
     }
     this.sched[s] = hits;
   }
@@ -223,36 +164,16 @@ class Player {
       }
       this.toNext -= 64;
     } else if (this.queue.length) this.queue = [];
-    // the free roll above the 1/32 point (80): 2 hits a step (32nds) there up to 16 (256ths, the top speed) at 100, tempo-relative, each where the phase
-    // crosses a whole number; the rate glides toward the fader's in log2 with a 40 ms time constant, and never puts hits
-    // closer than 256 samples (4 blocks), so at fast tempos the top speed is held back rather than smeared by the blocks
-    const S = this.rs;
-    if (this.playing && this.patternOn && this.rush > S.p32) {
-      const len = LXR.REAL_FS * 60 / this.bpm / 4, target = Math.min(1 + (this.rush - S.p32) * (S.top - 1) / (100 - S.p32), Math.log2(len / 256));
-      // it starts in step with the 32nd roll it takes over from (the next step starts toNext + 64 samples from this block)
-      if (this.rushPh === null) { this.rushLog = target; this.rushPh = (2 * (1 - (this.toNext + 64) / len)) % 1; }
-      else this.rushLog += (target - this.rushLog) * (1 - Math.exp(-64 / (S.rollMs / 1000 * LXR.REAL_FS)));
-      const rate = Math.min(Math.pow(2, this.rushLog), len / 256), d = rate * 64 / len;
-      const sw = 0.6 + 0.4 * (this.rush - S.start) / (100 - S.start);
-      for (let k = Math.floor(this.rushPh) + 1; k <= this.rushPh + d; k++) {
-        const h = this.rushHead; this.rushHead = null;
-        this.queue.push({ at: (k - this.rushPh) / d * 64, t: this.rushT, acc: !!h && h.acc, sw, free: true });
-      }
-      this.rushPh = (this.rushPh + d) % 1; this.rushGap = len / rate / 2;
-    } else { this.rushPh = null; this.rushHead = null; }
     // hits due in this block
     if (this.queue.length) {
       const keep = [];
       for (const q of this.queue) {
-        // a voice muted after its step was booked is skipped too; above 80 the grid roll gives way to the free one, and
-        // no snare plays within half a free-roll gap of the last
-        if (q.at < 64 && this.rush > S.p32 && (q.roll || q.free) && (q.roll || this.clock - this.snareAt < this.rushGap)) { if (q.roll === 2) this.rushHead = q; }
-        else if (q.at < 64) { if (q.t === this.rushT) this.snareAt = this.clock; if (!this.muted[Math.min(q.t, 5)]) { const sw = q.sw || 1; this.e.trigger(q.t, q.acc ? 127 : Math.max(1, Math.round(this.vel * sw)), 60); this.gainTo[Math.min(q.t, 5)] = q.acc ? 1 : this.accGain * sw; } }
+        // a voice muted after its step was booked is skipped too
+        if (q.at < 64) { if (!this.muted[Math.min(q.t, 5)]) { this.e.trigger(q.t, q.acc ? 127 : this.vel, 60); this.gainTo[Math.min(q.t, 5)] = q.acc ? 1 : this.accGain; } }
         else { q.at -= 64; keep.push(q); }
       }
       this.queue = keep;
     }
-    this.clock += 64;
     const out = this.e.renderBlock(), e = this.e;
     const pans = [e.drums[0], e.drums[1], e.drums[2], e.snare, e.cymbal, e.hat];
     const [L, R] = dst;
@@ -311,7 +232,6 @@ class Player {
       for (let i = 0; i < 64; i++) { const m = m0 + (m1 - m0) * (i + 1) / 64; L[i] += (bo[2 * i] / 32768 - L[i]) * m; R[i] += (bo[2 * i + 1] / 32768 - R[i]) * m; }
       this.distAt = m1;
     }
-    if (this.rush > S.hp || this.hpOn) this.highPass(L, R);
     if (M.comp) {
       // peak detector in dB, attack/release smoothing, gain = over * (1/ratio - 1) + makeup
       const ca = Math.exp(-1000 / (M.attack * LXR.REAL_FS)), cr = Math.exp(-1000 / (M.release * LXR.REAL_FS));
@@ -345,31 +265,6 @@ class Player {
       }
       this.cntGain = g;
     }
-  }
-  // the rush high-pass: a 12 dB/oct state-variable filter (TPT, Q 0.9) on both channels. Its cutoff glides in log Hz
-  // from 30 Hz at the filter start (90) to the top cutoff (1.5 kHz) at 100, with a 40 ms time constant (the defaults; set in
-  // the rush settings), ramped across each block; it fades in over about 10 ms when rush goes over the start, and once
-  // rush is back at the start or under and the cutoff has settled at 30 Hz it
-  // fades out, then turns off and clears its state
-  highPass(L, R) {
-    const FS = LXR.REAL_FS, rs = this.rs, lo = Math.log(30), up = this.rush > rs.hp;
-    const target = up ? lo + Math.log(rs.hpTop / 30) * Math.min(1, (this.rush - rs.hp) / (100 - rs.hp)) : lo;
-    if (!this.hpOn) { this.hpOn = true; this.hpLog = lo; this.hpMix = 0; this.hpS.fill(0); this.hpG = Math.tan(Math.PI * 30 / FS); }
-    this.hpLog += (target - this.hpLog) * (1 - Math.exp(-64 / (rs.hpMs / 1000 * FS)));
-    if (!up && this.hpLog - lo < 0.01) this.hpLog = lo;
-    const g0 = this.hpG, g1 = Math.tan(Math.PI * Math.exp(this.hpLog) / FS), k = 1 / 0.9, S = this.hpS;
-    const m0 = this.hpMix, m1 = up || this.hpLog > lo ? Math.min(1, m0 + 0.15) : Math.max(0, m0 - 0.15);
-    for (let i = 0; i < 64; i++) {
-      const g = g0 + (g1 - g0) * (i + 1) / 64, a = 1 / (1 + g * (g + k)), m = m0 + (m1 - m0) * (i + 1) / 64;
-      for (let c = 0; c < 2; c++) {
-        const X = c ? R : L, x = X[i], s1 = S[2 * c], s2 = S[2 * c + 1];
-        const hp = (x - (g + k) * s1 - s2) * a, bp = g * hp + s1, lp = g * bp + s2;
-        S[2 * c] = g * hp + bp; S[2 * c + 1] = g * bp + lp;
-        X[i] = x + (hp - x) * m;
-      }
-    }
-    this.hpG = g1; this.hpMix = m1;
-    if (!m1 && !up) { this.hpOn = false; this.hpS.fill(0); }
   }
   process(L, R) {
     for (let n = 0; n < L.length; n++) {

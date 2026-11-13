@@ -1,4 +1,4 @@
-// ---- the beat page: everything that makes the pattern, three by three: genre, beat, energy / fills, rush, velocity /
+// ---- the beat page: everything that makes the pattern, three by three: genre, beat, energy / fills, velocity /
 // groove, its depth, accent. Genre steps through the built-in styles (not user); a preset in the user style shows it
 // with the slider at the bottom ----
 const mGenres = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
@@ -13,10 +13,6 @@ mFader($('m-beat-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () =
 mFader($('m-beat-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => perfText('beat').replace(' · ', '\n') });
 mFader($('m-beat-faders'), 'energy', { ...pf('energy'), show: () => perfText('energy').replace(' · ', '\n') });
 mFader($('m-beat-faders'), 'fills', { ...pf('fills'), show: () => perfText('fills').replace(' · ', '\n') });
-mFader($('m-beat-faders'), 'rush', pf('rush'));
-// the voice the rush hands its hits to and rolls on (the snare unless changed)
-const RUSH_V = ['drum 1', 'drum 2', 'drum 3', 'snare', 'cymbal', 'cl hat', 'op hat'];
-mFader($('m-beat-faders'), 'rush on', { min: 0, max: 6, get: () => perf.rushT, set: (v) => { setPerf('rushT', v); setDirty(true); }, show: (v) => RUSH_V[v].replace(' ', '\n'), dflt: 3 });
 mFader($('m-beat-faders'), 'velocity', { ...pf('vel'), show: (v) => `${v}` });
 mFader($('m-beat-faders'), 'groove', { ...pf('groove'), show: () => perfText('groove').replace(' ', '\n') });
 mFader($('m-beat-faders'), 'depth', { ...pf('depth'), show: (v) => `${v}%` });
@@ -96,7 +92,7 @@ $('m-xrand').addEventListener('click', async () => {
   };
   mUndo();
 });
-// pattern: style, beat, energy, fills, groove and its depth rolled; the sound, tempo, rush, mixer and FX stay
+// pattern: style, beat, energy, fills, groove and its depth rolled; the sound, tempo, mixer and FX stay
 const mPatGet = () => ({ style: styleIdx, beat: perf.beat, energy: perf.energy, fills: perf.fills, type: groove.type, depth: groove.depth });
 function mPatSet(p) {
   setStyle(p.style);

@@ -7,7 +7,7 @@ try { localStorage.removeItem('elixir-desktop-perfmap'); } catch (e) {}
 // the defaults, four a row: the perform controls and energy, then the best of the beat page
 const SLOT0 = [['perf', 'perf', 'tempo'], ['beat', 'beat', 'var'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'],
   ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
-  ['beat', 'beat', 'genre'], ['beat', 'beat', 'beat'], ['beat', 'beat', 'fills'], ['beat', 'beat', 'rush']];
+  ['beat', 'beat', 'genre'], ['beat', 'beat', 'beat'], ['beat', 'beat', 'fills'], ['beat', 'beat', 'groove']];
 let mSlots = (() => { try { const v = JSON.parse(localStorage.getItem(SLOT_KEY)); return Array.isArray(v) && v.length >= 7 ? v : null; } catch (e) { return null; } })() || SLOT0.map((x) => x.slice());
 while (mSlots.length < SLOT0.length) mSlots.push(SLOT0[mSlots.length].slice());
 mSlots.length = SLOT0.length; // (picks kept from when there were twenty-four: the first twelve)

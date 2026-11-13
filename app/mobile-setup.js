@@ -1,5 +1,5 @@
 // ---- settings (the gear by the title): a tab each. copy: the perf faders' picks (to be baked in as SLOT0), the presets
-// saved here (to be built in), export presets and clear all. rush: the rush graph (mobile-rush.js) ----
+// saved here (to be built in), export presets and clear all ----
 // (for now the settings are behind a password, asked once a visit)
 const SET_PASS = 'Password1!';
 $('m-set-open').addEventListener('click', () => {
@@ -9,10 +9,10 @@ $('m-set-open').addEventListener('click', () => {
     if (pw !== SET_PASS) { if (pw !== null) alert('Wrong password.'); return; }
     try { sessionStorage.setItem('elixir-desktop-set', '1'); } catch (e) {}
   }
-  $('m-set').hidden = false; mRushDraw();
+  $('m-set').hidden = false;
 });
 mCloser('m-set');
-mPaneTabs($('m-set-tabs'), 'set', () => mRushDraw());
+mPaneTabs($('m-set-tabs'), 'set');
 // copy presets: every preset saved here, and the built-in ones saved over, in the export file's format
 $('m-set-presets').addEventListener('click', async () => {
   const b = $('m-set-presets'), list = mSetPresets(false);

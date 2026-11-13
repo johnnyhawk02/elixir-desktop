@@ -3,7 +3,7 @@
 // one bar at a time and add or take off bars. Tap a step for on or off, or drag across steps to paint (the first step
 // decides on or off); with cmd (ctrl) it's accents. The pattern buttons over the grid pick which pattern plays and is
 // edited (straight away, also while playing). A pattern plays instead of the generator's: the player gets its bars as
-// pages (app/player.js: 'lanes'), so the groove, the rush, the mutes and the densities' tracks work on it as before.
+// pages (app/player.js: 'lanes'), so the groove, the mutes and the densities' tracks work on it as before.
 // The grid | algo switch: algo hands back to the generator (the perf knobs, the beat page, the randomisers): what it
 // plays shows in the lanes, its bar conditions (fills) written out bar by bar, and "insert into pattern N" (beside the
 // bars) writes that into the pattern picked. A pattern button leaves the generator without writing. Right-click a pattern:

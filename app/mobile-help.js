@@ -6,7 +6,7 @@ const HELP = [
 <p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), the presets bar (‹ name ›, <b>save</b>, <b>manage presets</b>), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (seq, voice, fx, xfeed, mix, mstr), chosen by the buttons over it.</p>
 <p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>save</b> in the presets bar at the top. <b>rec</b> records a WAV. Keys for nearly everything: see keyboard.</p>
 <p>(On a screen under 1000 px wide it becomes the phone layout: pages along the bottom, and hold a fader for its sequencer.)</p>`],
-  ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: tempo, variation, the perform controls (pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and rush. MIDI CC 1 to 12 turn them (any channel).</p>
+  ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: tempo, variation, the perform controls (pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and groove. MIDI CC 1 to 12 turn them (any channel).</p>
 <ul><li>Each knob's ring shows its value. While its step sequencer runs, the pointer stays on your setting and the lit part of the ring shows where the sequencer has moved it.</li>
 <li><b>options</b> › <b>assign knobs</b>, then click a knob to choose what it does: any fader from any page, or any drum's setting. Or right-click a knob › <b>assign</b>.</li></ul>
 <p>The <b>randomise</b> button opens a pop-up with all the randomisers and undo (it stays open while you click; click elsewhere or esc to close):</p>
@@ -24,16 +24,15 @@ const HELP = [
 <li><b>on</b> switches it on and off. A control with a sequencer running has its name inverted. Presets keep them. esc greys the strip out.</li>
 <li>MIDI CC 21, 22, 23 and 24 set its length, slew, speed and depth (on the sequencer shown).</li>
 <li>The steps follow the groove and its depth, landing with the swung hits; switch that off in <b>options</b> › <b>user settings</b> › <b>seq</b>.</li></ul>`],
-  ['grid', 'seq: grid and algo', `<p>The first page on the right. <b>grid | algo</b> at its top picks what plays and what the page shows: <b>grid</b> your patterns, <b>algo</b> the generator, with the beat page's controls (pattern, feel, rush, density). The grid: a lane for each track (the kick at the bottom, the hats at the top), sixteen steps a bar.</p>
+  ['grid', 'seq: grid and algo', `<p>The first page on the right. <b>grid | algo</b> at its top picks what plays and what the page shows: <b>grid</b> your patterns, <b>algo</b> the generator, with the beat page's controls (pattern, feel, density). The grid: a lane for each track (the kick at the bottom, the hats at the top), sixteen steps a bar.</p>
 <ul><li>Tap a step for on or off, or drag across steps to paint; with cmd (ctrl) it puts accents on or off.</li>
 <li><b>1</b> to <b>8</b> over the grid pick which pattern plays and is edited, straight away. Right-click one to <b>record</b> into it (from the next bar, whatever plays, until you press its STOP) or <b>clear</b> it.</li>
 <li>In algo, <b>insert into pattern N</b> (top right) puts what the generator plays into the pattern picked, its fills written out bar by bar (up to 8 bars), and goes back to grid.</li>
 <li><b>bars</b>: a pattern is 1 to 8 bars. Tap a bar to show it (a dashed one adds bars up to it), <b>−</b> takes the last off, <b>+</b> adds a copy of the bar shown. <b>◀ ▶</b> shift the whole pattern a step (cmd/ctrl: a bar).</li>
 <li>Cmd/ctrl + c copies what plays, cmd/ctrl + v pastes it over the pattern picked. Tap a lane's name for its voice page. The patterns are kept in this browser.</li></ul>`],
-  ['beat', 'algo: the generator', `<p>Tempo, genre, beat, energy, fills, var and bars; rush, rush on, velocity, groove, depth and accent.</p>
+  ['beat', 'algo: the generator', `<p>Tempo, genre, beat, energy, fills, var and bars; velocity, groove, depth and accent.</p>
 <ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how often it fills.</li>
 <li>Every genre has 64 beats. <b>var</b> plays each beat as a phrase with variation bars in it: <b>off</b> loops one bar, <b>A</b> changes only the last bar, up to <b>D</b> which changes every second bar most. <b>bars</b> makes the phrase 4 or 8 bars long. Each beat always plays the same variations, and presets keep both.</li>
-<li><b>rush</b> builds a roll: the chosen drum (<b>rush on</b>) rolls faster and faster while the others drop out and a high-pass rises. Push it up for a build, drop it for the drop. Its curve is in <b>options</b> › <b>settings</b> › <b>rush</b>.</li>
 <li><b>groove</b> and <b>depth</b> give it swing or push; <b>accent</b> how loud the accents are.</li>
 <li><b>density</b>, a fader for each track (drum 1, 2, 3, snare, cymbal, closed and open hat): under 100% it thins that track, off-beats first; over 100% it adds hits on its empty steps, eighths first, until at 200% every step plays. The same steps go or come each time, and presets keep it. A square over each track lights on its hits, so you can see what the density is doing.</li></ul>`],
   ['voice', 'voice: shape a drum', `<p>Every setting of one drum. Pick the drum along the top (or keys 1 to 6), then a tab ([ and ] step through them):</p>
@@ -64,7 +63,7 @@ const HELP = [
 <li>Right-click a knob or fader for its step sequencer, reset and (on perform) assign. Double-click one to reset it.</li></ul>`],
   ['more', 'more', `<ul><li><b>options</b> (by the e) holds randomise on next bar, assign knobs, and:</li>
 <li><b>accent colour</b>: off (the plain screen), red, orange, blue or violet for lit buttons and knob rings.</li>
-<li><b>settings</b>: copy the knob assignments or your presets, export or clear presets, and the <b>rush</b> graph of how the rush builds (drag its squares).</li>
+<li><b>settings</b>: copy the knob assignments or your presets, export or clear presets.</li>
 <li><b>user settings</b>: <b>midi</b>, which CC moves each knob, with presets (cc1 to cc12, cc13 to cc24) and your own; <b>seq</b>, whether sequencers follow the groove.</li>
 <li>Install it as an app from your browser's menu; it works offline.</li>
 <li>The version number is by the e; the latest arrives when you open it with a connection (cmd+shift+R to be sure).</li></ul>`],

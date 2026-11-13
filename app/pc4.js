@@ -12,7 +12,6 @@ const PC4_CTRL = [
   { id: 'decay', label: 'decay', macro: 'decay', min: 0, max: 200 },
   { id: 'pitch', label: 'pitch', macro: 'pitch', min: 0, max: 48 },
   { id: 'filter', label: 'filter', macro: 'filter', min: 0, max: 200 },
-  { id: 'rush', label: 'snare rush', perf: 'rush' },
 ];
 const PC4_DEFAULT = [...PC4_CTRL.map((c) => c.id), ...Array(24 - PC4_CTRL.length).fill(null)]; // knob n = CC n
 const pc4Ctrl = (id) => PC4_CTRL.find((c) => c.id === id);
@@ -80,8 +79,7 @@ function drawPc4() {
 function pc4Midi(cc, val) {
   if (cc < 1 || cc > 24) return;
   const c = pc4Ctrl(pc4Map[cc - 1]);
-  // rush goes through unrounded, so the free roll's rate follows the knob's full resolution
-  if (c) { const [lo, hi] = pc4Range(c), v = lo + (hi - lo) * val / 127; pc4Write(c, c.perf === 'rush' ? v : Math.round(v)); }
+  if (c) { const [lo, hi] = pc4Range(c), v = lo + (hi - lo) * val / 127; pc4Write(c, Math.round(v)); }
   pc4Point(cc);
   const el = pc4Knobs[cc - 1];
   el.classList.add('hit'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('hit'), 120);

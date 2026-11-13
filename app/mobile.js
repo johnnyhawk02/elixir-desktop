@@ -4,7 +4,7 @@
 // every page uses. Then, in build order: mobile-pages (beat, perf, master, randomisers, voice), mobile-presets,
 // mobile-record, mobile-mix (fx, distortion, mix), mobile-seq (step sequencers), mobile-extras (install, next bar),
 // mobile-xy, mobile-settings (the randomisers' settings), mobile-slots (perf slots and MIDI CC), mobile-setup
-// (settings, behind the gear), mobile-rush (its rush graph), mobile-user (user settings), mobile-help, mobile-glass.
+// (settings, behind the gear), mobile-user (user settings), mobile-help, mobile-glass.
 // iOS: play Web Audio through the ringer switch like a music app
 try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
 const mRnd = (n) => Math.floor(Math.random() * n);

@@ -34,15 +34,13 @@ const presets = existsSync(presetDir) ? readdirSync(presetDir).filter((f) => /\.
   .flatMap((f) => JSON.parse(readFileSync(new URL(f, presetDir), 'utf8')).presets || []).map((p) => ({ ...p, fav: false })) : [];
 // the page reads presets in the current format only (PRESET_V in app/presets.js)
 const PRESET_V = Number(/const PRESET_V = (\d+);/.exec(read('app/presets.js'))[1]);
-// and they carry the snare rush and its settings, so loading one sets them (app/rush-set.js)
-for (const p of presets) if (p.song && (typeof p.song.rush !== 'number' || !p.song.rushSet)) throw new Error(`presets/: ${p.name} has no song.rush and song.rushSet`);
 for (const p of presets) if (p.v !== PRESET_V) throw new Error(`presets/: ${p.name} is format v${p.v || 1}, the page reads v${PRESET_V}`);
 
 // the page's own code: app/style.css, the audio thread (app/player.js) and the app's files, run in this
 // order as one classic script (each file sees the ones before it)
 const APP = ['kit', 'audio', 'groove-types', 'perform-state', 'sound', 'randomise', 'scope', 'steps', 'presets', 'midi', 'preset-manager', 'recorder',
-  'grooves', 'styles', 'mixer', 'fx', 'master', 'perform-knobs', 'rush-set', 'pc4', 'crossfeed', 'main',
-  'mobile', 'mobile-pages', 'mobile-density', 'mobile-presets', 'mobile-record', 'mobile-mix', 'mobile-seq', 'mobile-extras', 'mobile-xy', 'mobile-settings', 'mobile-slots', 'mobile-setup', 'mobile-rush', 'mobile-user', 'mobile-help', 'desktop-menu', 'desktop-seq', 'desktop-seqrand', 'desktop-mix', 'desktop-presets', 'desktop-mute', 'desktop-rdepth', 'desktop-keys', 'grid', 'mobile-glass', 'phone'];
+  'grooves', 'styles', 'mixer', 'fx', 'master', 'perform-knobs', 'pc4', 'crossfeed', 'main',
+  'mobile', 'mobile-pages', 'mobile-density', 'mobile-presets', 'mobile-record', 'mobile-mix', 'mobile-seq', 'mobile-extras', 'mobile-xy', 'mobile-settings', 'mobile-slots', 'mobile-setup', 'mobile-user', 'mobile-help', 'desktop-menu', 'desktop-seq', 'desktop-seqrand', 'desktop-mix', 'desktop-presets', 'desktop-mute', 'desktop-rdepth', 'desktop-keys', 'grid', 'mobile-glass', 'phone'];
 const app = APP.map((f) => read(`app/${f}.js`)).join('');
 
 const sources = { lxr: read('lxr.js'), verify: read('verify.mjs') };

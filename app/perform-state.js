@@ -1,9 +1,8 @@
 // ---- perform state: the perform dials (pattern card, PC4, presets) read and write here ----
 // The groove type and depth are the groove's; tempo is shown in the header's field too
-// (rushT: the track the rush rolls on, 0..6 = drum 1, 2, 3, snare, cymbal, closed hat, open hat; Elixir Mobile)
-const perf = { energy: 60, beat: 0, fills: 40, var: 2, bars: 4, tempo: 118, vel: 100, accent: 6, rush: 0, rushT: 3 };
+const perf = { energy: 60, beat: 0, fills: 40, var: 2, bars: 4, tempo: 118, vel: 100, accent: 6 };
 // [min, max, default] of each, as the knobs and the PC4 map them
-const PERF_RANGE = { energy: [0, 100, 60], beat: [0, 63, 0], var: [0, 4, 2], fills: [0, 100, 40], tempo: [40, 240, 118], rush: [0, 100, 0], vel: [1, 127, 100], accent: [0, 6, 6],
+const PERF_RANGE = { energy: [0, 100, 60], beat: [0, 63, 0], var: [0, 4, 2], fills: [0, 100, 40], tempo: [40, 240, 118], vel: [1, 127, 100], accent: [0, 6, 6],
   groove: [0, GROOVE_TYPES.length - 1, 0], depth: [0, 100, 100] };
 // var: the beat's variation bars, off (one bar, looped) then A (light) to D (busy); bars: the phrase they make, 4 or 8 bars
 const VAR_NAMES = ['off', 'A', 'B', 'C', 'D'];
@@ -20,7 +19,6 @@ function setPerf(k, v) {
   perf[k] = v;
   if (k === 'tempo') { $('tempo').value = v; sendSeq(); }
   else if (k === 'vel' || k === 'accent') sendSeq();
-  else if (k === 'rush' || k === 'rushT') send({ type: 'rush', v: perf.rush, t: perf.rushT });
   else { generate(); if (k === 'beat') drawUserTools(); }
   drawPerf();
 }
@@ -38,7 +36,6 @@ function perfText(k) {
   if (k === 'tempo') return `${v} bpm`;
   if (k === 'vel') return `${v} / 127`;
   if (k === 'accent') return `+${v} dB`;
-  if (k === 'rush') return v ? `${Math.round(v)}%` : 'off';
   if (k === 'groove') return GROOVE_TYPES[v].name;
   return `${v}%`;
 }
