@@ -127,9 +127,11 @@ function setStyle(i) {
 }
 const ROW = ['k', 'lo', 'hi', 's', 'cy', 'ch', 'oh'];
 const ENERGY_NAMES = [[1, 'empty'], [15, 'minimal'], [35, 'low'], [60, 'groove'], [85, 'driving'], [101, 'peak']];
+// fills 0: the plain beat. Turned up, the beat turns into fill bit by bit: the fill comes more often (every 8 bars, then
+// 4, 2, and from 80% every bar), grows from the last 2 steps of its bar to the whole bar at 100%, and gets busy from 40%
 function fillShape(fills) {
   if (!fills) return null;
-  return { every: fills < 34 ? 8 : fills < 67 ? 4 : 2, len: 2 * Math.round(1 + fills / 100 * 3), busy: fills >= 50 };
+  return { every: fills < 25 ? 8 : fills < 50 ? 4 : fills < 80 ? 2 : 1, len: 2 + 2 * Math.round(fills / 100 * 7), busy: fills >= 40 };
 }
 // the groove level the energy dial reaches (0 = empty, 1 the kick/snare skeleton .. 9 the full kit), and the fill
 // shape, once there is a groove
@@ -207,7 +209,7 @@ function genPage(g, pattern, energy, T, fill, fillOn, yields) {
       // the second bar's extra hits, outside the fill
       else if (!win && alt[s] && alt[s] !== '.' && Number(alt[s]) <= T) { on = 1; cond = 2; }
       // crash on the first bar after each fill, once there is enough energy
-      if (fill && t === 4 && s === 0 && !on && T >= 3) { on = 1; cond = 100 + fill.every; }
+      if (fill && fill.every > 1 && t === 4 && s === 0 && !on && T >= 3) { on = 1; cond = 100 + fill.every; }
       pattern.on[t][s] = on; pattern.bar[t][s] = cond;
       pattern.acc[t][s] = on && ((g.acc ? reg && !!g.acc[t][s] : c === '1' && energy >= 55) || (t === 6 && energy >= 85) || (fil && cond > 0 && (s % 4 === 0 || s === 15))) ? 1 : 0;
     }

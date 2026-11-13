@@ -32,7 +32,7 @@ function perfText(k) {
   }
   if (k === 'var') return VAR_NAMES[v];
   if (k === 'bars') return `${v} bars`;
-  if (k === 'fills') { const f = fillNow(); return f ? `every ${f.every} · ${f.len} steps` : 'off'; }
+  if (k === 'fills') { const f = fillNow(); return f ? `${f.every > 1 ? `every ${f.every} bars` : 'every bar'} · ${f.len} steps` : 'off'; }
   if (k === 'tempo') return `${v} bpm`;
   if (k === 'vel') return `${v} / 127`;
   if (k === 'accent') return `+${v} dB`;
