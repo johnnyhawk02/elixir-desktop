@@ -1676,7 +1676,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 .m-ph-bpm .m-vtrack b::after { content: "bpm"; display: block; font-size: 1.1rem; line-height: 1; opacity: .7; }
 .m-ph .m-ph-bpm { grid-row: span 2; }
 .m .m-ph-bpm .m-vtrack::after { background-position: 50% 9%; background-size: 3px 16%; } /* (the pointer kept out over the ring, clear of the number) */
-.m-ph-dec { grid-column: 1; grid-row: 1 / 9; display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(7, minmax(0, 1fr)); gap: 4px; min-height: 0; }
+.m-ph-dec { grid-column: 1; grid-row: 1 / 9; display: grid; grid-template-columns: 1fr; grid-template-rows: repeat(8, minmax(0, 1fr)); gap: 4px; min-height: 0; }
 .m-ph-dec .m-knob { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 0; }
 .m .m-ph-dec .m-vtrack { container-type: size; flex: 1; width: 100%; min-height: 0; background: none; border: 0; overflow: visible; border-radius: 0; touch-action: none; }
 .m-ph-dec .m-flab { font-size: 1.05rem; line-height: 1; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
@@ -1696,7 +1696,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 @media (orientation: landscape) {
   html.phone .m-ph { grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr) auto; gap: 8px; padding: 8px; }
   .m-ph .m-ph-bpm { grid-row: span 2; }
-  .m-ph-dec { grid-column: 1 / 5; grid-row: auto; grid-template-columns: repeat(7, 1fr); grid-template-rows: minmax(0, 1fr); gap: 4px 6px; }
+  .m-ph-dec { grid-column: 1 / 5; grid-row: auto; grid-template-columns: repeat(8, 1fr); grid-template-rows: minmax(0, 1fr); gap: 4px 6px; }
   /* (sideways the decay row goes under the second row of buttons: rows play knob everything kit alter / pattern
      crossfeed random fx alter fx / decay, rec / knob seqs, clear seqs, slew, undo, save) */
   .m-ph-dec, .m-ph-rec { order: 1; }
@@ -1711,7 +1711,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>239</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>240</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1919,7 +1919,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
       <button class="m-btn" id="m-pdelall" type="button">delete all</button>
       <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
     </div>
-    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v239, 13 Nov, 15:13</footer>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v240, 13 Nov, 15:16</footer>
   </section>
 </main>
 <main class="m m-ph" id="m-ph" aria-label="elixir">
@@ -9761,13 +9761,13 @@ $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][
 const SLOT_KEY = 'elixir-desktop-perfmap2';
 try { localStorage.removeItem('elixir-desktop-perfmap'); } catch (e) {}
 // the defaults, four a row: the perform controls and energy, then the best of the beat page
-const SLOT0 = [['master', 'distortion', 'mix'], ['beat', 'beat', 'var'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'],
+const SLOT0 = [['beat', 'beat', 'fill style'], ['beat', 'beat', 'var'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'],
   ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
   ['beat', 'beat', 'genre'], ['beat', 'beat', 'beat'], ['beat', 'beat', 'fills'], ['beat', 'beat', 'groove']];
 let mSlots = (() => { try { const v = JSON.parse(localStorage.getItem(SLOT_KEY)); return Array.isArray(v) && v.length >= 7 ? v : null; } catch (e) { return null; } })() || SLOT0.map((x) => x.slice());
 while (mSlots.length < SLOT0.length) mSlots.push(SLOT0[mSlots.length].slice());
 // (tempo is only on the title line now: a knob set to it takes its default instead)
-mSlots = mSlots.map((x, i) => (x[2] === 'tempo' || (i === 0 && x[2] === 'fill style') ? SLOT0[i].slice() : x)); // (knob 1 was fill style for a day: now the distortion)
+mSlots = mSlots.map((x, i) => (x[2] === 'tempo' || (i === 0 && x[0] === 'master' && x[2] === 'mix') ? SLOT0[i].slice() : x)); // (knob 1 was the distortion for a moment: back to fill style)
 mSlots.length = SLOT0.length; // (picks kept from when there were twenty-four: the first twelve)
 const slotAxis = ([pl, g, n]) => { const P = XY_PLACES.find((x) => x.name === pl), G = P && P.groups.find((x) => x[0] === g); return G && G[1].find((a) => a.label === n); };
 const mSlotEls = [];
@@ -9989,7 +9989,7 @@ const HELP = [
 <p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), the presets bar (‹ name ›, <b>save</b>, <b>manage presets</b>), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (seq, voice, fx, xfeed, mix, mstr), chosen by the buttons over it.</p>
 <p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>save</b> in the presets bar at the top. <b>rec</b> records a WAV. Keys for nearly everything: see keyboard.</p>
 <p>(On a screen under 1000 px wide it becomes the phone layout: pages along the bottom, and hold a fader for its sequencer.)</p>`],
-  ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: distortion (how much of the mix goes through it), variation, the perform controls (pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and groove. MIDI CC 1 to 12 turn them (any channel).</p>
+  ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: fill style, variation, the perform controls (pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and groove. MIDI CC 1 to 12 turn them (any channel).</p>
 <ul><li>Each knob's ring shows its value. While its step sequencer runs, the pointer stays on your setting and the lit part of the ring shows where the sequencer has moved it.</li>
 <li><b>options</b> › <b>assign knobs</b>, then click a knob to choose what it does: any fader from any page, or any drum's setting. Or right-click a knob › <b>assign</b>.</li></ul>
 <p>The <b>randomise</b> button opens a pop-up with all the randomisers and undo (it stays open while you click; click elsewhere or esc to close):</p>
@@ -10750,7 +10750,7 @@ addEventListener('resize', mDepth);
 requestAnimationFrame(mDepth);
 mSync(); mUndo(); mCompOn(); mDrawAll();
 // ---- phones (html.phone, set by the script in the page's head): one big screen, .m-ph, in place of the rest: play,
-// the tempo (a knob), a decay knob for each drum, rec, every randomiser, clear knob seqs, their slew, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
+// the tempo (a knob), a decay knob for each drum and a distortion knob, rec, every randomiser, clear knob seqs, their slew, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
 if (document.documentElement.classList.contains('phone')) {
   for (const b of $('m-ph').querySelectorAll('[data-for]')) b.addEventListener('click', () => $(b.dataset.for).click());
   $('m-ph-seqclear').addEventListener('click', mKnobSeqClear);
@@ -10845,6 +10845,24 @@ if (document.documentElement.classList.contains('phone')) {
       decBox.append(el); decs.push(draw);
     }
   });
+  // and after them the distortion: its mix (how much of the whole mix goes through it, 0 off), as on the master page
+  {
+    const el = document.createElement('div');
+    el.className = 'm-vf m-knob m-ph-dist';
+    el.innerHTML = '<div class="m-vtrack" role="slider" tabindex="0" aria-label="distortion"><i></i></div><span class="m-flab">dist</span>';
+    const tr = el.firstChild, get = () => fx3.dist.mix || 0;
+    const draw = () => tr.style.setProperty('--f', get() / 100);
+    let d = null;
+    tr.addEventListener('pointerdown', (e) => { e.preventDefault(); tr.setPointerCapture(e.pointerId); d = { y: e.clientY, v: get() }; });
+    tr.addEventListener('pointermove', (e) => {
+      if (!d) return;
+      const x = Math.max(0, Math.min(100, Math.round(d.v + (d.y - e.clientY) / 200 * 100)));
+      if (x !== get()) { fx3.dist.mix = x; sendMix(); setDirty(true); } draw();
+    });
+    for (const ev of ['pointerup', 'pointercancel']) tr.addEventListener(ev, () => { d = null; });
+    tr.addEventListener('contextmenu', (e) => e.preventDefault());
+    decBox.append(el); decs.push(draw);
+  }
   const decDraw = () => decs.forEach((f) => f());
   mDraws.push(decDraw); decDraw();
   // (a kit randomise doesn't always go through the sliders' redraw, so check now and then too)

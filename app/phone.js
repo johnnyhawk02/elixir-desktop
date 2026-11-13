@@ -1,5 +1,5 @@
 // ---- phones (html.phone, set by the script in the page's head): one big screen, .m-ph, in place of the rest: play,
-// the tempo (a knob), a decay knob for each drum, rec, every randomiser, clear knob seqs, their slew, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
+// the tempo (a knob), a decay knob for each drum and a distortion knob, rec, every randomiser, clear knob seqs, their slew, undo and save. Its buttons press the real ones, so they do just what they do on the laptop ----
 if (document.documentElement.classList.contains('phone')) {
   for (const b of $('m-ph').querySelectorAll('[data-for]')) b.addEventListener('click', () => $(b.dataset.for).click());
   $('m-ph-seqclear').addEventListener('click', mKnobSeqClear);
@@ -94,6 +94,24 @@ if (document.documentElement.classList.contains('phone')) {
       decBox.append(el); decs.push(draw);
     }
   });
+  // and after them the distortion: its mix (how much of the whole mix goes through it, 0 off), as on the master page
+  {
+    const el = document.createElement('div');
+    el.className = 'm-vf m-knob m-ph-dist';
+    el.innerHTML = '<div class="m-vtrack" role="slider" tabindex="0" aria-label="distortion"><i></i></div><span class="m-flab">dist</span>';
+    const tr = el.firstChild, get = () => fx3.dist.mix || 0;
+    const draw = () => tr.style.setProperty('--f', get() / 100);
+    let d = null;
+    tr.addEventListener('pointerdown', (e) => { e.preventDefault(); tr.setPointerCapture(e.pointerId); d = { y: e.clientY, v: get() }; });
+    tr.addEventListener('pointermove', (e) => {
+      if (!d) return;
+      const x = Math.max(0, Math.min(100, Math.round(d.v + (d.y - e.clientY) / 200 * 100)));
+      if (x !== get()) { fx3.dist.mix = x; sendMix(); setDirty(true); } draw();
+    });
+    for (const ev of ['pointerup', 'pointercancel']) tr.addEventListener(ev, () => { d = null; });
+    tr.addEventListener('contextmenu', (e) => e.preventDefault());
+    decBox.append(el); decs.push(draw);
+  }
   const decDraw = () => decs.forEach((f) => f());
   mDraws.push(decDraw); decDraw();
   // (a kit randomise doesn't always go through the sliders' redraw, so check now and then too)
