@@ -1561,12 +1561,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   #m-beat-faders::before, #m-beat-faders::after, .m-dens > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-s); padding-left: 4px; }
   #m-beat-faders::before { content: "pattern"; grid-area: 1 / 1 / 2 / -1; }
   #m-beat-faders::after { content: "feel \b7  fill"; grid-area: 3 / 1 / 4 / -1; padding-top: 8px; border-top: var(--rule); }
-  #m-beat-faders > :nth-child(-n+5) { grid-row: 2; }
-  #m-beat-faders > :nth-child(n+6) { grid-row: 4; }
-  #m-beat-faders > :nth-child(7) { grid-column: 1; } #m-beat-faders > :nth-child(8) { grid-column: 2; }
-  #m-beat-faders > :nth-child(9) { grid-column: 3; } #m-beat-faders > :nth-child(10) { grid-column: 4; }
-  #m-beat-faders > :nth-child(5) { grid-row: 4; grid-column: 6; } #m-beat-faders > :nth-child(6) { grid-column: 7; }
-  #m-beat-faders > :nth-child(11) { grid-row: 2; grid-column: 5; } #m-beat-faders > :nth-child(12) { grid-row: 2; grid-column: 6; }
+  #m-beat-faders > :nth-child(-n+3) { grid-row: 2; }
+  #m-beat-faders > :nth-child(n+4) { grid-row: 4; }
+  #m-beat-faders > :nth-child(6) { grid-column: 1; } #m-beat-faders > :nth-child(7) { grid-column: 2; }
+  #m-beat-faders > :nth-child(8) { grid-column: 3; } #m-beat-faders > :nth-child(9) { grid-column: 4; }
+  #m-beat-faders > :nth-child(4) { grid-column: 6; } #m-beat-faders > :nth-child(5) { grid-column: 7; }
+  #m-beat-faders > :nth-child(10) { grid-row: 2; grid-column: 4; } #m-beat-faders > :nth-child(11) { grid-row: 2; grid-column: 5; }
   .m-dens { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 4px; min-height: 0; padding-top: 8px; border-top: var(--rule); }
   #m-dens-faders { grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px 6px; min-height: 0; }
   #m-beat-faders .m-vf, #m-dens-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
@@ -1711,7 +1711,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>233</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>234</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1918,7 +1918,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
       <button class="m-btn" id="m-pdelall" type="button">delete all</button>
       <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
     </div>
-    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v233, 13 Nov, 12:45</footer>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v234, 13 Nov, 12:51</footer>
   </section>
 </main>
 <main class="m m-ph" id="m-ph" aria-label="elixir">
@@ -8649,7 +8649,6 @@ const pf = (k) => ({ min: PERF_RANGE[k][0], max: PERF_RANGE[k][1], get: () => pe
 // groove, its depth, accent. Genre steps through the built-in styles (not user); a preset in the user style shows it
 // with the slider at the bottom ----
 const mGenres = STYLES.map((st, i) => (st.user ? -1 : i)).filter((i) => i >= 0);
-mFader($('m-beat-faders'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
 mFader($('m-beat-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () => Math.max(0, mGenres.indexOf(styleIdx)),
   set: (v) => {
     setStyle(mGenres[v]); perf.beat = Math.min(perf.beat, STYLES[styleIdx].grooves.length - 1);
@@ -9745,11 +9744,13 @@ $('m-rs-reset').addEventListener('click', () => { const key = RS_PAGES[mRsPage][
 const SLOT_KEY = 'elixir-desktop-perfmap2';
 try { localStorage.removeItem('elixir-desktop-perfmap'); } catch (e) {}
 // the defaults, four a row: the perform controls and energy, then the best of the beat page
-const SLOT0 = [['perf', 'perf', 'tempo'], ['beat', 'beat', 'var'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'],
+const SLOT0 = [['beat', 'beat', 'fill style'], ['beat', 'beat', 'var'], ['perf', 'perf', 'pitch'], ['perf', 'perf', 'decay'],
   ['perf', 'perf', 'filter'], ['perf', 'perf', 'fm'], ['perf', 'perf', 'crossfeed'], ['beat', 'beat', 'energy'],
   ['beat', 'beat', 'genre'], ['beat', 'beat', 'beat'], ['beat', 'beat', 'fills'], ['beat', 'beat', 'groove']];
 let mSlots = (() => { try { const v = JSON.parse(localStorage.getItem(SLOT_KEY)); return Array.isArray(v) && v.length >= 7 ? v : null; } catch (e) { return null; } })() || SLOT0.map((x) => x.slice());
 while (mSlots.length < SLOT0.length) mSlots.push(SLOT0[mSlots.length].slice());
+// (tempo is only on the title line now: a knob set to it takes its default instead)
+mSlots = mSlots.map((x, i) => (x[2] === 'tempo' ? SLOT0[i].slice() : x));
 mSlots.length = SLOT0.length; // (picks kept from when there were twenty-four: the first twelve)
 const slotAxis = ([pl, g, n]) => { const P = XY_PLACES.find((x) => x.name === pl), G = P && P.groups.find((x) => x[0] === g); return G && G[1].find((a) => a.label === n); };
 const mSlotEls = [];
@@ -9971,7 +9972,7 @@ const HELP = [
 <p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), the presets bar (‹ name ›, <b>save</b>, <b>manage presets</b>), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (seq, voice, fx, xfeed, mix, mstr), chosen by the buttons over it.</p>
 <p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>save</b> in the presets bar at the top. <b>rec</b> records a WAV. Keys for nearly everything: see keyboard.</p>
 <p>(On a screen under 1000 px wide it becomes the phone layout: pages along the bottom, and hold a fader for its sequencer.)</p>`],
-  ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: tempo, variation, the perform controls (pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and groove. MIDI CC 1 to 12 turn them (any channel).</p>
+  ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: fill style, variation, the perform controls (pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and groove. MIDI CC 1 to 12 turn them (any channel).</p>
 <ul><li>Each knob's ring shows its value. While its step sequencer runs, the pointer stays on your setting and the lit part of the ring shows where the sequencer has moved it.</li>
 <li><b>options</b> › <b>assign knobs</b>, then click a knob to choose what it does: any fader from any page, or any drum's setting. Or right-click a knob › <b>assign</b>.</li></ul>
 <p>The <b>randomise</b> button opens a pop-up with all the randomisers and undo (it stays open while you click; click elsewhere or esc to close):</p>
@@ -9997,7 +9998,7 @@ const HELP = [
 <li>In algo, <b>rec</b> records what you hear (densities, mutes and your moves on the knobs included) into the pattern picked: pick <b>1, 2, 4 or 8</b> bars beside it, press rec, and from the next bar it records that many bars and stops by itself (press stop to end it sooner). It starts playing if it was stopped.</li>
 <li><b>bars</b>: a pattern is 1 to 8 bars. Tap a bar to show it (a dashed one adds bars up to it), <b>−</b> takes the last off, <b>+</b> adds a copy of the bar shown. <b>◀ ▶</b> shift the whole pattern a step (cmd/ctrl: a bar).</li>
 <li>Cmd/ctrl + c copies what plays, cmd/ctrl + v pastes it over the pattern picked. Tap a lane's name for its voice page. The patterns are kept in this browser.</li></ul>`],
-  ['beat', 'algo: the generator', `<p>Tempo, genre, beat, energy, fills, var and bars; velocity, groove, depth and accent.</p>
+  ['beat', 'algo: the generator', `<p>Genre, beat, energy, var and bars; fills and fill style; velocity, groove, depth and accent.</p>
 <ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how much fill, on every bar: at 0 the plain beat; turned up the fill grows from the last 2 steps of the bar to the whole bar, busy from 50%. <b>fill style</b> picks the kind of fill: the genre's own, or electro, techno, broken beat, IDM or breakcore. To bring a fill in when you want, put a knob seq on fills (right-click it, step sequencer) and paint the bars where it fills, or switch on its <b>fill</b> mode and press a random button.</li>
 <li>Every genre has 64 beats. <b>var</b> plays each beat as a phrase with variation bars in it: <b>off</b> loops one bar, <b>A</b> changes only the last bar, up to <b>D</b> which changes every second bar most. <b>bars</b> makes the phrase 4 or 8 bars long. Each beat always plays the same variations, and presets keep both.</li>
 <li><b>groove</b> and <b>depth</b> give it swing or push; <b>accent</b> how loud the accents are.</li>
