@@ -1479,7 +1479,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m.show-rand .m-pages .m-rand-card { display: grid; }
   .m .m-randbtn[aria-expanded="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
   .m-rand-card .m-rand { grid-template-columns: repeat(5, 150px); grid-template-rows: 50px 50px; height: auto; gap: 8px; }
-  #m-knobseq { grid-area: 1 / 5; } #m-xrand { grid-area: 2 / 1; } #m-undo { grid-area: 2 / 5; }
+  #m-knobseq { grid-area: 1 / 5; } #m-xrand { grid-area: 2 / 1; } #m-knobseq-clear { grid-area: 2 / 4; } #m-undo { grid-area: 2 / 5; }
   .m .m-rand-card .m-rand .m-btn { padding: 0 4px; letter-spacing: .02em; font-size: var(--fs-xs) !important; }
   .m-rand > :nth-child(1), .m-rand > :nth-child(2) { display: none; }
 
@@ -1711,7 +1711,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>235</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>236</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1748,6 +1748,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
         <button class="m-btn" id="m-fx-rand" type="button">random fx</button>
         <button class="m-btn" id="m-fx-alter" type="button">alter fx</button>
         <button class="m-btn" id="m-knobseq" type="button">knob seqs</button>
+        <button class="m-btn" id="m-knobseq-clear" type="button">clear knob seqs</button>
         <button class="m-btn" id="m-undo" data-m-undo type="button" disabled>undo</button>
       </div>
     </section>
@@ -1918,7 +1919,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
       <button class="m-btn" id="m-pdelall" type="button">delete all</button>
       <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
     </div>
-    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v235, 13 Nov, 12:55</footer>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v236, 13 Nov, 13:17</footer>
   </section>
 </main>
 <main class="m m-ph" id="m-ph" aria-label="elixir">
@@ -10212,6 +10213,8 @@ const mKnobSeqClear = () => {
   mUndoFn = () => { fs.forEach((f, i) => { if (f.base !== null) mSeqRelease(f); f.seq = was[i]; }); if (mSeqF) mSeqDraw(); else mSeqMarks(); setDirty(true); };
   mUndo();
 };
+// (the laptop's randomise pop-up has it too)
+$('m-knobseq-clear').addEventListener('click', mKnobSeqClear);
 // ---- the mixer on the laptop: a channel strip a drum (its echo and reverb send knobs over its level fader), with a
 // level meter beside each fader, fed by the same peaks as the full desktop mixer's meters (lvms in app/mixer.js) ----
 const mLvm = [...$('m-mix-vol').children].map((vf) => {

@@ -602,7 +602,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m.show-rand .m-pages .m-rand-card { display: grid; }
   .m .m-randbtn[aria-expanded="true"] { background: var(--ink) !important; color: var(--panel) !important; text-shadow: none; }
   .m-rand-card .m-rand { grid-template-columns: repeat(5, 150px); grid-template-rows: 50px 50px; height: auto; gap: 8px; }
-  #m-knobseq { grid-area: 1 / 5; } #m-xrand { grid-area: 2 / 1; } #m-undo { grid-area: 2 / 5; }
+  #m-knobseq { grid-area: 1 / 5; } #m-xrand { grid-area: 2 / 1; } #m-knobseq-clear { grid-area: 2 / 4; } #m-undo { grid-area: 2 / 5; }
   .m .m-rand-card .m-rand .m-btn { padding: 0 4px; letter-spacing: .02em; font-size: var(--fs-xs) !important; }
   .m-rand > :nth-child(1), .m-rand > :nth-child(2) { display: none; }
 

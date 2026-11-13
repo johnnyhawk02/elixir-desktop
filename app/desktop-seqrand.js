@@ -57,3 +57,5 @@ const mKnobSeqClear = () => {
   mUndoFn = () => { fs.forEach((f, i) => { if (f.base !== null) mSeqRelease(f); f.seq = was[i]; }); if (mSeqF) mSeqDraw(); else mSeqMarks(); setDirty(true); };
   mUndo();
 };
+// (the laptop's randomise pop-up has it too)
+$('m-knobseq-clear').addEventListener('click', mKnobSeqClear);
