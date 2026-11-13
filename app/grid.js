@@ -4,9 +4,9 @@
 // decides on or off); with cmd (ctrl) it's accents. The pattern buttons over the grid pick which pattern plays and is
 // edited (straight away, also while playing). A pattern plays instead of the generator's: the player gets its bars as
 // pages (app/player.js: 'lanes'), so the groove, the rush, the mutes and the densities' tracks work on it as before.
-// "generator" hands back to the generator (the perf knobs, the beat page, the randomisers): what it plays shows in the
-// lanes, its bar conditions (fills) written out bar by bar, and the button turns into "insert into pattern N", which
-// writes that into the pattern picked. A pattern button leaves the generator without writing. Right-click a pattern:
+// The grid | algo switch: algo hands back to the generator (the perf knobs, the beat page, the randomisers): what it
+// plays shows in the lanes, its bar conditions (fills) written out bar by bar, and "insert into pattern N" (beside the
+// bars) writes that into the pattern picked. A pattern button leaves the generator without writing. Right-click a pattern:
 // record (from the next bar whatever plays is written into it, looping over its 128 steps until its button is pressed)
 // or clear. Cmd/ctrl + c copies what plays, cmd/ctrl + v pastes it over the pattern picked. The patterns are kept in
 // this browser.
@@ -148,9 +148,11 @@ const gCells = [], gLabs = [];
   };
   $('m-g-left').addEventListener('click', (e) => shift(e.metaKey || e.ctrlKey ? -16 : -1));
   $('m-g-right').addEventListener('click', (e) => shift(e.metaKey || e.ctrlKey ? 16 : 1));
-  // generator: hand back to the generator; pressed again (insert), what it plays is written into the pattern picked
-  $('m-g-gen').addEventListener('click', () => {
-    if (gr.mode !== 'gen') { gr.mode = 'gen'; gGenCache = null; gr.page = 0; gSend(); gDraw(); return; }
+  // the switch: grid (the pattern picked plays) or algo (the generator plays); insert writes what the generator plays
+  // into the pattern picked, and goes back to the grid
+  $('m-g-grid').addEventListener('click', () => gPick(gr.cur));
+  $('m-g-algo').addEventListener('click', () => { if (gr.mode === 'gen') return; gr.mode = 'gen'; gGenCache = null; gr.page = 0; gSend(); gDraw(); });
+  $('m-g-ins').addEventListener('click', () => {
     const { L, n } = gGen();
     if (gr.rec === gr.cur) gRecStop();
     gr.pats[gr.cur] = gClean(L); gr.lens[gr.cur] = n; gr.mode = 'lanes'; gr.page = 0;
@@ -236,9 +238,8 @@ function gDraw() {
   });
   $('m-g-less').disabled = !lanes || n < 2;
   $('m-g-more').disabled = !lanes || n >= G_BARS;
-  const gen = $('m-g-gen');
-  gen.setAttribute('aria-pressed', !lanes); gen.classList.toggle('ask', !lanes);
-  gen.textContent = lanes ? 'generator' : `insert into pattern ${gr.cur + 1}`;
+  $('m-g-grid').setAttribute('aria-pressed', lanes); $('m-g-algo').setAttribute('aria-pressed', !lanes);
+  $('m-g-ins').hidden = lanes; $('m-g-ins').textContent = `insert into pattern ${gr.cur + 1}`;
   $('m').classList.toggle('g-gen', !lanes);
 }
 // the playhead (as heard), the lanes' names lighting as they hit, and the recording

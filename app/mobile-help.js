@@ -27,7 +27,7 @@ const HELP = [
   ['grid', 'grid: patterns', `<p>The first page on the right: a lane for each track (the kick at the bottom, the hats at the top), sixteen steps a bar.</p>
 <ul><li>Tap a step for on or off, or drag across steps to paint; with cmd (ctrl) it puts accents on or off.</li>
 <li><b>1</b> to <b>8</b> over the grid pick which pattern plays and is edited, straight away. Right-click one to <b>record</b> into it (from the next bar, whatever plays, until you press its STOP) or <b>clear</b> it.</li>
-<li><b>generator</b> hands back to the generator (the perform knobs, the beat page and the randomisers): what it makes shows in the lanes, its fills written out bar by bar. The button then says <b>insert into pattern N</b>: press it to put that into the pattern picked. Editing a step while the generator plays does the same.</li>
+<li><b>grid | algo</b> (top right) picks what plays: <b>grid</b> the pattern picked, <b>algo</b> the generator (the perform knobs, the beat page and the randomisers), shown in the lanes with its fills written out bar by bar. In algo, <b>insert into pattern N</b> (by the bars) puts what it plays into the pattern picked; editing a step or picking a pattern goes back to grid.</li>
 <li><b>bars</b>: a pattern is 1 to 8 bars. Tap a bar to show it (a dashed one adds bars up to it), <b>−</b> takes the last off, <b>+</b> adds a copy of the bar shown. <b>◀ ▶</b> shift the whole pattern a step (cmd/ctrl: a bar).</li>
 <li>Cmd/ctrl + c copies what plays, cmd/ctrl + v pastes it over the pattern picked. Tap a lane's name for its voice page. The patterns are kept in this browser.</li></ul>`],
   ['beat', 'beat: the pattern', `<p>Tempo, genre, beat, energy, fills, var and bars; rush, rush on, velocity, groove, depth and accent.</p>

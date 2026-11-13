@@ -542,8 +542,12 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m-g-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; font-size: var(--fs-xs); white-space: nowrap; flex-wrap: wrap; }
 .m-g-foot > * { flex: none; }
 .m .m-g-foot .m-toggle { min-width: 34px; min-height: 34px; padding: 0 8px; font-size: var(--fs-xs) !important; text-transform: uppercase; }
-.m .m-g-top #m-g-gen { flex: none; min-height: 34px; padding: 0 12px; font-size: var(--fs-xs) !important; text-transform: uppercase; }
-.m .m-g-top #m-g-gen.ask { background: var(--ink) !important; color: var(--panel); }
+.m-g-src { flex: none; display: flex; }
+.m .m-g-src .m-toggle { min-width: 64px; min-height: 34px; padding: 0 12px; font-size: var(--fs-xs) !important; text-transform: uppercase; }
+.m .m-g-src .m-toggle:first-child { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+.m .m-g-src .m-toggle:last-child { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; margin-left: -1.5px; }
+.m .m-g-foot #m-g-ins { padding: 0 12px; background: var(--ink) !important; color: var(--panel); }
+.m .m-g-foot #m-g-ins[hidden] { display: none; }
 .m-g-barbox, .m-g-shift, .m-g-bars { display: flex; align-items: center; gap: 3px; }
 .m-g-barbox > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; margin-right: 4px; }
 .m .m-g-bars .m-toggle { min-width: 26px !important; padding: 0 !important; }
