@@ -17,6 +17,9 @@ Erica Synths.
   crossfeed, delay and pattern. Any LXR kit file (`.SND`) can be opened too.
 - **Perform**: energy, beat and fills dials build electro patterns while it plays; a step editor
   with accents and bar conditions sits behind it.
+- **Grid**: the step grid from [808-SC](https://github.com/johnnyhawk02/808-SC), a lane a track: eight patterns of 1 to 8
+  bars, drag to paint, accents, record pattern, copy and paste. The generator feeds it: **generator** plays and shows
+  what the perform knobs make, fills written out bar by bar, and **insert into pattern** keeps it (`app/grid.js`).
 - **Randomise** a voice or the whole kit within drum-safe ranges (or wild).
 - **Presets** keep everything (sound, pattern, tempo, mixer, FX, master) under a two-word alien
   name in the browser. The preset manager stars favourites and exports them; favourites dropped

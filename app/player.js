@@ -27,6 +27,8 @@ class Player {
     this.B = [new Float32Array(64), new Float32Array(64)];
     this.idx = 0; this.frac = 0;
     this.pattern = { on: [], acc: [], bar: [] };
+    // the grid's pattern (app/grid.js): its bars, one { on, acc, bar } each, played in turn instead of the generator's; null: the generator's
+    this.lanes = null;
     this.playing = false; this.bpm = 120; this.vel = 100; this.accGain = 0.5;
     this.step = 0; this.bar = 0; this.toNext = 0; this.atBar = [];
     // groove: per track and step, how far its hits sit off the grid in 16ths (+ late, - early)
@@ -104,6 +106,7 @@ class Player {
       if (this.rec.count === 'run') { this.cntStep = 0; this.toNext = 0; }
       this.events.push({ type: 'rec', state: this.rec.on ? 'on' : this.rec.count === 'run' ? 'count' : 'wait' });
     } else if (m.type === 'recStop') { if (this.rec) this.recEnd(); }
+    else if (m.type === 'lanes') this.lanes = m.lanes && m.lanes.length ? m.lanes : null;
     else if (m.type === 'seq') {
       // a live pattern change (the perform sliders, the grid) wins over one still waiting for the bar
       this.atBar = this.atBar.filter((q) => q.type !== 'seq');
@@ -130,8 +133,9 @@ class Player {
   }
   // the hits of step s, each due `at` samples from now: the grid time of the step moved by the groove
   schedule(s, bar, at0) {
-    const pg = this.pattern.pages ? bar % this.pattern.pages.length : 0;
-    const P = this.pattern.pages ? this.pattern.pages[pg] : this.pattern; // pages: one bar each, in turn
+    const pages = this.lanes || this.pattern.pages;
+    const pg = pages ? bar % pages.length : 0;
+    const P = pages ? pages[pg] : this.pattern; // pages: one bar each, in turn (the grid's, when it plays)
     const hits = [], { on, acc, bar: cond } = P, G = this.groove, len = LXR.REAL_FS * 60 / this.bpm / 4;
     if (this.rush && this.patternOn) { this.scheduleRush(s, bar, pg, P, at0, len, hits); return; }
     for (let t = 0; t < 7 && this.patternOn; t++) {
