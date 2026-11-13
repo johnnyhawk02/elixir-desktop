@@ -158,7 +158,7 @@ function setDirty(d) {
 }
 function songSnapshot() {
   const copy = (a) => a.map((r) => r.slice());
-  return { style: STYLES[styleIdx].name, user: STYLES[styleIdx].user && userPats.length ? structuredClone(userPats[userSlot()]) : undefined, energy: perf.energy, beat: perf.beat, var: perf.var, bars: perf.bars, fills: perf.fills,
+  return { style: STYLES[styleIdx].name, user: STYLES[styleIdx].user && userPats.length ? structuredClone(userPats[userSlot()]) : undefined, energy: perf.energy, beat: perf.beat, var: perf.var, bars: perf.bars, fills: perf.fills, fillStyle: perf.fillStyle,
     tempo: perf.tempo, vel: perf.vel, accent: perf.accent, view, source, groove: structuredClone(groove), macro: { ...macro },
     pattern: { on: copy(pattern.on), acc: copy(pattern.acc), bar: copy(pattern.bar) }, stepPages: pages.slice(0, pageCount).map(copyPage),
     master: { ...master } };
@@ -167,6 +167,7 @@ function useSong(g, keepTempo) {
   setStyle(styleIndex(g.style));
   for (const k of ['energy', 'beat', 'fills', 'tempo', 'vel', 'accent']) if (!(keepTempo && k === 'tempo')) perf[k] = g[k];
   perf.tempo = clampTempo(perf.tempo); // presets from when the range was wider
+  perf.fillStyle = Number.isInteger(g.fillStyle) ? Math.max(0, Math.min(5, g.fillStyle)) : 0;
   // variations: presets from before them get B over 4 bars, like a new start
   perf.var = Number.isInteger(g.var) ? Math.max(0, Math.min(4, g.var)) : PERF_RANGE.var[2]; perf.bars = g.bars === 8 ? 8 : 4;
   $('tempo').value = perf.tempo;

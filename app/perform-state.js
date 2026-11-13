@@ -1,8 +1,8 @@
 // ---- perform state: the perform dials (pattern card, PC4, presets) read and write here ----
 // The groove type and depth are the groove's; tempo is shown in the header's field too
-const perf = { energy: 60, beat: 0, fills: 40, var: 2, bars: 4, tempo: 118, vel: 100, accent: 6 };
+const perf = { energy: 60, beat: 0, fills: 0, fillStyle: 0, var: 2, bars: 4, tempo: 118, vel: 100, accent: 6 };
 // [min, max, default] of each, as the knobs and the PC4 map them
-const PERF_RANGE = { energy: [0, 100, 60], beat: [0, 63, 0], var: [0, 4, 2], fills: [0, 100, 40], tempo: [40, 240, 118], vel: [1, 127, 100], accent: [0, 6, 6],
+const PERF_RANGE = { energy: [0, 100, 60], beat: [0, 63, 0], var: [0, 4, 2], fills: [0, 100, 0], fillStyle: [0, 5, 0], tempo: [40, 240, 118], vel: [1, 127, 100], accent: [0, 6, 6],
   groove: [0, GROOVE_TYPES.length - 1, 0], depth: [0, 100, 100] };
 // var: the beat's variation bars, off (one bar, looped) then A (light) to D (busy); bars: the phrase they make, 4 or 8 bars
 const VAR_NAMES = ['off', 'A', 'B', 'C', 'D'];
@@ -32,7 +32,8 @@ function perfText(k) {
   }
   if (k === 'var') return VAR_NAMES[v];
   if (k === 'bars') return `${v} bars`;
-  if (k === 'fills') { const f = fillNow(); return f ? `${f.every > 1 ? `every ${f.every} bars` : 'every bar'} · ${f.len} steps` : 'off'; }
+  if (k === 'fills') { const f = fillNow(); return f ? `${f.len} steps${f.busy ? ' busy' : ''}` : 'off'; }
+  if (k === 'fillStyle') return v ? FILL_STYLES[v - 1].name : 'genre';
   if (k === 'tempo') return `${v} bpm`;
   if (k === 'vel') return `${v} / 127`;
   if (k === 'accent') return `+${v} dB`;

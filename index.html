@@ -1553,12 +1553,13 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   #m-beat-faders { grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 4px 6px; padding-bottom: 10px; }
   #m-beat-faders::before, #m-beat-faders::after, .m-dens > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: var(--fs-s); padding-left: 4px; }
   #m-beat-faders::before { content: "pattern"; grid-area: 1 / 1 / 2 / -1; }
-  #m-beat-faders::after { content: "feel"; grid-area: 3 / 1 / 4 / -1; padding-top: 8px; border-top: var(--rule); }
+  #m-beat-faders::after { content: "feel \b7  fill"; grid-area: 3 / 1 / 4 / -1; padding-top: 8px; border-top: var(--rule); }
   #m-beat-faders > :nth-child(-n+5) { grid-row: 2; }
   #m-beat-faders > :nth-child(n+6) { grid-row: 4; }
-  #m-beat-faders > :nth-child(6) { grid-column: 1; } #m-beat-faders > :nth-child(7) { grid-column: 2; }
-  #m-beat-faders > :nth-child(8) { grid-column: 3; } #m-beat-faders > :nth-child(9) { grid-column: 4; }
-  #m-beat-faders > :nth-child(10) { grid-row: 2; grid-column: 6; } #m-beat-faders > :nth-child(11) { grid-row: 2; grid-column: 7; }
+  #m-beat-faders > :nth-child(7) { grid-column: 1; } #m-beat-faders > :nth-child(8) { grid-column: 2; }
+  #m-beat-faders > :nth-child(9) { grid-column: 3; } #m-beat-faders > :nth-child(10) { grid-column: 4; }
+  #m-beat-faders > :nth-child(5) { grid-row: 4; grid-column: 6; } #m-beat-faders > :nth-child(6) { grid-column: 7; }
+  #m-beat-faders > :nth-child(11) { grid-row: 2; grid-column: 5; } #m-beat-faders > :nth-child(12) { grid-row: 2; grid-column: 6; }
   .m-dens { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 4px; min-height: 0; padding-top: 8px; border-top: var(--rule); }
   #m-dens-faders { grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 4px 6px; min-height: 0; }
   #m-beat-faders .m-vf, #m-dens-faders .m-vf { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: 2px; }
@@ -1703,7 +1704,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>229</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>230</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1910,7 +1911,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
       <button class="m-btn" id="m-pdelall" type="button">delete all</button>
       <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
     </div>
-    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v229, 13 Nov, 11:34</footer>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v230, 13 Nov, 12:13</footer>
   </section>
 </main>
 <main class="m m-ph" id="m-ph" aria-label="elixir">
@@ -6235,9 +6236,9 @@ const grooveMsg = () => {
 };
 // ---- perform state: the perform dials (pattern card, PC4, presets) read and write here ----
 // The groove type and depth are the groove's; tempo is shown in the header's field too
-const perf = { energy: 60, beat: 0, fills: 40, var: 2, bars: 4, tempo: 118, vel: 100, accent: 6 };
+const perf = { energy: 60, beat: 0, fills: 0, fillStyle: 0, var: 2, bars: 4, tempo: 118, vel: 100, accent: 6 };
 // [min, max, default] of each, as the knobs and the PC4 map them
-const PERF_RANGE = { energy: [0, 100, 60], beat: [0, 63, 0], var: [0, 4, 2], fills: [0, 100, 40], tempo: [40, 240, 118], vel: [1, 127, 100], accent: [0, 6, 6],
+const PERF_RANGE = { energy: [0, 100, 60], beat: [0, 63, 0], var: [0, 4, 2], fills: [0, 100, 0], fillStyle: [0, 5, 0], tempo: [40, 240, 118], vel: [1, 127, 100], accent: [0, 6, 6],
   groove: [0, GROOVE_TYPES.length - 1, 0], depth: [0, 100, 100] };
 // var: the beat's variation bars, off (one bar, looped) then A (light) to D (busy); bars: the phrase they make, 4 or 8 bars
 const VAR_NAMES = ['off', 'A', 'B', 'C', 'D'];
@@ -6267,7 +6268,8 @@ function perfText(k) {
   }
   if (k === 'var') return VAR_NAMES[v];
   if (k === 'bars') return `${v} bars`;
-  if (k === 'fills') { const f = fillNow(); return f ? `${f.every > 1 ? `every ${f.every} bars` : 'every bar'} · ${f.len} steps` : 'off'; }
+  if (k === 'fills') { const f = fillNow(); return f ? `${f.len} steps${f.busy ? ' busy' : ''}` : 'off'; }
+  if (k === 'fillStyle') return v ? FILL_STYLES[v - 1].name : 'genre';
   if (k === 'tempo') return `${v} bpm`;
   if (k === 'vel') return `${v} / 127`;
   if (k === 'accent') return `+${v} dB`;
@@ -6547,10 +6549,10 @@ const safeRange = (text, voice, name) => {
 // ---- the randomisers' settings (Elixir Mobile): the ranges and chances each randomise button uses, edited in the
 // hidden settings pop-up (tap ELIXIR) and kept in this browser. Percentages are 0..100; Lo/Hi pairs are ranges ----
 const RAND0 = {
-  every: { vary: 10, panOn: 30, panMax: 50, xfeed: 1, genre: 1, energyLo: 45, energyHi: 90, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 5, depthHi: 50 },
+  every: { vary: 10, panOn: 30, panMax: 50, xfeed: 1, genre: 1, energyLo: 45, energyHi: 90, fillsLo: 0, fillsHi: 0, groove: 1, depthLo: 5, depthHi: 50 },
   kit: { vary: 0 },
   alter: { amount: 10 },
-  pattern: { genre: 1, energyLo: 35, energyHi: 95, fillsLo: 0, fillsHi: 100, groove: 1, depthLo: 50, depthHi: 100 },
+  pattern: { genre: 1, energyLo: 35, energyHi: 95, fillsLo: 0, fillsHi: 0, groove: 1, depthLo: 50, depthHi: 100 },
   xfeed: { linksLo: 3, linksHi: 6, amtLo: 25, amtHi: 100, neg: 30 },
   fx: { pingpong: 60, echoOn: 50, echoLo: 10, echoHi: 60, ringOn: 20, ringLo: 10, ringHi: 60, fbLo: 15, fbHi: 70, fbWild: 20, toneLo: 40, toneHi: 110, widthLo: 60, widthHi: 160 },
   alterfx: { amount: 10 },
@@ -6989,7 +6991,7 @@ function setDirty(d) {
 }
 function songSnapshot() {
   const copy = (a) => a.map((r) => r.slice());
-  return { style: STYLES[styleIdx].name, user: STYLES[styleIdx].user && userPats.length ? structuredClone(userPats[userSlot()]) : undefined, energy: perf.energy, beat: perf.beat, var: perf.var, bars: perf.bars, fills: perf.fills,
+  return { style: STYLES[styleIdx].name, user: STYLES[styleIdx].user && userPats.length ? structuredClone(userPats[userSlot()]) : undefined, energy: perf.energy, beat: perf.beat, var: perf.var, bars: perf.bars, fills: perf.fills, fillStyle: perf.fillStyle,
     tempo: perf.tempo, vel: perf.vel, accent: perf.accent, view, source, groove: structuredClone(groove), macro: { ...macro },
     pattern: { on: copy(pattern.on), acc: copy(pattern.acc), bar: copy(pattern.bar) }, stepPages: pages.slice(0, pageCount).map(copyPage),
     master: { ...master } };
@@ -6998,6 +7000,7 @@ function useSong(g, keepTempo) {
   setStyle(styleIndex(g.style));
   for (const k of ['energy', 'beat', 'fills', 'tempo', 'vel', 'accent']) if (!(keepTempo && k === 'tempo')) perf[k] = g[k];
   perf.tempo = clampTempo(perf.tempo); // presets from when the range was wider
+  perf.fillStyle = Number.isInteger(g.fillStyle) ? Math.max(0, Math.min(5, g.fillStyle)) : 0;
   // variations: presets from before them get B over 4 bars, like a new start
   perf.var = Number.isInteger(g.var) ? Math.max(0, Math.min(4, g.var)) : PERF_RANGE.var[2]; perf.bars = g.bars === 8 ? 8 : 4;
   $('tempo').value = perf.tempo;
@@ -7773,6 +7776,9 @@ const STYLES = [
     return { on, yields: f.busy ? [0, 1, 2, 3, 5, 6] : [0, 1, 2, 3] };
   } },
 ];
+// fill style: the genre's own fill (0), or any style's (1..5: electro, techno, broken beat, IDM, breakcore)
+const FILL_STYLES = STYLES.filter((x) => !x.user);
+const fillStyleFn = (st) => (perf.fillStyle ? FILL_STYLES[perf.fillStyle - 1] : st).fill;
 let styleIdx = 0; // saved with presets by name; presets from before the styles were electro
 // user: patterns saved from the steps tab (up to 16, in localStorage). Beat spreads them over its range;
 // energy brings hits in by their place (kick and snare on the beat or accented first, then hats, then the rest,
@@ -7841,11 +7847,11 @@ function setStyle(i) {
 }
 const ROW = ['k', 'lo', 'hi', 's', 'cy', 'ch', 'oh'];
 const ENERGY_NAMES = [[1, 'empty'], [15, 'minimal'], [35, 'low'], [60, 'groove'], [85, 'driving'], [101, 'peak']];
-// fills 0: the plain beat. Turned up, the beat turns into fill bit by bit: the fill comes more often (every 8 bars, then
-// 4, 2, and from 80% every bar), grows from the last 2 steps of its bar to the whole bar at 100%, and gets busy from 40%
+// fills: how much fill, on every bar (when it comes in is the knob seq's job): 0 the plain beat; turned up the fill grows
+// from the last 2 steps of the bar to the whole bar at 100%, and is busy from 50%
 function fillShape(fills) {
   if (!fills) return null;
-  return { every: fills < 25 ? 8 : fills < 50 ? 4 : fills < 80 ? 2 : 1, len: 2 + 2 * Math.round(fills / 100 * 7), busy: fills >= 40 };
+  return { every: 1, len: 2 + 2 * Math.round(fills / 100 * 7), busy: fills >= 50 };
 }
 // the groove level the energy dial reaches (0 = empty, 1 the kick/snare skeleton .. 9 the full kit), and the fill
 // shape, once there is a groove
@@ -7854,7 +7860,7 @@ const fillNow = () => (grooveLevel() >= 2 ? fillShape(perf.fills) : null);
 function generate() {
   const st = STYLES[styleIdx], energy = perf.energy, g = st.grooves[perf.beat];
   const T = grooveLevel(), fill = fillNow();
-  const { on: fillOn, yields } = fill ? st.fill(fill) : { on: blankFill(), yields: [] };
+  const { on: fillOn, yields } = fill ? fillStyleFn(st)(fill) : { on: blankFill(), yields: [] };
   const u = st.user && userPats.length ? userPats[userSlot()] : null;
   if (u && u.pages) {
     pattern.pages = u.pages.map((pg) => { const P = blankPage(); genPage(userGroove({ name: u.name, ...pg }), P, energy, T, fill, fillOn, yields); return P; });
@@ -8647,6 +8653,7 @@ mFader($('m-beat-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () =
 mFader($('m-beat-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => perfText('beat').replace(' · ', '\n') });
 mFader($('m-beat-faders'), 'energy', { ...pf('energy'), show: () => perfText('energy').replace(' · ', '\n') });
 mFader($('m-beat-faders'), 'fills', { ...pf('fills'), show: () => perfText('fills').replace(' · ', '\n') });
+mFader($('m-beat-faders'), 'fill style', { ...pf('fillStyle'), show: () => perfText('fillStyle') });
 mFader($('m-beat-faders'), 'velocity', { ...pf('vel'), show: (v) => `${v}` });
 mFader($('m-beat-faders'), 'groove', { ...pf('groove'), show: () => perfText('groove').replace(' ', '\n') });
 mFader($('m-beat-faders'), 'depth', { ...pf('depth'), show: (v) => `${v}%` });
@@ -9967,7 +9974,7 @@ const HELP = [
 <li><b>bars</b>: a pattern is 1 to 8 bars. Tap a bar to show it (a dashed one adds bars up to it), <b>−</b> takes the last off, <b>+</b> adds a copy of the bar shown. <b>◀ ▶</b> shift the whole pattern a step (cmd/ctrl: a bar).</li>
 <li>Cmd/ctrl + c copies what plays, cmd/ctrl + v pastes it over the pattern picked. Tap a lane's name for its voice page. The patterns are kept in this browser.</li></ul>`],
   ['beat', 'algo: the generator', `<p>Tempo, genre, beat, energy, fills, var and bars; velocity, groove, depth and accent.</p>
-<ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how fill-like it is: at 0 the plain beat; turned up, the fill comes more often (every 8 bars, then 4, 2, and from 80% every bar), grows from the last 2 steps of the bar to the whole bar, and gets busier.</li>
+<ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how much fill, on every bar: at 0 the plain beat; turned up the fill grows from the last 2 steps of the bar to the whole bar, busy from 50%. <b>fill style</b> picks the kind of fill: the genre's own, or electro, techno, broken beat, IDM or breakcore. To bring a fill in when you want, put a knob seq on fills (right-click it, step sequencer) and paint the bars where it fills.</li>
 <li>Every genre has 64 beats. <b>var</b> plays each beat as a phrase with variation bars in it: <b>off</b> loops one bar, <b>A</b> changes only the last bar, up to <b>D</b> which changes every second bar most. <b>bars</b> makes the phrase 4 or 8 bars long. Each beat always plays the same variations, and presets keep both.</li>
 <li><b>groove</b> and <b>depth</b> give it swing or push; <b>accent</b> how loud the accents are.</li>
 <li><b>density</b>, a fader for each track (drum 1, 2, 3, snare, cymbal, closed and open hat): under 100% it thins that track, off-beats first; over 100% it adds hits on its empty steps, eighths first, until at 200% every step plays. The same steps go or come each time, and presets keep it. A square over each track lights on its hits, so you can see what the density is doing.</li></ul>`],

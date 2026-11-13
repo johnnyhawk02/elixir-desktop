@@ -59,6 +59,9 @@ const STYLES = [
     return { on, yields: f.busy ? [0, 1, 2, 3, 5, 6] : [0, 1, 2, 3] };
   } },
 ];
+// fill style: the genre's own fill (0), or any style's (1..5: electro, techno, broken beat, IDM, breakcore)
+const FILL_STYLES = STYLES.filter((x) => !x.user);
+const fillStyleFn = (st) => (perf.fillStyle ? FILL_STYLES[perf.fillStyle - 1] : st).fill;
 let styleIdx = 0; // saved with presets by name; presets from before the styles were electro
 // user: patterns saved from the steps tab (up to 16, in localStorage). Beat spreads them over its range;
 // energy brings hits in by their place (kick and snare on the beat or accented first, then hats, then the rest,
@@ -127,11 +130,11 @@ function setStyle(i) {
 }
 const ROW = ['k', 'lo', 'hi', 's', 'cy', 'ch', 'oh'];
 const ENERGY_NAMES = [[1, 'empty'], [15, 'minimal'], [35, 'low'], [60, 'groove'], [85, 'driving'], [101, 'peak']];
-// fills 0: the plain beat. Turned up, the beat turns into fill bit by bit: the fill comes more often (every 8 bars, then
-// 4, 2, and from 80% every bar), grows from the last 2 steps of its bar to the whole bar at 100%, and gets busy from 40%
+// fills: how much fill, on every bar (when it comes in is the knob seq's job): 0 the plain beat; turned up the fill grows
+// from the last 2 steps of the bar to the whole bar at 100%, and is busy from 50%
 function fillShape(fills) {
   if (!fills) return null;
-  return { every: fills < 25 ? 8 : fills < 50 ? 4 : fills < 80 ? 2 : 1, len: 2 + 2 * Math.round(fills / 100 * 7), busy: fills >= 40 };
+  return { every: 1, len: 2 + 2 * Math.round(fills / 100 * 7), busy: fills >= 50 };
 }
 // the groove level the energy dial reaches (0 = empty, 1 the kick/snare skeleton .. 9 the full kit), and the fill
 // shape, once there is a groove
@@ -140,7 +143,7 @@ const fillNow = () => (grooveLevel() >= 2 ? fillShape(perf.fills) : null);
 function generate() {
   const st = STYLES[styleIdx], energy = perf.energy, g = st.grooves[perf.beat];
   const T = grooveLevel(), fill = fillNow();
-  const { on: fillOn, yields } = fill ? st.fill(fill) : { on: blankFill(), yields: [] };
+  const { on: fillOn, yields } = fill ? fillStyleFn(st)(fill) : { on: blankFill(), yields: [] };
   const u = st.user && userPats.length ? userPats[userSlot()] : null;
   if (u && u.pages) {
     pattern.pages = u.pages.map((pg) => { const P = blankPage(); genPage(userGroove({ name: u.name, ...pg }), P, energy, T, fill, fillOn, yields); return P; });

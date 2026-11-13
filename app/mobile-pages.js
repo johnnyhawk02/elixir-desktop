@@ -13,6 +13,7 @@ mFader($('m-beat-faders'), 'genre', { min: 0, max: mGenres.length - 1, get: () =
 mFader($('m-beat-faders'), 'beat', { ...pf('beat'), max: () => STYLES[styleIdx].grooves.length - 1 || 1, show: () => perfText('beat').replace(' · ', '\n') });
 mFader($('m-beat-faders'), 'energy', { ...pf('energy'), show: () => perfText('energy').replace(' · ', '\n') });
 mFader($('m-beat-faders'), 'fills', { ...pf('fills'), show: () => perfText('fills').replace(' · ', '\n') });
+mFader($('m-beat-faders'), 'fill style', { ...pf('fillStyle'), show: () => perfText('fillStyle') });
 mFader($('m-beat-faders'), 'velocity', { ...pf('vel'), show: (v) => `${v}` });
 mFader($('m-beat-faders'), 'groove', { ...pf('groove'), show: () => perfText('groove').replace(' ', '\n') });
 mFader($('m-beat-faders'), 'depth', { ...pf('depth'), show: (v) => `${v}%` });
