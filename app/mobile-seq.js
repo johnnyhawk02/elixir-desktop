@@ -53,7 +53,10 @@ function mSeqRelease(f) {
 let mSeqDraft = null;
 const mSeqQ = () => mSeqF.seq || mSeqDraft;
 function mSeqCommit() { if (!mSeqF.seq) { mSeqF.seq = mSeqDraft; mSeqDraft = null; } mSeqF.seq.on = true; }
+// (tempo has no sequencer: it's the title line's, and the host's in a plugin)
+const mSeqNone = (f) => f.label === 'tempo';
 function mSeqOpen(fd) {
+  if (mSeqNone(fd)) return;
   mSeqDraft = fd.seq ? null : { ...newSeq(), on: false };
   mSeqF = fd; mSeqPage = 0; $('m-seq-name').textContent = fd.label;
   $('m-seq').hidden = false; mSeqDraw();
@@ -98,6 +101,7 @@ useSong = function (g, keepTempo) {
     const hi = f.hiOf(), vals = q ? (q.rel ? q.vals.slice() : q.vals.map((v) => mSeqOff(((v - f.min) / (hi - f.min || 1)) * 2 - 1))) : null;
     f.seq = q ? { on: !!q.on, len: Math.max(2, Math.min(SEQ_MAX, q.len)), slew: q.slew || 0, step: SEQ_STEPS.includes(q.step) ? q.step : 1, depth: typeof q.depth === 'number' ? q.depth : 50, fill: !!q.fill, vals: mSeqPad(vals) } : null;
   }
+  for (const f of mFaders) if (mSeqNone(f)) f.seq = null; // (a preset's tempo sequencer is dropped)
   if (mSeqF) { if (!mSeqF.seq) mSeqDraft = { ...newSeq(), on: false }; mSeqDraw(); }
   mSeqMarks();
 };
@@ -227,7 +231,7 @@ onEvent = function (ev) {
     // early as the groove puts that 16th's hits on the fader's drum (all the drums' average for a fader that isn't one
     // drum's), booked a 16th ahead so an early one can still land before its grid time
     const off = mSeqGroove ? grooveMsg().off : null;
-    const due = (k) => mFaders.filter((f) => f.seq && f.seq.on && k % (f.seq.step || 1) === 0);
+    const due = (k) => mFaders.filter((f) => f.seq && f.seq.on && !mSeqNone(f) && k % (f.seq.step || 1) === 0);
     if (!off || fresh) for (const f of due(n)) mSeqStep(f, n / (f.seq.step || 1), stepMs * (f.seq.step || 1));
     if (off) {
       const k = n + 1, s16 = k % 16;
