@@ -1,6 +1,5 @@
-// ---- mutes (laptop), beside the knobs: a column a drum (drum 1, 2, 3, snare, cymbal, hihat: the hat's closed and open
-// together), each a level meter over its mute button (keys z x c v b n), then its echo send and reverb send as number
-// boxes, each with its own mute (keys a s d f g h and q w e r t y). A muted send sends nothing, its amount kept. They work on the notes, not the sound: a muted
+// ---- mutes (laptop), on the mix page: a mute a drum (drum 1, 2, 3, snare, cymbal, hihat: the hat's closed and open
+// together; keys z x c v b n) and a mute for each echo send and reverb send (keys a s d f g h and q w e r t y). A muted send sends nothing, its amount kept. They work on the notes, not the sound: a muted
 // drum's steps aren't sent to the player, so it stops being hit while anything already sounding (a decay, an echo) rings
 // on. Like density, they change what's sent, not the pattern; presets keep them (song.mute) ----
 let mMute = new Array(6).fill(false);
@@ -12,6 +11,8 @@ send = function (m) {
     const P = m.pattern, cut = (pg) => { mMute.forEach((on, d) => { if (on) for (const t of MUTE_TRACKS[d]) pg.on[t] = pg.on[t].map(() => 0); }); return pg; };
     if (P.pages) P.pages = P.pages.map(cut); else cut(P);
   }
+  // (the grid's patterns, app/grid.js, the same)
+  if (m && m.type === 'lanes' && m.lanes && mMute.some(Boolean)) m.lanes.forEach((pg) => mMute.forEach((on, d) => { if (on) for (const t of MUTE_TRACKS[d]) pg.on[t] = pg.on[t].map(() => 0); }));
   mMuteSend(m);
 };
 // the sends' mutes: the mixer's amounts stay as they are; what goes to the player is 0 while muted
@@ -25,33 +26,21 @@ send = ((inner) => function (m) {
 })(send);
 function mSendToggle(k, n) { mSendMute[k][n] = !mSendMute[k][n]; mMuteDraw(); sendMix(); setDirty(true); }
 const MUTE_N = ['dr1', 'dr2', 'dr3', 'sn', 'cy', 'hh'], MUTE_KEYS = ['z', 'x', 'c', 'v', 'b', 'n'];
+// on the mix page (laptop): a small mute square by each send knob, and a row of mute buttons (the drums' names) under
+// the level faders, with clear in the page's heading
 const mMuteCols = MUTE_N.map((n, d) => {
-  const col = document.createElement('div'); col.className = 'm-mute-col';
-  // top to bottom: the reverb send, the echo send (each a number box with its mute), the drum's level fader with its
-  // level meter beside it, its mute, its key
   const sends = {};
-  for (const k of ['ring', 'fx']) {
-    mFader(col, `${n} ${k === 'fx' ? 'echo' : 'verb'}`, { min: 0, max: 100, get: () => mix[k][d], dflt: 0, num: true,
-      show: String, set: (v) => { mix[k][d] = v; if (k === 'fx') fxButtons[d](); sendMix(); setDirty(true); } });
-    const box = col.lastElementChild, sm = document.createElement('button');
+  for (const [k, box] of [['fx', 'm-mix-echo'], ['ring', 'm-mix-ring']]) {
+    const knob = $(box).children[d], sm = document.createElement('button');
     sm.type = 'button'; sm.className = 'm-toggle m-send-mute'; sm.setAttribute('aria-pressed', 'false');
-    sm.addEventListener('click', () => mSendMute_toggle(k, d)); col.append(sm);
-    sends[k] = { box, sm };
+    sm.addEventListener('click', () => mSendToggle(k, d)); knob.append(sm);
+    sends[k] = { box: knob, sm };
   }
-  // the level: a fader like the mixer's, its meter beside the track (the same peaks as the mixer's)
-  const vol = PAR.VOL1 + d;
-  mFader(col, 'lvl', { min: 0, max: 127, get: () => values[vol], dflt: () => initValues[vol], knob: false,
-    show: String, set: (v) => { setValue(vol, v, true); setDirty(true); } });
-  const lvlEl = col.lastElementChild, meter = document.createElement('u');
-  meter.className = 'm-mute-meter'; meter.setAttribute('aria-hidden', 'true'); meter.innerHTML = '<span class="m-lvm-on"></span><span class="m-lvm-pk"></span>';
-  lvlEl.querySelector('.m-vtrack').append(meter);
-  lvlEl.classList.add('m-mute-level');
+  const col = $('m-mix-vol').children[d];
   const b = document.createElement('button'); b.type = 'button'; b.className = 'm-toggle'; b.textContent = n;
-  b.addEventListener('click', () => mMuteToggle(d)); col.append(b);
-  $('m-mute-rows').append(col);
-  return { col, b, meter, sends };
+  b.addEventListener('click', () => mMuteToggle(d)); $('m-mix-mute').append(b);
+  return { col, b, sends };
 });
-function mSendMute_toggle(k, d) { mSendToggle(k, d); }
 function mMuteToggle(d) { mMute[d] = !mMute[d]; mMuteDraw(); sendSeq(); setDirty(true); }
 function mMuteDraw() {
   mMuteCols.forEach(({ col, b, sends }, d) => {
@@ -62,14 +51,6 @@ function mMuteDraw() {
     }
   });
 }
-// the meters: the same peaks as the mixer's (lvms in app/mixer.js, one a drum)
-const mMuteLvm = lvmDraw;
-lvmDraw = function (m) {
-  mMuteLvm(m);
-  const c = mMuteCols[lvms.indexOf(m)]; if (!c) return;
-  c.meter.style.setProperty('--m', ((Math.max(LVM_FLOOR, m.db) - LVM_FLOOR) / -LVM_FLOOR).toFixed(3));
-  c.meter.style.setProperty('--h', ((Math.max(LVM_FLOOR, m.hold) - LVM_FLOOR) / -LVM_FLOOR).toFixed(3));
-};
 $('m-mute-clear').addEventListener('click', () => { mMute.fill(false); mSendMute.fx.fill(false); mSendMute.ring.fill(false); mMuteDraw(); sendSeq(); sendMix(); setDirty(true); });
 const mMuteSnap = songSnapshot, mMuteUse = useSong;
 songSnapshot = function () { return { ...mMuteSnap(), mute: mMute.slice(), sendMute: { fx: mSendMute.fx.slice(), ring: mSendMute.ring.slice() } }; };

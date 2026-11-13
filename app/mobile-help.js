@@ -3,7 +3,7 @@ const HELP = [
   ['start', 'getting started', `<p>Elixir is a six voice drum machine: drum 1, 2 and 3, snare, cymbal and hihat. Three steps to a beat:</p>
 <ol><li>Press <b>play</b> (or space).</li><li>Press <b>everything</b> until you like what you hear: each press is a new beat, kit, effects and mix.</li>
 <li>Turn the knobs, or press <b>kit</b>, <b>pattern</b> or <b>alter</b> to change one part. <b>undo</b> takes back the last one.</li></ol>
-<p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), the presets bar (‹ name ›, <b>save</b>, <b>manage presets</b>), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (beat, voice, fx, xfeed, mix, mstr), chosen by the buttons over it.</p>
+<p>The screen: the title line has <b>options</b>, <b>randomise</b> (a pop-up with every randomiser and undo), the presets bar (‹ name ›, <b>save</b>, <b>manage presets</b>), then <b>play</b> and <b>rec</b>. Under it on the left, the perform knobs and the step sequencer; on the right, one page at a time (grid, beat, voice, fx, xfeed, mix, mstr), chosen by the buttons over it.</p>
 <p>Drag a knob or fader up or down, or scroll on it; double-click to reset it. When you like the sound, <b>save</b> in the presets bar at the top. <b>rec</b> records a WAV. Keys for nearly everything: see keyboard.</p>
 <p>(On a screen under 1000 px wide it becomes the phone layout: pages along the bottom, and hold a fader for its sequencer.)</p>`],
   ['perf', 'perform: knobs and randomisers', `<p>Twelve knobs, four across and three down: tempo, variation, the perform controls (pitch, decay, filter, fm, crossfeed), energy, then genre, beat, fills and rush. MIDI CC 1 to 12 turn them (any channel).</p>
@@ -16,11 +16,6 @@ const HELP = [
 <li>Click to randomise. Drag up or down on one to set how far it goes, 10% to 100% (a dotted bar along its foot below 100%): at 30% it moves everything only 30% of the way to the new sound, and switches choices like the style 30% of the time.</li>
 <li>Hold one still for half a second for its settings, the ranges and chances it uses.</li>
 <li><b>options</b> › <b>randomise on next bar</b>: while playing, randomises wait for the start of the next bar (the button flashes until then).</li></ul>`],
-  ['mute', 'mutes and sends', `<p>Beside the knobs, a column for each drum (drum 1, 2, 3, snare, cymbal, hihat): its level meter, its reverb send and echo send as number boxes (each with its own mute), and its mute at the foot.</p>
-<ul><li>Each send has a small square under its box: a click mutes that send (the square fills, and the box goes black). The mute buttons under the mixer's level faders take the drum's name: a click mutes the drum.</li>
-<li>The keys aren't printed on the screen. <b>z x c v b n</b> mute the drums (drum 1, 2, 3, snare, cymbal, hihat, in that order); <b>a s d f g h</b> mute their echo sends; <b>q w e r t y</b> their reverb sends. <b>clear</b> lifts every mute.</li>
-<li>Drag a number box up or down, or scroll on it, to set the send; double-click to reset. A muted send sends nothing but keeps its amount (its box goes black).</li>
-<li>Mutes work on the notes, not the sound: a muted drum's last hit, its decay and its echo ring on. The hihat's mute covers both its closed and open hits. Presets keep them all.</li></ul>`],
   ['seq', 'step sequencer', `<p>Under the knobs. Touch any knob or fader, here or on a page on the right, and its sequencer shows there (greyed out until it runs). It starts once you paint a step or press a shape or a random button, and nothing runs for a control until then.</p>
 <ul><li>2 to 64 steps, each moving the control up or down from where you leave it, so you can still play it. Paint them with the mouse. Past 16 steps they're on pages: the <b>1</b> to <b>4</b> buttons by the name show each sixteen (the one playing is underlined). On an empty sequencer they also set the length: 16, 32, 48 or 64.</li>
 <li><b>length</b> the number of steps (2 to 64); <b>slew</b> glides between them; <b>speed</b> each step's length, a 16th up to 8 bars; <b>depth</b> how far they reach.</li>
@@ -47,7 +42,11 @@ const HELP = [
   ['fx', 'fx: echo, reverb, crossfeed (xfeed)', `<ul><li><b>echo</b>: send, time (musical lengths), tone, feedback and width; tick <b>ping pong</b> to bounce it left and right.</li>
 <li><b>reverb</b>: send, time (the pre-delay before it), decay, tone (dark to bright) and early (the early reflections' level). It's the LXR firmware's own reverb, written for it but never switched on in the hardware.</li>
 <li><b>crossfeed</b>: drums feeding each other. A row is the drum it comes from, a column the drum it goes into; click a column's name to pick what it changes there (fm, filter or ring). Drag a cell up or down to set it; double-click to clear.</li></ul>`],
-  ['mix', 'mix: the channel strips', `<p>A strip for each drum: its echo send knob, reverb send knob and pan knob (L, C, R) over its level fader, with a level meter beside it.</p>`],
+  ['mix', 'mix: the channel strips and mutes', `<p>The one mixer. A strip for each drum (drum 1, 2, 3, snare, cymbal, hihat): its echo send knob, reverb send knob and pan knob (L, C, R) over its level fader, with a level meter beside it, and its mute at the foot.</p>
+<ul><li>Each send has a small square under its knob: a click mutes that send (the square fills, the knob dims). A muted send sends nothing but keeps its amount.</li>
+<li>The buttons at the foot take the drum's name: a click mutes the drum. <b>clear mutes</b> lifts every mute.</li>
+<li>Keys: <b>z x c v b n</b> mute the drums; <b>a s d f g h</b> mute their echo sends; <b>q w e r t y</b> their reverb sends.</li>
+<li>Mutes work on the notes, not the sound: a muted drum's last hit, its decay and its echo ring on. The hihat's mute covers both its closed and open hits. Presets keep them all, and they work on the grid's patterns too.</li></ul>`],
   ['mstr', 'mstr: the master chain', `<p>The whole mix runs top to bottom:</p>
 <ul><li><b>distortion</b>: mix, type, drive, colour, tone and volume.</li><li><b>compressor</b>: glues it together; the meter shows the gain reduction.</li></ul>`],
   ['prst', 'presets', `<ul><li>The bar at the top shows the preset loaded: <b>‹</b> and <b>›</b> step through them, <b>save</b> keeps what you hear as a new one. While playing, a new preset flashes until the next bar, then takes over.</li>
