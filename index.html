@@ -1514,6 +1514,13 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
     display: flex; align-items: flex-end; justify-content: center; text-align: center; overflow: visible; max-width: none; letter-spacing: -.02em; flex: none; }
   #m [data-m-panel] .m-vf:not(.m-knob):not(.m-num) .m-flab { font-size: var(--fs-xs); letter-spacing: -.02em; white-space: nowrap; overflow: hidden; max-width: 100%; line-height: 1.2; }
   #m [data-m-panel] .m-vf:not(.m-knob):not(.m-num) .m-vtrack { width: min(44px, 100%); flex: 1; height: auto; min-height: 12px; }
+  /* (tidy: every page's slider the same: 44px wide and at most 150px tall, its readout on one line over it and name under it, top
+     aligned in its row, so the pages line up; the mixer's level faders stay full height) */
+  #m [data-m-panel] .m-vf:not(.m-knob):not(.m-num) { justify-content: flex-start; }
+  #m [data-m-panel] .m-vf:not(.m-knob):not(.m-num) .m-vtrack { max-height: 150px; }
+  #m [data-m-panel] .m-vf:not(.m-knob):not(.m-num) output, .m #m-beat-faders .m-vf output, .m #m-dens-faders .m-vf output {
+    white-space: nowrap; height: 1.3em; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; text-align: center; }
+  #m #m-mix-vol .m-vf .m-vtrack { max-height: none; }
 
   /* -- the right: the page buttons, then the page chosen (beat until another is) -- */
   .m > .m-tabs { grid-area: 2 / 2; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0; padding: 10px 0 8px 24px; border-top: var(--rule); border-left: var(--rule); }
@@ -1689,7 +1696,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>225</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>226</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1896,7 +1903,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
       <button class="m-btn" id="m-pdelall" type="button">delete all</button>
       <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
     </div>
-    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v225, 13 Nov, 09:46</footer>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v226, 13 Nov, 10:30</footer>
   </section>
 </main>
 <main class="m m-ph" id="m-ph" aria-label="elixir">
