@@ -24,7 +24,18 @@ const SEQ_STEPS = [1, 2, 4, 8, 16, 32, 64, 128];
 const stepName = (v) => (v < 16 ? `1/${16 / v}` : v === 16 ? '1 bar' : `${v / 16} bars`);
 // a step's offset, -1..1 of depth, in twentieths
 const mSeqOff = (x) => Math.round(Math.max(-1, Math.min(1, x)) * 20) / 20;
-const newSeq = () => ({ on: true, len: 16, slew: 0, step: 1, depth: 50, vals: new Array(SEQ_MAX).fill(0) });
+const newSeq = () => ({ on: true, len: 16, slew: 0, step: 1, depth: 50, fill: false, vals: new Array(SEQ_MAX).fill(0) });
+// fill mode: each time it's randomised, every 2, 4 or 8 bars (picked at random, out of those the sequence is long enough
+// for) the steps at the end of the bar (its last beat, or the whole step when a step is a beat or longer) go up high and
+// the rest stay low, so the knob rises into a fill there; any knob, made for the fills one
+const mSeqLoopBars = (q) => q.len * q.step / 16;
+function mSeqFill(q, v) {
+  const loop = mSeqLoopBars(q), fit = [2, 4, 8].filter((n) => n <= loop), n = fit.length ? fit[Math.floor(Math.random() * fit.length)] : Math.max(1, Math.floor(loop));
+  return v.map((x, i) => {
+    const e = (i + 1) * q.step, bar = Math.floor((e - 1) / 16) + 1, end = e - 1 >= (bar - 1) * 16 + 12;
+    return end && bar % n === 0 ? .7 + Math.random() * .3 : -1 + (x + 1) * .3;
+  });
+}
 // the value heard: the setting moved by the current offset
 function mSeqApply(f) {
   const q = f.seq;
@@ -61,6 +72,7 @@ function mSeqDraw() {
   $('m-seq-slew').style.setProperty('--w', q.slew / 100); $('m-seq-slew-out').textContent = q.slew ? `${q.slew}%` : 'off';
   $('m-seq-speed').style.setProperty('--w', (SEQ_STEPS.indexOf(q.step) + 1) / SEQ_STEPS.length); $('m-seq-speed-out').textContent = stepName(q.step);
   $('m-seq-on').setAttribute('aria-pressed', q.on); $('m-seq-on').textContent = q.on ? 'on' : 'off';
+  $('m-seq-fill').setAttribute('aria-pressed', !!q.fill);
   mSeqMarks();
 }
 const mSeqMarks = () => mFaders.forEach((f) => f.el.classList.toggle('seq', !!(f.seq && f.seq.on)));
@@ -71,7 +83,7 @@ songSnapshot = function () {
   // (with the settings, not the values heard, saved)
   const held = mFaders.filter((f) => f.base !== null).map((f) => [f, f.get()]);
   for (const [f] of held) f.put(f.base);
-  for (const f of mFaders) if (f.seq) seqs[f.key] = { on: f.seq.on, len: f.seq.len, slew: f.seq.slew, step: f.seq.step, depth: f.seq.depth, rel: true, vals: f.seq.vals.slice() };
+  for (const f of mFaders) if (f.seq) seqs[f.key] = { on: f.seq.on, len: f.seq.len, slew: f.seq.slew, step: f.seq.step, depth: f.seq.depth, fill: !!f.seq.fill, rel: true, vals: f.seq.vals.slice() };
   const song = { ...mSnapSong(), seqs, xdepth: Number($('xdepth').value) };
   for (const [f, v] of held) f.put(v);
   return song;
@@ -84,7 +96,7 @@ useSong = function (g, keepTempo) {
     f.base = null; f.off = 0; f.glide = null;
     // (sequences saved before they were offsets held values: they become offsets from the middle of the range)
     const hi = f.hiOf(), vals = q ? (q.rel ? q.vals.slice() : q.vals.map((v) => mSeqOff(((v - f.min) / (hi - f.min || 1)) * 2 - 1))) : null;
-    f.seq = q ? { on: !!q.on, len: Math.max(2, Math.min(SEQ_MAX, q.len)), slew: q.slew || 0, step: SEQ_STEPS.includes(q.step) ? q.step : 1, depth: typeof q.depth === 'number' ? q.depth : 50, vals: mSeqPad(vals) } : null;
+    f.seq = q ? { on: !!q.on, len: Math.max(2, Math.min(SEQ_MAX, q.len)), slew: q.slew || 0, step: SEQ_STEPS.includes(q.step) ? q.step : 1, depth: typeof q.depth === 'number' ? q.depth : 50, fill: !!q.fill, vals: mSeqPad(vals) } : null;
   }
   if (mSeqF) { if (!mSeqF.seq) mSeqDraft = { ...newSeq(), on: false }; mSeqDraw(); }
   mSeqMarks();
@@ -123,7 +135,7 @@ const SEQ_BARS = [(x) => { mSeqQ().len = 2 + Math.round(x * (SEQ_MAX - 2)); }, (
   (x) => { mSeqQ().step = SEQ_STEPS[Math.min(SEQ_STEPS.length - 1, Math.floor(x * SEQ_STEPS.length))]; },
   (x) => { mSeqQ().depth = Math.round(x * 20) * 5; if (mSeqF.base !== null) mSeqApply(mSeqF); }];
 ['m-seq-len', 'm-seq-slew', 'm-seq-speed', 'm-seq-depth'].forEach((id, i) => mSeqBar($(id), SEQ_BARS[i]));
-$('m-seq-rand').addEventListener('click', () => { mSeqCommit(); const q = mSeqF.seq; for (let i = 0; i < SEQ_MAX; i++) q.vals[i] = mSeqOff(Math.random() * 2 - 1); mSeqDraw(); });
+$('m-seq-rand').addEventListener('click', () => { mSeqCommit(); const q = mSeqF.seq, v = Array.from({ length: SEQ_MAX }, () => Math.random() * 2 - 1), w = q.fill ? mSeqFill(q, v) : v; for (let i = 0; i < SEQ_MAX; i++) q.vals[i] = mSeqOff(w[i]); mSeqDraw(); });
 // shapes (laptop): the steps over the sequence's length set to a ramp, a triangle, a square or a sine, from -1 to 1
 const SEQ_SHAPES = { up: (x) => 2 * x - 1, down: (x) => 1 - 2 * x, tri: (x) => (x < .5 ? 4 * x - 1 : 3 - 4 * x), square: (x) => (x < .5 ? 1 : -1), sine: (x) => Math.sin(2 * Math.PI * x) };
 $('m-seq-shapes').addEventListener('click', (e) => {
@@ -147,10 +159,11 @@ const SEQ_RNDS = {
 };
 $('m-seq-rnds').addEventListener('click', (e) => {
   const b = e.target.closest('[data-rnd]'); if (!b) return;
-  mSeqCommit(); const q = mSeqF.seq, v = SEQ_RNDS[b.dataset.rnd](q.len);
+  mSeqCommit(); const q = mSeqF.seq, r = SEQ_RNDS[b.dataset.rnd](q.len), v = q.fill ? mSeqFill(q, r) : r;
   for (let i = 0; i < SEQ_MAX; i++) q.vals[i] = i < q.len ? mSeqOff(v[i]) : 0;
   mSeqDraw();
 });
+$('m-seq-fill').addEventListener('click', () => { const q = mSeqQ(); q.fill = !q.fill; if (q.fill) mSeqCommit(); setDirty(true); mSeqDraw(); });
 $('m-seq-on').addEventListener('click', () => { if (!mSeqF.seq || !mSeqF.seq.on) mSeqCommit(); else { mSeqF.seq.on = false; mSeqRelease(mSeqF); } mSeqDraw(); });
 mCloser('m-seq', () => { mSeqF = null; mSeqDraft = null; });
 // the glides, a frame at a time while any is moving

@@ -27,10 +27,15 @@ $('m-knobseq').addEventListener('click', () => {
   const fs = mKnobFaders(), was = fs.map((f) => (f.seq ? { ...f.seq, vals: f.seq.vals.slice() } : null));
   const kinds = Object.keys(SEQ_RNDS);
   for (const f of fs) {
-    const len = Math.random() < .5 ? 8 : 16, v = SEQ_RNDS[kinds[Math.floor(Math.random() * kinds.length)]](len);
+    // (a knob already in fill mode keeps it, and the fills knob always gets it: its fills come in at the ends of bars
+    // 2, 4 and 8, a step a beat to a bar long, and deep enough to hear)
+    const fill = !!(f.seq && f.seq.fill) || f.label === 'fills';
+    // (in fill mode: a beat to a bar a step, and long enough for 8 bars)
+    const step = fill ? [4, 8, 16][Math.floor(Math.random() * 3)] : mSeqRandStep(), len = fill ? 128 / step : Math.random() < .5 ? 8 : 16;
+    const q = { on: true, len, slew: fill ? 0 : Math.round(Math.random() * 10) * 10, step, depth: fill ? 60 + Math.round(Math.random() * 8) * 5 : 20 + Math.round(Math.random() * 12) * 5, fill };
+    const r = SEQ_RNDS[kinds[Math.floor(Math.random() * kinds.length)]](len), v = fill ? mSeqFill(q, r) : r;
     if (f.base !== null) mSeqRelease(f);
-    f.seq = { on: true, len, slew: Math.round(Math.random() * 10) * 10, step: mSeqRandStep(), depth: 20 + Math.round(Math.random() * 12) * 5,
-      vals: Array.from({ length: SEQ_MAX }, (_, i) => (i < len ? mSeqOff(v[i]) : 0)) };
+    f.seq = { ...q, vals: Array.from({ length: SEQ_MAX }, (_, i) => (i < len ? mSeqOff(v[i]) : 0)) };
   }
   if (mSeqF && fs.includes(mSeqF)) mSeqDraft = null;
   if (mSeqF) mSeqDraw(); else mSeqMarks();

@@ -1704,7 +1704,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>230</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>231</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1876,7 +1876,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 
   <div class="m-seq" id="m-seq" hidden>
     <section class="m-card m-seq-card" role="dialog" aria-labelledby="m-seq-name">
-      <div class="m-chead"><b><span id="m-seq-name"></span> seq</b><span class="m-seq-pages" id="m-seq-pages" role="group" aria-label="step pages"></span><output id="m-seq-val"></output><button class="m-toggle" id="m-seq-on" type="button" aria-pressed="true">on</button></div>
+      <div class="m-chead"><b><span id="m-seq-name"></span> seq</b><span class="m-seq-pages" id="m-seq-pages" role="group" aria-label="step pages"></span><output id="m-seq-val"></output><button class="m-toggle" id="m-seq-fill" type="button" aria-pressed="false">fill</button><button class="m-toggle" id="m-seq-on" type="button" aria-pressed="true">on</button></div>
       <div class="m-seq-steps" id="m-seq-steps" aria-label="steps"></div>
       <div class="m-seq-lenrow"><span>length</span><div class="m-seq-len" id="m-seq-len" role="slider" aria-label="length"><i></i></div><output id="m-seq-len-out"></output></div>
       <div class="m-seq-lenrow"><span>slew</span><div class="m-seq-len" id="m-seq-slew" role="slider" aria-label="slew"><i></i></div><output id="m-seq-slew-out"></output></div>
@@ -1911,7 +1911,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
       <button class="m-btn" id="m-pdelall" type="button">delete all</button>
       <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
     </div>
-    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v230, 13 Nov, 12:13</footer>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v231, 13 Nov, 12:19</footer>
   </section>
 </main>
 <main class="m m-ph" id="m-ph" aria-label="elixir">
@@ -9340,7 +9340,18 @@ const SEQ_STEPS = [1, 2, 4, 8, 16, 32, 64, 128];
 const stepName = (v) => (v < 16 ? `1/${16 / v}` : v === 16 ? '1 bar' : `${v / 16} bars`);
 // a step's offset, -1..1 of depth, in twentieths
 const mSeqOff = (x) => Math.round(Math.max(-1, Math.min(1, x)) * 20) / 20;
-const newSeq = () => ({ on: true, len: 16, slew: 0, step: 1, depth: 50, vals: new Array(SEQ_MAX).fill(0) });
+const newSeq = () => ({ on: true, len: 16, slew: 0, step: 1, depth: 50, fill: false, vals: new Array(SEQ_MAX).fill(0) });
+// fill mode: each time it's randomised, every 2, 4 or 8 bars (picked at random, out of those the sequence is long enough
+// for) the steps at the end of the bar (its last beat, or the whole step when a step is a beat or longer) go up high and
+// the rest stay low, so the knob rises into a fill there; any knob, made for the fills one
+const mSeqLoopBars = (q) => q.len * q.step / 16;
+function mSeqFill(q, v) {
+  const loop = mSeqLoopBars(q), fit = [2, 4, 8].filter((n) => n <= loop), n = fit.length ? fit[Math.floor(Math.random() * fit.length)] : Math.max(1, Math.floor(loop));
+  return v.map((x, i) => {
+    const e = (i + 1) * q.step, bar = Math.floor((e - 1) / 16) + 1, end = e - 1 >= (bar - 1) * 16 + 12;
+    return end && bar % n === 0 ? .7 + Math.random() * .3 : -1 + (x + 1) * .3;
+  });
+}
 // the value heard: the setting moved by the current offset
 function mSeqApply(f) {
   const q = f.seq;
@@ -9377,6 +9388,7 @@ function mSeqDraw() {
   $('m-seq-slew').style.setProperty('--w', q.slew / 100); $('m-seq-slew-out').textContent = q.slew ? `${q.slew}%` : 'off';
   $('m-seq-speed').style.setProperty('--w', (SEQ_STEPS.indexOf(q.step) + 1) / SEQ_STEPS.length); $('m-seq-speed-out').textContent = stepName(q.step);
   $('m-seq-on').setAttribute('aria-pressed', q.on); $('m-seq-on').textContent = q.on ? 'on' : 'off';
+  $('m-seq-fill').setAttribute('aria-pressed', !!q.fill);
   mSeqMarks();
 }
 const mSeqMarks = () => mFaders.forEach((f) => f.el.classList.toggle('seq', !!(f.seq && f.seq.on)));
@@ -9387,7 +9399,7 @@ songSnapshot = function () {
   // (with the settings, not the values heard, saved)
   const held = mFaders.filter((f) => f.base !== null).map((f) => [f, f.get()]);
   for (const [f] of held) f.put(f.base);
-  for (const f of mFaders) if (f.seq) seqs[f.key] = { on: f.seq.on, len: f.seq.len, slew: f.seq.slew, step: f.seq.step, depth: f.seq.depth, rel: true, vals: f.seq.vals.slice() };
+  for (const f of mFaders) if (f.seq) seqs[f.key] = { on: f.seq.on, len: f.seq.len, slew: f.seq.slew, step: f.seq.step, depth: f.seq.depth, fill: !!f.seq.fill, rel: true, vals: f.seq.vals.slice() };
   const song = { ...mSnapSong(), seqs, xdepth: Number($('xdepth').value) };
   for (const [f, v] of held) f.put(v);
   return song;
@@ -9400,7 +9412,7 @@ useSong = function (g, keepTempo) {
     f.base = null; f.off = 0; f.glide = null;
     // (sequences saved before they were offsets held values: they become offsets from the middle of the range)
     const hi = f.hiOf(), vals = q ? (q.rel ? q.vals.slice() : q.vals.map((v) => mSeqOff(((v - f.min) / (hi - f.min || 1)) * 2 - 1))) : null;
-    f.seq = q ? { on: !!q.on, len: Math.max(2, Math.min(SEQ_MAX, q.len)), slew: q.slew || 0, step: SEQ_STEPS.includes(q.step) ? q.step : 1, depth: typeof q.depth === 'number' ? q.depth : 50, vals: mSeqPad(vals) } : null;
+    f.seq = q ? { on: !!q.on, len: Math.max(2, Math.min(SEQ_MAX, q.len)), slew: q.slew || 0, step: SEQ_STEPS.includes(q.step) ? q.step : 1, depth: typeof q.depth === 'number' ? q.depth : 50, fill: !!q.fill, vals: mSeqPad(vals) } : null;
   }
   if (mSeqF) { if (!mSeqF.seq) mSeqDraft = { ...newSeq(), on: false }; mSeqDraw(); }
   mSeqMarks();
@@ -9439,7 +9451,7 @@ const SEQ_BARS = [(x) => { mSeqQ().len = 2 + Math.round(x * (SEQ_MAX - 2)); }, (
   (x) => { mSeqQ().step = SEQ_STEPS[Math.min(SEQ_STEPS.length - 1, Math.floor(x * SEQ_STEPS.length))]; },
   (x) => { mSeqQ().depth = Math.round(x * 20) * 5; if (mSeqF.base !== null) mSeqApply(mSeqF); }];
 ['m-seq-len', 'm-seq-slew', 'm-seq-speed', 'm-seq-depth'].forEach((id, i) => mSeqBar($(id), SEQ_BARS[i]));
-$('m-seq-rand').addEventListener('click', () => { mSeqCommit(); const q = mSeqF.seq; for (let i = 0; i < SEQ_MAX; i++) q.vals[i] = mSeqOff(Math.random() * 2 - 1); mSeqDraw(); });
+$('m-seq-rand').addEventListener('click', () => { mSeqCommit(); const q = mSeqF.seq, v = Array.from({ length: SEQ_MAX }, () => Math.random() * 2 - 1), w = q.fill ? mSeqFill(q, v) : v; for (let i = 0; i < SEQ_MAX; i++) q.vals[i] = mSeqOff(w[i]); mSeqDraw(); });
 // shapes (laptop): the steps over the sequence's length set to a ramp, a triangle, a square or a sine, from -1 to 1
 const SEQ_SHAPES = { up: (x) => 2 * x - 1, down: (x) => 1 - 2 * x, tri: (x) => (x < .5 ? 4 * x - 1 : 3 - 4 * x), square: (x) => (x < .5 ? 1 : -1), sine: (x) => Math.sin(2 * Math.PI * x) };
 $('m-seq-shapes').addEventListener('click', (e) => {
@@ -9463,10 +9475,11 @@ const SEQ_RNDS = {
 };
 $('m-seq-rnds').addEventListener('click', (e) => {
   const b = e.target.closest('[data-rnd]'); if (!b) return;
-  mSeqCommit(); const q = mSeqF.seq, v = SEQ_RNDS[b.dataset.rnd](q.len);
+  mSeqCommit(); const q = mSeqF.seq, r = SEQ_RNDS[b.dataset.rnd](q.len), v = q.fill ? mSeqFill(q, r) : r;
   for (let i = 0; i < SEQ_MAX; i++) q.vals[i] = i < q.len ? mSeqOff(v[i]) : 0;
   mSeqDraw();
 });
+$('m-seq-fill').addEventListener('click', () => { const q = mSeqQ(); q.fill = !q.fill; if (q.fill) mSeqCommit(); setDirty(true); mSeqDraw(); });
 $('m-seq-on').addEventListener('click', () => { if (!mSeqF.seq || !mSeqF.seq.on) mSeqCommit(); else { mSeqF.seq.on = false; mSeqRelease(mSeqF); } mSeqDraw(); });
 mCloser('m-seq', () => { mSeqF = null; mSeqDraft = null; });
 // the glides, a frame at a time while any is moving
@@ -9965,7 +9978,8 @@ const HELP = [
 <li>Random: <b>rnd</b> (every step anywhere), <b>drunk</b> (a wandering walk), <b>hold</b> (values held for 2 to 4 steps), <b>sparse</b> (mostly still, now and then a jump), <b>smooth</b> (random points glided between).</li>
 <li><b>on</b> switches it on and off. A control with a sequencer running has its name inverted. Presets keep them. esc greys the strip out.</li>
 <li>MIDI CC 21, 22, 23 and 24 set its length, slew, speed and depth (on the sequencer shown).</li>
-<li>The steps follow the groove and its depth, landing with the swung hits; switch that off in <b>options</b> › <b>user settings</b> › <b>seq</b>.</li></ul>`],
+<li>The steps follow the groove and its depth, landing with the swung hits; switch that off in <b>options</b> › <b>user settings</b> › <b>seq</b>.</li></ul>
+<p><b>fill</b> (by on) is fill mode: each time the steps are randomised, every 2, 4 or 8 bars (picked at random) the end of the bar goes up high and the rest stays low, so the knob rises into a fill there. It works on any knob; on fills it brings the fills in. The knob seqs randomiser always puts the fills knob in fill mode.</p>`],
   ['grid', 'seq: grid and algo', `<p>The first page on the right. <b>grid | algo</b> at its top picks what plays and what the page shows: <b>grid</b> your patterns, <b>algo</b> the generator, with the beat page's controls (pattern, feel, density). The grid: a lane for each track (the kick at the bottom, the hats at the top), sixteen steps a bar.</p>
 <ul><li>Tap a step for on or off, or drag across steps to paint; with cmd (ctrl) it puts accents on or off.</li>
 <li><b>1</b> to <b>8</b> over the grid pick which pattern plays and is edited, straight away. Right-click one to <b>record</b> into it (from the next bar, whatever plays, until you press its STOP) or <b>clear</b> it.</li>
@@ -9974,7 +9988,7 @@ const HELP = [
 <li><b>bars</b>: a pattern is 1 to 8 bars. Tap a bar to show it (a dashed one adds bars up to it), <b>−</b> takes the last off, <b>+</b> adds a copy of the bar shown. <b>◀ ▶</b> shift the whole pattern a step (cmd/ctrl: a bar).</li>
 <li>Cmd/ctrl + c copies what plays, cmd/ctrl + v pastes it over the pattern picked. Tap a lane's name for its voice page. The patterns are kept in this browser.</li></ul>`],
   ['beat', 'algo: the generator', `<p>Tempo, genre, beat, energy, fills, var and bars; velocity, groove, depth and accent.</p>
-<ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how much fill, on every bar: at 0 the plain beat; turned up the fill grows from the last 2 steps of the bar to the whole bar, busy from 50%. <b>fill style</b> picks the kind of fill: the genre's own, or electro, techno, broken beat, IDM or breakcore. To bring a fill in when you want, put a knob seq on fills (right-click it, step sequencer) and paint the bars where it fills.</li>
+<ul><li><b>genre</b> picks a style, <b>beat</b> one of its grooves, <b>energy</b> how busy it is, <b>fills</b> how much fill, on every bar: at 0 the plain beat; turned up the fill grows from the last 2 steps of the bar to the whole bar, busy from 50%. <b>fill style</b> picks the kind of fill: the genre's own, or electro, techno, broken beat, IDM or breakcore. To bring a fill in when you want, put a knob seq on fills (right-click it, step sequencer) and paint the bars where it fills, or switch on its <b>fill</b> mode and press a random button.</li>
 <li>Every genre has 64 beats. <b>var</b> plays each beat as a phrase with variation bars in it: <b>off</b> loops one bar, <b>A</b> changes only the last bar, up to <b>D</b> which changes every second bar most. <b>bars</b> makes the phrase 4 or 8 bars long. Each beat always plays the same variations, and presets keep both.</li>
 <li><b>groove</b> and <b>depth</b> give it swing or push; <b>accent</b> how loud the accents are.</li>
 <li><b>density</b>, a fader for each track (drum 1, 2, 3, snare, cymbal, closed and open hat): under 100% it thins that track, off-beats first; over 100% it adds hits on its empty steps, eighths first, until at 200% every step plays. The same steps go or come each time, and presets keep it. A square over each track lights on its hits, so you can see what the density is doing.</li></ul>`],
@@ -10153,10 +10167,15 @@ $('m-knobseq').addEventListener('click', () => {
   const fs = mKnobFaders(), was = fs.map((f) => (f.seq ? { ...f.seq, vals: f.seq.vals.slice() } : null));
   const kinds = Object.keys(SEQ_RNDS);
   for (const f of fs) {
-    const len = Math.random() < .5 ? 8 : 16, v = SEQ_RNDS[kinds[Math.floor(Math.random() * kinds.length)]](len);
+    // (a knob already in fill mode keeps it, and the fills knob always gets it: its fills come in at the ends of bars
+    // 2, 4 and 8, a step a beat to a bar long, and deep enough to hear)
+    const fill = !!(f.seq && f.seq.fill) || f.label === 'fills';
+    // (in fill mode: a beat to a bar a step, and long enough for 8 bars)
+    const step = fill ? [4, 8, 16][Math.floor(Math.random() * 3)] : mSeqRandStep(), len = fill ? 128 / step : Math.random() < .5 ? 8 : 16;
+    const q = { on: true, len, slew: fill ? 0 : Math.round(Math.random() * 10) * 10, step, depth: fill ? 60 + Math.round(Math.random() * 8) * 5 : 20 + Math.round(Math.random() * 12) * 5, fill };
+    const r = SEQ_RNDS[kinds[Math.floor(Math.random() * kinds.length)]](len), v = fill ? mSeqFill(q, r) : r;
     if (f.base !== null) mSeqRelease(f);
-    f.seq = { on: true, len, slew: Math.round(Math.random() * 10) * 10, step: mSeqRandStep(), depth: 20 + Math.round(Math.random() * 12) * 5,
-      vals: Array.from({ length: SEQ_MAX }, (_, i) => (i < len ? mSeqOff(v[i]) : 0)) };
+    f.seq = { ...q, vals: Array.from({ length: SEQ_MAX }, (_, i) => (i < len ? mSeqOff(v[i]) : 0)) };
   }
   if (mSeqF && fs.includes(mSeqF)) mSeqDraft = null;
   if (mSeqF) mSeqDraw(); else mSeqMarks();
