@@ -36,17 +36,17 @@ const gClean = (src) => {
   return L;
 };
 // mode 'gen' (the generator plays, as before the grid) or 'lanes' (pattern cur plays); page: the bar shown
-const gr = { mode: 'gen', pats: G_SEEDS.map(gFromText), lens: new Array(G_N).fill(1), cur: 0, page: 0, rec: -1, recPos: -1 };
+const gr = { mode: 'gen', pats: G_SEEDS.map(gFromText), lens: new Array(G_N).fill(1), cur: 0, page: 0, rec: -1, recPos: -1, recBars: 0, nBars: 4 };
 try {
   const s = JSON.parse(localStorage.getItem(G_KEY));
   if (s && Array.isArray(s.pats)) {
     for (let i = 0; i < G_N; i++) if (s.pats[i]) gr.pats[i] = gClean(s.pats[i]);
     if (s.cur >= 0 && s.cur < G_N) gr.cur = s.cur;
     if (Array.isArray(s.lens)) for (let i = 0; i < G_N; i++) gr.lens[i] = Math.max(1, Math.min(G_BARS, s.lens[i] | 0 || 1));
-    gr.mode = s.mode === 'lanes' ? 'lanes' : 'gen';
+    gr.mode = s.mode === 'lanes' ? 'lanes' : 'gen'; if ([1, 2, 4, 8].includes(s.nBars)) gr.nBars = s.nBars;
   }
 } catch (e) {}
-const gSave = () => { try { localStorage.setItem(G_KEY, JSON.stringify({ pats: gr.pats, lens: gr.lens, cur: gr.cur, mode: gr.mode })); } catch (e) {} };
+const gSave = () => { try { localStorage.setItem(G_KEY, JSON.stringify({ pats: gr.pats, lens: gr.lens, cur: gr.cur, mode: gr.mode, nBars: gr.nBars })); } catch (e) {} };
 // a bar condition's cycle (0 every bar; n, -n and 1/n: n bars)
 const gPeriod = (b) => (!b ? 1 : b > 100 ? b - 100 : Math.abs(b));
 // what the generator plays, written out bar by bar (its fills and phrase), up to 8 bars: { L, n }
@@ -152,6 +152,14 @@ const gCells = [], gLabs = [];
   // into the pattern picked, and goes back to the grid
   $('m-g-grid').addEventListener('click', () => gPick(gr.cur));
   $('m-g-algo').addEventListener('click', () => { if (gr.mode === 'gen') return; gr.mode = 'gen'; gGenCache = null; gr.page = 0; gSend(); gDraw(); });
+  // rec (algo): from the next bar what plays goes into the pattern picked, for the bars chosen beside it, then stops
+  for (const n of [1, 2, 4, 8]) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'm-toggle'; b.textContent = String(n); b.dataset.n = n;
+    b.setAttribute('aria-label', `record ${n} bar${n > 1 ? 's' : ''}`);
+    b.addEventListener('click', () => { gr.nBars = n; gSave(); gDraw(); });
+    $('m-g-recbars').append(b);
+  }
+  $('m-g-rec').addEventListener('click', () => { if (gr.rec >= 0) gRecStop(); else gRecStart(gr.cur, gr.nBars); });
   $('m-g-ins').addEventListener('click', () => {
     const { L, n } = gGen();
     if (gr.rec === gr.cur) gRecStop();
@@ -195,22 +203,25 @@ function gClear(i) {
 // Recording a pattern: it empties, its button says STOP, and from the next bar what is heard (whichever pattern plays,
 // or the generator) is written into it step by step; it loops over its 128 steps (8 bars), overwriting, until its button
 // is pressed (stopping the transport stops it too)
-function gRecStart(i) {
-  gr.rec = i; gr.recPos = -1;
+// (bars: stop by itself after that many bars, 0 = loop until stopped)
+function gRecStart(i, bars = 0) {
+  gr.rec = i; gr.recPos = -1; gr.recBars = bars;
   gr.pats[i] = gEmpty(); gr.lens[i] = 1;
   if (gr.mode === 'lanes' && gr.cur === i) { const o = [...Array(G_N).keys()].find((j) => j !== i && gr.pats[j].on.some((r) => r.some(Boolean))); if (o !== undefined) gPick(o); else { gr.mode = 'gen'; gSend(); } }
   if (!playing) $('m-play').click();
   gSave(); gDraw();
 }
-function gRecStop() { gr.rec = -1; gr.recPos = -1; gSave(); gDraw(); }
-function gRecStep(s, bar) {
+function gRecStop() { gr.rec = -1; gr.recPos = -1; gr.recBars = 0; gSave(); gDraw(); }
+// (what is heard: the step's hits as played, after the densities and mutes; their accents from the pattern playing)
+function gRecStep(s, bar, hits) {
   if (gr.rec < 0) return;
   if (s < 0) { gRecStop(); return; }
   if (gr.recPos < 0) { if (s !== 0) return; gr.recPos = 0; }
-  const src = gShown(), k = (bar % gLen()) * 16 + s, R = gr.pats[gr.rec], j = gr.recPos;
-  for (let t = 0; t < 7; t++) { R.on[t][j] = src.on[t][k] ? 1 : 0; R.acc[t][j] = src.acc[t][k] ? 1 : 0; }
+  const src = gShown(), k = (bar % gLen()) * 16 + s, R = gr.pats[gr.rec], j = gr.recPos, heard = new Set(hits);
+  for (let t = 0; t < 7; t++) { R.on[t][j] = heard.has(t) ? 1 : 0; R.acc[t][j] = heard.has(t) && src.acc[t][k] ? 1 : 0; }
   gr.recPos++; gr.lens[gr.rec] = Math.max(gr.lens[gr.rec], Math.ceil(gr.recPos / 16));
   if (gr.recPos % 16 === 0) gSave();
+  if (gr.recBars && gr.recPos >= gr.recBars * 16) { gr.lens[gr.rec] = gr.recBars; gRecStop(); return; } // (its bars done)
   if (gr.recPos >= G_STEPS) gr.recPos = 0; // (round again, over the top)
 }
 function gPick(i) {
@@ -240,6 +251,10 @@ function gDraw() {
   $('m-g-more').disabled = !lanes || n >= G_BARS;
   $('m-g-grid').setAttribute('aria-pressed', lanes); $('m-g-algo').setAttribute('aria-pressed', !lanes);
   $('m-g-ins').hidden = lanes; $('m-g-ins').textContent = `insert into pattern ${gr.cur + 1}`;
+  $('m-g-recbox').hidden = lanes;
+  [...$('m-g-recbars').children].forEach((b) => b.setAttribute('aria-pressed', Number(b.dataset.n) === gr.nBars));
+  const rb = $('m-g-rec'); rb.classList.toggle('rec', gr.rec >= 0);
+  rb.textContent = gr.rec < 0 ? 'rec' : 'stop';
   $('m').classList.toggle('g-gen', !lanes);
   $('m-g-body').hidden = !lanes;
 }
@@ -260,7 +275,7 @@ onEvent = function (ev) {
   setTimeout(() => {
     if (!playing) return;
     gNow = ev.step; gNowBar = ev.bar % gLen();
-    gRecStep(ev.step, ev.bar);
+    gRecStep(ev.step, ev.bar, ev.hits);
     for (const t of new Set(ev.hits)) { const l = gLabs[t]; if (!l) continue; l.classList.add('hit'); clearTimeout(l._hit); l._hit = setTimeout(() => l.classList.remove('hit'), 90); }
     gDraw();
   }, delay);

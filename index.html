@@ -1428,6 +1428,13 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-g-src .m-toggle:last-child { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; margin-left: -1.5px; }
 .m .m-g-head #m-g-ins { min-height: 34px; padding: 0 12px; font-size: var(--fs-xs) !important; text-transform: uppercase; background: var(--ink) !important; color: var(--panel); }
 .m .m-g-head #m-g-ins[hidden] { display: none; }
+.m-g-recbox { display: flex; align-items: center; gap: 4px; }
+.m-g-recbox[hidden] { display: none; }
+.m-g-recbox > b { font-weight: 400; font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; margin-right: 2px; }
+.m-g-recbars { display: flex; gap: 3px; margin-right: 8px; }
+.m .m-g-recbars .m-toggle { min-width: 30px !important; min-height: 34px; padding: 0; font-size: var(--fs-xs) !important; }
+.m .m-g-head #m-g-rec { min-width: 0; min-height: 34px; padding: 0 12px; margin-right: 6px; font-size: var(--fs-xs) !important; text-transform: uppercase; white-space: nowrap; }
+.m .m-g-head #m-g-rec.rec { background: var(--ink) !important; color: var(--panel); animation: grec 1s steps(2) infinite; }
 .m-g-barbox, .m-g-shift, .m-g-bars { display: flex; align-items: center; gap: 3px; }
 .m-g-barbox > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; margin-right: 4px; }
 .m .m-g-bars .m-toggle { min-width: 26px !important; padding: 0 !important; }
@@ -1696,7 +1703,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 
 <main class="m" id="m">
   <header class="m-top">
-    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>227</small></b>
+    <b class="m-title" id="m-title"><span class="m-title-long">elixir</span><span class="m-title-short" aria-hidden="true"></span><small class="m-ver"><i class="m-ver-v">v</i>228</small></b>
     <button class="m-toggle m-setbtn m-optsbtn" id="m-opts" type="button" aria-label="Options">options</button>
     <button class="m-toggle m-setbtn m-optsbtn m-randbtn" id="m-rand-open" type="button" aria-expanded="false" aria-label="Randomise">randomise</button>
     <button class="m-toggle m-setbtn m-userbtn" id="m-user-open" type="button" aria-label="User settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></button>
@@ -1740,7 +1747,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
 
   <div class="m-panel" data-m-panel="grid">
     <section class="m-card m-g-card" aria-label="sequencer">
-      <div class="m-g-head"><span class="m-g-src" role="group" aria-label="what plays"><button class="m-toggle" id="m-g-grid" type="button" aria-pressed="false">grid</button><button class="m-toggle" id="m-g-algo" type="button" aria-pressed="false">algo</button></span><button class="m-toggle" id="m-g-ins" type="button" hidden>insert into pattern 1</button></div>
+      <div class="m-g-head"><span class="m-g-src" role="group" aria-label="what plays"><button class="m-toggle" id="m-g-grid" type="button" aria-pressed="false">grid</button><button class="m-toggle" id="m-g-algo" type="button" aria-pressed="false">algo</button></span><span class="m-g-recbox" id="m-g-recbox" hidden><b>bars</b><span class="m-g-recbars" id="m-g-recbars" role="group" aria-label="bars to record"></span><button class="m-toggle" id="m-g-rec" type="button">rec</button><button class="m-toggle" id="m-g-ins" type="button" hidden>insert into pattern 1</button></span></div>
       <div class="m-g-body" id="m-g-body">
         <div class="m-g-pats" id="m-g-pats" role="group" aria-label="patterns"></div>
         <div class="m-g-grid" id="m-grid"></div>
@@ -1903,7 +1910,7 @@ html.phone .m-ph { display: grid; max-width: none; grid-template-columns: 76px r
       <button class="m-btn" id="m-pdelall" type="button">delete all</button>
       <button class="m-btn m-install" id="m-install" type="button" hidden>install app</button>
     </div>
-    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v227, 13 Nov, 11:00</footer>
+    <footer class="m-foot">Erica Synths LXR-02 port, GPL-3.0, unofficial · <a href="help.html">Help</a> · <a href="https://github.com/johnnyhawk02/elixir-desktop">Source</a> · v228, 13 Nov, 11:28</footer>
   </section>
 </main>
 <main class="m m-ph" id="m-ph" aria-label="elixir">
@@ -9954,6 +9961,7 @@ const HELP = [
 <ul><li>Tap a step for on or off, or drag across steps to paint; with cmd (ctrl) it puts accents on or off.</li>
 <li><b>1</b> to <b>8</b> over the grid pick which pattern plays and is edited, straight away. Right-click one to <b>record</b> into it (from the next bar, whatever plays, until you press its STOP) or <b>clear</b> it.</li>
 <li>In algo, <b>insert into pattern N</b> (top right) puts what the generator plays into the pattern picked, its fills written out bar by bar (up to 8 bars), and goes back to grid.</li>
+<li>In algo, <b>rec</b> records what you hear (densities, mutes and your moves on the knobs included) into the pattern picked: pick <b>1, 2, 4 or 8</b> bars beside it, press rec, and from the next bar it records that many bars and stops by itself (press stop to end it sooner). It starts playing if it was stopped.</li>
 <li><b>bars</b>: a pattern is 1 to 8 bars. Tap a bar to show it (a dashed one adds bars up to it), <b>−</b> takes the last off, <b>+</b> adds a copy of the bar shown. <b>◀ ▶</b> shift the whole pattern a step (cmd/ctrl: a bar).</li>
 <li>Cmd/ctrl + c copies what plays, cmd/ctrl + v pastes it over the pattern picked. Tap a lane's name for its voice page. The patterns are kept in this browser.</li></ul>`],
   ['beat', 'algo: the generator', `<p>Tempo, genre, beat, energy, fills, var and bars; velocity, groove, depth and accent.</p>
@@ -10403,17 +10411,17 @@ const gClean = (src) => {
   return L;
 };
 // mode 'gen' (the generator plays, as before the grid) or 'lanes' (pattern cur plays); page: the bar shown
-const gr = { mode: 'gen', pats: G_SEEDS.map(gFromText), lens: new Array(G_N).fill(1), cur: 0, page: 0, rec: -1, recPos: -1 };
+const gr = { mode: 'gen', pats: G_SEEDS.map(gFromText), lens: new Array(G_N).fill(1), cur: 0, page: 0, rec: -1, recPos: -1, recBars: 0, nBars: 4 };
 try {
   const s = JSON.parse(localStorage.getItem(G_KEY));
   if (s && Array.isArray(s.pats)) {
     for (let i = 0; i < G_N; i++) if (s.pats[i]) gr.pats[i] = gClean(s.pats[i]);
     if (s.cur >= 0 && s.cur < G_N) gr.cur = s.cur;
     if (Array.isArray(s.lens)) for (let i = 0; i < G_N; i++) gr.lens[i] = Math.max(1, Math.min(G_BARS, s.lens[i] | 0 || 1));
-    gr.mode = s.mode === 'lanes' ? 'lanes' : 'gen';
+    gr.mode = s.mode === 'lanes' ? 'lanes' : 'gen'; if ([1, 2, 4, 8].includes(s.nBars)) gr.nBars = s.nBars;
   }
 } catch (e) {}
-const gSave = () => { try { localStorage.setItem(G_KEY, JSON.stringify({ pats: gr.pats, lens: gr.lens, cur: gr.cur, mode: gr.mode })); } catch (e) {} };
+const gSave = () => { try { localStorage.setItem(G_KEY, JSON.stringify({ pats: gr.pats, lens: gr.lens, cur: gr.cur, mode: gr.mode, nBars: gr.nBars })); } catch (e) {} };
 // a bar condition's cycle (0 every bar; n, -n and 1/n: n bars)
 const gPeriod = (b) => (!b ? 1 : b > 100 ? b - 100 : Math.abs(b));
 // what the generator plays, written out bar by bar (its fills and phrase), up to 8 bars: { L, n }
@@ -10519,6 +10527,14 @@ const gCells = [], gLabs = [];
   // into the pattern picked, and goes back to the grid
   $('m-g-grid').addEventListener('click', () => gPick(gr.cur));
   $('m-g-algo').addEventListener('click', () => { if (gr.mode === 'gen') return; gr.mode = 'gen'; gGenCache = null; gr.page = 0; gSend(); gDraw(); });
+  // rec (algo): from the next bar what plays goes into the pattern picked, for the bars chosen beside it, then stops
+  for (const n of [1, 2, 4, 8]) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'm-toggle'; b.textContent = String(n); b.dataset.n = n;
+    b.setAttribute('aria-label', `record ${n} bar${n > 1 ? 's' : ''}`);
+    b.addEventListener('click', () => { gr.nBars = n; gSave(); gDraw(); });
+    $('m-g-recbars').append(b);
+  }
+  $('m-g-rec').addEventListener('click', () => { if (gr.rec >= 0) gRecStop(); else gRecStart(gr.cur, gr.nBars); });
   $('m-g-ins').addEventListener('click', () => {
     const { L, n } = gGen();
     if (gr.rec === gr.cur) gRecStop();
@@ -10562,22 +10578,25 @@ function gClear(i) {
 // Recording a pattern: it empties, its button says STOP, and from the next bar what is heard (whichever pattern plays,
 // or the generator) is written into it step by step; it loops over its 128 steps (8 bars), overwriting, until its button
 // is pressed (stopping the transport stops it too)
-function gRecStart(i) {
-  gr.rec = i; gr.recPos = -1;
+// (bars: stop by itself after that many bars, 0 = loop until stopped)
+function gRecStart(i, bars = 0) {
+  gr.rec = i; gr.recPos = -1; gr.recBars = bars;
   gr.pats[i] = gEmpty(); gr.lens[i] = 1;
   if (gr.mode === 'lanes' && gr.cur === i) { const o = [...Array(G_N).keys()].find((j) => j !== i && gr.pats[j].on.some((r) => r.some(Boolean))); if (o !== undefined) gPick(o); else { gr.mode = 'gen'; gSend(); } }
   if (!playing) $('m-play').click();
   gSave(); gDraw();
 }
-function gRecStop() { gr.rec = -1; gr.recPos = -1; gSave(); gDraw(); }
-function gRecStep(s, bar) {
+function gRecStop() { gr.rec = -1; gr.recPos = -1; gr.recBars = 0; gSave(); gDraw(); }
+// (what is heard: the step's hits as played, after the densities and mutes; their accents from the pattern playing)
+function gRecStep(s, bar, hits) {
   if (gr.rec < 0) return;
   if (s < 0) { gRecStop(); return; }
   if (gr.recPos < 0) { if (s !== 0) return; gr.recPos = 0; }
-  const src = gShown(), k = (bar % gLen()) * 16 + s, R = gr.pats[gr.rec], j = gr.recPos;
-  for (let t = 0; t < 7; t++) { R.on[t][j] = src.on[t][k] ? 1 : 0; R.acc[t][j] = src.acc[t][k] ? 1 : 0; }
+  const src = gShown(), k = (bar % gLen()) * 16 + s, R = gr.pats[gr.rec], j = gr.recPos, heard = new Set(hits);
+  for (let t = 0; t < 7; t++) { R.on[t][j] = heard.has(t) ? 1 : 0; R.acc[t][j] = heard.has(t) && src.acc[t][k] ? 1 : 0; }
   gr.recPos++; gr.lens[gr.rec] = Math.max(gr.lens[gr.rec], Math.ceil(gr.recPos / 16));
   if (gr.recPos % 16 === 0) gSave();
+  if (gr.recBars && gr.recPos >= gr.recBars * 16) { gr.lens[gr.rec] = gr.recBars; gRecStop(); return; } // (its bars done)
   if (gr.recPos >= G_STEPS) gr.recPos = 0; // (round again, over the top)
 }
 function gPick(i) {
@@ -10607,6 +10626,10 @@ function gDraw() {
   $('m-g-more').disabled = !lanes || n >= G_BARS;
   $('m-g-grid').setAttribute('aria-pressed', lanes); $('m-g-algo').setAttribute('aria-pressed', !lanes);
   $('m-g-ins').hidden = lanes; $('m-g-ins').textContent = `insert into pattern ${gr.cur + 1}`;
+  $('m-g-recbox').hidden = lanes;
+  [...$('m-g-recbars').children].forEach((b) => b.setAttribute('aria-pressed', Number(b.dataset.n) === gr.nBars));
+  const rb = $('m-g-rec'); rb.classList.toggle('rec', gr.rec >= 0);
+  rb.textContent = gr.rec < 0 ? 'rec' : 'stop';
   $('m').classList.toggle('g-gen', !lanes);
   $('m-g-body').hidden = !lanes;
 }
@@ -10627,7 +10650,7 @@ onEvent = function (ev) {
   setTimeout(() => {
     if (!playing) return;
     gNow = ev.step; gNowBar = ev.bar % gLen();
-    gRecStep(ev.step, ev.bar);
+    gRecStep(ev.step, ev.bar, ev.hits);
     for (const t of new Set(ev.hits)) { const l = gLabs[t]; if (!l) continue; l.classList.add('hit'); clearTimeout(l._hit); l._hit = setTimeout(() => l.classList.remove('hit'), 90); }
     gDraw();
   }, delay);

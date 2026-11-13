@@ -28,6 +28,7 @@ const HELP = [
 <ul><li>Tap a step for on or off, or drag across steps to paint; with cmd (ctrl) it puts accents on or off.</li>
 <li><b>1</b> to <b>8</b> over the grid pick which pattern plays and is edited, straight away. Right-click one to <b>record</b> into it (from the next bar, whatever plays, until you press its STOP) or <b>clear</b> it.</li>
 <li>In algo, <b>insert into pattern N</b> (top right) puts what the generator plays into the pattern picked, its fills written out bar by bar (up to 8 bars), and goes back to grid.</li>
+<li>In algo, <b>rec</b> records what you hear (densities, mutes and your moves on the knobs included) into the pattern picked: pick <b>1, 2, 4 or 8</b> bars beside it, press rec, and from the next bar it records that many bars and stops by itself (press stop to end it sooner). It starts playing if it was stopped.</li>
 <li><b>bars</b>: a pattern is 1 to 8 bars. Tap a bar to show it (a dashed one adds bars up to it), <b>−</b> takes the last off, <b>+</b> adds a copy of the bar shown. <b>◀ ▶</b> shift the whole pattern a step (cmd/ctrl: a bar).</li>
 <li>Cmd/ctrl + c copies what plays, cmd/ctrl + v pastes it over the pattern picked. Tap a lane's name for its voice page. The patterns are kept in this browser.</li></ul>`],
   ['beat', 'algo: the generator', `<p>Tempo, genre, beat, energy, fills, var and bars; velocity, groove, depth and accent.</p>

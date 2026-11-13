@@ -551,6 +551,13 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 .m .m-g-src .m-toggle:last-child { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; margin-left: -1.5px; }
 .m .m-g-head #m-g-ins { min-height: 34px; padding: 0 12px; font-size: var(--fs-xs) !important; text-transform: uppercase; background: var(--ink) !important; color: var(--panel); }
 .m .m-g-head #m-g-ins[hidden] { display: none; }
+.m-g-recbox { display: flex; align-items: center; gap: 4px; }
+.m-g-recbox[hidden] { display: none; }
+.m-g-recbox > b { font-weight: 400; font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; margin-right: 2px; }
+.m-g-recbars { display: flex; gap: 3px; margin-right: 8px; }
+.m .m-g-recbars .m-toggle { min-width: 30px !important; min-height: 34px; padding: 0; font-size: var(--fs-xs) !important; }
+.m .m-g-head #m-g-rec { min-width: 0; min-height: 34px; padding: 0 12px; margin-right: 6px; font-size: var(--fs-xs) !important; text-transform: uppercase; white-space: nowrap; }
+.m .m-g-head #m-g-rec.rec { background: var(--ink) !important; color: var(--panel); animation: grec 1s steps(2) infinite; }
 .m-g-barbox, .m-g-shift, .m-g-bars { display: flex; align-items: center; gap: 3px; }
 .m-g-barbox > b { font-weight: 400; text-transform: uppercase; letter-spacing: .08em; margin-right: 4px; }
 .m .m-g-bars .m-toggle { min-width: 26px !important; padding: 0 !important; }
