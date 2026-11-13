@@ -24,6 +24,9 @@ mFader($('m-beat-faders'), 'bars', { min: 0, max: 1, get: () => (perf.bars === 8
 // ---- the perf page's own controls: tempo, the sound macros and crossfeed. They live in a hidden box;
 // the page shows twelve assignable slots (below, after the x/y page's lists), these six by default ----
 mFader($('m-perf-src'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo}\nbpm`, travel: 2 });
+// (laptop) the tempo again on the title line, by play and rec: a number box, dragged up or down, scrolled, double-click resets
+mFader($('m-trans'), 'tempo', { ...pf('tempo'), show: () => `${perf.tempo} bpm`, num: true });
+$('m-trans').prepend($('m-trans').lastElementChild);
 // the sound macros, as on the desktop's pattern card: 100 (pitch 24) is the middle, the sound as it is
 for (const [m, label] of [['pitch', 'pitch'], ['decay', 'decay'], ['filter', 'filter'], ['fm', 'fm']]) {
   const pitch = m === 'pitch';

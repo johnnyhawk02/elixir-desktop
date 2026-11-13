@@ -163,6 +163,7 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
 /* play, rec, rec loop */
 .m-trans { padding: 8px 0; display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; align-items: stretch; }
 .m > .m-card.m-trans { border-bottom: var(--rule); }
+.m-trans > .m-num { display: none; }
 .m-play { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; background: var(--ink) !important;
   color: var(--panel) !important; font-weight: 400; text-transform: uppercase; }
 .m .m-play { border: 2px solid var(--ink); border-radius: 3px; letter-spacing: .1em; font-size: var(--fs-m) !important; }
@@ -582,7 +583,13 @@ body { padding: max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-i
   .m .m-title .m-ver { position: absolute; left: 0; width: 46px; top: 58%; transform: translateY(-50%); margin: 0; text-align: center;
     color: var(--panel); opacity: 1; font-size: 15px; letter-spacing: 0; text-shadow: none; pointer-events: none; }
   .m .m-optsbtn { display: grid; padding: 0 10px !important; font-size: var(--fs-xs) !important; letter-spacing: .04em; }
-  .m > .m-card.m-trans { grid-area: 1 / 2; border-bottom: 0; padding: 6px 0 10px 24px; grid-template-columns: 130px 130px; justify-content: end; }
+  .m > .m-card.m-trans { grid-area: 1 / 2; border-bottom: 0; padding: 6px 0 10px 24px; grid-template-columns: 120px 130px 130px; justify-content: end; }
+  /* (the tempo by play and rec: a box with its bpm in it, the same height as the buttons) */
+  .m-trans > .m-num { display: block; min-width: 0; }
+  .m-trans > .m-num output, .m-trans > .m-num .m-flab { display: none; }
+  .m .m-trans > .m-num .m-vtrack { width: 100%; height: 100%; min-height: 38px; border: 2px solid var(--ink); border-radius: 4px; background: none; display: grid; place-items: center; overflow: hidden; cursor: ns-resize; }
+  .m .m-trans > .m-num .m-vtrack i, .m .m-trans > .m-num .m-vtrack b { display: none; }
+  .m .m-trans > .m-num .m-vtrack::after { content: attr(aria-valuetext); font-size: var(--fs-s); letter-spacing: .06em; text-transform: uppercase; line-height: 1; }
   .m .m-play, .m .m-rec { min-height: 38px; }
   .m .m-trans .m-loop { display: none; }
   /* (the presets bar in the middle of the title line) */
