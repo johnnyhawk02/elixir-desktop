@@ -158,7 +158,7 @@ $('m-pexport').addEventListener('click', async () => {
   const blob = new Blob([JSON.stringify({ elixir: 1, presets: list }, null, 1)], { type: 'application/json' });
   await mOffer({ blob, name: 'elixir-desktop-presets.json' }, 'application/json');
 });
-// clear all (in settings): every saved preset deleted and every star cleared (the built-in ones stay)
+// clear all (in settings, and delete all in manage presets): every saved preset deleted and every star cleared
 function mClearAll() {
   const mine = kitList.filter((k) => k.saved), cur = kitList[Number($('kit').value)];
   for (const k of mine) kitList.splice(kitList.indexOf(k), 1);
@@ -167,6 +167,10 @@ function mClearAll() {
   mDrawPresets();
   return mine.length;
 }
+$('m-pdelall').addEventListener('click', () => {
+  const n = kitList.filter((k) => k.saved).length;
+  if (n && confirm(`Delete all ${n} preset${n > 1 ? 's' : ''}? This can't be undone.`)) mClearAll();
+});
 
 
 // ---- manage presets: a pop-up under its button; it stays open to try one after another, and a click elsewhere or esc

@@ -7,7 +7,7 @@ Elixir (they are this format, minus the additions below), but a preset saved her
 Every preset with a kit is brought into the current format (`PRESET_V` in `app/presets.js`, `toCurrent`) as it's read,
 whether built in, stored in this browser (rewritten in place) or imported, even when that changes how it sounds: v5
 drops the distortion sends (`fx3.dsend`; the distortion is now an insert on the whole mix, `fx3.params.dist.mix`,
-0 = off), gives the master its spacer (`space: 0`), and drops a song too old to have its pattern pages and rush
+0 = off), drops the old sidechain settings (`duck`, `duckRelease`, `duckFx`, `duckOn`, `space`; the sidechain was removed), and drops a song too old to have its pattern pages and rush
 settings (the preset loads its sound alone). The built-in presets in `presets/*.json` are kept in the current
 format (`build.mjs` refuses one in any other version).
 
@@ -24,7 +24,6 @@ format (`build.mjs` refuses one in any other version).
 
 ## Additions in Elixir Mobile
 
-- `song.master.space`: the sidechain's spacer, 0..100 (missing means 0).
 - `song.seqs`: the step sequencers, `{ "<box id>:<fader label>": { on, len, slew, step, depth, rel, vals } }`, where `len` is 2..16, `slew` 0..100 (how much of a step it glides over), `step`
   how long each step lasts in 16ths (1, 2, 4, 8, 16, 32, 64 or 128: a 16th note up to 8 bars; missing means 1), `depth`
   0..100 (how far a step can move the fader, as a share of its range, either way; missing means 50), `rel: true`, and
