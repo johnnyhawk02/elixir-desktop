@@ -1,4 +1,4 @@
-// ---- knob seqs (in the randomise pop-up): every perform knob but tempo, genre and beat gets a new step sequencer, switched on: 8 or 16 steps,
+// ---- knob seqs (in the randomise pop-up): every perform knob gets a new step sequencer, switched on: 8 or 16 steps,
 // each step a 16th up to 8 bars long, picked mostly from the long ones (the chance grows with the square of the
 // length's place: 8 bars is 64 times as likely as a 16th), its steps made one of the five random ways, with a random
 // depth and slew. Undo puts the knobs' sequencers back ----
@@ -17,8 +17,8 @@ const mSeqRandStep = () => {
   for (let i = 0; i < SEQ_STEPS.length; i++) if ((r -= SEQR_W[i]) < 0) return SEQ_STEPS[i];
   return SEQ_STEPS[SEQ_STEPS.length - 1];
 };
-// (any knob, whatever it's assigned to, except tempo, genre and beat, which it leaves alone)
-const SEQR_SKIP = ['tempo', 'genre', 'beat'];
+// (any knob, whatever it's assigned to; only tempo, which has no sequencer, is left alone)
+const SEQR_SKIP = ['tempo'];
 const mKnobFaders = () => mFaders.filter((f) => {
   const m = /^m-faders:slot(\d+)$/.exec(f.key), sl = m && mSlots[Number(m[1])];
   return sl && !((sl[0] === 'perf' || sl[0] === 'beat') && SEQR_SKIP.includes(sl[2]));

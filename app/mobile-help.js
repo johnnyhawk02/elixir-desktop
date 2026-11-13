@@ -12,7 +12,7 @@ const HELP = [
 <p>The <b>randomise</b> button opens a pop-up with all the randomisers and undo (it stays open while you click; click elsewhere or esc to close):</p>
 <ul><li><b>everything</b>: a new beat (genre, groove, kit, effects, mix). <b>kit</b>: new sounds. <b>alter</b>: the sounds nudged about 10%. <b>pattern</b>: a new beat on the same sounds.</li>
 <li><b>crossfeed</b>: a new crossfeed patch (see fx). <b>random fx</b>: new effects and sends. <b>alter fx</b>: the effects nudged.</li>
-<li><b>knob seqs</b>: a new step sequencer on every perform knob except tempo, genre and beat: 8 or 16 steps, each step a 16th up to 8 bars long (mostly the long ones), random steps, depth and slew. Undo puts the old ones back.</li>
+<li><b>knob seqs</b>: a new step sequencer on every perform knob: 8 or 16 steps, each step a 16th up to 8 bars long (mostly the long ones), random steps, depth and slew. Undo puts the old ones back.</li>
 <li>Click to randomise. Drag up or down on one to set how far it goes, 10% to 100% (a dotted bar along its foot below 100%): at 30% it moves everything only 30% of the way to the new sound, and switches choices like the style 30% of the time.</li>
 <li>Hold one still for half a second for its settings, the ranges and chances it uses.</li>
 <li><b>options</b> › <b>randomise on next bar</b>: while playing, randomises wait for the start of the next bar (the button flashes until then).</li></ul>`],
